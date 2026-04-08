@@ -1,0 +1,43 @@
+# ─────────────────────────────────────────────
+# Slide Builder - Project Configuration
+# ─────────────────────────────────────────────
+# This file drives the build (stitch) and split operations.
+# Edit the slides list to match your deck.
+
+# Presentation metadata (injected into <title> and <meta>)
+title: "Presentation Title"
+author: "Author"
+date_label: ""
+
+# Dimensions of the slide canvas (px)
+canvas:
+  width: 960
+  height: 540
+
+# Google Fonts to load
+fonts: []
+#  - family: "Inter"
+#    weights: [400, 600, 700]
+
+# External scripts loaded before slides render
+external_scripts: []
+#  - "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"
+
+# Ordered list of slide partial files (relative to slides_dir)
+slides: []
+#  - file: "00-title.html"
+#    class: "s1"
+#    label: "Title"
+
+# Paths (relative to this config file)
+paths:
+  slides_dir: "output/slides"
+  styles_file: "design/styles.css"
+  script_file: "design/script.js"
+  output_dir: "output/slide-deck"
+  output_filename: "presentation.html"
+
+# Slide numbering
+numbering:
+  enabled: true
+  format: "{current} / {total}"
