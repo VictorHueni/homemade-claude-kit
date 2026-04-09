@@ -7,7 +7,18 @@ projects and synced across machines via dotfiles.
 
 | Skill | Description |
 |-------|-------------|
+| [bug-rca](./bug-rca/) | Systematic bug root cause analysis and fix recommendations |
+| [docs-auditor](./docs-auditor/) | Scan repo docs for stale, outdated, and dead documentation |
+| [git-commit](./git-commit/) | Conventional commit message analysis and generation |
+| [idea-generator](./idea-generator/) | Create and manage structured idea files |
+| [pr-creator](./pr-creator/) | Create PRs following repo templates and standards |
+| [ralph-loop-runner](./ralph-loop-runner/) | Autonomous implementation loop: implement, test, commit, repeat |
 | [slide-builder-skill](./slide-builder-skill/) | Build single-file HTML slide decks from modular partials |
+| [spec-adr-manager](./spec-adr-manager/) | Architecture Decision Records (MADR 4.x) |
+| [spec-implementation-planner](./spec-implementation-planner/) | Small-step, testable implementation roadmaps from PRDs |
+| [spec-peer-reviewer](./spec-peer-reviewer/) | Review PRDs and plans for gaps and delivery risks |
+| [spec-prd-creator](./spec-prd-creator/) | Generate Product Requirements Documents |
+| [using-git-worktrees](./using-git-worktrees/) | Guide for Git worktree workflows |
 
 ## Install
 
