@@ -44,7 +44,7 @@ for skill_dir in "$SCRIPT_DIR"/*/; do
 
     ln -s "$skill_dir" "$link"
     echo "  ✓ $skill_name → $skill_dir"
-    ((installed++))
+    installed=$((installed + 1))
 done
 
 echo ""
