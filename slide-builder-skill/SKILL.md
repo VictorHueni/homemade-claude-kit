@@ -250,6 +250,7 @@ Run through this before every build. Items 1-4 are startup gates.
 9. [ ] Content aligns with the brief (tone, audience, key messages)
 10. [ ] Build runs without errors
 11. [ ] Output file opens correctly in a browser
+12. [ ] Slides scale correctly on mobile viewports (baseline responsive is auto-injected by build.py)
 
 ---
 

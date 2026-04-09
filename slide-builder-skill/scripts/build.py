@@ -56,6 +56,38 @@ def build_font_url(fonts: list) -> str:
     return f"https://fonts.googleapis.com/css2?{'&'.join(families)}&display=swap"
 
 
+BASELINE_CSS = """\
+/* ── Baseline: mobile responsive scaling ── */
+@media (max-width: 980px) {
+  body:not(.presenting) {
+    padding: 1rem 0;
+    gap: 1rem;
+  }
+  body:not(.presenting) .slide {
+    transform: scale(var(--slide-scale, 1));
+    transform-origin: top center;
+    margin-bottom: calc(540px * (var(--slide-scale, 1) - 1));
+  }
+}
+"""
+
+BASELINE_JS = """\
+// ── Baseline: mobile responsive scaling ──
+(function() {
+  function setMobileScale() {
+    if (window.innerWidth < 980) {
+      var scale = (window.innerWidth - 16) / 960;
+      document.documentElement.style.setProperty('--slide-scale', scale);
+    } else {
+      document.documentElement.style.removeProperty('--slide-scale');
+    }
+  }
+  setMobileScale();
+  window.addEventListener('resize', setMobileScale);
+})();
+"""
+
+
 def build_head(cfg: dict) -> str:
     font_url = build_font_url(cfg.get("fonts", []))
     font_tags = ""
@@ -114,10 +146,12 @@ def build(config_path: Path, output_override: str = None):
     # Head
     parts = [build_head(cfg)]
 
-    # Styles
+    # Styles (project + baseline responsive)
     css = read_file(styles_path)
     if css:
-        parts.append(f"<style>\n{css}\n</style>")
+        parts.append(f"<style>\n{css}\n{BASELINE_CSS}\n</style>")
+    else:
+        parts.append(f"<style>\n{BASELINE_CSS}\n</style>")
     parts.append("</head>\n<body>\n")
 
     # Controls hint
@@ -153,10 +187,9 @@ def build(config_path: Path, output_override: str = None):
         parts.append("\n")
         print(" OK")
 
-    # Script
+    # Script (baseline responsive + project)
     js = read_file(script_path)
-    if js:
-        parts.append(f"\n<script>\n{js}\n</script>\n")
+    parts.append(f"\n<script>\n{BASELINE_JS}\n{js}\n</script>\n")
 
     parts.append("</body>\n</html>\n")
 
