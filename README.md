@@ -1,7 +1,8 @@
-# Homemade Agent Skills
+# Homemade Claude Kit
 
-Reusable skills for Claude Code. Single source of truth — symlinked into
-projects and synced across machines via dotfiles.
+A personal collection of Claude Code extensions — **skills** and **slash commands** —
+managed as a single source of truth, symlinked into `~/.claude/` and synced across
+machines via dotfiles.
 
 ## Skills
 
@@ -20,35 +21,47 @@ projects and synced across machines via dotfiles.
 | [spec-prd-creator](./spec-prd-creator/) | Generate Product Requirements Documents |
 | [using-git-worktrees](./using-git-worktrees/) | Guide for Git worktree workflows |
 
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| [ralph-audit](./commands/ralph-audit.md) | Audit an execution plan against Ralph Loop requirements |
+
 ## Install
 
 ```bash
 # Clone once
-git clone git@github.com:VictorHueni/homemade-agents-skills.git ~/projets/homemade-agents-skills
+git clone git@github.com:VictorHueni/homemade-claude-kit.git ~/projets/homemade-claude-kit
 
-# Symlink all skills globally (~/.claude/skills/)
+# Symlink everything globally (~/.claude/skills/ + ~/.claude/commands/)
 ./install.sh
 
-# Or symlink into a specific project
+# Or symlink into a specific project (.claude/skills/ + .claude/commands/)
 ./install.sh /path/to/my-project
 ```
 
 ## Update
 
 ```bash
-cd ~/projets/homemade-agents-skills
+cd ~/projets/homemade-claude-kit
 git pull
 # Symlinks already point here — done.
 ```
 
 ## Workflow
 
-1. **Edit** a skill from any project (symlinks point to this repo)
+1. **Edit** a skill or command from any project (symlinks point to this repo)
 2. **Commit** the change here (the source of truth)
 3. **Pull** on other machines — every project sees the update instantly
 
 ## Adding a new skill
 
 1. Create a directory: `my-skill/SKILL.md` + supporting files
+2. Run `./install.sh` to symlink it
+3. Commit and push
+
+## Adding a new command
+
+1. Create a markdown file: `commands/my-command.md` (with the standard slash-command frontmatter)
 2. Run `./install.sh` to symlink it
 3. Commit and push
