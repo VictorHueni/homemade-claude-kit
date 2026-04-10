@@ -3,36 +3,39 @@
 # Homemade Agent Skills — Install / Sync
 # ─────────────────────────────────────────────
 # Usage:
-#   ./install.sh                  # symlink all skills to ~/.claude/skills/
-#   ./install.sh /path/to/project # symlink all skills into a project's .claude/skills/
+#   ./install.sh                  # symlink all skills & commands to ~/.claude/
+#   ./install.sh /path/to/project # symlink into a project's .claude/
 #
-# Run again after git pull to pick up new skills automatically.
+# Run again after git pull to pick up new skills or commands automatically.
 # ─────────────────────────────────────────────
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Determine target directory
+# Determine target base directory
 if [[ $# -ge 1 ]]; then
-    TARGET="$1/.claude/skills"
-    echo "Installing skills into project: $1"
+    BASE="$1/.claude"
+    echo "Installing into project: $1"
 else
-    TARGET="$HOME/.claude/skills"
-    echo "Installing skills globally: $TARGET"
+    BASE="$HOME/.claude"
+    echo "Installing globally: $BASE"
 fi
 
-mkdir -p "$TARGET"
+SKILLS_TARGET="$BASE/skills"
+COMMANDS_TARGET="$BASE/commands"
 
-# Find all skill directories (contain a SKILL.md)
-installed=0
+mkdir -p "$SKILLS_TARGET" "$COMMANDS_TARGET"
+
+# ── Skills: each top-level dir containing SKILL.md → symlinked directory
+installed_skills=0
 for skill_dir in "$SCRIPT_DIR"/*/; do
     skill_name="$(basename "$skill_dir")"
 
     # Skip if no SKILL.md (not a real skill)
     [[ -f "$skill_dir/SKILL.md" ]] || continue
 
-    link="$TARGET/$skill_name"
+    link="$SKILLS_TARGET/$skill_name"
 
     # Remove existing (stale symlink or old copy)
     if [[ -L "$link" ]]; then
@@ -43,9 +46,30 @@ for skill_dir in "$SCRIPT_DIR"/*/; do
     fi
 
     ln -s "$skill_dir" "$link"
-    echo "  ✓ $skill_name → $skill_dir"
-    installed=$((installed + 1))
+    echo "  ✓ skill:   $skill_name"
+    installed_skills=$((installed_skills + 1))
 done
 
+# ── Commands: each *.md file in commands/ → symlinked file
+installed_commands=0
+if [[ -d "$SCRIPT_DIR/commands" ]]; then
+    for cmd_file in "$SCRIPT_DIR/commands"/*.md; do
+        # Handle empty commands/ directory (glob yields literal pattern)
+        [[ -f "$cmd_file" ]] || continue
+
+        cmd_name="$(basename "$cmd_file")"
+        link="$COMMANDS_TARGET/$cmd_name"
+
+        # Remove existing (stale symlink or plain file copy)
+        if [[ -L "$link" ]] || [[ -f "$link" ]]; then
+            rm "$link"
+        fi
+
+        ln -s "$cmd_file" "$link"
+        echo "  ✓ command: $cmd_name"
+        installed_commands=$((installed_commands + 1))
+    done
+fi
+
 echo ""
-echo "Done. $installed skill(s) linked to $TARGET"
+echo "Done. $installed_skills skill(s) + $installed_commands command(s) linked to $BASE"
