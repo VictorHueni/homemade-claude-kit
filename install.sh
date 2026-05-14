@@ -45,7 +45,7 @@ for skill_dir in "$SCRIPT_DIR"/*/; do
         rm -rf "$link"
     fi
 
-    ln -s "$skill_dir" "$link"
+    ln -s "$(realpath --relative-to="$(dirname "$link")" "$skill_dir")" "$link"
     echo "  ✓ skill:   $skill_name"
     installed_skills=$((installed_skills + 1))
 done
@@ -65,7 +65,7 @@ if [[ -d "$SCRIPT_DIR/commands" ]]; then
             rm "$link"
         fi
 
-        ln -s "$cmd_file" "$link"
+        ln -s "$(realpath --relative-to="$(dirname "$link")" "$cmd_file")" "$link"
         echo "  ✓ command: $cmd_name"
         installed_commands=$((installed_commands + 1))
     done
