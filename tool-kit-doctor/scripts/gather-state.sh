@@ -94,10 +94,11 @@ check_symlinks_in() {
 
         if [ -L "$entry" ]; then
             target="$(readlink "$entry")"
+            resolved="$(readlink -f "$entry" 2>/dev/null || echo "")"
             if [ ! -e "$entry" ]; then
                 broken=$((broken + 1))
                 fail "$label/$name → BROKEN symlink ($target)"
-            elif [[ "$target" != "$KIT_DIR/"* ]]; then
+            elif [[ "$resolved" != "$KIT_DIR/"* ]]; then
                 wrong_target=$((wrong_target + 1))
                 warn "$label/$name → wrong target ($target)"
             else
