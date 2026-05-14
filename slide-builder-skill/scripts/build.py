@@ -56,35 +56,68 @@ def build_font_url(fonts: list) -> str:
     return f"https://fonts.googleapis.com/css2?{'&'.join(families)}&display=swap"
 
 
-BASELINE_CSS = """\
+def make_baseline_css(canvas_w: int, canvas_h: int) -> str:
+    return f"""\
+/* ── Baseline: controls hint ── */
+.controls-hint {{
+  text-align: center;
+  padding: 10px 0 6px;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  color: #888;
+  user-select: none;
+}}
+.controls-hint kbd {{
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 11px;
+  background: #f5f5f5;
+  color: #444;
+}}
+/* ── Baseline: presentation mode ── */
+body.presenting {{
+  background: #111;
+  overflow: hidden;
+}}
+body.presenting .controls-hint {{ display: none; }}
+body.presenting .slide:not(.active) {{ display: none; }}
+body.presenting .slide.active {{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+}}
 /* ── Baseline: mobile responsive scaling ── */
-@media (max-width: 980px) {
-  body:not(.presenting) {
+@media (max-width: 980px) {{
+  body:not(.presenting) {{
     padding: 1rem 0;
     gap: 1rem;
-  }
-  body:not(.presenting) .slide {
+  }}
+  body:not(.presenting) .slide {{
     transform: scale(var(--slide-scale, 1));
     transform-origin: top center;
-    margin-bottom: calc(540px * (var(--slide-scale, 1) - 1));
-  }
-}
+    margin-bottom: calc({canvas_h}px * (var(--slide-scale, 1) - 1));
+  }}
+}}
 """
 
-BASELINE_JS = """\
+
+def make_baseline_js(canvas_w: int) -> str:
+    return f"""\
 // ── Baseline: mobile responsive scaling ──
-(function() {
-  function setMobileScale() {
-    if (window.innerWidth < 980) {
-      var scale = (window.innerWidth - 16) / 960;
+(function() {{
+  function setMobileScale() {{
+    if (window.innerWidth < 980) {{
+      var scale = (window.innerWidth - 16) / {canvas_w};
       document.documentElement.style.setProperty('--slide-scale', scale);
-    } else {
+    }} else {{
       document.documentElement.style.removeProperty('--slide-scale');
-    }
-  }
+    }}
+  }}
   setMobileScale();
   window.addEventListener('resize', setMobileScale);
-})();
+}})();
 """
 
 
@@ -146,12 +179,19 @@ def build(config_path: Path, output_override: str = None):
     # Head
     parts = [build_head(cfg)]
 
+    # Canvas dimensions (used by baseline CSS/JS)
+    canvas = cfg.get("canvas", {})
+    canvas_w = int(canvas.get("width",  960))
+    canvas_h = int(canvas.get("height", 540))
+    baseline_css = make_baseline_css(canvas_w, canvas_h)
+    baseline_js  = make_baseline_js(canvas_w)
+
     # Styles (project + baseline responsive)
     css = read_file(styles_path)
     if css:
-        parts.append(f"<style>\n{css}\n{BASELINE_CSS}\n</style>")
+        parts.append(f"<style>\n{css}\n{baseline_css}\n</style>")
     else:
-        parts.append(f"<style>\n{BASELINE_CSS}\n</style>")
+        parts.append(f"<style>\n{baseline_css}\n</style>")
     parts.append("</head>\n<body>\n")
 
     # Controls hint
@@ -189,7 +229,7 @@ def build(config_path: Path, output_override: str = None):
 
     # Script (baseline responsive + project)
     js = read_file(script_path)
-    parts.append(f"\n<script>\n{BASELINE_JS}\n{js}\n</script>\n")
+    parts.append(f"\n<script>\n{baseline_js}\n{js}\n</script>\n")
 
     parts.append("</body>\n</html>\n")
 
