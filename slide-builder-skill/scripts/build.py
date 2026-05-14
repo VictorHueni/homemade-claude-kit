@@ -19,6 +19,7 @@ import argparse
 import re
 import sys
 import textwrap
+import urllib.parse
 from pathlib import Path
 
 try:
@@ -56,6 +57,74 @@ def build_font_url(fonts: list) -> str:
     return f"https://fonts.googleapis.com/css2?{'&'.join(families)}&display=swap"
 
 
+def load_bibliography(config: dict, base: Path) -> dict:
+    """Load context/bibliography.yaml if configured. Returns {key: source_dict}.
+
+    Returns an empty dict silently if the file is absent or the path is not
+    configured — so existing projects without a bibliography are unaffected.
+    """
+    bib_rel = config.get("paths", {}).get("bibliography_file", "")
+    if not bib_rel:
+        return {}
+    bib_path = resolve_path(base, bib_rel)
+    if not bib_path.exists():
+        return {}
+    with open(bib_path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    return data.get("sources", {}) or {}
+
+
+def format_source_bar(keys: list, bibliography: dict) -> str:
+    """Resolve source keys and return a formatted .slide-source-bar div.
+
+    Format per source: "Org · Title (year) — domain"
+    Multiple sources joined by " &nbsp;|&nbsp; ".
+    Unknown keys emit a build warning and are skipped without failing the build.
+    """
+    parts = []
+    for key in keys:
+        key = key.strip()
+        if not key:
+            continue
+        if key not in bibliography:
+            print(f"  [WARN] bibliography key not found: '{key}'")
+            continue
+        s = bibliography[key]
+        # Build label: prefer org as primary identifier
+        label = s.get("org", "") or s.get("title", key)
+        title = s.get("title", "")
+        if title and title != label:
+            label = f"{label} · {title}"
+        year = s.get("year")
+        if year:
+            label += f" ({year})"
+        url = s.get("url", "")
+        if url:
+            domain = urllib.parse.urlparse(url).netloc.lstrip("www.")
+            label += f" — {domain}"
+        parts.append(label)
+    if not parts:
+        return ""
+    return (
+        '<div class="slide-source-bar">'
+        + " &nbsp;|&nbsp; ".join(parts)
+        + "</div>"
+    )
+
+
+def inject_before_slide_end(slide_html: str, injection: str) -> str:
+    """Insert injection content just before the root .slide div's closing tag.
+
+    Relies on the invariant that every slide partial ends with </div> (the root
+    .slide closing tag) as the last non-whitespace content. The slide-number div
+    closes before it, so rstrip() + endswith("</div>") reliably targets the root.
+    """
+    stripped = slide_html.rstrip()
+    if stripped.endswith("</div>"):
+        return stripped[: -len("</div>")] + injection + "\n</div>\n"
+    return slide_html  # fallback: return unchanged if invariant not met
+
+
 def make_baseline_css(canvas_w: int, canvas_h: int) -> str:
     return f"""\
 /* ── Baseline: controls hint ── */
@@ -87,6 +156,21 @@ body.presenting .slide.active {{
   position: fixed;
   top: 50%;
   left: 50%;
+}}
+/* ── Baseline: source bar ── */
+.slide-source-bar {{
+  position: absolute;
+  bottom: 28px;
+  left: 72px;
+  right: 52px;
+  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-size: 10px;
+  color: var(--dim, #8C8C8C);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
 }}
 /* ── Baseline: mobile responsive scaling ── */
 @media (max-width: 980px) {{
@@ -176,6 +260,11 @@ def build(config_path: Path, output_override: str = None):
     print(f"[BUILD] Slides:  {slides_dir}")
     print(f"[BUILD] Output:  {output_file}")
 
+    # Bibliography (optional — empty dict if absent or not configured)
+    bibliography = load_bibliography(cfg, base)
+    if bibliography:
+        print(f"[BUILD] Sources: {len(bibliography)} entries in bibliography")
+
     # Head
     parts = [build_head(cfg)]
 
@@ -186,7 +275,7 @@ def build(config_path: Path, output_override: str = None):
     baseline_css = make_baseline_css(canvas_w, canvas_h)
     baseline_js  = make_baseline_js(canvas_w)
 
-    # Styles (project + baseline responsive)
+    # Styles (project + baseline)
     css = read_file(styles_path)
     if css:
         parts.append(f"<style>\n{css}\n{baseline_css}\n</style>")
@@ -221,6 +310,17 @@ def build(config_path: Path, output_override: str = None):
 
         if num_enabled:
             html = update_slide_numbers(html, idx, total, num_format)
+
+        # Inject source bar if the slide declares data-sources and bibliography exists
+        if bibliography:
+            sources_match = re.search(
+                r'data-sources=["\']([^"\']+)["\']', html
+            )
+            if sources_match:
+                keys = sources_match.group(1).split(",")
+                source_bar = format_source_bar(keys, bibliography)
+                if source_bar:
+                    html = inject_before_slide_end(html, "\n" + source_bar)
 
         parts.append(f"\n<!-- slide {idx}: {label} -->\n")
         parts.append(html.strip())

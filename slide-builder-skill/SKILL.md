@@ -31,6 +31,8 @@ project-specific content.
 | Prototype a variation        | Create file in project's `output/prototypes/`             |
 | Build shareable HTML         | `python scripts/build.py --config path/to/config.yaml`    |
 | Split an existing deck       | `python scripts/split.py <file> --config path/to/config.yaml` |
+| Cite a source on a slide     | Add `data-sources="key1,key2"` to the `.slide` div; add entries to `context/bibliography.yaml` |
+| Add a new source             | Add a keyed entry to `context/bibliography.yaml` |
 
 ---
 
@@ -45,6 +47,7 @@ slide-builder-skill/           <-- VERSION THIS (Git repo or .claude/skills/)
   templates/
     brief-template.md          Blank presentation brief
     design-system-template.md  Blank design system definition
+    bibliography-template.yaml Blank source registry
     config-template.yaml       Blank build configuration
   scripts/
     init.py                    Scaffolds a new project
@@ -61,6 +64,8 @@ my-repo/
     context/
       brief-template.md        Reference copy of the template
       brief.md                 Completed brief (you fill this)
+      bibliography-template.yaml  Reference copy of the template
+      bibliography.yaml        Source registry (you fill this)
     design/
       design-system-template.md  Reference copy of the template
       design-system.md         Completed design system (you fill this)
@@ -131,6 +136,67 @@ Read these three files into your working context. Do not skip any:
 3. Project's `config.yaml` - build config (slide order, paths, metadata)
 
 Only after all three are loaded do you proceed to any slide work.
+
+---
+
+## Bibliography & Source Citations
+
+Every external figure (statistic, count, date, published claim) that appears on a
+slide **must** be backed by a source entry in `context/bibliography.yaml`. This file
+is auto-scaffolded by `init.py` from `bibliography-template.yaml`.
+
+### Rule: cite or qualify
+
+- **External fact with a public URL** → add an entry to `bibliography.yaml`, reference
+  it on the slide with `data-sources`.
+- **Internal estimate (no public source)** → add an entry with `org: "Internal estimate"`
+  and no `url` field. This makes the assumption explicit rather than invisible.
+- **Unsourced figure** → do not include it. A wrong number in a pitch deck is more
+  damaging than a missing one.
+
+### Adding a source
+
+```yaml
+# context/bibliography.yaml
+sources:
+  interpharma-preismodelle:
+    org: Interpharma
+    title: "Preismodelle bei Medikamenten"
+    url: "https://www.interpharma.ch/blog/preismodelle-bei-medikamenten-darum-geht-es/"
+    year: 2023
+    accessed: 2026-05-14
+```
+
+Fields: `org`, `title`, `url`, `year`, `accessed`. All are optional except the key
+itself; recommended minimum is `org + title + url + year`.
+
+### Referencing on a slide
+
+Add `data-sources="key1,key2"` to the **root `.slide` div** — `build.py` resolves
+the keys and injects a `.slide-source-bar` automatically before the closing tag:
+
+```html
+<div class="slide s-context" data-sources="priminfo-kostengruppen,interpharma-preismodelle">
+  <!-- slide content -->
+  <div class="slide-number"></div>
+</div>
+<!-- build.py injects:
+  <div class="slide-source-bar">
+    Priminfo / BAG · Kostengruppen (2024) — priminfo.admin.ch
+    &nbsp;|&nbsp;
+    Interpharma · Preismodelle bei Medikamenten (2023) — interpharma.ch
+  </div>
+-->
+```
+
+The source bar is styled by the baseline CSS (Geist Mono 10px, bottom-left,
+ellipsis overflow). No manual HTML needed — the attribute is enough.
+
+### Build behaviour
+
+- Bibliography absent or empty → source bars silently skipped. Existing slides unaffected.
+- Unknown key in `data-sources` → build warning printed, key skipped, build continues.
+- Multiple keys → rendered left-to-right, separated by `|`.
 
 ---
 
@@ -251,6 +317,7 @@ Run through this before every build. Items 1-4 are startup gates.
 10. [ ] Build runs without errors
 11. [ ] Output file opens correctly in a browser
 12. [ ] Slides scale correctly on mobile viewports (baseline responsive is auto-injected by build.py)
+13. [ ] Every external figure on a slide has a matching key in `context/bibliography.yaml`
 
 ---
 

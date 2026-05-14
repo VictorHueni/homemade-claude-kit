@@ -41,11 +41,13 @@ def init_project(target: Path, name: str = "", author: str = ""):
 
     # Copy templates (never overwrite existing files)
     copies = [
-        ("brief-template.md", "context/brief-template.md"),
-        ("brief-template.md", "context/brief.md"),
-        ("design-system-template.md", "design/design-system-template.md"),
-        ("design-system-template.md", "design/design-system.md"),
-        ("config-template.yaml", "config.yaml"),
+        ("brief-template.md",          "context/brief-template.md"),
+        ("brief-template.md",          "context/brief.md"),
+        ("design-system-template.md",  "design/design-system-template.md"),
+        ("design-system-template.md",  "design/design-system.md"),
+        ("bibliography-template.yaml", "context/bibliography-template.yaml"),
+        ("bibliography-template.yaml", "context/bibliography.yaml"),
+        ("config-template.yaml",       "config.yaml"),
     ]
 
     for src_name, dest_rel in copies:

@@ -1,0 +1,28 @@
+# Bibliography — source registry for this presentation
+# ─────────────────────────────────────────────────────
+# Instructions:
+#   1. Add one entry per external source with a unique lowercase-kebab key.
+#   2. On any .slide div that uses figures from a source, add the attribute:
+#        data-sources="key1,key2"
+#      build.py resolves the keys and injects a citation bar automatically.
+#   3. All fields are optional except the key itself.
+#      Recommended minimum: org + title + url + year.
+#   4. Internal estimates (no public URL) should use:
+#        org: "Internal estimate"
+#      and omit the url field.
+#
+# Example entry:
+#   interpharma-preismodelle:
+#     org: Interpharma
+#     title: "Preismodelle bei Medikamenten"
+#     url: "https://www.interpharma.ch/blog/preismodelle-bei-medikamenten-darum-geht-es/"
+#     year: 2023
+#     accessed: 2026-05-14
+
+sources: {}
+#  example-source:
+#    org: "Organisation Name"
+#    title: "Document or Page Title"
+#    url: "https://example.com/source"
+#    year: 2024
+#    accessed: 2026-01-01

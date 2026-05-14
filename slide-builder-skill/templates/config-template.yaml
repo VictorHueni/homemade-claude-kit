@@ -31,11 +31,12 @@ slides: []
 
 # Paths (relative to this config file)
 paths:
-  slides_dir: "output/slides"
-  styles_file: "design/styles.css"
-  script_file: "design/script.js"
-  output_dir: "output/slide-deck"
-  output_filename: "presentation.html"
+  slides_dir:        "output/slides"
+  styles_file:       "design/styles.css"
+  script_file:       "design/script.js"
+  bibliography_file: "context/bibliography.yaml"
+  output_dir:        "output/slide-deck"
+  output_filename:   "presentation.html"
 
 # Slide numbering
 numbering:
