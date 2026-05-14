@@ -6,7 +6,7 @@
 #   - prerequisites (chezmoi, git, gh, ssh to github.com)
 #   - dotfiles repo state (~/.local/share/chezmoi)
 #   - chezmoi deployed-vs-source drift
-#   - kit repo state (~/projets/homemade-claude-kit)
+#   - kit repo state (~/projects/homemade-claude-kit)
 #   - ~/.claude/skills/ and ~/.claude/commands/ symlink health
 #
 # Exits 0 always. The output is structured for the model to parse.
@@ -18,7 +18,7 @@ DOTFILES_REMOTE="git@github.com:VictorHueni/dotfiles.git"
 KIT_REMOTE="git@github.com:VictorHueni/homemade-claude-kit.git"
 
 DOTFILES_DIR="$HOME/.local/share/chezmoi"
-KIT_DIR="$HOME/projets/homemade-claude-kit"
+KIT_DIR="$HOME/projects/homemade-claude-kit"
 CLAUDE_DIR="$HOME/.claude"
 
 # ── helpers

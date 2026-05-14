@@ -1,7 +1,7 @@
 ---
 name: tool-kit-doctor
 description: Audit and repair Victor's Claude Code setup health — chezmoi state, dotfiles + homemade-claude-kit repo sync, and ~/.claude/ symlink integrity. Auto-fixes safe drift but stops on uncommitted local changes. Use when the user asks to check, audit, sync, repair, doctor, or initialize their Claude setup, dotfiles, kit repo, skills, or commands installation.
-allowed-tools: Bash(chezmoi *) Bash(git *) Bash(ls *) Bash(readlink *) Bash(stat *) Bash(test *) Bash(cat *) Bash(/home/slimpunkerz/projets/homemade-claude-kit/tool-kit-doctor/scripts/gather-state.sh) Bash(/home/slimpunkerz/projets/homemade-claude-kit/install.sh*)
+allowed-tools: Bash(chezmoi *) Bash(git *) Bash(ls *) Bash(readlink *) Bash(stat *) Bash(test *) Bash(cat *) Bash(~/projects/homemade-claude-kit/tool-kit-doctor/scripts/gather-state.sh) Bash(~/projects/homemade-claude-kit/install.sh*)
 ---
 
 # tool-kit-doctor
@@ -11,7 +11,7 @@ Diagnose and (safely) repair the health of Victor's Claude Code setup.
 ## Step 1 — Always run the diagnostic first
 
 ```bash
-~/projets/homemade-claude-kit/tool-kit-doctor/scripts/gather-state.sh
+~/projects/homemade-claude-kit/tool-kit-doctor/scripts/gather-state.sh
 ```
 
 The script is read-only. It checks:
@@ -19,8 +19,8 @@ The script is read-only. It checks:
 - **Prerequisites**: `chezmoi`, `git`, `gh`, SSH auth to `github.com`
 - **Dotfiles repo** (`~/.local/share/chezmoi`): existence, remote, working tree clean, ahead/behind origin
 - **Chezmoi deployed-vs-source drift**: `chezmoi status` output
-- **Kit repo** (`~/projets/homemade-claude-kit`): same checks as dotfiles
-- **Symlink health**: every entry under `~/.claude/skills/` and `~/.claude/commands/` must be a symlink resolving into `~/projets/homemade-claude-kit/`
+- **Kit repo** (`~/projects/homemade-claude-kit`): same checks as dotfiles
+- **Symlink health**: every entry under `~/.claude/skills/` and `~/.claude/commands/` must be a symlink resolving into `~/projects/homemade-claude-kit/`
 
 ## Step 2 — Detect mode
 
@@ -33,7 +33,7 @@ The script is read-only. It checks:
 
 | Finding | Fix |
 |---------|-----|
-| Symlink drift in `~/.claude/skills/` or `~/.claude/commands/` (real dirs, broken symlinks, wrong-target symlinks) | `~/projets/homemade-claude-kit/install.sh` |
+| Symlink drift in `~/.claude/skills/` or `~/.claude/commands/` (real dirs, broken symlinks, wrong-target symlinks) | `~/projects/homemade-claude-kit/install.sh` |
 | Kit repo missing AND dotfiles healthy | `chezmoi apply` (triggers the on-change hook to clone the kit) |
 | Either repo **clean** AND **behind origin** with **0 commits ahead** | `git -C <repo> pull --ff-only` |
 | Chezmoi has only deployed-state drift (`chezmoi status` shows changes) AND source is clean | `chezmoi apply` |

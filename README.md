@@ -31,7 +31,7 @@ machines via dotfiles.
 
 ```bash
 # Clone once
-git clone git@github.com:VictorHueni/homemade-claude-kit.git ~/projets/homemade-claude-kit
+git clone git@github.com:VictorHueni/homemade-claude-kit.git ~/projects/homemade-claude-kit
 
 # Symlink everything globally (~/.claude/skills/ + ~/.claude/commands/)
 ./install.sh
@@ -43,7 +43,7 @@ git clone git@github.com:VictorHueni/homemade-claude-kit.git ~/projets/homemade-
 ## Update
 
 ```bash
-cd ~/projets/homemade-claude-kit
+cd ~/projects/homemade-claude-kit
 git pull
 # Symlinks already point here — done.
 ```
