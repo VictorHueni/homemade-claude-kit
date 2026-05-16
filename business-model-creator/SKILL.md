@@ -90,6 +90,45 @@ If the funnel is 3-step instead of 4-step (TAM/SAM/SOM), collapse §3 and §4 in
 
 ---
 
+## Recommended stack when the user builds the interactive calculator
+
+**Out of scope for this skill** — the skill only creates the markdown model. But if the user follows up with "and let's build the interactive calculator too", suggest the stack below. It's been validated end-to-end on a real project (markdown model → marimo notebook → WASM-exported HTML stakeholders can open in any browser).
+
+| Concern | Choice |
+|---|---|
+| Python env manager | [`uv`](https://docs.astral.sh/uv/) — single-binary, fast, handles multiple interpreter versions |
+| Notebook framework | [`marimo`](https://marimo.io/) — reactive cells, deterministic execution, exports to standalone HTML |
+| Charting | [`plotly`](https://plotly.com/python/) — interactive client-side (works inside the WASM bundle) |
+| Data wrangling | [`pandas`](https://pandas.pydata.org/) — only if you need DataFrames; otherwise skip |
+| Math layer | Pure Python module (no I/O, no marimo imports), unit-tested with `pytest` |
+| Distribution | `marimo export html-wasm` → single static HTML, runs Python in the browser via Pyodide |
+| Dependency declaration | [PEP 723](https://peps.python.org/pep-0723/) inline-deps header in the notebook for portable execution |
+| Layout | Flat `analysis/` directory (math + notebook + tests side by side); no `src/<package>/` until at least 2 notebooks share code |
+
+**Suggested directory layout:**
+
+```text
+analysis/
+  pyproject.toml          # uv-managed
+  uv.lock
+  {{model_slug}}_math.py  # pure math, 100% unit-tested
+  {{model_slug}}.py       # marimo notebook (the I/O shell)
+  test_{{model_slug}}_math.py
+  exports/
+    {{model_slug}}.html   # static WASM-interactive export
+```
+
+**Gotchas worth flagging up front (these are real footguns):**
+
+1. **WASM exports don't bundle sibling `.py` files.** Pyodide only sees the notebook itself. If your math lives in a separate `*_math.py` for testability, you'll have to **inline a copy** of the math into the notebook's first code cell for the WASM bundle. Keep the standalone module as the test source-of-truth and mark the inline copy as a manual mirror.
+2. **WASM exports must be served over HTTP, not opened via `file://`.** Browser CORS blocks the Pyodide asset chunks otherwise. The export will appear to load, charts will render (Plotly is pure JS), but **sliders won't trigger Python re-execution** because Pyodide silently fails. Tell stakeholders to run `python3 -m http.server` from the `exports/` folder.
+3. **Pyodide lags CPython by 6-12 months.** Pin `requires-python` conservatively. Run a Pyodide hello-world smoke export *before* committing to a specific Python version in `pyproject.toml`.
+4. **Math module field naming should not assume a single product or single value-capture scope.** When the model has multiple scopes (e.g., direct vs. central allocation, or addressable vs. non-addressable channels), make that explicit in field names — `total_revenue` is ambiguous, `channel_a_revenue` is not.
+
+**Don't build the calculator inside this skill.** If the user wants it, point them at the project's plan-creation workflow (or your `spec-implementation-planner` skill) to scaffold a proper increment plan — calculators benefit from a real Ralph-Loop-able plan with explicit increments, not ad-hoc construction.
+
+---
+
 ## The §5.2 assumption table is the doc's killer feature
 
 Without §5.2, a reader cannot tell whether the model's structure is right; they only see the numbers and assume they're trustworthy. **Always seed §5.2 with concrete starter rows before declaring the scaffold complete.** Common starters by funnel type:
