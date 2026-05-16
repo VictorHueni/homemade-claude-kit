@@ -4,11 +4,13 @@ BUSINESS MODEL TEMPLATE — clone-and-fill
 =============================================================================
 
 Purpose: provide a consistent shape for every quantitative business model
-under docs/business/models/. Use this as the starting point for every new
-model (1A, 1B, 1C, future TAM funnels, savings models, etc.).
+under docs/business/models/ (or the project's equivalent directory). Use
+this as the starting point for every new model — TAM/SAM/SOM, recovery /
+restitution funnels, savings / automation models, customer-ROI calculators,
+etc.
 
 How to use:
-  1. cp _template_business_model.md NN-your-model-slug.md
+  1. cp template.md docs/business/models/NN-your-model-slug.md
   2. Fill placeholders marked {{LIKE_THIS}}
   3. Drop sections that genuinely don't apply (don't pad)
   4. Keep §5 sub-sections (How to read + Implicit assumptions) — those are
@@ -21,22 +23,18 @@ If it's a 5+ step funnel, add steps. The template doesn't enforce four.
 Render-invisible HTML comments like this one carry guidance; markdown
 previewers won't show them but they survive in the raw source for the next
 author.
+
+Currency: the template uses generic "{{currency}}" placeholders. Substitute
+your project's working currency (USD, EUR, GBP, etc.) when filling.
 =============================================================================
 -->
 
 # {{Model Name}}
 
-> **Phase {{N}} of [pitch-readiness-plan.md](../pitch-readiness-plan.md)**
+> **Phase {{N}} of {{roadmap doc}}** (e.g., `product-roadmap.md`, `gtm-plan.md`, `north-star-strategy.md`, or "none" if standalone)
 >
 > **Purpose:** {{One sentence — what this model computes and for whom.}}
 >
-<!--
-Status rubric — use these definitions consistently across all models:
-  🟢 = all CHF / numeric cells filled with cited values; assumptions table populated
-  🟡 = some cells _TODO_ but bounded scenarios exist (e.g., conservative/base/aggressive)
-  🔲 = pure scaffolding; structure exists, no values yet
--->
-
 > **Status:**
 > - 🟢 Sections {{populated section list}}
 > - 🟡 Sections {{partially populated}}
@@ -44,39 +42,47 @@ Status rubric — use these definitions consistently across all models:
 >
 > **Key remaining unknown:** {{The single highest-impact validation gap. Be specific.}}
 >
-> **Validation path:** {{The one interview / data pull that would unblock it.}}
+> **Validation path:** {{The one interview / data pull / desk-research session that would unblock it.}}
+
+<!--
+Status rubric — use these definitions consistently across all models:
+  🟢 = all numeric cells filled with cited values; assumptions table populated
+  🟡 = some cells _TODO_ but bounded scenarios exist (e.g., conservative/base/aggressive)
+  🔲 = pure scaffolding; structure exists, no values yet
+-->
 
 <!--
 Interactive calculator callout — pick ONE of the two variants below depending
-on whether a marimo notebook exists for this model. Delete the unused variant.
+on whether a marimo / notebook / spreadsheet exists for this model. Delete
+the unused variant.
 -->
 
-<!-- VARIANT A — calculator EXISTS. Use when a marimo notebook is already shipped. -->
+<!-- VARIANT A — calculator EXISTS. Use when an interactive tool is already shipped. -->
 
-> **🧮 Interactive calculator:** [`analysis/{{slug}}.py`](../../../analysis/{{slug}}.py) (marimo notebook).
-> Static HTML export, openable in any browser without setup: [`analysis/exports/{{slug}}.html`](../../../analysis/exports/{{slug}}.html).
-> Source-of-truth Python math (unit-tested): [`analysis/{{slug}}_math.py`](../../../analysis/{{slug}}_math.py).
-> Drag the sliders to explore alternative scenarios; the §6 scenario matrix below was generated from this notebook at base-case settings.
+> **🧮 Interactive calculator:** [`analysis/{{slug}}.py`](../../../analysis/{{slug}}.py) (or wherever your project keeps interactive tools).
+> Static export, openable without setup: [`analysis/exports/{{slug}}.html`](../../../analysis/exports/{{slug}}.html).
+> Source-of-truth math (unit-tested): [`analysis/{{slug}}_math.py`](../../../analysis/{{slug}}_math.py).
+> Drag the sliders to explore alternative scenarios; the §6 scenario matrix below was generated from this tool at base-case settings.
 
 <!-- VARIANT B — calculator NOT YET BUILT. Use when only the markdown model exists. -->
 
-> **🧮 Interactive calculator:** _Not yet built._ Planned to follow the [1A pattern](./1a-preismodelle-restitution-model.md) (range sliders for the bounded inputs, scenarios re-rendered live in a per-segment table). For now §6 below is hand-computed from base-case sliders.
+> **🧮 Interactive calculator:** _Not yet built._ Planned to follow the project's existing model-calculator pattern (range sliders for the bounded inputs, scenarios re-rendered live in a per-segment table). For now §6 below is hand-computed from base-case assumptions.
 
 ---
 
 ## Table of Contents
 
-- [§1 — Inputs and Data Sources](#1--inputs-and-data-sources)
-- [§2 — Step 1: {{name of top-of-funnel quantity}}](#2--step-1-name-of-top-of-funnel-quantity)
-- [§3 — Step 2: {{name of filter}}](#3--step-2-name-of-filter)
-- [§4 — Step 3: {{name of conversion rate}}](#4--step-3-name-of-conversion-rate)
-- [§5 — Step 4: Scale by segment](#5--step-4-scale-by-segment)
+- [§1 — Inputs and Data Sources](#1-inputs-and-data-sources)
+- [§2 — Step 1: {{name of top-of-funnel quantity}}](#2-step-1-name-of-top-of-funnel-quantity)
+- [§3 — Step 2: {{name of filter}}](#3-step-2-name-of-filter)
+- [§4 — Step 3: {{name of conversion rate}}](#4-step-3-name-of-conversion-rate)
+- [§5 — Step 4: Scale by segment](#5-step-4-scale-by-segment)
   - [§5.1 How to read these numbers](#51-how-to-read-these-numbers-math-chain)
   - [§5.2 Implicit assumptions](#52-implicit-assumptions-read-this-before-quoting-any-5-number)
   - [§5.3 Named segments](#53-named-segments)
   - [§5.4 Per-segment scenarios](#54-per-segment-scenarios)
 - [§6 — Scenario Matrix](#6--scenario-matrix)
-- [§7 — Paracel Value Capture](#7--paracel-value-capture)
+- [§7 — Value capture](#7--value-capture)
 - [§8 — Key Unknowns and Validation Path](#8--key-unknowns-and-validation-path)
 - [§9 — Related Documents](#9--related-documents)
 - [Changelog](#changelog)
@@ -87,7 +93,7 @@ on whether a marimo notebook exists for this model. Delete the unused variant.
 §0 GLOSSARY — OPTIONAL.
 
 Include only if your model uses 5+ domain-specific terms that aren't defined
-in docs/data/glossary.md. Otherwise link to the central glossary from the
+in a central glossary doc. Otherwise link to the central glossary from the
 frontmatter and skip §0 entirely. Don't create parallel glossaries.
 -->
 
@@ -97,20 +103,18 @@ frontmatter and skip §0 entirely. Don't create parallel glossaries.
 Standard input-table format. Confidence stars use a 5-star scale anchored to
 the type of evidence backing each value:
 
-  ★★★★★ Primary government / regulator data (BAG, Bundesgericht, parlament.ch);
-        or internal data verified by unit tests + sanity-check queries
-  ★★★★  Primary industry data (single-source authoritative — Helsana report,
-        Interpharma Panorama, IC LAMal annual report)
-  ★★★   Industry-published, supported by independent sourcing (multiple
-        sources triangulating to the same answer)
+  ★★★★★ Primary government / regulator data, or verified internal data
+        (with unit tests + sanity-check queries)
+  ★★★★  Primary industry data (single-source authoritative — major report,
+        vendor regulatory filing, official statistic)
+  ★★★   Industry-published, triangulated across multiple independent sources
   ★★    Internal hypothesis / workshop output / vendor marketing —
         directional only, needs external validation
   ★     Anecdote / single-source weak signal — cite with explicit caveat
         and flag in §8 Key Unknowns
 
 If an input itself has a counting-methodology gotcha (different sources
-counting different things), give it its own §1.x sub-section. See 1A §1.1
-for an example.
+counting different things), give it its own §1.x sub-section.
 -->
 
 | Input | Value | Source | Confidence |
@@ -126,22 +130,24 @@ for an example.
 
 <!--
 First step of the funnel. What's the TOTAL relevant quantity before any
-filtering? Examples:
-  - 1A: total OKP drug spend on PM drugs
-  - 1B: total Swiss insurer pharma-desk addressable spend
-  - 1C: total industry cost of current KG process
+filtering? This is the universe of the addressable opportunity.
 
-Should produce a single headline CHF figure (or count, or rate).
+Examples (replace with your own):
+  - Recovery model: total spend that could trigger restitutions / refunds
+  - TAM model: total addressable customer count × maximum price tier
+  - Savings model: total industry cost of the current manual process
+
+Should produce a single headline figure ({{currency}}, count, or rate).
 
 Add §2.x sub-sections for triangulation, cross-checks, or empirical
-brackets. See 1A §2.1, 2.2, 2.3 for the pattern.
+brackets when the headline figure has multiple independent sourcings.
 -->
 
 | Scenario | Assumption | Estimated value |
 |---|---|---|
-| Conservative | {{...}} | CHF {{...}} |
-| Base | {{...}} | CHF {{...}} |
-| Aggressive | {{...}} | CHF {{...}} |
+| Conservative | {{...}} | {{currency}} {{...}} |
+| Base | {{...}} | {{currency}} {{...}} |
+| Aggressive | {{...}} | {{currency}} {{...}} |
 
 **Assumption rationale:**
 
@@ -151,9 +157,6 @@ brackets. See 1A §2.1, 2.2, 2.3 for the pattern.
 SANITY CHECK CALLOUT — RECOMMENDED when this model's §2 derives from another
 model. Compare your §2 figure against the upstream model's headline number
 and note the ratio. Catches order-of-magnitude errors before they propagate.
-Example from 1B:
-  "37 insurers × CHF 60-120K/yr = CHF 2.2M-4.4M/yr TAM. Compare to CHF 300M
-   industry Channel A flow ([1A §4]) — the TAM is ~1% of the recovered flow."
 -->
 
 **Sanity check vs upstream:** {{Compare this §2 figure against the upstream model it derives from. If the ratio looks wrong, fix the assumption before continuing.}}
@@ -166,13 +169,14 @@ Example from 1B:
 
 <!--
 Second step: what subset of the §2 quantity actually counts for this model?
-Examples:
-  - 1A: triggerable spend by PM type (PRICE / P4P / VOLUME_CAP)
-  - 1B: serviceable portion (insurers we can sell to in T+3 years)
-  - 1C: automatable case subset (Vertrauensarzt clear-cut cases)
+
+Examples (replace with your own):
+  - Recovery model: spend triggerable by the specific recovery mechanism
+  - TAM model: reachable / serviceable subset within N years
+  - Savings model: subset of cases that are automatable today
 -->
 
-| {{Filter dimension}} | Distinct {{units}} | {{Triggers / criteria}} | Est. % of §2 | CHF estimate |
+| {{Filter dimension}} | Distinct {{units}} | {{Triggers / criteria}} | Est. % of §2 | {{currency}} estimate |
 |---|---|---|---|---|
 | {{...}} | {{...}} | {{...}} | {{...}} | {{...}} |
 
@@ -184,10 +188,11 @@ Examples:
 
 <!--
 Third step: what fraction of the §3-filtered quantity flows through today?
-Examples:
-  - 1A: current recovery rate (30%/50%/70% bounded)
-  - 1B: market-penetration assumption
-  - 1C: % of cases auto-approvable today (OLUtool A/B)
+
+Examples (replace with your own):
+  - Recovery model: current recovery rate (e.g., 30%/50%/70% bounded)
+  - TAM model: closable subset in Year 1-2 (SOM as fraction of SAM)
+  - Savings model: % of cases auto-processed today
 
 This is usually the WEAKEST input — flag it explicitly and bracket it with
 scenarios. Cite the methodology for picking conservative/base/aggressive.
@@ -235,8 +240,8 @@ formula and the resulting number.
 **Step B — derive {{intermediate quantity}}.**
 
 ```
-{{intermediate}} = {{previous} ÷ {{rate or fraction}}
-                 = CHF {{value}}
+{{intermediate}} = {{previous}} ÷ {{rate or fraction}}
+                 = {{currency}} {{value}}
 ```
 
 **Step C — slice by {{segmentation dimension}}.**
@@ -269,7 +274,7 @@ Every assumption that could be wrong gets a row. Be brutally honest.
 
 <!--
 Concrete map from the model's abstraction (tiers, deciles, cohorts) to the
-actual world. For Swiss insurers: top 8 named + long tail.
+actual world. List the top N players / segments by size.
 -->
 
 | Rank | Segment | Size | % share | Cumulative % | Tier label |
@@ -283,9 +288,9 @@ The headline per-segment outputs. Format as a table the user can quote from
 in a pitch sentence.
 -->
 
-| Segment | Lives / size | Headline CHF | Notes |
+| Segment | Size | Headline {{currency}} | Notes |
 |---|---|---|---|
-| {{...}} | {{...}} | **{{CHF ...}}** | {{...}} |
+| {{...}} | {{...}} | **{{currency}} {{...}}** | {{...}} |
 
 ---
 
@@ -303,35 +308,29 @@ from it at base-case settings, and re-generation is one command.
 
 | {{Segment tier}} | Conservative | Base | Aggressive |
 |---|---|---|---|
-| {{...}} | {{CHF ...}} | {{CHF ...}} | {{CHF ...}} |
+| {{...}} | {{currency}} {{...}} | {{currency}} {{...}} | {{currency}} {{...}} |
 
 <!--
 CALIBRATION CALLOUT — RECOMMENDED for any model that feeds the investor deck.
 Compare your Base-case headline against the external expectation (investor norm,
 peer benchmark, industry comparable). If you fall short, the §5.2 assumptions
-either need to be more aggressive or the SOM/penetration assumption needs to be
-faster. Forces honesty about whether the pitch math actually clears the bar.
-
-Example from 1B §6: "typical seed-round Swiss B2B SaaS expects CHF 500K-1M ARR
-by Year 2-3 to justify a CHF 5-10M Series A. Base case at CHF 320K Year 2 sits
-below that threshold — either pricing or SOM penetration needs to be more
-aggressive."
+either need to be more aggressive or the SOM / penetration assumption needs to
+be faster. Forces honesty about whether the pitch math actually clears the bar.
 -->
 
 **Calibration vs external expectation:** {{What does an investor / peer / comparable benchmark expect to see in this cell? If Base case falls short, what specifically needs to change in §3/§4/§5 to clear the bar?}}
 
 ---
 
-## 7. Paracel Value Capture
+## 7. Value capture
 
 <!--
-Paracel-specific math: how do we monetize the addressable gap? This section
-varies most per model because it depends on which Paracel product (Reclaim,
-Maintainer, Explorer, KG) the model feeds.
+How does the vendor / product monetize the addressable gap? This section
+varies most per model because it depends on which product feeds the model.
 
 Standard sub-sections:
-  - Uplift assumption (what % of the gap can we actually capture?)
-  - WTP fraction (what fraction of our recovered value does the customer pay?)
+  - Uplift assumption (what % of the gap can the product actually capture?)
+  - WTP fraction (what fraction of recovered value does the customer pay?)
   - Headroom math (WTP ÷ list price)
   - Pricing sensitivity / band exploration
 -->
@@ -340,20 +339,20 @@ Anchoring on §4's bounded scenarios:
 
 | | Conservative | Base | Aggressive |
 |---|---|---|---|
-| {{Industry headline}} | CHF {{...}} | **CHF {{...}}** | CHF {{...}} |
-| Per-segment | CHF {{...}} | **CHF {{...}}** | CHF {{...}} |
-| Paracel capture (@ {{N}}% uplift) | CHF {{...}} | **CHF {{...}}** | CHF {{...}} |
-| Implied WTP ({{N}}% of capture) | CHF {{...}} | **CHF {{...}}** | CHF {{...}} |
+| {{Industry headline}} | {{currency}} {{...}} | **{{currency}} {{...}}** | {{currency}} {{...}} |
+| Per-segment | {{currency}} {{...}} | **{{currency}} {{...}}** | {{currency}} {{...}} |
+| Product capture (@ {{N}}% uplift) | {{currency}} {{...}} | **{{currency}} {{...}}** | {{currency}} {{...}} |
+| Implied WTP ({{N}}% of capture) | {{currency}} {{...}} | **{{currency}} {{...}}** | {{currency}} {{...}} |
 | Headroom vs proposed price | **{{N×}}** | **{{N×}}** | **{{N×}}** |
 
 **Headline pitch sentence (base case):**
 
-> {{One-sentence value prop using the base-case CHF figures.}}
+> {{One-sentence value prop using the base-case figures.}}
 
 **Sources for the assumptions:**
 
-- Uplift fraction: {{cite the benchmark — Lyfegen, Cotiviti, Codoxo, etc.}}
-- WTP fraction: {{cite the benchmark — typical recovery-SaaS ratio, etc.}}
+- Uplift fraction: {{cite the benchmark — comparable vendor, prior project, published case study}}
+- WTP fraction: {{cite the benchmark — typical recovery-SaaS ratio, contingency pricing norm, etc.}}
 - Proposed price: {{cite the workshop deliverable or pricing decision}}
 
 ---

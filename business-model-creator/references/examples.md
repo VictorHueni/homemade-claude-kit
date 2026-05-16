@@ -1,91 +1,88 @@
 # Examples — how the template gets filled for different funnel shapes
 
-Two real-world examples drawn from a Swiss pharma project (`swiss-aos-drug-reimbursement-model`). Both follow the same template but instantiate the funnel differently.
-
-> **Generic-use note:** the examples are domain-specific (Swiss health insurance). The *patterns* — how each step is filled, how §5.2 is seeded, how §6 is bracketed — generalize. Substitute your own domain terms.
+Two abstract worked examples showing how the template is instantiated for the two most common funnel shapes. The figures and segment names are placeholders — adapt to your project's actual market, currency, and customer base.
 
 ---
 
-## Example 1 — 4-step restitution funnel (1A model)
+## Example 1 — 4-step recovery / restitution funnel
 
-**Purpose:** quantify the annual restitution obligation a Swiss insurer should claw back from pharma, and how much goes unclaimed today.
+**Purpose:** quantify the annual revenue / refund / rebate that customers in a market should be claiming back from suppliers, and how much goes unclaimed today.
 
 | Step | Filled value | Notes |
 |---|---|---|
-| **§2 Top of funnel** | Total OKP drug spend on PM drugs ≈ CHF 3B (33% of CHF 9.2B) | Quadruply validated: BAG, Helsana, APV, Krebsliga |
-| **§3 Filter** | Triggerable PM dossiers by type: 142 PRICE-CONFIDENTIAL + 91 PRICE-PUBLIC + 19 P4P-PUBLIC + 5 VolCap + 1 P4P-CONFIDENTIAL | DB-verified counts; rates of trigger partly TODO |
-| **§4 Conversion rate** | Bounded scenario: 30% / **50%** / 70% recovery rate | The single biggest unknown; anchored by Interpharma's CHF 300M |
-| **§5 Segmentation** | Per-tier: Large (1.5M lives) CHF 102M obligation → Small (100K lives) CHF 7M | Lives-share proxy for drug-spend share (assumption #3 in §5.2) |
+| **§2 Top of funnel** | Total relevant industry spend ≈ {{currency}} {{X}}B (some fraction of broader market) | Validate against multiple independent sources (regulator stats, industry reports, internal data) |
+| **§3 Filter** | Triggerable subset by mechanism type: e.g., flat-rebate dossiers + performance-based dossiers + volume-cap dossiers | Counts can come from a verified internal dataset; per-type rates partly TODO |
+| **§4 Conversion rate** | Bounded scenario: 30% / **50%** / 70% recovery rate | Often the single biggest unknown; anchor with an industry-published "recovered today" figure if available |
+| **§5 Segmentation** | Per-tier breakdown: Large customers (high lives/revenue share) capture {{currency}} {{Y}}M, smaller customers proportionally less | Customer-size proxy stands in for usage proxy (assumption #3 in §5.2) |
 
 ### Key §5.2 assumptions seeded
 
 | # | Assumption | Risk |
 |---|---|---|
-| 1 | Industry-total anchor reflects all 37 insurers | ✅ Probably right |
-| 2 | 50% recovery is the right base case | ⚠️ Biggest single unknown — pharma-desk-analyst interview confirms |
-| 3 | Drug-spend share ≈ lives share | ⚠️ Mildly wrong (±20% skew); PCG data resolves |
-| 4 | PM formulary coverage is uniform | ✅ Mostly true (federally mandated LS) |
-| 5 | Recovery rate uniform across segments | ⚠️ **Probably the most consequential oversimplification** |
-| 6 | Capture-rate uplift is the right one | ⚠️ Placeholder until validated |
+| 1 | Industry-published "recovered" figure reflects all market participants | ✅ Probably right if from an industry association |
+| 2 | Base-case conversion rate of 50% is the right central estimate | ⚠️ Biggest single unknown — practitioner interview confirms |
+| 3 | Customer-size proxy ≈ revenue / usage share | ⚠️ Often off by ±20%; per-customer usage data resolves |
+| 4 | Coverage of the mechanism is uniform across customers | ✅ Mostly true when the mechanism is regulator-mandated |
+| 5 | Capture quality is uniform across customer sizes | ⚠️ **Probably the most consequential oversimplification** — larger customers often have dedicated teams with better claim hygiene |
+| 6 | Vendor uplift fraction is the right one | ⚠️ Placeholder until validated against a real comparable vendor |
 
 ### §6 Scenario matrix (excerpt)
 
 | Segment | Conservative (70% recovery) | Base (50%) | Aggressive (30%) |
 |---|---|---|---|
-| Large | CHF 21.8M unclaimed | CHF 50.8M | CHF 118.5M |
-| Mid-large | CHF 11.6M | CHF 27.1M | CHF 63.2M |
-| Mid | CHF 7.3M | CHF 16.9M | CHF 39.5M |
-| Small | CHF 1.5M | CHF 3.4M | CHF 7.9M |
+| Large | {{currency}} {{...}} | {{currency}} {{...}} | {{currency}} {{...}} |
+| Mid | {{currency}} {{...}} | {{currency}} {{...}} | {{currency}} {{...}} |
+| Small | {{currency}} {{...}} | {{currency}} {{...}} | {{currency}} {{...}} |
 
 ### §7 Headline pitch sentence (Base case)
 
-> *"A Swiss insurer with ~10% market share has approximately CHF 60M in annual restitution obligations, recovers ~CHF 30M today, and leaves ~CHF 30M on the table each year."*
+> *"A customer with ~10% market share has approximately {{currency}} {{X}}M in annual recovery obligations, recovers ~{{currency}} {{X/2}}M today, and leaves ~{{currency}} {{X/2}}M on the table each year."*
 
 ---
 
-## Example 2 — 3-step TAM/SAM/SOM funnel (1B model)
+## Example 2 — 3-step TAM / SAM / SOM funnel
 
-**Purpose:** quantify Paracel's total addressable / serviceable / obtainable market for the investor deck.
+**Purpose:** quantify a startup's total addressable / serviceable / obtainable market for the investor deck.
 
 | Step | Filled value | Notes |
 |---|---|---|
-| **§2 TAM** | 37 Swiss insurers × Enterprise pricing → CHF 2.2M–4.4M / yr revenue ceiling | Sanity-check vs upstream: ~1% of CHF 300M Channel A flow — TAM is conservatively priced |
-| **§3 SAM** | Top 8 insurers reachable in 3 yrs ≈ 83% of OKP lives | Concrete named insurers from upstream 1A model's §5.3 |
-| **§4 SOM** | 2 / 4 / 6 pilots (Bear / Base / Bull) by end of Year 2 | 12-18 month sales cycle assumption |
-| **§5 Segmentation** | Per-segment ARR: Large 2×CHF 100K + Mid-large 4×CHF 80K + Mid 2×CHF 70K = CHF 660K steady-state | Long-tail Small / regional insurers are out of SAM at Enterprise pricing |
+| **§2 TAM** | Total customer count × top-tier annual price → {{currency}} {{X}}M / yr revenue ceiling | Sanity-check vs upstream: ratio against per-customer value model from another internal doc |
+| **§3 SAM** | Top N customers reachable in 3 years (~{{X}}% of total market by some proxy) | Concrete named segments preferable to abstract "top N" |
+| **§4 SOM** | 2 / 4 / 6 pilots (Bear / Base / Bull) by end of Year 2 | Sales-cycle assumption (typical 12–18 months for B2B SaaS) |
+| **§5 Segmentation** | Per-segment ARR: Large 2 × {{currency}} {{A}} + Mid-large 4 × {{currency}} {{B}} + Mid 2 × {{currency}} {{C}} = {{currency}} {{ARR}} steady-state | Long-tail / small segments are often out of SAM at top-tier pricing — flag this honestly |
 
 ### Key §5.2 assumptions seeded
 
 | # | Assumption | Risk |
 |---|---|---|
-| 1 | CHF 5–10K/month Enterprise pricing is achievable | ⚠️ Biggest single unknown — Phase 2B Leistungseinkauf interview |
-| 2 | Pharma-sales co-founders give warm intros to ~8 insurers | ⚠️ Verify by listing actual named contacts |
-| 3 | 12–18 month sales cycle | ⚠️ Industry-standard, not Swiss-rebate-specific |
-| 4 | Small / regional insurers out of SAM | ✅ Probably right at Enterprise pricing |
-| 5 | Flat Enterprise pricing | ⚠️ Probably wrong; value-based could double TAM |
-| 6 | One subscription per insurer (no seat expansion) | ✅ Conservative |
+| 1 | Top-tier pricing is achievable | ⚠️ Biggest single unknown — procurement interview validates |
+| 2 | Warm-intro coverage of named segments | ⚠️ Verify by listing actual named contacts at each target customer |
+| 3 | 12–18 month sales cycle | ⚠️ Industry-standard, may not match your specific buyer profile |
+| 4 | Long-tail / small segments out of SAM | ✅ Probably right at top-tier pricing |
+| 5 | Flat pricing across all customer sizes | ⚠️ Probably wrong; value-based pricing could double TAM |
+| 6 | One subscription per customer (no seat expansion) | ✅ Conservative — module bundling could lift ARR/customer by 1.5–2× |
 
 ### §6 Calibration vs investor expectation
 
-Typical seed-round Swiss B2B SaaS expects CHF 500K-1M ARR by Year 2-3 to justify a CHF 5-10M Series A. Base case at CHF 320K Year 2 sits below that threshold — either pricing assumption #1 needs to flex (value-based) or SOM penetration rate needs to be faster.
+Typical seed-round investor expectation: {{currency}} {{500K-1M}} ARR by Year 2-3 to justify a {{currency}} {{5-10M}} Series A. If your Base case sits below that threshold, either pricing assumption #1 needs to flex (value-based) or SOM penetration rate needs to be faster.
 
-This callout was forced by the template; without §6's calibration prompt, the gap would have been invisible.
+This callout is forced by the template; without §6's calibration prompt, the gap would have been invisible.
 
 ---
 
 ## What both examples have in common
 
-1. **§5.2 was the highest-value section** — both surfaced "the most consequential oversimplification" that wasn't in the original scaffold.
+1. **§5.2 was the highest-value section** — both surface "the most consequential oversimplification" that wouldn't be in a naive scaffold.
 2. **The Base case quotable sentence** in §7 anchors the pitch deck.
 3. **Bounded scenarios** in §4 + §6 prevent over-confidence in single point estimates.
-4. **Upstream cross-links** make the model's dependencies explicit (1B → 1A for per-insurer values).
-5. **Calculator callout** keeps the markdown narrative and the interactive truth from drifting (1A has Variant A, 1B has Variant B "not yet built").
+4. **Upstream cross-links** make the model's dependencies explicit (a TAM model usually depends on a per-customer value model).
+5. **Calculator callout** keeps the markdown narrative and the interactive truth from drifting (Variant A when shipped, Variant B "not yet built" otherwise).
 
 ---
 
 ## What to copy when filling a new model
 
-If you're writing a **4-step funnel** (restitution / savings / recovery model), use Example 1 as the structural reference.
+If you're writing a **4-step funnel** (recovery / savings / conversion / restitution model), use Example 1 as the structural reference.
 
 If you're writing a **3-step funnel** (TAM/SAM/SOM / market-sizing model), use Example 2.
 
