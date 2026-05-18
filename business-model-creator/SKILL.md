@@ -153,6 +153,84 @@ Without §5.2, a reader cannot tell whether the model's structure is right; they
 
 ---
 
+## Cross-reference — the 3-layer artifact lifecycle
+
+A model doc is one of three artifact types that together describe a domain operationally:
+
+| Layer | Job | Owns |
+|---|---|---|
+| **Strategic analysis** | "Why this matters / what could change" | Business case, strategic argument, market-opportunity framing |
+| **Process** | "What happens — who, what, how, with what data" | Descriptive walkthrough, actors, activities, data flows, KPIs |
+| **Model** *(this skill)* | "How much / how big" | Quantification (TAM, savings, recovery, customer-ROI, etc.) |
+
+### The content-routing rule (one rule)
+
+When you're uncertain where a piece of content belongs, ask three questions in order:
+
+1. **Is it a fact about how things work today?** → process doc. (What exists, who does what, how it's applied, what it produces.)
+2. **Is it an argument about why things are this way, or what could change?** → analysis doc. (Why something exists, what it tries to solve, the strategic case for changing it.)
+3. **Is it a number that quantifies an opportunity?** → model doc. (Volumes, rates, financial impact, scenario sensitivity.) ← **this is your layer**
+
+**Tie-breaker test:** "Would this still be true if no one ever changed anything?" If yes → it's a fact, process owns it. If no → it's an argument (analysis) or a projection (model).
+
+### What belongs in a model doc
+
+- Volumes, growth rates, conversion rates
+- Pricing tiers, value-capture math, headroom analysis
+- TAM / SAM / SOM funnel
+- Scenario matrix (conservative / base / aggressive)
+- Implicit assumptions about market structure
+- Per-segment / per-customer / per-tier projections
+- Break-even / cost-base analysis
+- Validation paths for the model's key unknowns
+
+### What does NOT belong in a model doc
+
+- **The mechanism / process that generates the volume** → process doc owns this (e.g., the workflow that creates the unclaimed-rebate gap; the operational steps that generate the cost the model quantifies)
+- **The strategic argument for why the market exists** → analysis doc owns this (e.g., the regulatory or competitive context; the historical reason the opportunity exists; the policy critique)
+- **The legal / regulatory mechanism** → process doc owns this (statute citations, ordinance references, official actor responsibilities)
+- **The reasoning behind the pricing strategy** → analysis doc owns this (competitive positioning, customer-segment psychology); the *CHF numbers* and headroom math stay in the model
+
+### Abstract worked example — a pricing tier
+
+A "pricing tier offered to customers" gets split cleanly across the three layers:
+
+| Content | Layer | Why |
+|---|---|---|
+| What the customer receives at each tier (features / volume allowance / SLA) | **Process** | Operational fact: this is what the product delivers |
+| How customers consume / interact with each tier in practice | **Process** | Operational fact about current state |
+| **Why** the company chose this pricing structure (competitive positioning, customer-segment fit) | **Analysis** | Argument about strategy |
+| **Why** a flat-tier vs value-based vs usage-based pricing was selected | **Analysis** | Argument about pricing-model choice |
+| The CHF / $ / € amounts per tier | **Model** §1 inputs | Quantification |
+| The headroom math (tier price vs implied customer WTP) | **Model** §7 value capture | Quantification |
+| Sensitivity to tier-price changes across scenarios | **Model** §6 scenario matrix | Quantification |
+| Estimated revenue per segment at each tier | **Model** §5 segmentation | Quantification |
+
+The model doc owns the CHF math and the headroom analysis. The reasoning behind *why* this pricing strategy was chosen lives in the analysis. The customer-facing reality of *what each tier delivers* lives in the process. Each layer is independently complete.
+
+### Soft-reference principle
+
+The layers cross-reference each other *as pointers, not as dependencies*.
+
+- **Each layer is independently complete.** A reader of the model doc should understand the quantification without having to read the analysis or process. Cross-references add depth, not prerequisites.
+- **Cross-references are light.** When the model doc mentions a process that generates a volume (e.g., "the process described in {process doc} produces ~N events/year"), the model names it briefly + links — it does not re-explain the process.
+- **Linkage is many-to-many, not strict.** A model is typically anchored to one analysis (the strategic argument it quantifies) and may draw volume / rate / KPI inputs from one or more processes. Some standalone models (e.g., headline TAM scoping) may exist before any process is documented — that's fine.
+- **Do not block a model on the existence of an analysis or process doc.** If the analysis doesn't exist yet, the model still ships; flag the missing strategic context in §8 Key Unknowns.
+
+### When in doubt — the symptom test
+
+If you're scaffolding a model doc and you find yourself writing:
+
+- "*The way the system works is...*" (descriptive multi-paragraph workflow) → that belongs in process. Reference it; don't replicate it.
+- "*Why this opportunity exists in the first place...*" (multi-paragraph strategic context) → analysis. Reference it; don't argue for it inside the model.
+- "*The 4-step process for customer X is...*" (operator-level detail) → process.
+- "*N customers × CHF Y per customer = CHF Z TAM*" → this is your job.
+- "*If we changed Z, the impact would be Y*" (sensitivity analysis) → this is your job.
+
+When the user asks you to produce a model doc but the conversation has been about market mechanics or strategic positioning, gently surface this distinction and confirm they want the quantification layer — and offer to also scaffold the missing process / analysis docs if those gaps are blocking the model.
+
+---
+
 ## Common patterns to apply
 
 1. **Sanity check vs upstream** (§2) — if your top-of-funnel quantity is derived from another model, compute the ratio between this and the upstream headline figure. Catches order-of-magnitude errors.

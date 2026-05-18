@@ -194,10 +194,57 @@ A process doc is one of three artifact types that together describe a domain ope
 | **Process** *(this skill)* | "What happens — who, what, how, with what data" | BPMN-ready descriptive walkthrough, actors, activities, data, KPIs |
 | **Model** | "How much / how big" | Quantification (TAM, savings, recovery, etc.); anchored to one analysis + observes N processes |
 
-**Linkage rules:**
-- A strategic analysis can spawn 0..n processes (not every analysis has an operational process to digitise).
-- A model is anchored to exactly one analysis and may observe one or more processes (it draws KPIs from them).
-- A process doc does NOT contain strategic argument or revenue numbers — those belong in analysis / model.
+### The content-routing rule (one rule)
+
+When you're uncertain where a piece of content belongs, ask three questions in order:
+
+1. **Is it a fact about how things work today?** → process doc. (What exists, who does what, how it's applied, what it produces.)
+2. **Is it an argument about why things are this way, or what could change?** → analysis doc. (Why something exists, what it tries to solve, the strategic case for changing it.)
+3. **Is it a number that quantifies an opportunity?** → model doc. (Volumes, rates, financial impact, scenario sensitivity.)
+
+**Tie-breaker test:** "Would this still be true if no one ever changed anything?" If yes → it's a fact, process owns it. If no → it's an argument (analysis) or a projection (model).
+
+### Abstract worked example — a structured decision framework
+
+A "structured decision framework used by a reviewer to make a categorical decision" (regulatory rubric, clinical scoring system, credit-risk grade table, claim-triage matrix — anything in this shape) gets split cleanly across the three layers:
+
+| Content | Layer | Why |
+|---|---|---|
+| The framework itself (the categories, their criteria, the resulting outcomes) | **Process** §7 Decision points + business rules | Operational fact: this is the rubric being applied today |
+| The reviewer's manual workflow (how they read inputs, apply the rubric, log the decision) | **Process** §6 Activities | Operational fact: this is how the work happens |
+| Scope of when the rubric applies (which cases / triggers it covers) | **Process** §2 Triggers + §7 | Operational fact: defines applicability |
+| The authoring body (who maintains the rubric) | **Process** §3 Actors + §10 Sources | Operational fact: who is responsible |
+| Known reviewer-to-reviewer variance | **Process** §9 Pain points | Operational observation about current state |
+| **Why** the framework exists (what variance problem it was created to solve) | **Analysis** | Argument about historical / strategic motivation |
+| **Why** there are multiple variants of the framework (if applicable) | **Analysis** | Argument about evolutionary divergence |
+| Strategic implications of category distribution (e.g., "most cases fall in categories X and Y → automation candidate") | **Analysis** | Argument about what could change |
+| Path to computability / automation / restructuring | **Analysis** | Argument about future state |
+| What computability / automation does **not** eliminate | **Analysis** | Strategic caveat |
+| The headline rate (e.g., "80% approval rate") | **Model** input + **Analysis** strategic frame | Number → model; interpretation → analysis |
+| Estimated distribution across categories | **Model** assumption | Quantification |
+| Financial impact of automating selected categories | **Model** | Quantification |
+
+The same concept appears in all three docs, but each owns a different *facet*. The process doc reader gets the operational picture; the analysis reader gets the argument; the model reader gets the numbers. None of them needs the others to make sense of their own layer.
+
+### Soft-reference principle
+
+The layers cross-reference each other *as pointers, not as dependencies*.
+
+- **Each layer is independently complete.** A reader of one doc should be able to understand it without reading the others. Cross-references add depth, not prerequisites.
+- **Cross-references are light.** When a process doc mentions a concept the analysis doc unpacks strategically, the process doc names it briefly + links — it does not summarise the strategic argument.
+- **Linkage is many-to-many, not strict.** An analysis can spawn 0..n processes (some strategic frames have no operational process to digitise). A model is typically anchored to one analysis and may draw KPI / volume / rate inputs from one or more processes. A process can be informed by multiple analyses (cross-cutting strategic frames).
+- **Do not create dependencies that block one layer on another.** If the analysis doc doesn't exist yet, the process doc still ships. If the model doc doesn't exist yet, the process doc still ships. Layers are independent artifacts, not phases of a single document.
+
+### When in doubt — the symptom test
+
+If you're scaffolding a process doc and you find yourself writing:
+
+- "*Why* this matters..." → that paragraph belongs in analysis. Move it out, link to it.
+- "*If this changed*..." or "*The opportunity to*..." → analysis.
+- A CHF / $ / € number with a multi-year projection → model.
+- A pricing tier or revenue split → model.
+- "*Today the process is broken because of X*" (descriptive) → process §9 pain points.
+- "*The way to fix this is Y*" (prescriptive) → analysis.
 
 When the user asks you to produce a process doc but the conversation has been about strategy or quantification, gently surface this distinction and confirm they want the descriptive layer.
 
