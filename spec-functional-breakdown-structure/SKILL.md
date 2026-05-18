@@ -1,0 +1,309 @@
+---
+name: spec-functional-breakdown-structure
+description: "Create a Functional Breakdown Structure (FBS) — the functionality registry organised by product → capability → functionality, with status tracking (✅/🔄/⬜), optional code-path annotations, and optional value-stream-stage linkage. Synthesises BABOK §10.22 Functional Decomposition + NASA FBS + TOGAF Business Architecture + practitioner discipline. Use when the user asks to build an FBS, scaffold a functionality registry, decompose a product into functionalities, track feature status across the lifecycle, or extend a Business Capability Map with feature-level detail. Triggers on: FBS, functional breakdown structure, functionality registry, decompose product, feature inventory, what does the product do (concretely), capability-to-feature mapping, product decomposition. Domain-agnostic. Soft-links UP to the Business Capability Map (BC Map owns L0+L1 strategic; FBS adds L2 functionalities + status + code paths). Stays out of PRD/roadmap territory."
+version: "1.0.0"
+user-invocable: true
+allow_implicit_invocation: true
+impact: "low"
+metadata:
+  category: "specification"
+  complexity: "medium"
+---
+
+# Functional Breakdown Structure Builder
+
+You are an expert at producing **Functional Breakdown Structures (FBS)** — the canonical functionality registry that answers, for any product: *"does this product do X, and where in the codebase does it live?"* Synthesises BABOK §10.22 (Functional Decomposition), NASA's FBS doctrine, TOGAF's capability-to-feature mapping, and practitioner discipline from software product literature.
+
+The artifact produced by this skill is **a markdown document** at `docs/product-specs/functional-breakdown-structure/FBS.md` (adapt to project convention). It is NOT a feature backlog, NOT a roadmap, NOT a PRD, NOT a capability map — it is **the functionality registry**: comprehensive, status-tracked, and traceable to capabilities (UP) and PRDs (DOWN).
+
+This skill is **domain-agnostic**. When activated inside a project, it inherits the project's BC Map (capability IDs + names) and produces an FBS that extends the capability hierarchy with functionality-level detail.
+
+---
+
+## What "FBS" means here — pure-FBS vs hybrid-FBS
+
+Strictly per NASA's Systems Engineering literature, a Functional Breakdown Structure is *"a structured, modular breakdown of every function that must be addressed to perform a generic mission… The FBS is not tied to any particular architectural implementation because it is a listing of the needed functions, not the elements, of the architecture."* In its pure form, an FBS contains **only functions**, organised independently of products, organisations, and technology.
+
+In software-product orgs, "FBS" is commonly used to mean a **hybrid** structure where the top levels organise by product (or product family) and the leaf level enumerates functionalities. This hybrid mixes:
+- **Product Breakdown Structure (PBS)** elements (L0 — product or domain)
+- **Capability Map** elements (L1 — soft-linked from the BC Map by ID)
+- **FBS-proper** elements (L2 — the functionalities)
+
+This skill produces the **hybrid form** because it's what product/software teams actually need. The methodology references explain the distinction honestly so readers understand the trade-off.
+
+---
+
+## What a "good FBS" means
+
+An FBS is good when a reader can answer, without ambiguity:
+
+| Question | Where it lives |
+|---|---|
+| **What is the organising axis (L0)?** | §L0 axis declaration (inherited from BC Map) |
+| **Which capabilities does the product cover (L1)?** | §Per-capability sections — soft-linked to BC Map by ID |
+| **What functionalities realise each capability?** | Per-capability functionality table |
+| **Is functionality X shipped / planned / backlog?** | Status column per functionality (✅ 🔄 ⬜) |
+| **Where in the codebase does each capability live?** | Per-capability backend/frontend code-path annotations (optional) |
+| **Which value-stream stage does a functionality support?** | Per-functionality VS-stage column (optional) |
+| **What's the stable identifier for functionality X?** | Per-functionality ID `C1.1.F01` (capability + functionality counter) |
+
+**Hard scope rules:**
+- FBS does **NOT** define capabilities — soft-links to BC Map. If you find yourself writing a capability definition, that belongs in `business-capability-map.md`.
+- FBS does **NOT** contain feature specs / acceptance criteria — those are PRD territory.
+- FBS does **NOT** contain roadmap timelines, dates, or milestones — those belong in a roadmap doc.
+- FBS does **NOT** include cycle-time or operational metrics — that's process-doc territory.
+
+If the FBS doc starts to grow any of these, it has crossed scope. Pull the offending content out into its proper home and link instead.
+
+---
+
+## The three modes of operation
+
+### Mode 1 — Scaffold
+
+**When:** the project has no FBS folder yet, or has one missing the canonical template.
+
+**Output:** ONE file in `docs/product-specs/functional-breakdown-structure/` (or project-chosen folder):
+- `FBS.md` — hub document with intro, kit-link methodology pointer, L0 axis declaration, ASCII tree placeholder, empty per-capability sections.
+
+Source from `references/template.md`. Substitute `{{product_or_scope}}` and `{{L0_axis_label}}` placeholders. Do NOT invent functionalities in scaffold mode.
+
+**Do NOT** ship a project-side `methodology-references.md`. The canonical bibliography lives in the skill at `references/methodology-references.md` and is linked from the project doc's header.
+
+### Mode 2 — Build structure (auto-import from BC Map)
+
+**When:** the scaffold exists but the per-capability sections are empty.
+
+**Process:**
+1. **Read the BC Map** at `docs/business/capability-map/capability-map.md`. If absent, warn and ask whether to proceed with manual capability-list entry (degrades discipline — the FBS becomes the source of truth for capability names instead of soft-linking).
+2. **Import L0 + L1 wholesale** — every L0 item from the BC Map becomes an L0 section in the FBS; every L1 capability becomes a `### C-N.M · {Name}` sub-section.
+3. **Render the ASCII tree** at the top of the FBS, mirroring the BC Map structure but adding a functionality-count placeholder per capability:
+   ```
+   {{product}}
+   ├── C1 · {L0 name}
+   │   ├── C1.1 · {Capability name}  (functionalities: _TODO_)
+   │   └── C1.2 · {Capability name}  (functionalities: _TODO_)
+   └── C2 · {L0 name}
+       └── ...
+   ```
+4. **Pre-fill per-capability annotations** if present in the BC Map (or as `_TODO_` placeholders):
+   - One-line capability summary (mirroring the BC Map's definition — kept short, references BC Map for full strategic prose)
+   - Backend code paths (`_TODO_` initially)
+   - Frontend code paths (`_TODO_` initially)
+   - Empty functionality table
+
+**Do NOT fully enumerate functionalities in structure mode.** Each capability table starts with one `_TODO_` placeholder row. Mode 3 fills it.
+
+### Mode 3 — Add / update functionalities
+
+**When:** the structure exists; the user wants to enumerate / update functionalities for one or more capabilities.
+
+**Process:**
+1. **Confirm the capability** (e.g., `C1.1` or "all of C1") the user wants populated.
+2. **For each functionality, assign:**
+   - **ID** — `C1.1.F01`, `C1.1.F02`, … (counter scoped under the capability; never reused or recycled even if a functionality is retired).
+   - **Name** — short, function-oriented (verb-led OR noun phrase, but always describing *what the system does*, not what users do — see anti-patterns).
+   - **Status** — `✅ Shipped` / `🔄 Planned` / `⬜ Backlog`. Default `⬜` when adding new rows; promote as work progresses.
+   - **VS stage** (optional column) — `VS-N.M` link to value-streams.md, or `_TODO_` / `—` if value streams don't exist.
+3. **For each capability section** (set once, refined over time):
+   - **Backend code paths** — package/folder names where this capability's code lives.
+   - **Frontend code paths** — page / component paths.
+   - **One-line capability summary** — short reminder of what the capability does. **Do not** restate the BC Map definition.
+4. **Run discipline checks** (see `references/fbs-discipline.md` §"Quality checks"):
+   - No anti-patterns survived
+   - Status reflects production reality (audit when in doubt)
+   - No PRD / roadmap content crept in
+   - Functionality counts are within sizing heuristics
+
+---
+
+## Hard scope rules — what does NOT belong in the FBS
+
+Common scope violations and where the content actually belongs:
+
+| Symptom | Belongs in |
+|---|---|
+| Capability definition / strategic prose | BC Map |
+| Acceptance criteria, user stories | PRD |
+| Sprint commitment, release date, milestone | Roadmap doc |
+| Cycle time, latency target, throughput KPI | Process doc |
+| Persona served, value proposition | Persona doc / Value-stream doc |
+| Implementation plan, atomic increments | Implementation plan |
+| Bug report, incident timeline | Issue tracker (Linear, Jira, GitHub) |
+
+If you find yourself writing any of these in the FBS, pull the content into its proper home and add a soft-link from the FBS.
+
+---
+
+## Inputs
+
+| Needed | What you ask if missing |
+|---|---|
+| **Project context location** | Look for `docs/product-specs/`. If unclear, ask. |
+| **Mode** (scaffold / structure / fill) | Detect from request. Confirm if ambiguous. |
+| **BC Map existence** | Check for `docs/business/capability-map/capability-map.md`. If absent, warn: structure mode will degrade to manual capability entry. Suggest running `spec-business-capability-map` first. |
+| **Scope name** | What product / product family / domain does this FBS cover? Used for `{{product_or_scope}}` substitution. |
+| **Capability ID** (fill mode) | Which capability does the user want populated? Single ID or batch (e.g., "all of C1" or "C1.1, C1.2, C1.3"). |
+| **Value-streams existence** | Check for `docs/business/value-streams/value-streams.md`. If absent, VS-stage column will be `_TODO_` placeholders. |
+
+Ask 2–4 questions max, single message, lettered options where possible. Don't drag through a wizard.
+
+---
+
+## Output structure — the fixed template
+
+The skill produces ONE markdown file at `{folder}/FBS.md` with this fixed structure (full template in `references/template.md`):
+
+```
+<!-- doc-version: 1.0 | created: YYYY-MM-DD -->
+
+H1: {{product_or_scope}} — Functional Breakdown Structure
+
+Intro paragraph:
+  - What an FBS is (hybrid PBS+FBS framing)
+  - Hard scope rules (no capabilities, no PRD content, no roadmap, no metrics)
+  - Methodology kit-link pointer
+  - Companion docs (BC Map, value-streams, PRDs, processes)
+
+§Status legend — ✅ Shipped / 🔄 Planned / ⬜ Backlog
+
+§L0 axis declaration — inherited from BC Map (chosen axis + rationale)
+
+§Global overview — ASCII tree (L0 → L1 with functionality counts per capability)
+
+§Per-L0 H2 section
+  §§ Per-capability H3 section (C-N.M · {Name})
+    - One-line capability summary (soft-link to BC Map by ID — DO NOT restate definition)
+    - Backend: {paths or _TODO_}
+    - Frontend: {paths or _TODO_}
+    - Functionality table:
+      | ID | Functionality | Status | VS stage |
+      |---|---|---|---|
+      | C-N.M.F01 | ... | ✅ | VS-2.3 |
+
+Changelog
+```
+
+**Section count is fixed; ordering is fixed.** The ASCII tree + per-capability sections are mandatory.
+
+---
+
+## Sizing heuristics
+
+| Level | Recommended count | Source |
+|---|---|---|
+| L0 items | 3–10 | Practitioner: "no more than ten domains, including the core product" + Miller 7±2 |
+| L1 capabilities per L0 | 5–12 | Inherited from BC Map |
+| L2 functionalities per capability | 5–25 | Practitioner heuristic; total can reach "a few hundred features for a grown-up product" |
+| Total functionalities (FBS-wide) | 50–500 typical | Practitioner |
+
+**Anti-explosion signals:**
+- L2 going past 25 per capability → the capability is probably too coarse in the BC Map; consider splitting at the BC Map level
+- L3 functionalities (sub-functionalities) emerging → you're mixing functionality with implementation detail; collapse back to L2 or move detail into PRDs
+- Total >500 → the project may have outgrown a single FBS doc; consider splitting by L0 (one FBS per product / domain)
+
+---
+
+## Cross-reference — the architecture-artefact lifecycle
+
+The FBS sits at the **tactical product-decomposition layer**, downstream of the strategic Business Architecture artefacts and upstream of feature delivery:
+
+| Artefact | Owns | FBS relationship |
+|---|---|---|
+| **Personas** | Who the product serves | FBS doesn't link directly (value streams handle persona → capability traceability) |
+| **Business Capability Map** | What abilities the business has | FBS soft-links UP by capability ID; never restates capabilities |
+| **Value Streams** | How value flows persona → stages → capabilities | FBS optionally links each functionality to a VS stage |
+| **Processes** | How operations happen | FBS doesn't link directly (processes operationalise capabilities, which FBS already links to) |
+| **FBS** *(this skill)* | What the product does, status-tracked | — |
+| **PRD** | What we will build for one functionality slice | Per-PRD soft-link to the FBS functionality IDs it delivers |
+| **Implementation plans** | How we will build it | Downstream of PRDs; no direct FBS link |
+
+### Soft-reference principle
+
+The FBS references other artefacts as pointers, not as dependencies. A scaffolded FBS must stand alone; cross-references add depth, not prerequisites. Build the FBS even if value streams / PRDs do not yet exist.
+
+When linking, use stable IDs: `C1.1 ↔ value-stream VS-3.2 ↔ FBS functionality C1.1.F01 ↔ PRD-0042`. Make traceability mechanical.
+
+---
+
+## Common patterns to apply
+
+1. **Functionalities are what the system does, not what users do.** "Validate email format" (functionality) ≠ "User enters email" (user story — PRD territory). The system-perspective phrasing prevents PRD/story creep.
+
+2. **Status reflects production reality.** ✅ means "shipped and in production". If a feature is shipped behind a flag, mark it 🔄 with a note. If a feature was shipped then rolled back, mark ⬜ and add changelog. Status drift between FBS and prod is the #1 hygiene failure.
+
+3. **One FBS row = one atomic functionality.** "Search + filter + sort" should be three rows, not one row that mixes them. The atomicity lets PRDs target one row precisely.
+
+4. **Soft-link to BC Map, never restate.** Each capability section has a one-line summary AND a link to the BC Map row. The one-liner is a reminder, not a definition. Definitions live in the BC Map.
+
+5. **Code paths are capability-level, not functionality-level.** Listing every functionality's exact file paths is noise; listing the package/folder per capability tells engineers where to look. Practitioner experience shows capability-level is the right granularity.
+
+6. **VS-stage links are optional but illuminating.** When filled, the FBS becomes a traceability surface: stakeholder → value stream → stage → capability → functionality. Without VS links, the FBS is still useful as a registry — just less traceable.
+
+7. **Retired functionalities stay in the FBS with `⬜` and a changelog note.** Don't delete history. "We used to do X" is institutional memory.
+
+8. **The FBS is one doc per project scope.** A single product → one FBS. A product family → still one FBS, organised by product at L0. If you want per-product FBSs, the scope is wrong; widen.
+
+9. **Status promotion is the most common edit.** ⬜ → 🔄 when a PRD commits the work; 🔄 → ✅ when the PRD ships. The skill should make this edit fast.
+
+10. **Comments / rationale belong in the changelog, not in the row.** Functionality rows stay terse; *why* a functionality was added/changed lives in the changelog at the bottom.
+
+---
+
+## Finding the right folder
+
+Default: `docs/product-specs/functional-breakdown-structure/`. Alternatives:
+- `docs/architecture/functional-breakdown-structure/` when architecture artefacts have their own root.
+- `docs/<domain>/functional-breakdown-structure/` when scoped narrowly.
+
+**Always check for an existing folder first:**
+
+```bash
+find docs -type d -iname "*functional*" -o -type d -iname "*fbs*" 2>/dev/null
+```
+
+If a folder exists at a non-default location, use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none, default to `docs/product-specs/functional-breakdown-structure/` and confirm.
+
+**Never overwrite an existing `FBS.md`.** Switch modes if it exists:
+- Scaffold mode → skip (report what's there).
+- Structure mode → only fill empty capability sections; preserve existing ones.
+- Fill mode → append/update rows in the targeted capability table.
+
+---
+
+## Reference materials
+
+Three files in `references/` carry the canonical content. Read when needed:
+
+- **`references/template.md`** — the canonical `FBS.md` skeleton. Copy to `{folder}/FBS.md` and fill placeholders.
+- **`references/methodology-references.md`** — canonical bibliography (BABOK §10.22, NASA FBS, NASA WBS Handbook, TOGAF, Hackernoon practitioner guide). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
+- **`references/fbs-discipline.md`** — internal Claude guidance: 6 anti-patterns, capability-vs-functionality-vs-feature decision tree, status-drift detection, sizing heuristics. Never copied into the project.
+
+---
+
+## Closing report to the user
+
+After running any mode, summarise in 4–6 lines:
+
+1. **Mode executed** + **files created or updated** with paths.
+2. **L0 / L1 inheritance** — confirm count imported from BC Map (or note absence).
+3. **Functionalities filled vs `_TODO_`** — counts per capability.
+4. **Status distribution** (fill mode) — how many ✅ / 🔄 / ⬜ so the user sees the current shipping picture.
+5. **Anti-pattern check** — explicit confirmation that no PRD / roadmap / capability-definition content leaked in.
+6. **Cross-link opportunities** — value streams + PRDs the FBS should soft-link to.
+
+---
+
+## Checklist
+
+Before declaring the work done:
+
+- [ ] Folder exists or was created.
+- [ ] `FBS.md` exists with intro + L0 axis + ASCII tree + per-capability sections (scaffold mode).
+- [ ] Methodology pointer in `FBS.md` header links to the kit's canonical bibliography.
+- [ ] L0 / L1 imported from BC Map (or manual entry flagged in changelog).
+- [ ] Each functionality has ID (`C-N.M.F01` pattern), name, status; optional VS-stage / code paths populated where applicable.
+- [ ] No capability definitions, PRD content, or roadmap detail leaked in.
+- [ ] Sizing heuristics respected (L2 ≤ 25 per capability; total ≤ ~500).
+- [ ] No project-specific terms baked in (kit version).
+- [ ] Closing report delivered.
