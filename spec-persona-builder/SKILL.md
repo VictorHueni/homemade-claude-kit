@@ -50,11 +50,12 @@ The skill operates in one of three modes. Detect which mode the user wants from 
 
 **When:** the project has no `personas/` folder yet, or has one but is missing the canonical template + methodology references.
 
-**Output:** two files in the project's chosen personas folder:
-- `personas.md` — hub document with introduction, template, backlog scaffold, "no personas yet" placeholder.
-- `methodology-references.md` — the canonical bibliography (BABOK §10.43, Cooper, Pruitt & Adlin, Lene Nielsen, NNG, Lean UX, JTBD).
+**Output:** ONE file in the project's chosen personas folder:
+- `personas.md` — hub document with introduction, kit-link methodology pointer, template, backlog scaffold, "no personas yet" placeholder.
 
-Source the file content from `references/template.md` and `references/methodology-references-template.md`. Substitute `{{product}}`, `{{domain}}`, `{{org_type_examples}}` placeholders from the project context.
+Source from `references/template.md`. Substitute `{{product}}`, `{{domain}}`, `{{org_type_examples}}` placeholders from the project context.
+
+**Do NOT** ship a project-side `methodology-references.md`. The canonical bibliography lives in the skill at `references/methodology-references.md` and is linked from the project doc's header. Single source of truth; no drift across projects.
 
 **Do not** invent personas in scaffold mode. The output is the empty hub document.
 
@@ -132,7 +133,7 @@ H1: {{product}} — Personas
 
 Introduction paragraph:
   - What personas are, why they exist, who they serve
-  - Methodology one-liner (link to methodology-references.md)
+  - Methodology pointer (2-line blockquote linking to the skill's canonical bibliography in the kit)
   - NNG design-decision-relevance rule of inclusion
 
 §Persona Template (the blueprint, copied for each new persona)
@@ -279,7 +280,7 @@ If a folder exists at a non-default location (e.g., `docs/product-specs/personas
 Three files in `references/` carry the canonical content. Read them when needed:
 
 - **`references/template.md`** — the canonical `personas.md` skeleton. Copy this to `{personas folder}/personas.md` and fill placeholders.
-- **`references/methodology-references-template.md`** — the canonical `methodology-references.md` that ships alongside `personas.md`. Full bibliography with BABOK §10.43, Cooper, Pruitt & Adlin, Lene Nielsen, NNG, Lean UX, JTBD.
+- **`references/methodology-references.md`** — the canonical bibliography (BABOK §10.43, Cooper, Pruitt & Adlin, Lene Nielsen, NNG, Lean UX, JTBD). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
 - **`references/persona-types-and-quality.md`** — Cooper's six persona types with decision rules, NNG quality-check anti-patterns, proto-persona discipline. Internal Claude guidance; never copied into the project.
 
 ---
@@ -303,7 +304,8 @@ Keep it short. The user will read the file directly; your job is to point them a
 Before declaring the work done:
 
 - [ ] Folder existed or was created (with user confirmation if new path).
-- [ ] `personas.md` and `methodology-references.md` exist in the personas folder (scaffold mode).
+- [ ] `personas.md` exists in the personas folder (scaffold mode).
+- [ ] Methodology pointer in `personas.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
 - [ ] Backlog tables populated with Cooper persona types + tiers + negative section (backlog mode).
 - [ ] Persona body filled with all required fields per the template (fill-one mode).
 - [ ] Every snapshot field present passes the NNG design-decision-relevance test.

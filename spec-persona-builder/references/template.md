@@ -8,13 +8,7 @@ precise vocabulary for "the user" across product, engineering, and business
 analysis work, and to ground feature prioritisation in concrete human needs
 rather than assumptions.
 
-**Methodology:** personas are built using the canonical synthesis of BABOK®
-§10.43 (Stakeholder List, Map, or Personas), Cooper's goal-directed design
-(persona types), Pruitt & Adlin's persona lifecycle, Lene Nielsen's 10-step
-process, Nielsen Norman Group's design-decision-relevance rule, Lean UX
-(proto-persona discipline), and Jobs-to-be-Done (goal framing). See
-[methodology-references.md](methodology-references.md) for the full theoretical
-grounding and bibliography.
+> **Methodology:** built using the canonical synthesis of [BABOK §10.43 + Cooper goal-directed design + Pruitt & Adlin lifecycle + Lene Nielsen 10-step + NNG + Lean UX + JTBD](https://github.com/VictorHueni/homemade-claude-kit/tree/main/spec-persona-builder/references/methodology-references.md). The full bibliography and framework synthesis live with the skill that generated this doc — single source of truth across every project.
 
 **Rule of inclusion (NNG):** every field in a persona must be able to answer
 *"would removing this detail change a design or prioritisation decision?"* If
@@ -128,7 +122,7 @@ capability, or others.*
 #### Stakeholder Profile (BABOK §10.43)
 
 *Dimensions for business-analysis planning — stakeholder engagement,
-collaboration strategy, RACI assignment. See methodology-references.md §1.*
+collaboration strategy, RACI assignment. See the BABOK §10.43 entry in the [skill's methodology reference](https://github.com/VictorHueni/homemade-claude-kit/tree/main/spec-persona-builder/references/methodology-references.md).*
 
 | BABOK dimension | Assessment |
 |---|---|

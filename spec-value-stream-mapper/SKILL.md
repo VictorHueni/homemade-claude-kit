@@ -68,11 +68,12 @@ A value stream is good when a reader can answer, without ambiguity:
 
 **When:** the project has no `value-streams/` folder, or has one but is missing the canonical template + methodology.
 
-**Output:** two files in `docs/business/value-streams/` (or project-chosen folder):
-- `value-streams.md` — hub doc with intro, catalogue table scaffold, template block, "no streams yet" placeholder.
-- `methodology-references.md` — canonical bibliography (TOGAF Series Guide, BIZBOK, Ulrich/Kuehn, EA-vs-Lean-VSM stance).
+**Output:** ONE file in `docs/business/value-streams/` (or project-chosen folder):
+- `value-streams.md` — hub doc with intro, kit-link methodology pointer, catalogue table scaffold, template block, "no streams yet" placeholder.
 
-Source from `references/template.md` and `references/methodology-references-template.md`. Substitute `{{product_or_scope}}` placeholders. Do NOT invent streams in scaffold mode.
+Source from `references/template.md`. Substitute `{{product_or_scope}}` placeholders. Do NOT invent streams in scaffold mode.
+
+**Do NOT** ship a project-side `methodology-references.md`. The canonical bibliography lives in the skill at `references/methodology-references.md` and is linked from the project doc's header. Single source of truth; no drift across projects.
 
 ### Mode 2 — Build the value-stream catalogue
 
@@ -163,7 +164,7 @@ Intro paragraph:
   - What a value stream is (BIZBOK + TOGAF), why it exists
   - EA vs Lean VSM stance (this skill is EA)
   - Triangulation: persona (who) → value stream (how value flows) → capability (what abilities) → process (operational how)
-  - Methodology link (methodology-references.md)
+  - Methodology pointer (2-line blockquote linking to the skill's canonical bibliography in the kit)
   - Companion docs (../personas/personas.md, ../capability-map/capability-map.md, ../processes/ folder)
 
 §Value Stream Template (the blueprint, copied for each new stream)
@@ -272,7 +273,7 @@ If a folder exists at a non-default location, use it — don't move existing wor
 Three files in `references/` carry the canonical content:
 
 - **`references/template.md`** — the canonical `value-streams.md` skeleton. Copy to `{folder}/value-streams.md` and fill.
-- **`references/methodology-references-template.md`** — the canonical bibliography (TOGAF, BIZBOK, Ulrich/Kuehn, EA-vs-Lean stance).
+- **`references/methodology-references.md`** — the canonical bibliography (TOGAF, BIZBOK, Ulrich/Kuehn, EA-vs-Lean stance). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
 - **`references/value-stream-discipline.md`** — internal Claude guidance: 7 anti-patterns, EA-vs-Lean stance, scope-vs-process boundary, naming rules, quality checks. Never copied into the project.
 
 ---
@@ -295,7 +296,8 @@ After running any mode, summarise in 4–6 lines:
 Before declaring the work done:
 
 - [ ] Folder exists or was created.
-- [ ] `value-streams.md` and `methodology-references.md` exist (scaffold mode).
+- [ ] `value-streams.md` exists (scaffold mode).
+- [ ] Methodology pointer in `value-streams.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
 - [ ] Catalogue table populated with naming-rule-compliant stream names (catalogue mode).
 - [ ] Every stream has a triggering stakeholder linking to a persona ID (or honest `_TODO_` if personas absent).
 - [ ] Every stream has exactly one value proposition (no "AND" in the value).

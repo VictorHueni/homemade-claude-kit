@@ -47,11 +47,12 @@ The skill operates in one of three modes. Detect from the user's prompt; ask if 
 
 **When:** the project has no BC Map folder yet, or has one but is missing the template + methodology references.
 
-**Output:** two files in the project's chosen folder:
-- `capability-map.md` — the hub doc (intro + axis declaration + tree + index + per-capability blocks + changelog).
-- `methodology-references.md` — the canonical bibliography (TOGAF G189, Cutter, SAP, BABOK, Cesar Gonzalez naming, Miller 7±2 sizing).
+**Output:** ONE file in the project's chosen folder:
+- `capability-map.md` — the hub doc (intro + kit-link methodology pointer + axis declaration + tree + index + per-capability blocks + changelog).
 
-Source the file content from `references/template.md` and `references/methodology-references-template.md`. Substitute `{{product_or_scope}}`, `{{L0_axis_label}}` placeholders from project context. Do NOT invent capabilities in scaffold mode — leave the tree as a `_TODO_` skeleton.
+Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{L0_axis_label}}` placeholders. Do NOT invent capabilities in scaffold mode — leave the tree as a `_TODO_` skeleton.
+
+**Do NOT** ship a project-side `methodology-references.md`. The canonical bibliography lives in the skill at `references/methodology-references.md` and is linked from the project doc's header. Single source of truth; no drift across projects.
 
 ### Mode 2 — Build the L0/L1 structure
 
@@ -143,7 +144,7 @@ H1: {{product_or_scope}} — Business Capability Map
 Intro paragraph:
   - What a BC Map is, why it exists
   - Hard scope rule: L0+L1 only (L2 if extensive), no features/functionality
-  - Methodology one-liner (link to methodology-references.md)
+  - Methodology pointer (2-line blockquote linking to the skill's canonical bibliography in the kit)
   - Companion docs (FBS, personas, value streams, processes)
 
 §L0 axis declaration
@@ -282,7 +283,7 @@ If a folder exists at a non-default location, use it — don't move existing wor
 Three files in `references/` carry the canonical content. Read when needed:
 
 - **`references/template.md`** — the canonical `capability-map.md` skeleton. Copy to `{folder}/capability-map.md` and fill placeholders.
-- **`references/methodology-references-template.md`** — the canonical `methodology-references.md` (project-side bibliography: TOGAF G189, Cutter, SAP, BABOK, Gonzalez naming, Miller sizing).
+- **`references/methodology-references.md`** — the canonical bibliography (TOGAF G189, Cutter, SAP, BABOK, Gonzalez naming, Miller sizing). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
 - **`references/capability-discipline.md`** — internal Claude guidance: noun test, technology-independence test, anti-overlap test, capability-vs-process-vs-function-vs-unit decision tree, common mistakes from Cutter. Never copied into the project.
 
 ---
@@ -306,7 +307,8 @@ Keep it short. Point the user at the next move.
 Before declaring the work done:
 
 - [ ] Folder identified or created (with user confirmation if new).
-- [ ] `capability-map.md` and `methodology-references.md` exist (scaffold mode).
+- [ ] `capability-map.md` exists (scaffold mode).
+- [ ] Methodology pointer in `capability-map.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
 - [ ] L0 axis explicitly chosen + rationale documented (structure / fill mode).
 - [ ] ASCII tree + Capability Index table populated (structure mode).
 - [ ] L0 count: 3–8. L1 count per L0: 5–12. L1 total: ≤25.
