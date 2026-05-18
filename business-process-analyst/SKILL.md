@@ -133,7 +133,20 @@ Frontmatter blockquote:
 Changelog
 ```
 
-**Section count is fixed.** Section ordering is fixed. The §8 KPIs and §11 TODOs tables are **mandatory** — never empty.
+**Section count is fixed; ordering is fixed; §8 KPIs and §11 TODOs are mandatory (never empty).**
+
+**§6 Activities decomposition has 5 documented exceptions** — full detail in `references/logic-and-sequence.md` *When to break the template*. Most processes use per-actor §6 sub-sections. Use a deviation when the natural organising axis is clearly different:
+
+| Default | When to deviate |
+|---|---|
+| §6 per-actor (one sub-section per actor / pool / lane) | Default — works for ~80% of processes |
+| §6 per-variant (one sub-section per request type) | When 3+ structurally distinct sub-flows share the same actors — e.g., a regulatory process with new-application / renewal / special-track / removal variants |
+| §6 per-channel (one sub-section per parallel channel) | When the process is fundamentally bifurcated into 2 channels with different actors / rules / data — e.g., insurer-direct vs pooled-fund rebate flows |
+| §6 collapsed to system components | When there are no human actors (automated pipelines) |
+| §6 as ongoing duties | When the process is a continuous loop with no defined end (monitoring, surveillance) |
+| §6 per-jurisdiction | When the same process runs differently across cantons / states / countries |
+
+**Always document the deviation in the doc's frontmatter blockquote** with a one-sentence rationale. Default to the standard per-actor template when in doubt — deviations are escape hatches for genuine misfit, not licence to redesign to taste.
 
 ---
 

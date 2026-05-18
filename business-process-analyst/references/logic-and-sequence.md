@@ -116,10 +116,61 @@ Follow this order when populating a new process doc. The order matters — each 
 
 ## When to break the template
 
-The template is opinionated but not religious. Three legitimate reasons to deviate:
+The template is opinionated but not religious. The §6 Activities section is the most common place where a strict template fight produces a worse doc than a thoughtful deviation. Five legitimate reasons to deviate:
 
-1. **Process has no human actors** — purely automated pipelines. Drop §3 detail to "system components" and reweight §4 Data Stores + §5 Data Objects accordingly.
-2. **Process is a continuous loop with no defined end** — monitoring processes, evergreen reconciliation. §1 should explicitly say "no defined end state"; §8 KPIs become the primary deliverable.
-3. **Process spans multiple regulatory jurisdictions** — add a §3.1 jurisdiction-by-jurisdiction actor mapping; otherwise the single-table §3 won't capture the complexity.
+### 1. Process has no human actors
 
-In all three cases, document the deviation in the doc's frontmatter blockquote so future readers understand why this doc doesn't match the template precisely.
+Purely automated pipelines. Drop §3 detail to "system components" and reweight §4 Data Stores + §5 Data Objects accordingly. The §6 sequence diagrams still work — participants are services, not roles.
+
+### 2. Process is a continuous loop with no defined end
+
+Monitoring processes, evergreen reconciliation, surveillance. §1 should explicitly say "no defined end state"; §8 KPIs become the primary deliverable; §6 activities are described as ongoing duties of each actor, not numbered one-time steps.
+
+### 3. Process spans multiple regulatory jurisdictions
+
+The same process runs differently in different jurisdictions (cantonal variation in CH, state variation in US, EU member-state variation). Add a §3.1 jurisdiction-by-jurisdiction actor mapping; the §7 decision-rule provenance cites jurisdiction-specific sources; otherwise the single-table §3 won't capture the complexity.
+
+### 4. Process is fundamentally variant-organised (by request type, not by actor)
+
+**Recognise this when:** the process has 3+ structurally distinct sub-flows that share the same actors but differ in steps, decision criteria, and outcomes — and forcing them into a per-actor §6 decomposition would fragment each sub-flow across multiple actor lanes, losing narrative flow.
+
+**Example:** a Swiss LS-admission process where the same OFSP/EAK/Swissmedic actors handle structurally different request types (new-admission ND, triennial review, special-track applications, radiation/delisting). Per-actor §6 would scatter each request type across lanes; per-variant §6 keeps each variant's narrative coherent.
+
+**How to apply:** organise §6 sub-sections **by variant**, not by actor. Each §6.x is a complete variant walkthrough including the per-actor interactions for that variant. §3 Actors stays at the top as a unified table; §7 Decision points may need per-variant sub-sections. Mention in the frontmatter blockquote that "§6 is organised by request type, not by actor — see [variant axis] below."
+
+**Trade-off:** loses some BPMN-pool-mapping convenience (a BPMN modeler will need to re-decompose by lane), but gains narrative readability for a domain where the variants are the primary organising axis.
+
+### 5. Process is fundamentally channel-bifurcated
+
+**Recognise this when:** the process has two (rarely three) parallel channels that share the same trigger and end goal but differ structurally in actors, data flows, and rules — and the channel choice itself is a first-class concept that readers must hold throughout.
+
+**Example:** a Swiss Preismodelle rebate-flow process with Channel A (insurer-direct rebates from MAH) and Channel B (volume-based rebates pooled via Institution commune LAMal). The two channels share the trigger ("a Preismodelle drug is dispensed") and the goal ("MAH transfers rebate"), but have different actors, different visibility on the LS, different reconciliation cadences, different aggregation rules.
+
+**How to apply:** keep the per-channel axis as the primary organising principle. §3 Actors gets a "Channel A / Channel B" column. §4 Data Stores splits by channel where systems differ. §5 Data Objects gets per-channel rows. §6 Activities subsections each describe one channel end-to-end. §7 Decision points includes the "which channel applies" gateway prominently. Mention in the frontmatter blockquote: "§6 is organised by channel (A vs B), not by actor — channel choice is a first-class concept in this process."
+
+**Trade-off:** same as variant — loses some BPMN-pool symmetry, but a single-axis decomposition would obscure the channel differentiation that operators *need* to keep in mind constantly. The channel axis IS the operational reality.
+
+---
+
+**In all five cases, document the deviation in the doc's frontmatter blockquote** so future readers understand why this doc doesn't match the template precisely. Format:
+
+```
+> **Template deviation:** §6 Activities is organised by {variant / channel / etc.}
+> rather than per-actor, because {one-sentence rationale}. The per-actor unified
+> table appears at §3.
+```
+
+---
+
+## Detecting which exception applies
+
+When you're stuck deciding whether the per-actor template fits, ask:
+
+1. **Can I name 3+ distinct sub-flows that share the same actors but differ structurally?** → Exception 4 (by variant)
+2. **Are there 2 channels/paths that exist in parallel for the full process duration?** → Exception 5 (by channel)
+3. **Is the process running constantly with no instance boundary?** → Exception 2 (continuous loop)
+4. **Are there no human actors at all?** → Exception 1 (automated pipeline)
+5. **Does the process exist in N different forms across jurisdictions?** → Exception 3 (multi-jurisdictional)
+6. **None of the above?** → Use the standard per-actor template. If the per-actor structure feels awkward but doesn't match any exception, the more likely problem is that §3 Actors hasn't been worked through carefully enough — go back and refine the actor list before deciding to deviate.
+
+When in doubt, **default to the standard template**. Deviations are escape hatches for genuine misfit, not licence to redesign the structure to taste.
