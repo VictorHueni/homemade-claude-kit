@@ -29,7 +29,7 @@ Processes (how it operationally happens)
 
 **Companion documents:**
 - Personas: [link to personas.md if exists]
-- Business Capability Map: [link to business-capability-map.md if exists]
+- Business Capability Map: [link to ../capability-map/capability-map.md if exists]
 - Business Processes: [link to docs/business/processes/ if exists]
 
 **Hard rules:**
@@ -75,7 +75,7 @@ using business-object framing. Avoid internal-lifecycle naming
 | **Entrance criteria** | [What must be true to enter this stage — 2–4 bullets] |
 | **Exit criteria** | [What must be true to leave — 2–4 bullets; the value item produced is the primary exit] |
 | **Value items produced** | [1–3 incremental value items that accrue toward the value proposition] |
-| **Enabling capabilities** | [C-N.M IDs — soft-link to business-capability-map.md] |
+| **Enabling capabilities** | [C-N.M IDs — soft-link to ../capability-map/capability-map.md] |
 | **Operationalised by processes** | [process-name.md — soft-link to docs/business/processes/, or `_TODO_`] |
 | **Pain point index** | **[Low / Medium / High / Critical]** — [one-line rationale: evidence-based, not wishlist] |
 

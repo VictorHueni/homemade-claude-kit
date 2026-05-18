@@ -14,7 +14,9 @@ metadata:
 
 You are an expert at producing **strategic Business Capability Maps (BC Maps)** — TOGAF-aligned, domain-agnostic artefacts that answer one question: *"what does this business / product / service actually do?"* — expressed as a stable hierarchy of capabilities, independent of the technology, organisation, or processes that realise them.
 
-The artifact produced by this skill is **a markdown document** in the project's architecture folder (typically `docs/architecture/business-capability-map/` or `docs/product-specs/business-capability-map/` — adapt to project convention). It is NOT a feature backlog, NOT a process diagram, NOT an org chart — it is **the strategic "what" layer** that other architecture artefacts (FBS, value streams, processes, personas) soft-reference by capability ID.
+The artifact produced by this skill is **a markdown document** in the project's business-architecture folder (default `docs/business/capability-map/`, adapt to project convention). It is NOT a feature backlog, NOT a process diagram, NOT an org chart — it is **the strategic "what" layer** that other architecture artefacts (FBS, value streams, processes, personas) soft-reference by capability ID.
+
+The capability map is one of the four canonical **Business Architecture artefacts** (BIZBOK / TOGAF), alongside personas, value streams, and business processes — which is why they all sit together under `docs/business/`.
 
 This skill is **domain-agnostic**. The template patterns work for any product, service, or enterprise. When activated inside a project, the skill picks up the project's own naming, scope, and existing artefacts.
 
@@ -46,7 +48,7 @@ The skill operates in one of three modes. Detect from the user's prompt; ask if 
 **When:** the project has no BC Map folder yet, or has one but is missing the template + methodology references.
 
 **Output:** two files in the project's chosen folder:
-- `business-capability-map.md` — the hub doc (intro + axis declaration + tree + index + per-capability blocks + changelog).
+- `capability-map.md` — the hub doc (intro + axis declaration + tree + index + per-capability blocks + changelog).
 - `methodology-references.md` — the canonical bibliography (TOGAF G189, Cutter, SAP, BABOK, Cesar Gonzalez naming, Miller 7±2 sizing).
 
 Source the file content from `references/template.md` and `references/methodology-references-template.md`. Substitute `{{product_or_scope}}`, `{{L0_axis_label}}` placeholders from project context. Do NOT invent capabilities in scaffold mode — leave the tree as a `_TODO_` skeleton.
@@ -119,7 +121,7 @@ If unsure, **default to "capability domain / theme"** (TOGAF-classic) — it's t
 
 | Needed | What you ask if missing |
 |---|---|
-| **Project context location** | Look for `docs/architecture/`, `docs/product-specs/`, or equivalent. If unclear, ask. |
+| **Project context location** | Look for `docs/business/`, `docs/architecture/`, or equivalent. If unclear, ask. |
 | **Mode** (scaffold / structure / fill) | Detect from request. Confirm if ambiguous. |
 | **Scope name** | What is this BC Map for? A product family? An enterprise? A single product? Required for `{{product_or_scope}}` substitution. |
 | **L0 axis** (mode 2 only) | The 7-option anchor decision above. Don't proceed without an explicit choice. |
@@ -131,7 +133,7 @@ Ask 2–4 questions max, single message, lettered options where possible.
 
 ## Output structure — the fixed template
 
-The skill produces ONE markdown file at `{folder}/business-capability-map.md` with this fixed structure (full template in `references/template.md`):
+The skill produces ONE markdown file at `{folder}/capability-map.md` with this fixed structure (full template in `references/template.md`):
 
 ```
 <!-- doc-version: 1.0 | created: YYYY-MM-DD -->
@@ -258,11 +260,7 @@ When both BC Map and FBS exist for the same product/scope:
 
 ## Finding the right folder
 
-BC Map docs typically live in:
-
-- `docs/architecture/business-capability-map/` — when architecture has its own root.
-- `docs/product-specs/business-capability-map/` — when capability work sits alongside product specs.
-- `docs/business/business-capability-map/` — when it's primarily a business-architecture artefact.
+**Default:** `docs/business/capability-map/` — aligns the capability map with the other Business Architecture artefacts (personas, value streams, processes).
 
 **Always check for an existing folder first:**
 
@@ -270,9 +268,9 @@ BC Map docs typically live in:
 find docs -type d -iname "*capabilit*" 2>/dev/null
 ```
 
-If multiple candidates exist, ask the user. If none exists, ask where the project wants it.
+If a folder exists at a non-default location, use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none exists, default to `docs/business/capability-map/` and confirm with the user.
 
-**Never overwrite an existing `business-capability-map.md`.** Switch modes if it exists:
+**Never overwrite an existing `capability-map.md`.** Switch modes if it exists:
 - Scaffold mode → skip (report what's there).
 - Structure mode → only fill empty tree/index; preserve existing capabilities.
 - Fill mode → append/update per-capability blocks; preserve existing content.
@@ -283,7 +281,7 @@ If multiple candidates exist, ask the user. If none exists, ask where the projec
 
 Three files in `references/` carry the canonical content. Read when needed:
 
-- **`references/template.md`** — the canonical `business-capability-map.md` skeleton. Copy to `{folder}/business-capability-map.md` and fill placeholders.
+- **`references/template.md`** — the canonical `capability-map.md` skeleton. Copy to `{folder}/capability-map.md` and fill placeholders.
 - **`references/methodology-references-template.md`** — the canonical `methodology-references.md` (project-side bibliography: TOGAF G189, Cutter, SAP, BABOK, Gonzalez naming, Miller sizing).
 - **`references/capability-discipline.md`** — internal Claude guidance: noun test, technology-independence test, anti-overlap test, capability-vs-process-vs-function-vs-unit decision tree, common mistakes from Cutter. Never copied into the project.
 
@@ -308,7 +306,7 @@ Keep it short. Point the user at the next move.
 Before declaring the work done:
 
 - [ ] Folder identified or created (with user confirmation if new).
-- [ ] `business-capability-map.md` and `methodology-references.md` exist (scaffold mode).
+- [ ] `capability-map.md` and `methodology-references.md` exist (scaffold mode).
 - [ ] L0 axis explicitly chosen + rationale documented (structure / fill mode).
 - [ ] ASCII tree + Capability Index table populated (structure mode).
 - [ ] L0 count: 3–8. L1 count per L0: 5–12. L1 total: ≤25.

@@ -125,7 +125,7 @@ per legal entity."]
 - *Personas served:* [P-xx](../personas/personas.md#p-xx-name), [P-yy]
 - *Value streams enabled:* [VS-x](../value-streams/value-streams.md#vs-x)
 - *Operationalised by processes:* [process-name](../../business/processes/process-name.md)
-- *FBS row:* [BC1.1 in FBS](../functional-breakdown-structure/FBS.md#bc11)
+- *FBS row:* [C1.1 in FBS](../../product-specs/functional-breakdown-structure/FBS.md#c11)
 
 ---
 

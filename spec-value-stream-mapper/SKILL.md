@@ -14,7 +14,9 @@ metadata:
 
 You are an expert at producing **Business Architecture value streams** in the TOGAF + BIZBOK tradition — strategic, stage-based descriptions of how value flows from a triggering stakeholder through a sequence of stages to a delivered value proposition. Each stage soft-links to the capabilities it consumes and the processes that operationalise it.
 
-The artifact produced by this skill is **a markdown document** at `docs/product-specs/value-streams/` (adapt to project convention). It is NOT a Lean VSM (factory-floor cycle-time analysis), NOT a customer journey (emotional experience map), NOT a business process (operational activity sequence) — it is **the strategic value-flow layer** that bridges personas (who) and capabilities (what abilities), and which processes (how operationally) implement.
+The artifact produced by this skill is **a markdown document** at `docs/business/value-streams/` (adapt to project convention). It is NOT a Lean VSM (factory-floor cycle-time analysis), NOT a customer journey (emotional experience map), NOT a business process (operational activity sequence) — it is **the strategic value-flow layer** that bridges personas (who) and capabilities (what abilities), and which processes (how operationally) implement.
+
+Value streams are one of the four canonical **Business Architecture artefacts** (BIZBOK / TOGAF), alongside personas, the capability map, and business processes — which is why they all sit together under `docs/business/`.
 
 This skill is **domain-agnostic**. When activated inside a project, it picks up the project's own personas, capability map, and processes.
 
@@ -66,7 +68,7 @@ A value stream is good when a reader can answer, without ambiguity:
 
 **When:** the project has no `value-streams/` folder, or has one but is missing the canonical template + methodology.
 
-**Output:** two files in `docs/product-specs/value-streams/` (or project-chosen folder):
+**Output:** two files in `docs/business/value-streams/` (or project-chosen folder):
 - `value-streams.md` — hub doc with intro, catalogue table scaffold, template block, "no streams yet" placeholder.
 - `methodology-references.md` — canonical bibliography (TOGAF Series Guide, BIZBOK, Ulrich/Kuehn, EA-vs-Lean-VSM stance).
 
@@ -140,8 +142,8 @@ Lifted from BIZBOK common mistakes + TOGAF + practitioner literature. Run these 
 | **Project context location** | Look for `docs/product-specs/`. If unclear, ask. |
 | **Mode** (scaffold / catalogue / fill) | Detect from request. Confirm if ambiguous. |
 | **Scope name** | What scope is this value-stream catalogue for? A product? A product family? An enterprise? |
-| **Personas existence** | Check for `docs/product-specs/personas/personas.md`. If absent, warn: triggering stakeholders will be `_TODO_` and discipline is degraded. Suggest running `spec-persona-builder` first. |
-| **BC Map existence** | Check for `business-capability-map.md`. If absent, warn: enabling-capabilities links will be `_TODO_`. Suggest running `spec-business-capability-map` first. |
+| **Personas existence** | Check for `docs/business/personas/personas.md` (or legacy `docs/product-specs/personas/personas.md`). If absent, warn: triggering stakeholders will be `_TODO_` and discipline is degraded. Suggest running `spec-persona-builder` first. |
+| **BC Map existence** | Check for `docs/business/capability-map/capability-map.md`. If absent, warn: enabling-capabilities links will be `_TODO_`. Suggest running `spec-business-capability-map` first. |
 | **VS ID** (mode 3 only) | Which row from the catalogue does the user want filled? |
 
 Ask 2–4 questions max, single message, lettered options where possible. Don't drag through a wizard.
@@ -162,7 +164,7 @@ Intro paragraph:
   - EA vs Lean VSM stance (this skill is EA)
   - Triangulation: persona (who) → value stream (how value flows) → capability (what abilities) → process (operational how)
   - Methodology link (methodology-references.md)
-  - Companion docs (personas.md, business-capability-map.md, business processes folder)
+  - Companion docs (../personas/personas.md, ../capability-map/capability-map.md, ../processes/ folder)
 
 §Value Stream Template (the blueprint, copied for each new stream)
 
@@ -248,9 +250,7 @@ This is what closes the architecture-gap pattern where teams "jump from capabili
 
 ## Finding the right folder
 
-Default: `docs/product-specs/value-streams/`. Alternatives:
-- `docs/architecture/value-streams/` when the project organises architecture artefacts separately.
-- `docs/business/value-streams/` when value streams anchor business-analysis work.
+**Default:** `docs/business/value-streams/` — aligns value streams with the other Business Architecture artefacts (personas, capability map, processes).
 
 **Always check for an existing folder first:**
 
@@ -258,7 +258,7 @@ Default: `docs/product-specs/value-streams/`. Alternatives:
 find docs -type d -iname "*value-stream*" 2>/dev/null
 ```
 
-If multiple candidates exist, ask. If none, default to `docs/product-specs/value-streams/`.
+If a folder exists at a non-default location, use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none exists, default to `docs/business/value-streams/` and confirm with the user.
 
 **Never overwrite an existing `value-streams.md`.** Switch modes if it exists:
 - Scaffold mode → skip (report what's there).

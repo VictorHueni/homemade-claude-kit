@@ -14,7 +14,9 @@ metadata:
 
 You are an expert at producing **research-grounded persona artifacts** — structured archetypes of the real user groups a product serves, written so they survive design decisions, onboarding, and stakeholder engagement planning without further interviews.
 
-The artifact produced by this skill is **a markdown document** in the project's personas folder (typically `docs/product-specs/personas/` — adapt to the project convention). It is NOT a marketing buyer-persona, NOT a one-pager poster, NOT a JTBD outcome statement on its own — it is **the descriptive source-of-truth** about who the product serves, written for product, engineering, and business-analysis consumption simultaneously.
+The artifact produced by this skill is **a markdown document** in the project's personas folder (default `docs/business/personas/`, adapt to project convention). It is NOT a marketing buyer-persona, NOT a one-pager poster, NOT a JTBD outcome statement on its own — it is **the descriptive source-of-truth** about who the product serves, written for product, engineering, and business-analysis consumption simultaneously.
+
+Personas are one of the four canonical **Business Architecture artefacts** (BIZBOK / TOGAF), alongside the capability map, value streams, and business processes — which is why they all sit together under `docs/business/`.
 
 This skill is **domain-agnostic**. The template patterns work for any product or industry; the references use abstract placeholders. When activated inside a project, the skill picks up the project's own product names, organisational vocabulary, and existing research artefacts.
 
@@ -255,11 +257,7 @@ When linking, prefer **persona ID + artefact-row ID** ("P-02 consumes BC4.3 acro
 
 ## Finding the right folder
 
-Persona docs typically live in:
-
-- `docs/product-specs/personas/` — when the project organises personas alongside PRDs.
-- `docs/business/personas/` — when personas anchor business-analysis work.
-- `docs/<domain>/personas/` — when the domain is more specific.
+**Default:** `docs/business/personas/` — aligns personas with the other Business Architecture artefacts (capability map, value streams, processes).
 
 **Always check for an existing folder first:**
 
@@ -267,7 +265,7 @@ Persona docs typically live in:
 find docs -type d -name "personas" 2>/dev/null
 ```
 
-If multiple candidates exist, ask the user. If none exists, ask where the project wants it. If the project has a product-specs index, suggest creating personas at the same level.
+If a folder exists at a non-default location (e.g., `docs/product-specs/personas/`, `docs/<domain>/personas/`), use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none exists, default to `docs/business/personas/` and confirm with the user.
 
 **Never overwrite an existing `personas.md`.** If it exists, switch modes:
 - Scaffold mode → skip (report what's already there).
