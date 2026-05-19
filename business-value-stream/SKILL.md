@@ -93,9 +93,36 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}` placehol
 
 **When:** the catalogue row exists for `VS-N` and the user wants the full body filled.
 
+**Step 0 — Clarifying questions (ask BEFORE generating)**
+
+Ask the user the following 4 questions in a single message with lettered options. Users respond like `1A, 2C, 3B, 4A`:
+
+```text
+1. Which stream to fill?
+   A. [name the VS-N ID from the catalogue]
+   B. Fill all catalogue rows in one pass
+
+2. Stage count target?
+   A. Lean — 4–5 stages (high-level; process docs add operational depth later)
+   B. Standard — 6–8 stages (recommended for most streams)
+   C. Detailed — 9–10 stages (complex multi-actor or multi-phase flow)
+
+3. Pain index basis?
+   A. Evidence-based — I have data / customer feedback / observed delays to reference
+   B. Hypothesis-based — team intuitions only (all ratings labelled Assumed)
+   C. Skip — leave all pain index as _TODO_
+
+4. Process doc linkage?
+   A. Process docs exist — link "Operationalised by" to existing docs/business/processes/ files
+   B. No process docs yet — all "Operationalised by" stay _TODO_
+   C. Partial — some exist; I will name them
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
 **Process:**
 1. **Confirm the catalogue row** — triggering stakeholder, value proposition, scope. Verify the triggering stakeholder is a real persona ID; if `_TODO_`, surface and ask.
-2. **Identify the stages** — 4–10 ordered stages from trigger to value proposition. Each stage produces an intermediate **value item** that accrues toward the final value proposition.
+2. **Identify the stages** — use the Stage count target from Step 0 Q2 as the target (Lean: 4–5 / Standard: 6–8 / Detailed: 9–10). Each stage produces an intermediate **value item** that accrues toward the final value proposition.
 3. **Apply BIZBOK stage-naming rule** — stages are short noun-led or imperative phrases describing the value milestone, not the activity sequence. "Validate eligibility" (stage) ≠ "Run eligibility-check script" (activity).
 4. **For each stage, fill the canonical block** (see `references/template.md`):
    - **Stage name + ID** (`VS-N.M`)
@@ -104,8 +131,8 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}` placehol
    - **Exit criteria** — what must be true to leave (2–4 bullets; the value item produced is the primary exit).
    - **Value items produced** — 1–3 incremental value items that accrue toward the value proposition.
    - **Enabling capabilities** — soft-link to BC Map (`C-N.M` IDs). One stage consumes 1–4 capabilities typically. Capabilities CAN be reused across streams (BIZBOK: "a capability can be reused many times within and across value streams").
-   - **Operationalised by processes** — soft-link to process docs if they exist. Optional; if no processes documented, leave `_TODO_`.
-   - **Pain point index** — `Low / Medium / High / Critical` plus a one-line rationale. Marks which stages are transformation priorities.
+   - **Operationalised by processes** — use the linkage answer from Step 0 Q4: link to named process docs, or leave `_TODO_` if none exist.
+   - **Pain point index** — use the basis from Step 0 Q3: evidence-based ratings with source, `Assumed` label for hypothesis-based, or `_TODO_` if skipped.
 5. **Build the ASCII stage-flow** at the top of the stream block:
    ```
    [P-02 trigger] → VS-2.1 → VS-2.2 → VS-2.3 → VS-2.4 → [Value: Onboarded Customer]
