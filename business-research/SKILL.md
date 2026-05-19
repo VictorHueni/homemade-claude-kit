@@ -242,6 +242,12 @@ find docs -type d -iname "*research*" -o -type d -iname "*interview*" 2>/dev/nul
 
 If a folder exists, use it. If multiple, ask. If none, default and confirm.
 
+**Never overwrite an existing research file.** Each mode creates a new file; existing files are never regenerated wholesale:
+- Scaffold mode → skip if `README.md` already exists (report what's there).
+- Interview script mode → always create a new `interview-{slug}.md`; never overwrite a previous script.
+- Synthesis mode → always create a new `research-synthesis-{date}-{topic}.md`; never overwrite prior synthesis.
+- Research plan mode → always create a new `research-plan-{topic}.md`; never overwrite a prior plan.
+
 ---
 
 ## Reference materials

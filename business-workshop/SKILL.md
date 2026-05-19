@@ -274,6 +274,12 @@ find docs -type d -iname "*workshop*" 2>/dev/null
 
 If a folder exists, use it. If multiple, ask. If none, default and confirm.
 
+**Never overwrite an existing workshop file.** Each mode creates a new file; existing files are never regenerated wholesale:
+- Scaffold mode → skip if `README.md` already exists (report what's there).
+- Single workshop mode → always create a new `workshop-{slug}-{date}.md`; never overwrite a previous guide.
+- Series mode → always create new series + per-session files; never overwrite existing sessions.
+- Synthesis mode → always create a new `workshop-synthesis-{slug}-{date}.md`; never overwrite prior synthesis.
+
 ---
 
 ## Reference materials
