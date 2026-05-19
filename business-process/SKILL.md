@@ -319,6 +319,24 @@ When the user asks you to produce a process doc but the conversation has been ab
 
 ---
 
+## Sizing heuristics
+
+| Element | Recommended | Source |
+|---|---|---|
+| Actors per process | 2–6 | Practitioner — more signals the process is too broad |
+| Activities per actor in §6 | 5–15 | Practitioner |
+| KPIs in §8 | 3–8 (minimum 3 mandatory) | Practitioner — fewer = narrative, not process |
+| Decision points in §7 | 1–6 | Practitioner — more signals the process should be split |
+| Open TODOs in §11 on first scaffold | ≥3 | Practitioner |
+
+**If any number exceeds the recommended range, reconsider:**
+- Too many actors (>6) → the process spans too many organisational boundaries; split into sub-processes or use a higher-level coordinator actor.
+- Too many activities per actor (>15) → the actor's lane is too detailed; group related steps or decompose into a child process.
+- Too few KPIs (<3) → the process has no measurable outcomes; seed candidate KPI rows even if values are `_TODO_`.
+- Too many decision points (>6) → the process has too much branching logic; consider whether variants deserve separate process docs.
+
+---
+
 ## Finding the right folder
 
 Process docs typically live in:

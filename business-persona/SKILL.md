@@ -287,6 +287,26 @@ When linking, prefer **persona ID + artefact-row ID** ("P-02 consumes BC4.3 acro
 
 ---
 
+## Sizing heuristics
+
+| Element | Recommended | Source |
+|---|---|---|
+| Tier-1 personas per product | 1–3 | Lean UX + Cooper (max 1 primary per surface) |
+| Total personas in backlog | ≤8 | Practitioner — more signals scope is too broad |
+| Proto-persona next-review | ≤90 days from Created | Lean UX validate-or-retire discipline |
+| Goals per persona | 3–5 | NNG |
+| Scenarios per persona | 1–2 | Cooper + Nielsen |
+| Frustrations per persona | 3–5 | Practitioner |
+
+**If any number exceeds the recommended range, reconsider:**
+- Too many Tier-1 personas → the product is trying to serve everyone; force a primary/secondary split.
+- Too many personas in backlog (>8) → the scope is too wide; tighten the target market or split by product surface.
+- Proto-persona past next-review date → it has expired; validate or retire before using it in design decisions.
+- Too many goals (>5) → goals are too granular; consolidate into higher-level JTBD outcomes.
+- Too many scenarios (>2) → scenarios are covering edge cases; trim to the most representative use moments.
+
+---
+
 ## Finding the right folder
 
 **Default:** `docs/business/personas/` — aligns personas with the other Business Architecture artefacts (capability map, value streams, processes).

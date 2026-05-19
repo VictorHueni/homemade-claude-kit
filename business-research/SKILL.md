@@ -228,6 +228,26 @@ Consult during generation.
 
 ---
 
+## Sizing heuristics
+
+| Element | Recommended | Source |
+|---|---|---|
+| Interviews per persona to saturation | 5 | NN/g saturation rule |
+| Interview duration | 45–60 min | NN/g semi-structured guidance |
+| Hypotheses per script | 1–4 | Practitioner — more = interview loses focus |
+| Questions per section | 3–5 | Portigal |
+| Sections per script | 4–6 | Practitioner sweet spot |
+| Synthesis lag after interview | ≤1h | Practitioner — memory decay |
+
+**If any number exceeds the recommended range, reconsider:**
+- Fewer than 5 interviews per persona → findings are directional, not saturated; label synthesis as `Tested` not `Validated`; plan a second wave.
+- Interview over 60 min → participant fatigue degrades late-session quality; cut a section or split into two sessions.
+- More than 4 hypotheses per script → the interview will be too long and unfocused; split into two scripts targeting different hypothesis families.
+- More than 6 sections → the script is too long; apply the 45–60 min constraint and drop the lowest-priority section.
+- Synthesis written >1h after interview → flag that recall may be degraded; note in the synthesis header.
+
+---
+
 ## Finding the right folder
 
 Default: `docs/business/research/`. Alternatives:

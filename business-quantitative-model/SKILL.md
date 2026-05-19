@@ -406,6 +406,25 @@ If the project needs more than one model, **run `catalogue` mode first** (Mode 0
 
 ---
 
+## Sizing heuristics
+
+| Element | Recommended | Source |
+|---|---|---|
+| Funnel steps | 3–5 | Practitioner — fewer = oversimplified; more = over-engineered |
+| §5.2 assumption rows | 5–10 (minimum 3 mandatory) | Practitioner |
+| Scenario columns | Exactly 3 (Conservative / Base / Aggressive) | Fixed by template |
+| Named segments in §5.3 | Top 3–5 | Practitioner |
+| §8 key unknowns | 3–7 | Practitioner |
+| Active models per project | 3–6 | Practitioner — one per quantification question |
+
+**If any number exceeds the recommended range, reconsider:**
+- Fewer than 3 §5.2 assumption rows → the model is hiding its premises; seed at least 3 even on first scaffold.
+- More than 10 §5.2 rows → the model has too many free variables; collapse correlated assumptions or promote the most consequential ones.
+- More than 5 funnel steps → the model is over-engineering the pipeline; merge adjacent steps or reconsider what "step" means.
+- More than 6 active models → the project is likely duplicating quantification; audit for overlap before adding another model.
+
+---
+
 ## Index update
 
 After generating the model file, append a row to the project's models index (typically `docs/business/index.md`). The standard columns are: File | Phase | Purpose | Status. Use this initial status:
