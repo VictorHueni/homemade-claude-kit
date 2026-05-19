@@ -30,6 +30,7 @@ what order, and where to put it**.
 - `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/{NNNN}-{slug}.md`
 - `spec-idea` — captures pre-PRD ideas → `docs/ideas/{slug}.md`
 - `spec-peer-review` — reviews PRDs / plans
+- `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/competitive-landscape/`; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
 - `ops-runbook`, `ops-bug-rca` — operational artefacts (post-ship)
 - `util-docs-audit` — periodic health check
 - `dev-*` skills — developer workflow (git, PR, worktree, slide deck)
