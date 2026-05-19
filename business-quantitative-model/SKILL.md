@@ -1,7 +1,7 @@
 ---
 name: business-quantitative-model
-description: "Create a new quantitative business model document under docs/business/models/. Use when the user asks to create a TAM/SAM/SOM model, a savings model, a recovery / restitution model, a customer-ROI model, or any other revenue-quantified funnel that feeds an investor or sales pitch. Triggers on: create a business model, scaffold a TAM, bootstrap a quant model, fill in a model from the template, write a market-sizing doc, turn this idea into a model doc, model for the {product/feature/flow}, new model under docs/business/models. Encodes the canonical 4-step funnel (top-of-funnel → filter → conversion → segmentation), mandatory §5 implicit-assumptions table, scenario matrix, and value-capture sections."
-version: "1.1.0"
+description: "Create or plan quantitative business model documents under docs/business/models/. Four modes: (catalogue) recommend the full model set + build order for the venture shape before any file is created; (scaffold) generate a single empty model file from the canonical template; (fill) populate the funnel sections with project context; (refresh) recalibrate inputs and assumptions when new evidence arrives. Use when the user asks to create a TAM/SAM/SOM model, a savings model, a recovery / restitution model, a customer-ROI model, plan the quant models, or any other revenue-quantified funnel that feeds an investor or sales pitch. Triggers on: create a business model, plan the models, which models do we need, scaffold a TAM, bootstrap a quant model, fill in a model from the template, write a market-sizing doc, turn this idea into a model doc, model for the {product/feature/flow}, new model under docs/business/models. Encodes the canonical 4-step funnel, mandatory §5 implicit-assumptions table, scenario matrix, value-capture sections, the venture-shape catalogue (B2B SaaS / savings-recovery / marketplace / hardware), and the {phase-digit}{letter}-{topic} naming convention."
+version: "1.2.0"
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"
@@ -36,9 +36,48 @@ A model doc is good when a reader can answer, without ambiguity:
 
 ---
 
-## The three modes of operation
+## The four modes of operation
 
-The skill operates in one of three modes. Detect which mode the user wants from their prompt; ask if ambiguous.
+The skill operates in one of four modes. Detect which mode the user wants from their prompt; ask if ambiguous. **Catalogue** precedes the build trio (Scaffold / Fill / Refresh) and answers a different question: *which models does this project need*, not *how to build one*.
+
+| Mode | Question it answers | Output |
+|---|---|---|
+| **0 — Catalogue** | Which models does this project need, and in what order? | Chat-message plan (no files) |
+| **1 — Scaffold** | Create one empty model file from the template | `docs/business/models/{slug}.md` with all numerics `_TODO_` |
+| **2 — Fill** | Populate the funnel sections with project context | The scaffold, with knowable cells pre-filled |
+| **3 — Refresh** | Recalibrate inputs when new evidence arrives | Targeted updates + changelog entry |
+
+### Mode-selection heuristic
+
+- Plural / generic request (*"plan the models"*, *"what models for X"*, *"which models do we need"*) → **catalogue**
+- Specific model named (*"build the TAM"*, *"scaffold the customer ROI model"*) and no file exists → **scaffold**, immediately followed by **fill** if the user provides context
+- Existing scaffold + the user wants it populated → **fill**
+- Existing populated model + new data has landed → **refresh**
+- Ambiguous → ask one clarifying question, don't guess
+
+### Mode 0 — Catalogue
+
+**When:** the project is producing quantitative models for the first time (no files in `docs/business/models/`, or only `_template_*` exists), OR the user asks plural / generic questions about which models to build.
+
+**Output:** a chat-message plan — recommended model set + build-order DAG + external gates. **No files created.**
+
+**Workflow:**
+
+1. **Detect the venture shape** by reading the project's existing artefacts (Lean Canvas / BMC, personas, capability map, value streams). The four canonical shapes and their detection heuristics are in `references/canonical-model-set.md`:
+   - **Shape A** — B2B SaaS pre-pricing (default)
+   - **Shape B** — Savings / recovery / restitution
+   - **Shape C** — Marketplace / take-rate
+   - **Shape D** — Hardware / physical product
+   - **Shape Z** — Standalone / unknown (fall-through)
+2. **Ask one disambiguation question** only if the shape is not detectable from artefacts. Use the question template in `references/canonical-model-set.md`.
+3. **Emit the recommended model set** from the reference doc: slugs, what each computes, dependency DAG, and which models are gated on external decisions (architecture ADR, pilot data, pricing negotiation, regulatory approval).
+4. **Flag deviations** if the project has reasons to depart from the canonical set (small enumerable market, no competitor identified, pre-build pilot client, regulated industry, etc.) — see "When to deviate" in the reference doc.
+5. **Stop.** Do not create any model files in this mode. The user picks which model to build first; switching to Scaffold is a separate request.
+
+**Do NOT** in catalogue mode:
+- Create any files in `docs/business/models/`.
+- Pre-fill any numbers — the catalogue is structural only.
+- Recommend models the project will not need (a B2B SaaS does not need a BoM model; a marketplace does not need a TAM-by-customer-count).
 
 ### Mode 1 — Scaffold
 
@@ -304,20 +343,66 @@ When the user asks you to produce a model doc but the conversation has been abou
 
 ---
 
-## How to find the right slug and phase
+## Naming convention
 
-When the user mentions a model by purpose (not by exact slug), infer based on the project's existing convention:
+The slug is the model's first piece of documentation — it should self-describe what the model is for, without requiring the reader to open the file. Use this pattern for every new model:
 
-- Check `docs/business/models/` for existing slugs to follow the project's numbering scheme (1A / 1B / 1C, or P1 / P2, etc.).
-- The slug is typically `{phase}-{short-topic}-model` (e.g., `1c-cost-savings-model`, `2a-customer-roi-model`).
-- The display name is the human-readable H1 (e.g., "Cost Savings Model", "Customer ROI Model").
+```
+{phase-digit}{letter}-{topic}-model.md
+```
 
-**Always run a quick check before generating:** `ls docs/business/models/` to see if a scaffold already exists. If it does, the user probably wants you to *populate* it using the template, not create a duplicate file. Confirm with them.
+**Phase digit semantics — *value before market before economics*:**
 
-**Never overwrite an existing model file.** Switch modes if it exists:
-- Scaffold mode → skip (report what's already there).
-- Fill mode → open the existing file and populate empty sections; never regenerate wholesale.
-- Refresh mode → targeted updates + changelog entry only.
+| Digit | Layer | What lives here |
+|---|---|---|
+| **1** | Per-customer value | ROI, willingness-to-pay, pricing headroom, BoM / COGS per unit |
+| **2** | Market and projection | TAM / SAM / SOM, ARR / GMV curve, addressable units, named-account roster |
+| **3** | Cost, operations, and economics | CAC, gross margin, payback, LTV/CAC, channel economics, onboarding cost, warranty / regulatory reserves |
+
+The digit order is not arbitrary. You cannot defend market sizing until you know what one customer is worth (phase 1 → phase 2). You cannot target unit economics until you know price × volume (phase 2 → phase 3). Reversing the order forces you to rebuild upstream models when downstream assumptions change.
+
+**Letter:** sequence within phase (`a`, `b`, `c`, …) — typically the dependency order inside that phase.
+
+**Topic:** 1–3 kebab-case words naming what the model computes. Pick the *output* of the model, not its inputs (`tam-sam-som` not `market-research`; `customer-roi` not `time-saved-analysis`).
+
+**Examples:**
+
+| Slug | What it computes |
+|---|---|
+| `1a-customer-roi-model.md` | Per-customer / per-account value the product delivers |
+| `1b-pricing-headroom-model.md` | Tier price ÷ ROI = value-capture ratio + payback |
+| `2a-tam-sam-som-model.md` | Addressable market in customer count + ARR |
+| `2b-revenue-projection-model.md` | N-year ARR / GMV / unit-sales curve |
+| `3a-unit-economics-model.md` | CAC, gross margin, payback, LTV/CAC |
+| `3b-onboarding-cost-model.md` | Time-to-live + onboarding labour per customer |
+
+### Picking the right slug for a new model
+
+1. **Check `docs/business/models/` first** — `ls` to see if a scaffold already exists. Never duplicate; never overwrite.
+2. **If existing files use a different scheme** (uppercase `1A`, `P1` prefix, no phase digit, etc.) — **follow the project's convention**, don't fight it. Consistency within a project beats kit-wide uniformity.
+3. **If the project has no existing models** — use the canonical convention above. Determine the phase digit from what the model produces (value / market / economics).
+4. **If the project doesn't have a multi-model plan** — use a descriptive slug with no phase digit (e.g., `market-sizing-model.md`).
+
+### Display name (H1) discipline
+
+The H1 is the slug, transformed:
+- Strip `{phase-digit}{letter}-` and `-model.md`
+- Title Case the remainder
+- Add "Model" suffix
+
+`1a-customer-roi-model.md` → `# Customer ROI Model`
+`2a-tam-sam-som-model.md` → `# TAM / SAM / SOM Model`
+
+### Don't overwrite existing model files
+
+If a file at the slug already exists, switch modes:
+- **Scaffold mode** → skip; report what's already there
+- **Fill mode** → open the existing file and populate empty sections only; never regenerate wholesale
+- **Refresh mode** → targeted updates + changelog entry only
+
+### Whole-project model planning
+
+If the project needs more than one model, **run `catalogue` mode first** (Mode 0) to pick the right venture shape and the canonical set + build order. See `references/canonical-model-set.md` for the four shapes (B2B SaaS / savings-recovery / marketplace / hardware) and their recommended slugs.
 
 ---
 
@@ -335,8 +420,9 @@ If the project doesn't have an index file, ask the user where the new model shou
 
 ## Reference materials
 
-Three files in `references/` carry the canonical content. Read them when needed:
+Four files in `references/` carry the canonical content. Read them when needed:
 
+- **`references/canonical-model-set.md`** — the venture-shape catalogue used by `mode: catalogue`. Defines the four shapes (B2B SaaS / savings-recovery / marketplace / hardware) and their recommended model sets, slugs, dependency DAGs, and external gates. **Read this whenever the user asks "which models do we need?" or starts model work on a fresh project.**
 - **`references/template.md`** — the canonical model skeleton. Copy this to `docs/business/models/{slug}.md` and fill placeholders. If the project has its own `_template_business_model.md`, prefer that as the source of truth (it may have project-specific tweaks).
 - **`references/logic-and-sequence.md`** — the plain-English explanation of why each section exists and the 9-step sequence you follow when filling the template. Reference this when explaining the structure to the user.
 - **`references/examples.md`** — abstract worked examples for a 4-step funnel (recovery / restitution shape) and a 3-step funnel (TAM/SAM/SOM shape), showing how the template gets filled for different funnel shapes.
