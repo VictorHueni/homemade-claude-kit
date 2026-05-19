@@ -8,18 +8,18 @@ machines via dotfiles.
 
 | Skill | Description |
 |-------|-------------|
-| [bug-rca](./bug-rca/) | Systematic bug root cause analysis and fix recommendations |
-| [docs-auditor](./docs-auditor/) | Scan repo docs for stale, outdated, and dead documentation |
-| [git-commit](./git-commit/) | Conventional commit message analysis and generation |
-| [idea-generator](./idea-generator/) | Create and manage structured idea files |
-| [pr-creator](./pr-creator/) | Create PRs following repo templates and standards |
-| [ralph-loop-runner](./ralph-loop-runner/) | Autonomous implementation loop: implement, test, commit, repeat |
-| [slide-builder-skill](./slide-builder-skill/) | Build single-file HTML slide decks from modular partials |
+| [ops-bug-rca](./ops-bug-rca/) | Systematic bug root cause analysis and fix recommendations |
+| [util-docs-audit](./util-docs-audit/) | Scan repo docs for stale, outdated, and dead documentation |
+| [dev-git-commit](./dev-git-commit/) | Conventional commit message analysis and generation |
+| [spec-idea](./spec-idea/) | Create and manage structured idea files |
+| [dev-pr](./dev-pr/) | Create PRs following repo templates and standards |
+| [dev-ralph-loop](./dev-ralph-loop/) | Autonomous implementation loop: implement, test, commit, repeat |
+| [dev-slide-deck](./dev-slide-deck/) | Build single-file HTML slide decks from modular partials |
 | [spec-adr-manager](./spec-adr-manager/) | Architecture Decision Records (MADR 4.x) |
-| [spec-implementation-planner](./spec-implementation-planner/) | Small-step, testable implementation roadmaps from PRDs |
-| [spec-peer-reviewer](./spec-peer-reviewer/) | Review PRDs and plans for gaps and delivery risks |
-| [spec-prd-creator](./spec-prd-creator/) | Generate Product Requirements Documents |
-| [using-git-worktrees](./using-git-worktrees/) | Guide for Git worktree workflows |
+| [spec-implementation-plan](./spec-implementation-plan/) | Small-step, testable implementation roadmaps from PRDs |
+| [spec-peer-review](./spec-peer-review/) | Review PRDs and plans for gaps and delivery risks |
+| [spec-prd](./spec-prd/) | Generate Product Requirements Documents |
+| [dev-git-worktree](./dev-git-worktree/) | Guide for Git worktree workflows |
 
 ## Commands
 
