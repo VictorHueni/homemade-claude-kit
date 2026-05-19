@@ -74,12 +74,37 @@ A canvas is good when a reader can answer, without ambiguity:
 
 **When:** the project has no canvas folder yet, or has one missing the canonical template.
 
-**Process:**
-1. **Ask which variant** — BMC or Lean Canvas (default suggestion based on project type, but user decides).
-2. **Ask scope name** — the product / business / venture being modelled (for `{{product_or_scope}}` substitution).
+**Step 0 — Clarifying questions (ask BEFORE generating)**
 
-**Output:** ONE file in `docs/business/business-model-canvas/` (or project-chosen folder):
-- `business-model-canvas.md` (if BMC) or `lean-canvas.md` (if Lean Canvas) — hub document with intro, kit-link methodology pointer, all 9 blocks scaffolded with `_TODO_` placeholders + confidence ratings + soft-link slots.
+Ask the user the following 3 questions in a single message with lettered options. Users respond like `1A, 2B, 3C`:
+
+```text
+1. Variant?
+   A. Business Model Canvas (BMC) — Osterwalder/Pigneur; established business or scaling team
+   B. Lean Canvas — Ash Maurya; startup or high-uncertainty environment
+
+2. Canvas timeframe?
+   A. Current state only (default — captures how the model works today)
+   B. Future state only (captures the aspirational model)
+   C. Both — create a current-state + future-state file and cross-link them
+
+3. Existing BA artefacts to pre-populate soft-link slots?
+   A. None yet — all soft-link slots stay _TODO_
+   B. Some exist — I will check the project (personas, capability map, value streams, processes)
+   C. Full BA stack exists — pre-populate all soft-link slots from existing IDs
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
+**Inputs needed before generating:**
+
+| Needed | What you ask if missing |
+|---|---|
+| **Scope name** | "What product / business / venture is this canvas for?" — used for `{{product_or_scope}}` substitution |
+
+**Output:** ONE file (or two if timeframe = Both) in `docs/business/business-model-canvas/` (or project-chosen folder):
+- `business-model-canvas.md` (BMC) or `lean-canvas.md` (Lean Canvas) — hub document with intro, kit-link methodology pointer, all 9 blocks scaffolded with `_TODO_` placeholders + confidence ratings + soft-link slots pre-populated where artefacts exist.
+- If timeframe = Both: also create `business-model-canvas-future.md` (or `lean-canvas-future.md`) and cross-link the two files in each header.
 
 Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{variant}}` placeholders. Do NOT invent block content in scaffold mode.
 
