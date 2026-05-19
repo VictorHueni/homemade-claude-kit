@@ -59,6 +59,37 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{indu
 
 **When:** the scaffold exists; the user wants to fill the industry-structure layer.
 
+**Step 0 — Clarifying questions (ask BEFORE generating)**
+
+Ask the user the following 4 questions in a single message with lettered options. Users respond like `1A, 2C, 3D, 4B`:
+
+```text
+1. Starting competitor list source?
+   A. I have a named list — I'll provide the competitors
+   B. Discover from project context (PRDs, BMC, persona docs)
+   C. Discover from market research (analyst lists, G2, Capterra, regulatory filings)
+   D. Hybrid — I have some + please discover more
+
+2. Industry pace (drives refresh cadence)?
+   A. Fast — consumer tech, AI, fintech, mobile (refresh every 60-90 days)
+   B. Medium — B2B enterprise software, professional services (90-180 days)
+   C. Slow — regulated, healthcare, insurance, pharma (180-365 days)
+   D. Very slow — commodity, infrastructure, capital-intensive (365+ days)
+
+3. Industry / market scope?
+   A. Single industry, single geography
+   B. Single industry, multi-geography
+   C. Multi-industry (some players cross verticals)
+   D. Adjacent industries prominent (substitutes are a major axis)
+
+4. Five Forces evidence basis?
+   A. I have evidence sources (URLs, reports) for each force — ratings will be Tested/Validated
+   B. I have some — others stay _TODO_ / Assumed
+   C. Start from scratch — all Assumed; refresh later with evidence
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
 **Process:**
 1. **Read project context** — PRDs, BMC, persona docs, market analysis if any. Identify the industry / scope.
 2. **Fill Porter's Five Forces** (5-row table in hub doc):

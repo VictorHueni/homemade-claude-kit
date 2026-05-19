@@ -88,6 +88,37 @@ Source from `references/template.md`. Substitute `{{product}}`, `{{domain}}`, `{
 
 **When:** the backlog row exists for a persona ID (e.g., `P-02`) and the user wants the full persona body filled.
 
+**Step 0 — Clarifying questions (ask BEFORE generating)**
+
+Ask the user the following 4 questions in a single message with lettered options. Users respond like `1A, 2C, 3D, 4B`:
+
+```text
+1. Persona evidence basis?
+   A. Proto-persona — assumptions-based; set Next review ≤90 days (Lean UX)
+   B. Research-grounded — I have interview / observation / survey notes
+   C. Hybrid — some fields evidenced, others assumed (label per-field)
+
+2. Persona type (Cooper taxonomy — see references/persona-types-and-quality.md)?
+   A. Primary — THE design target (max ONE primary per product/surface)
+   B. Secondary — uses the product; design accommodates minor needs
+   C. Supplemental — occasional user; satisfied by primary design
+   D. Served — affected by the product but doesn't use it directly
+   E. Customer — buys/authorises but doesn't use
+   F. Negative — explicitly NOT designed for
+
+3. Snapshot field inclusions (NNG design-decision-relevance test)?
+   A. Minimal — Role, Org type, Domain experience, Usage frequency only
+   B. Standard — above + Usage context (voluntary/required) + Primary language
+   C. Full — above + Age range + Primary device (only if they affect design)
+
+4. Goal framing?
+   A. Jobs-to-be-Done — "When [trigger], I want [motivation], so I can [outcome]" (NNG-recommended)
+   B. Bulleted goals — traditional outcome list
+   C. Mixed — JTBD where it fits, bullets where it doesn't
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
 **Process:**
 1. **Confirm mode** — proto-persona (assumption-based, Lean UX) or research-grounded (interview/observation/survey, BABOK). Both are valid; both must be **labelled honestly** in the §Research Grounding table.
 2. **Pull project context** — the backlog row, plus any interviews / notes / customer feedback the user references.

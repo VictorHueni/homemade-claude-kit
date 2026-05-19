@@ -58,6 +58,38 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{L0_a
 
 **When:** the scaffold exists but the tree + index are empty.
 
+**Step 0 — Clarifying questions (ask BEFORE generating)**
+
+Ask the user the following 4 questions in a single message with lettered options. Users respond like `1A, 2C, 3D, 4B`:
+
+```text
+1. What is your L0 (top-level) organising axis?
+   A. Product / Service family — multi-product company
+   B. Value stream — customer-journey-driven business
+   C. Capability domain / theme — enterprise-wide neutral (TOGAF default)
+   D. Line of business — true conglomerate with distinct LOBs
+   E. Customer segment — segment-led business
+   F. Other: [please specify your axis + rationale]
+
+2. What is the scope of this capability map?
+   A. Single product or service
+   B. Product family (multiple products under one company)
+   C. Enterprise-wide (the whole organisation)
+   D. Single LOB / domain (slice of larger org)
+
+3. How should L1 capabilities be discovered?
+   A. Top-down — leadership / vision-driven; I'll provide capabilities
+   B. Bottom-up — discover from existing PRDs / project docs (read context)
+   C. Hybrid — top-down framework + bottom-up validation
+   D. Industry reference model (BIAN, APQC PCF, or similar) — please name
+
+4. Strategic Importance assessment timing?
+   A. Assign now (Differentiator / Necessary / Commodity per L1)
+   B. Leave as _TODO_; assign in fill mode later
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
 **Process:**
 1. **Make the L0 axis decision** (most consequential choice — see "L0 axis anchor decision" below). Record the chosen axis and one-sentence rationale in the doc.
 2. **Read project context** — PRD(s), product roadmap, FBS if it exists, personas backlog, processes, business-analysis docs. The L1 list must derive from this, not from generic templates.
