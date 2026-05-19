@@ -27,7 +27,7 @@ document anchors on the EA-flavoured tradition.
 | **Companion artefacts** | Capability map, personas, processes | Process maps with cycle-time data, kaizen events |
 
 **Where Lean VSM concerns belong in this project:** in process docs (the
-`spec-business-process` artefacts). Cycle times, queue depths, and
+`business-process` artefacts). Cycle times, queue depths, and
 waste classification are operational concerns; they live in process docs
 where the activity sequence is documented, not in this strategic catalogue.
 

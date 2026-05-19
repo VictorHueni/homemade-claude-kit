@@ -1,5 +1,5 @@
 ---
-name: spec-value-stream
+name: business-value-stream
 description: "Create EA-flavoured Business Architecture value streams (TOGAF + BIZBOK), modelling how value flows from triggering stakeholder through stages to value proposition. Use when the user asks to map value streams, define how value flows to a persona, model end-to-end customer outcomes, or build the bridge between personas + capabilities. Triggers on: value stream, value streams, map value flow, BIZBOK value stream, TOGAF value stream, how does value flow, end-to-end stages, value delivery model, customer outcome map. Domain-agnostic. Anchors on EA value streams (strategic, stage-based, capability-consuming) — NOT Lean VSM (operational cycle-time analysis). Stays strategic: stages soft-link to capabilities + processes, never define them inline."
 version: "1.0.0"
 user-invocable: true
@@ -32,9 +32,9 @@ The phrase "value stream mapping" carries two distinct traditions. This skill an
 | **Purpose** | Strategic — how value flows to a stakeholder | Operational — find waste, optimise cycle time |
 | **Primary axes** | Stages, value items, capabilities | Cycle time, queues, value-add vs non-value-add |
 | **Output** | Strategic alignment with capabilities, personas, processes | Process improvement; takt time; pull systems |
-| **Peer artefact in this project** | Capability map (BC Map), personas, processes | Process docs (`spec-business-process` skill) |
+| **Peer artefact in this project** | Capability map (BC Map), personas, processes | Process docs (`business-process` skill) |
 
-If the user asks for cycle-time analysis, queue lengths, value-add classification, or factory-floor flow — that's Lean VSM. Push back politely and redirect to `spec-business-process` (which handles operational decomposition) or recommend a Lean VSM tool outside this kit.
+If the user asks for cycle-time analysis, queue lengths, value-add classification, or factory-floor flow — that's Lean VSM. Push back politely and redirect to `business-process` (which handles operational decomposition) or recommend a Lean VSM tool outside this kit.
 
 ---
 
@@ -120,7 +120,7 @@ Lifted from BIZBOK common mistakes + TOGAF + practitioner literature. Run these 
 
 1. **Internal-lifecycle naming.** "Hire-to-retire", "order-to-cash", "concept-to-cash" frame the stream around internal phases, not stakeholder value. BIZBOK's #1 scoping mistake. Use customer-outcome naming: "Onboard Human Resource", "Acquire Product".
 
-2. **Confusing value stream with business process.** A process has a verb-led activity sequence and no triggering stakeholder receiving a value proposition. If the candidate has no clear "who gets what at the end", it's a process — push to `spec-business-process`.
+2. **Confusing value stream with business process.** A process has a verb-led activity sequence and no triggering stakeholder receiving a value proposition. If the candidate has no clear "who gets what at the end", it's a process — push to `business-process`.
 
 3. **Confusing value stream with customer journey.** A journey captures emotions, channels, touchpoints, and the actual customer experience. A value stream describes the idealised value-delivery model. If the user wants to map emotions or omnichannel touchpoints, recommend a journey-mapping tool — not this skill.
 
@@ -143,8 +143,8 @@ Lifted from BIZBOK common mistakes + TOGAF + practitioner literature. Run these 
 | **Project context location** | Look for `docs/product-specs/`. If unclear, ask. |
 | **Mode** (scaffold / catalogue / fill) | Detect from request. Confirm if ambiguous. |
 | **Scope name** | What scope is this value-stream catalogue for? A product? A product family? An enterprise? |
-| **Personas existence** | Check for `docs/business/personas/personas.md` (or legacy `docs/product-specs/personas/personas.md`). If absent, warn: triggering stakeholders will be `_TODO_` and discipline is degraded. Suggest running `spec-persona` first. |
-| **BC Map existence** | Check for `docs/business/capability-map/capability-map.md`. If absent, warn: enabling-capabilities links will be `_TODO_`. Suggest running `spec-business-capability-map` first. |
+| **Personas existence** | Check for `docs/business/personas/personas.md` (or legacy `docs/product-specs/personas/personas.md`). If absent, warn: triggering stakeholders will be `_TODO_` and discipline is degraded. Suggest running `business-persona` first. |
+| **BC Map existence** | Check for `docs/business/capability-map/capability-map.md`. If absent, warn: enabling-capabilities links will be `_TODO_`. Suggest running `business-capability-map` first. |
 | **VS ID** (mode 3 only) | Which row from the catalogue does the user want filled? |
 
 Ask 2–4 questions max, single message, lettered options where possible. Don't drag through a wizard.

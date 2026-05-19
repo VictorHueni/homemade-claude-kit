@@ -82,7 +82,7 @@ Adapt to process type per the SKILL.md "Common KPI patterns" guidance.
 
 **Why:** every claim should trace to a source. The four categories cover the full source-quality spectrum from primary regulatory to internal companion docs.
 
-**Source-quality stars:** use the same ★★★★★ → ★ scale from the spec-quantitative-model skill for consistency across the docs lifecycle.
+**Source-quality stars:** use the same ★★★★★ → ★ scale from the business-quantitative-model skill for consistency across the docs lifecycle.
 
 ### §11 — Open TODOs
 

@@ -192,9 +192,9 @@ git bisect good <last-known-good-commit>
 
 ## Report Output
 
-**Save every RCA report to a file** in the project directory at `./docs/bugs/`.
+**Save every RCA report to a file** in the project directory at `./docs/ops/rcas/`.
 
-- Create the `docs/bugs/` directory if it doesn't exist.
+- Create the `docs/ops/rcas/` directory if it doesn't exist.
 - File naming: `YYYY-MM-DD-<short-slug>.md` (e.g. `2026-03-30-api-500-race-condition.md`)
 - The slug should be a brief, kebab-case summary of the bug.
 - Always tell the user the path of the saved report.

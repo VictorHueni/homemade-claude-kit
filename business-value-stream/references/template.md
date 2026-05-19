@@ -8,7 +8,7 @@ value flows** from a triggering stakeholder, through a sequence of stages,
 to a delivered value proposition. Each stage soft-links to the capabilities
 it consumes and the processes that operationalise it.
 
-> **Methodology:** built using the canonical synthesis of [TOGAF Value Streams Guide + BIZBOK + Ulrich/Kuehn practitioner framing + Millett journey-vs-stream distinction](https://github.com/VictorHueni/homemade-claude-kit/tree/main/spec-value-stream/references/methodology-references.md). The full bibliography lives with the skill — single source of truth across every project.
+> **Methodology:** built using the canonical synthesis of [TOGAF Value Streams Guide + BIZBOK + Ulrich/Kuehn practitioner framing + Millett journey-vs-stream distinction](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-value-stream/references/methodology-references.md). The full bibliography lives with the skill — single source of truth across every project.
 >
 > **Stance:** EA value streams (strategic, stage-based, capability-consuming) — NOT Lean VSM (operational cycle-time analysis). See the methodology reference for the full distinction.
 

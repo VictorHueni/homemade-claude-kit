@@ -141,7 +141,7 @@ If you find yourself writing any of these in the FBS, pull the content into its 
 |---|---|
 | **Project context location** | Look for `docs/product-specs/`. If unclear, ask. |
 | **Mode** (scaffold / structure / fill) | Detect from request. Confirm if ambiguous. |
-| **BC Map existence** | Check for `docs/business/capability-map/capability-map.md`. If absent, warn: structure mode will degrade to manual capability entry. Suggest running `spec-business-capability-map` first. |
+| **BC Map existence** | Check for `docs/business/capability-map/capability-map.md`. If absent, warn: structure mode will degrade to manual capability entry. Suggest running `business-capability-map` first. |
 | **Scope name** | What product / product family / domain does this FBS cover? Used for `{{product_or_scope}}` substitution. |
 | **Capability ID** (fill mode) | Which capability does the user want populated? Single ID or batch (e.g., "all of C1" or "C1.1, C1.2, C1.3"). |
 | **Value-streams existence** | Check for `docs/business/value-streams/value-streams.md`. If absent, VS-stage column will be `_TODO_` placeholders. |

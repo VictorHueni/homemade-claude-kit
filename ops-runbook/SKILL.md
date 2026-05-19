@@ -22,7 +22,7 @@ Invoke when the user asks to:
 
 **Do NOT invoke for:**
 
-- Architecture decision records → use `spec-adr-manager`
+- Architecture decision records → use `arch-adr`
 - Implementation plans → use `spec-implementation-plan`
 - General API or code documentation → use `technical-writer`
 - Post-incident reports → those have a different structure (timeline, impact, root cause, action items)
@@ -35,7 +35,7 @@ Before drafting, check whether the project already has runbooks and what structu
 
 ```bash
 find . -type f -name "*.md" | xargs grep -l "## Prerequisites\|## Troubleshooting" 2>/dev/null | head -10
-ls docs/runbooks/ 2>/dev/null || ls runbooks/ 2>/dev/null || ls docs/ops/ 2>/dev/null
+ls docs/ops/runbooks/ 2>/dev/null || ls runbooks/ 2>/dev/null || ls docs/ops/ 2>/dev/null
 ```
 
 Read up to 2 existing runbooks to extract:
@@ -118,7 +118,7 @@ If multiple environments apply, add a column per environment. This table is the 
 
 ### 8. Save and report
 
-Save to `docs/runbooks/<kebab-case-name>.md` (or wherever existing runbooks live in the project).
+Save to `docs/ops/runbooks/<kebab-case-name>.md` (or wherever existing runbooks live in the project).
 Tell the user:
 - File path
 - Which existing runbooks were updated with cross-links

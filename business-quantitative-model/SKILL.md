@@ -1,5 +1,5 @@
 ---
-name: spec-quantitative-model
+name: business-quantitative-model
 description: "Create a new quantitative business model document under docs/business/models/. Use when the user asks to create a TAM/SAM/SOM model, a savings model, a recovery / restitution model, a customer-ROI model, or any other revenue-quantified funnel that feeds an investor or sales pitch. Triggers on: create a business model, scaffold a TAM, bootstrap a quant model, fill in a model from the template, write a market-sizing doc, turn this idea into a model doc, model for the {product/feature/flow}, new model under docs/business/models. Encodes the canonical 4-step funnel (top-of-funnel → filter → conversion → segmentation), mandatory §5 implicit-assumptions table, scenario matrix, and value-capture sections."
 version: "1.1.0"
 user-invocable: true

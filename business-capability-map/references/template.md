@@ -9,7 +9,7 @@ stories, or code organisation — those belong in the Functional Breakdown
 Structure (FBS), a peer artefact that soft-references this map by capability
 ID.
 
-> **Methodology:** built using the canonical synthesis of [TOGAF G189 + Cutter "BC Map as Rosetta Stone" + SAP Business Architecture + BABOK + Cesar Gonzalez naming + Miller 7±2 sizing](https://github.com/VictorHueni/homemade-claude-kit/tree/main/spec-business-capability-map/references/methodology-references.md). The full bibliography and framework synthesis live with the skill that generated this doc — single source of truth across every project.
+> **Methodology:** built using the canonical synthesis of [TOGAF G189 + Cutter "BC Map as Rosetta Stone" + SAP Business Architecture + BABOK + Cesar Gonzalez naming + Miller 7±2 sizing](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-capability-map/references/methodology-references.md). The full bibliography and framework synthesis live with the skill that generated this doc — single source of truth across every project.
 
 **Scope discipline:**
 - Capabilities answer "what does the business do?" — stable, technology-independent, noun phrases.

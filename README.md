@@ -15,7 +15,7 @@ machines via dotfiles.
 | [dev-pr](./dev-pr/) | Create PRs following repo templates and standards |
 | [dev-ralph-loop](./dev-ralph-loop/) | Autonomous implementation loop: implement, test, commit, repeat |
 | [dev-slide-deck](./dev-slide-deck/) | Build single-file HTML slide decks from modular partials |
-| [spec-adr-manager](./spec-adr-manager/) | Architecture Decision Records (MADR 4.x) |
+| [arch-adr](./arch-adr/) | Architecture Decision Records (MADR 4.x) |
 | [spec-implementation-plan](./spec-implementation-plan/) | Small-step, testable implementation roadmaps from PRDs |
 | [spec-peer-review](./spec-peer-review/) | Review PRDs and plans for gaps and delivery risks |
 | [spec-prd](./spec-prd/) | Generate Product Requirements Documents |

@@ -10,10 +10,10 @@ logic.
 > Pigneur's Business Model Generation (2010) + Osterwalder's Value
 > Proposition Design (2014) + Ash Maurya's Lean Canvas + Strategyzer
 > practitioner
-> discipline](https://github.com/VictorHueni/homemade-claude-kit/tree/main/spec-business-model-canvas/references/methodology-references.md).
+> discipline](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-model-canvas/references/methodology-references.md).
 > The full bibliography lives with the
-> [spec-business-model-canvas
-> skill](https://github.com/VictorHueni/homemade-claude-kit/tree/main/spec-business-model-canvas)
+> [business-model-canvas
+> skill](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-model-canvas)
 > — single source of truth across every project.
 
 **Variant chosen:** {{BMC | Lean Canvas}}

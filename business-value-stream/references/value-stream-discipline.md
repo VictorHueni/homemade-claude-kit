@@ -42,7 +42,7 @@ triggering stakeholder receiving a value proposition.
 - No clear "who gets what at the end".
 - Concerns sequence of activities rather than value milestones.
 
-**Fix:** push to the `spec-business-process` skill. Value streams are
+**Fix:** push to the `business-process` skill. Value streams are
 strategic; processes are operational.
 
 ### 3. Confusing value stream with customer journey

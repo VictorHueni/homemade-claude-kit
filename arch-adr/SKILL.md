@@ -1,5 +1,5 @@
 ---
-name: spec-adr-manager
+name: arch-adr
 description: Create, review, and update Architecture Decision Records (ADRs) using MADR 4.x conventions and repository ADR patterns. Use when asked to document an architecture/technical decision, compare options with rationale, supersede an older ADR, or improve ADR quality.
 version: "1.0.0"
 user-invocable: true
@@ -30,7 +30,7 @@ Use this skill to produce ADRs that are explicit, auditable, and easy to revisit
 3. Apply repository conventions first, then MADR structure.
 
    - **First**, check for a `CONVENTIONS.md` in the ADR directory. If present, follow its naming, scoping, and style rules exactly.
-   - Default location: `docs/design-docs/architecture-decisions/`.
+   - Default location: `docs/architecture/decisions/`.
    - If ADR numbering exists, continue the numbering pattern.
    - If the repo already has ADR style/location conventions, preserve those while ensuring MADR-quality decision content.
 
