@@ -70,6 +70,7 @@ either over-fragmented attributes or under-decomposed coarse entries.
 Run all three before adding or keeping any row.
 
 **Test 1 — Independent testability (too atomic?)**
+*Anchored in: INVEST criteria "I" (Independent) + "T" (Testable) — Bill Wake (2003)*
 
 Ask: "Can this row be tested in isolation, independently of any sibling row?"
 
@@ -83,6 +84,8 @@ Ask: "Can this row be tested in isolation, independently of any sibling row?"
 > (name, identifier, colour code, enabled status)".
 
 **Test 2 — Size ceiling (too coarse?)**
+*Anchored in: INVEST criterion "S" (Small) — Cohn, *User Stories Applied* (2004);
+practitioner heuristic: "fits in a sprint" → ~5 days focused development*
 
 Ask: "Could this row represent more than ~5 days of focused development?"
 
@@ -91,10 +94,16 @@ Ask: "Could this row represent more than ~5 days of focused development?"
   "planning views" row that bundles 8 distinct UI screens is too coarse.
 - If NO → keep the row.
 
+Note: the 5-day figure is a practitioner heuristic derived from common sprint
+sizing discipline (Cohn, Schwaber & Sutherland *Scrum Guide*), not a
+scientifically derived threshold. Apply with judgment, not mechanically.
+
 > Example: "View planning grid" bundling day/week/month/semester/per-surgeon
 > views fails Test 2 — split into one row per distinct view.
 
 **Test 3 — System perspective (user-story phrasing?)**
+*Anchored in: BABOK §10.22 Functional Decomposition (IIBA, 2015);
+Cockburn goal-level distinction — *Writing Effective Use Cases* (2000)*
 
 Ask: "Does this row describe what the *system does*, or what the *user can do*?"
 
@@ -102,11 +111,17 @@ Ask: "Does this row describe what the *system does*, or what the *user can do*?"
   are user-story phrasing — they belong in PRDs, not the FBS.
 - Rephrase to system perspective: the subject is the system, the verb
   describes a system behaviour.
+- Cockburn's goal-level model: user goals belong in use cases / user stories
+  (sea-level); system functions belong in the FBS (fish/clam-level).
 
 > ❌ "Allow surgeon to signal absence on a specific slot"
 > ✅ "Absence signal intake and slot liberation"
 
 ### The attribute vs functionality rule
+
+*Anchored in: Yourdon structured analysis — entity vs operation distinction
+(Yourdon & DeMarco, *Structured Design*, 1979); Wiegers & Beatty,
+*Software Requirements* 3rd ed. (2013) §feature granularity*
 
 An **attribute** is a property of a data entity that always configures or
 modifies alongside the entity itself. Attributes do not belong as separate
@@ -122,6 +137,9 @@ Common attribute mistakes:
   entity when they are configured in the same UI interaction → merge
 
 ### The clustering rule — when source documents are provided
+
+*Anchored in: BABOK §10.22 decomposition principle; NASA SP-2016-6105
+§4.3 FBS — "functions needed, not elements of the architecture"*
 
 When the user supplies source material (Excel, user stories, PRD draft,
 interview notes), **do not translate rows 1:1**. Instead:
@@ -141,10 +159,29 @@ interview notes), **do not translate rows 1:1**. Instead:
 
 ### Non-functional requirements do not belong in the FBS
 
+*Anchored in: ISO/IEC 25010 (2023) quality model — functional vs
+non-functional requirements are distinct; BABOK §10.22 scope boundary*
+
 Security constraints, compliance obligations, and infrastructure requirements
 (HTTPS enforcement, data residency, DPA management) are **not functionalities**
-— they are system-wide quality attributes. They belong in ADRs, technical
+— they are system-wide quality attributes classified as non-functional
+requirements under ISO/IEC 25010. They belong in ADRs, technical
 specs, or compliance docs. Remove them from the FBS if found.
+
+### Granularity sources
+
+The three tests synthesise the following primary sources:
+
+| Source | What it anchors |
+|---|---|
+| Wake, B. (2003). "INVEST in Good Stories, and SMART Tasks." XP123. https://xp123.com/articles/invest-in-good-stories-and-smart-tasks/ | Tests 1 (Independent) and 2 (Small + Testable) |
+| Cohn, M. (2004). *User Stories Applied.* Addison-Wesley. | Test 2 size ceiling; story sizing discipline |
+| IIBA. (2015). *BABOK Guide* v3, §10.22 Functional Decomposition. | Tests 1, 3, clustering rule; system-perspective framing |
+| Cockburn, A. (2000). *Writing Effective Use Cases.* Addison-Wesley. | Test 3; goal-level model (user vs system vs subfunction) |
+| NASA. (2016). *Systems Engineering Handbook* SP-2016-6105 Rev 2, §4.3. | Clustering rule; FBS as function list, not architecture |
+| Yourdon, E. & DeMarco, T. (1979). *Structured Design.* Prentice Hall. | Attribute vs functionality rule; entity/operation distinction |
+| Wiegers, K. & Beatty, J. (2013). *Software Requirements* 3rd ed. Microsoft Press. | Attribute rule; feature granularity guidance |
+| ISO/IEC 25010:2023. *Systems and software quality models.* | NFR exclusion rule; functional vs quality attribute boundary |
 
 ---
 
