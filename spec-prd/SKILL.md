@@ -1,7 +1,7 @@
 ---
 name: spec-prd
 description: "Generate a Product Requirements Document (PRD) for a new feature. Use when planning a feature, starting a new project, or when asked to create a PRD. Triggers on: create a prd, write prd for, plan this feature, requirements for, spec out."
-version: "1.0.0"
+version: "1.1.0"
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"
@@ -12,19 +12,35 @@ metadata:
 
 # PRD Generator
 
-You are an expert at writing product requirements documents (PRDs) and feature specifications. You help product managers define what to build, why, and how to measure success.
+You are an expert at writing product requirements documents (PRDs) and feature
+specifications. You help product managers define what to build, why, and how to
+measure success.
+
+PRDs produced by this skill are **architecture-stack-aware**: when upstream
+artefacts exist (BC Map, FBS, personas, value streams), the PRD cross-references
+them by stable ID so traceability is mechanical, not narrative.
 
 ---
 
-## The Job
+## Step 0: Detect upstream artefacts
 
-1. Receive a feature description from the user
-2. Ask 3-5 essential clarifying questions (with lettered options)
-3. Generate a structured PRD based on answers
-4. Find the next available ID by running `python skills/spec-prd/scripts/get-next-id.py` (or check `docs/product-specs/` for the highest 4-digit prefix).
-5. Save to `docs/product-specs/[NNNN]_prd_[feature-name].md`
+Before asking any questions, silently check which upstream artefacts exist:
 
-**Important:** Do NOT start implementing. Just create the PRD.
+```bash
+ls docs/business/personas/personas.md 2>/dev/null
+ls docs/business/capability-map/capability-map.md 2>/dev/null
+ls docs/product-specs/functional-breakdown-structure/FBS.md 2>/dev/null
+ls docs/business/value-streams/value-streams.md 2>/dev/null
+```
+
+**If artefacts exist:** extract the relevant IDs and use them to enrich the PRD
+(persona IDs `P-NN`, capability IDs `C-N.M`, FBS functionality IDs `C-N.M.FXX`,
+value-stream stage IDs `VS-N.M`). Do not ask the user to supply IDs you can read
+directly.
+
+**If artefacts are absent:** proceed with the generic PRD format (current
+behaviour). Use specific role descriptions in user stories rather than generic
+"user" or "admin".
 
 ---
 
@@ -37,6 +53,11 @@ Ask only critical questions where the initial prompt is ambiguous. Focus on:
 - **Scope/Boundaries:** What should it NOT do?
 - **Success Criteria:** How do we know it's done?
 
+If the FBS exists, also ask:
+
+- **FBS scope:** Which FBS capabilities / functionalities does this PRD target?
+  (Show the user the relevant ⬜ rows from the FBS and ask them to confirm scope.)
+
 ### Format Questions Like This:
 
 ```text
@@ -46,11 +67,11 @@ Ask only critical questions where the initial prompt is ambiguous. Focus on:
    C. Reduce support burden
    D. Other: [please specify]
 
-2. Who is the target user?
-   A. New users only
-   B. Existing users only
-   C. All users
-   D. Admin users only
+2. Who is the primary persona served?
+   A. P-01 Francine — OR coordinator
+   B. P-03 Dr. Favre — surgeon (physician portal)
+   C. Both equally
+   D. Other: [please specify]
 
 3. What is the scope?
    A. Minimal viable version
@@ -59,7 +80,7 @@ Ask only critical questions where the initial prompt is ambiguous. Focus on:
    D. Just the UI
 ```
 
-This lets users respond with "1A, 2C, 3B" for quick iteration. Remember to indent the options.
+This lets users respond with "1A, 2C, 3B" for quick iteration.
 
 ---
 
@@ -67,113 +88,178 @@ This lets users respond with "1A, 2C, 3B" for quick iteration. Remember to inden
 
 Generate the PRD with these sections.
 
-Include an overall status at the top of the PRD: `**Status:** draft | approved | in-progress | complete`
+Include an overall status at the top: `**Status:** draft | approved | in-progress | complete`
+
+---
+
+### §0 · Architecture Traceability
+
+> Fill this block from the upstream artefacts detected in Step 0.
+> If no upstream artefacts exist, omit this section entirely.
+
+```markdown
+**PRD-ID:** PRD-NNNN
+**Status:** draft
+
+| Field | Value |
+|---|---|
+| **Personas served** | [P-01 · Francine](link) · [P-03 · Dr. Favre](link) |
+| **Capabilities covered** | [C3.1 Schedule Generation](link) · [C3.2 Conflict Detection](link) |
+| **Primary value stream** | [VS-1.2 · Generate Schedule Draft](link) — Pain: Critical |
+
+**FBS functionalities delivered by this PRD:**
+
+| FBS ID | Functionality | Status before | Status after |
+|---|---|---|---|
+| C3.1.F02 | Generate semester schedule from recurrence rules | ⬜ | 🔄 |
+| C3.2.F01 | Detect double attribution | ⬜ | 🔄 |
+```
+
+**Rules for this block:**
+- Link every ID to its source document using a relative path.
+- `Status after` is always `🔄` when the PRD is approved; `✅` when shipped.
+- If a functionality is already `✅`, this PRD should not re-scope it — raise as
+  a conflict in §8 Open Questions instead.
+- After the PRD is approved, manually update the referenced FBS rows from `⬜`
+  to `🔄` (see Step 4 below).
+
+---
 
 ### 1. Problem Statement
 
-- Describe the user problem in 2-3 sentences
-- Who experiences this problem and how often
+- Describe the user problem in 2–3 sentences
+- Who experiences this problem (reference persona by role + P-NN) and how often
 - What is the cost of not solving it (user pain, business impact, competitive risk)
 - Ground this in evidence: user research, support data, metrics, or customer feedback
 
+---
+
 ### 2. Goals
 
-- 3-5 specific, measurable outcomes this feature should achieve
+- 3–5 specific, measurable outcomes this feature should achieve
 - Each goal should answer: "How will we know this succeeded?"
-- Distinguish between user goals (what users get) and business goals (what the company gets)
-- Goals should be outcomes, not outputs ("reduce time to first value by 50%" not "build onboarding wizard")
+- Distinguish between user goals and business goals
+- Goals should be outcomes, not outputs
+
+If a value stream stage was identified in §0, anchor one goal to its pain index:
+> "Reduce VS-1.2 (Generate Schedule Draft) from 3 working days to under 5 minutes."
+
+---
 
 ### 3. Non-Goals
 
-- 3-5 things this feature explicitly will NOT do
-- Adjacent capabilities that are out of scope for this version
-- For each non-goal, briefly explain why it is out of scope (not enough impact, too complex, separate initiative, premature)
-- Non-goals prevent scope creep during implementation and set expectations with stakeholders
+- 3–5 things this feature explicitly will NOT do
+- For each non-goal, briefly explain why it is out of scope
+- Reference FBS IDs for functionalities explicitly deferred:
+  > "C3.1.F06 (rolling schedule mode) — deferred to a future PRD; not needed for
+  > the semester-based pilot."
+
+---
 
 ### 4. User Stories
 
-Each story needs:
+Each story MUST reference a named persona role and ID:
 
-- **Title:** Short descriptive name
-- **Description:** "As a [user], I want [feature] so that [benefit]"
-- **Acceptance Criteria:** Verifiable checklist of what "done" means
+```
+As a [persona role] (P-NN), I want [action] so that [outcome].
+```
 
-Each story should be small enough to implement in one focused session.
+**If multiple personas share the same feature, write one story per persona.**
+They have different contexts, devices, and success criteria even for the same
+feature — merging them into one story produces acceptance criteria that satisfy
+neither.
 
-**Format:**
+**User story format:**
 
 ```markdown
 ### US-001: [Title]
 
+**Persona:** P-NN · [Role name]
 **Status:** pending
+**FBS refs:** C3.1.F02 · C3.2.F01
 
-**Description:** As a [user], I want [feature] so that [benefit].
+**Description:**
+As a [persona role] (P-NN), I want [action] so that [outcome].
 
 **Acceptance Criteria:**
-
 - [ ] Specific verifiable criterion
 - [ ] Another criterion
 - [ ] Typecheck/lint passes
 - [ ] **[UI stories only]** Verify in browser using dev-browser skill
 ```
 
-#### 4.1 User story Guidelines:
+#### 4.1 User Story Guidelines
 
 Good user stories are:
 
-- **Independent**: Can be developed and delivered on their own
-- **Negotiable**: Details can be discussed, the story is not a contract
-- **Valuable**: Delivers value to the user (not just the team)
-- **Estimable**: The team can roughly estimate the effort
-- **Small**: Can be completed in one sprint/iteration
-- **Testable**: There is a clear way to verify it works
-- The user type should be specific enough to be meaningful ("enterprise admin" not just "user")
+- **Independent:** can be developed and delivered on their own
+- **Negotiable:** details can be discussed, the story is not a contract
+- **Valuable:** delivers value to the persona (not just the team)
+- **Estimable:** the team can roughly estimate the effort
+- **Small:** can be completed in one sprint/iteration
+- **Testable:** there is a clear way to verify it works
+- **Persona-grounded:** written for a specific P-NN, not a generic "user"
 
-**General Guidelines:**
+**Common Mistakes:**
 
-- The capability should describe what they want to accomplish, not how
-- The benefit should explain the "why" — what value does this deliver
-- Include edge cases: error states, empty states, boundary conditions
-- Include different user types if the feature serves multiple personas
-- Order by priority — most important stories first
+- Generic persona: "As a user…" — always name the role + P-NN
+- Too vague: "As a P-01, I want the product to be faster" — what specifically?
+- Solution-prescriptive: "I want a dropdown menu" — describe the need, not the widget
+- No benefit: "I want to click a button" — why? What does it accomplish?
+- Too large: "I want to manage my surgical workforce" — break into specific capabilities
+- Multiple personas merged: split into separate stories, each grounded in one P-NN
 
-**Common Mistakes in User Stories**
+**Example (with persona + FBS refs):**
 
-- Too vague: "As a user, I want the product to be faster" — what specifically should be faster?
-- Solution-prescriptive: "As a user, I want a dropdown menu" — describe the need, not the UI widget
-- No benefit: "As a user, I want to click a button" — why? What does it accomplish?
-- Too large: "As a user, I want to manage my team" — break this into specific capabilities
-- Internal focus: "As the engineering team, we want to refactor the database" — this is a task, not a user story
+```markdown
+### US-001: Generate semester OR schedule
 
-**Example:**
+**Persona:** P-01 · OR coordinator
+**Status:** pending
+**FBS refs:** C3.1.F02 · C3.1.F03 · C3.1.F04 · C3.1.F05
 
-- "As a team admin, I want to configure SSO for my organization so that my team members can log in with their corporate credentials"
-- "As a team member, I want to be automatically redirected to my company's SSO login so that I do not need to remember a separate password"
-- "As a team admin, I want to see which members have logged in via SSO so that I can verify the rollout is working"
+**Description:**
+As an OR coordinator (P-01), I want to generate a 6-month OR schedule
+from surgeon recurrence rules so that I no longer spend 3 working days
+cross-referencing PEP and Excel to produce it manually.
+
+**Acceptance Criteria:**
+- [ ] A semester schedule is generated for all active surgeons in under 5 minutes
+- [ ] Vacation exclusions are applied automatically
+- [ ] Hard surgeon constraints block invalid attributions
+- [ ] A conflict report is produced listing every violation with resolution context
+- [ ] Generation can be re-run after constraint edits without side effects
+```
 
 #### 4.2 Tips for Acceptance Criteria
 
 - Cover the happy path, error cases, and edge cases
-- Be specific about the expected behavior, not the implementation
-- Include what should NOT happen (negative test cases)
-- Each criterion should be independently testable
-- Avoid ambiguous words: "fast", "user-friendly", "intuitive" — define what these mean concretely
+- Be specific about expected behaviour, not implementation
+- Include negative test cases ("must NOT show other surgeons' names")
+- Reference the persona's context: device, usage frequency, time pressure
+- Each criterion must be independently testable
 
-**Important:**
-
-- Acceptance criteria must be verifiable, not vague. "Works correctly" is bad. "Button shows confirmation dialog before deleting" is good.
+---
 
 ### 5. Design Considerations (Optional)
 
 - UI/UX requirements
 - Link to mockups if available
 - Relevant existing components to reuse
+- Note the primary device for the target persona (P-03 → mobile-first; P-01 → desktop)
+
+---
 
 ### 6. Technical Considerations (Optional)
 
 - Known constraints or dependencies
 - Integration points with existing systems
-- Performance requirements
+- Performance requirements grounded in the persona's context
+  (e.g., "P-01 uses this during live phone calls — response time ≤ 2s")
+- Reference relevant ADRs if architecture decisions apply:
+  > "See ADR-0001 for the schedule generation algorithm architecture decision."
+
+---
 
 ### 7. Success Metrics
 
@@ -183,46 +269,65 @@ How will success be measured?
 
 Metrics that change quickly after launch (days to weeks):
 
-- **Adoption rate**: % of eligible users who try the feature
-- **Activation rate**: % of users who complete the core action
-- **Task completion rate**: % of users who successfully accomplish their goal
-- **Time to complete**: How long the core workflow takes
-- **Error rate**: How often users encounter errors or dead ends
-- **Feature usage frequency**: How often users return to use the feature
+- **Adoption rate:** % of eligible personas (P-NN) who use the feature
+- **Activation rate:** % of users who complete the core action
+- **Task completion rate:** % of users who successfully accomplish their goal
+- **Time to complete:** how long the core workflow takes
+- **Error rate:** how often users encounter errors or dead ends
 
 #### 7.2 Lagging Indicators
 
 Metrics that take time to develop (weeks to months):
 
-- **Retention impact**: Does this feature improve user retention?
-- **Revenue impact**: Does this drive upgrades, expansion, or new revenue?
-- **NPS / satisfaction change**: Does this improve how users feel about the product?
-- **Support ticket reduction**: Does this reduce support load?
-- **Competitive win rate**: Does this help win more deals?
+- **Retention impact:** does this feature improve user retention?
+- **Revenue impact:** does this drive upgrades, expansion, or new revenue?
+- **NPS / satisfaction change:** does this improve how users feel about the product?
+- **Support ticket reduction:** does this reduce support load?
 
 #### 7.3 Setting Targets
 
 - Targets should be specific: "50% adoption within 30 days" not "high adoption"
-- Base targets on comparable features, industry benchmarks, or explicit hypotheses
+- Base targets on comparable features, pain index from value streams, or PRD §9
 - Set a "success" threshold and a "stretch" target
-- Define the measurement method: what tool, what query, what time window
-- Specify when you will evaluate: 1 week, 1 month, 1 quarter post-launch
-
-### 8. Open Questions
-
-Remaining questions or areas needing clarification.
+- Specify the measurement method and time window
 
 ---
 
-## Writing for Junior Developers
+### 8. Open Questions
 
-The PRD reader may be a junior developer or AI agent. Therefore:
+Remaining questions or areas needing clarification. Include:
+- Unresolved FBS scope (functionalities considered but not committed)
+- Persona edge cases not yet designed for
+- Dependencies on other PRDs or ADR decisions
 
-- Be explicit and unambiguous
-- Avoid jargon or explain it
-- Provide enough detail to understand purpose and core logic
-- Number requirements for easy reference
-- Use concrete examples where helpful
+---
+
+## Step 3: Save the PRD
+
+Find the next available ID:
+
+```bash
+python skills/spec-prd/scripts/get-next-id.py
+# or: check docs/product-specs/ for the highest 4-digit prefix
+```
+
+Save to: `docs/product-specs/[NNNN]_prd_[feature-name].md`
+
+**Important:** Do NOT start implementing. Just create the PRD.
+
+---
+
+## Step 4: Promote FBS functionalities
+
+After saving the PRD, instruct the user to update the FBS — or do it directly
+if the FBS file is accessible:
+
+> "The following FBS functionalities are now committed by this PRD.
+> Update their status from ⬜ to 🔄 in
+> `docs/product-specs/functional-breakdown-structure/FBS.md`."
+
+List each committed functionality with its ID and name. If you have write
+access, make the edits directly and commit the FBS alongside the PRD.
 
 ---
 
@@ -230,7 +335,7 @@ The PRD reader may be a junior developer or AI agent. Therefore:
 
 - **Format:** Markdown (`.md`)
 - **Location:** `docs/product-specs/`
-- **Filename:** `[NNNN]_prd_[feature-name].md` (e.g., 0001_prd_onboard-agent.md)
+- **Filename:** `[NNNN]_prd_[feature-name].md` (e.g., `0001_prd_semester-schedule-generation.md`)
 
 ---
 
@@ -238,9 +343,14 @@ The PRD reader may be a junior developer or AI agent. Therefore:
 
 Before saving the PRD:
 
-- [ ] Asked clarifying questions with lettered options
-- [ ] Incorporated user's answers
-- [ ] User stories are small and specific
-- [ ] Functional requirements are numbered and unambiguous
-- [ ] Non-goals section defines clear boundaries
+- [ ] Upstream artefacts checked (BC Map, FBS, personas, value streams)
+- [ ] §0 Architecture Traceability block filled (or omitted if no artefacts exist)
+- [ ] Clarifying questions asked with lettered options
+- [ ] User answers incorporated
+- [ ] Every user story references a specific persona role + P-NN ID
+- [ ] User stories are small, specific, and grounded in one persona
+- [ ] FBS refs listed per user story where applicable
+- [ ] Non-goals reference FBS IDs for explicitly deferred functionalities
+- [ ] Success metrics anchored to persona context and value-stream pain index
 - [ ] Saved to `docs/product-specs/[NNNN]_prd_[feature-name].md`
+- [ ] FBS promotion instructions provided (⬜ → 🔄 for committed functionalities)
