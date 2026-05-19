@@ -20,44 +20,102 @@ This skill is **domain-agnostic**. The template patterns work for any industry; 
 
 ---
 
-## The job
+## What a "good quantitative model" means
 
-When the user asks you to create a new business model, you:
+A model doc is good when a reader can answer, without ambiguity:
 
-1. **Establish minimum inputs** — model name, one-line purpose, phase (if applicable). Ask only if missing.
-2. **Infer the funnel shape** — 3 steps (TAM/SAM/SOM-style), 4 steps (recovery / savings-style), or other. Default 4; confirm with the user if ambiguous.
-3. **Identify upstream dependencies** — does this model derive inputs from another model? Cross-link explicitly.
-4. **Generate the file** at `docs/business/models/{slug}.md` from the canonical template (see `references/template.md`).
-5. **Pre-fill what's knowable** from the user's prompt and the project context; mark the rest `_TODO_`.
-6. **Seed §5.2** (implicit assumptions table) with 3–5 starter rows based on funnel shape — these are mandatory and should never be left empty.
-7. **Seed §8** (key unknowns) with the obvious gaps and the specific validation path for each.
-8. **Update the models index** at `docs/business/index.md` (or the project's equivalent) with a new row.
-9. **Report back** a summary: what's filled, what's TODO, top-3 research / interview priorities, which assumption is most consequential.
-
-**Do NOT:**
-
-- Invent revenue figures or market-size numbers — those are research, not template work.
-- Hide softness behind precise-looking placeholders. Use `_TODO_` literally; let the gap be visible.
-- Decide which §5.2 assumptions are ⚠️ vs ✅ for risk judgment without the user's input — flag the candidates and ask.
-- Build interactive calculators — that is a separate workflow.
-- Promote changelog entries to the frontmatter — keep frontmatter showing CURRENT state only.
+| Question | Where it lives |
+|---|---|
+| **What does this model compute, and for whom?** | Frontmatter blockquote §Purpose |
+| **What is the funnel shape?** | §2–§5 section headings + §5.1 math chain |
+| **What are the inputs and how confident are we?** | §1 Inputs and Data Sources (confidence stars) |
+| **What are the key assumptions that could be wrong?** | §5.2 Implicit assumptions table (⚠️/✅/❌) |
+| **What happens in Conservative / Base / Aggressive scenarios?** | §6 Scenario Matrix |
+| **What is the headline revenue / savings number?** | §7 Value capture (one quotable sentence) |
+| **What do we still not know, and how do we find out?** | §8 Key Unknowns and Validation Path |
 
 ---
 
-## Inputs
+## The three modes of operation
+
+The skill operates in one of three modes. Detect which mode the user wants from their prompt; ask if ambiguous.
+
+### Mode 1 — Scaffold
+
+**When:** no model file exists yet for this slug.
+
+**Output:** ONE file at `docs/business/models/{slug}.md` from the canonical template — all numeric cells `_TODO_`, structure complete.
+
+Seed §5.2 (implicit assumptions) with 3–5 starter rows matched to the funnel type — this section is mandatory and must never be left empty.
+Seed §8 (key unknowns) with the obvious gaps and their validation path.
+Update the models index at `docs/business/index.md` (or equivalent) with a new row at status 🔲 Scaffolding.
+
+Do NOT invent revenue figures or market-size numbers in scaffold mode.
+
+### Mode 2 — Fill
+
+**When:** the scaffold exists (or the user wants to create + fill in one pass) and the user has context to populate the funnel.
+
+**Step 0 — Clarifying questions (ask BEFORE generating)**
+
+Ask the user the following 4 questions in a single message with lettered options. Users respond like `1A, 2C, 3B, 4A`:
+
+```text
+1. Funnel shape?
+   A. 3-step — TAM/SAM/SOM-style (top-of-funnel → filter → conversion)
+   B. 4-step — recovery / savings / conversion-style (top-of-funnel → filter → conversion → segmentation) [default]
+   C. Other / custom — please describe the steps
+
+2. Phase / roadmap slot?
+   A. Standalone (no phase number)
+   B. Has a phase number — please name it (e.g., 1A, P2, Phase 3)
+
+3. Upstream model dependency?
+   A. Standalone — no inputs derived from another model
+   B. Derives inputs from an existing model — please name it
+
+4. Calculator status?
+   A. Not yet built — scaffold markdown only [default]
+   B. Calculator already exists — I will provide the link
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
+**Inputs needed before generating:**
 
 | Needed | What you ask if missing |
 |---|---|
-| **Model slug** (kebab-case, will become the filename) | "What should we call the file? (e.g., `2a-recovery-savings-model`)" |
-| **Display name** (the H1 title) | "And the display name in the H1? (e.g., 'Recovery Savings Model')" |
+| **Model slug** (kebab-case, becomes the filename) | "What should we call the file? (e.g., `2a-recovery-savings-model`)" |
+| **Display name** (the H1 title) | "And the human-readable display name?" |
 | **One-line purpose** | "One sentence — what does this model compute and for whom?" |
-| **Phase number** (your project's scheme: 1A / 1B / P1 / etc., or "none") | "Which phase / roadmap slot does this fit? (or 'none' if standalone)" |
-| **Funnel shape** | "Is this a 3-step funnel (TAM/SAM/SOM-style), a 4-step (recovery / savings / conversion-style), or something else? Default 4 unless you tell me otherwise." |
-| **Upstream model** (if any) | "Does this model derive inputs from another model? (e.g., a TAM model usually depends on a per-customer value model)" |
-| **Calculator status** | Default to "🧮 not yet built" (Variant B). If the user mentions a calculator already exists, switch to Variant A. |
-| **Currency** | Infer from project context (USD, EUR, GBP, etc.). Default to the project's existing models' currency if any. |
+| **Currency** | Infer from project context. Ask if not determinable. |
 
-Ask 2–4 questions max, in a single message, with lettered options where possible. Don't drag the user through a wizard.
+**Process:**
+1. If funnel shape is not 4-step (default), adjust §2–§5 section count accordingly: 3-step collapses §3+§4; 5-step adds a section.
+2. Read project context to pre-fill what is knowable from PRDs, personas, BMC, process docs.
+3. Fill each funnel section — pre-fill known inputs with confidence stars; mark the rest `_TODO_`.
+4. Seed §5.2 with starter assumption rows matched to the funnel type (see §5.2 patterns below).
+5. Seed §8 with gaps + specific validation path per gap.
+6. Update the models index row to 🟡 Structure populated.
+
+**Do NOT:**
+- Invent revenue figures or market-size numbers — those are research, not template work.
+- Hide softness behind precise-looking placeholders — use `_TODO_` literally; let the gap be visible.
+- Decide which §5.2 assumptions are ⚠️ vs ✅ without the user's input — flag candidates and ask.
+- Build interactive calculators — that is a separate workflow.
+- Promote changelog entries to the frontmatter — keep frontmatter showing CURRENT state only.
+
+### Mode 3 — Refresh
+
+**When:** new data arrives (interview findings, market research, actuals) and one or more inputs need recalibration.
+
+**Process:**
+1. Identify the specific §1 inputs or §5.2 assumptions to update.
+2. Update confidence stars where evidence has improved.
+3. Recalculate affected funnel steps and scenario matrix.
+4. Promote §5.2 rows from ⚠️ to ✅ where the assumption is now validated.
+5. Update the models index row status if the model has materially improved.
+6. Add a changelog entry: date · what changed · evidence source.
 
 ---
 
@@ -256,6 +314,11 @@ When the user mentions a model by purpose (not by exact slug), infer based on th
 
 **Always run a quick check before generating:** `ls docs/business/models/` to see if a scaffold already exists. If it does, the user probably wants you to *populate* it using the template, not create a duplicate file. Confirm with them.
 
+**Never overwrite an existing model file.** Switch modes if it exists:
+- Scaffold mode → skip (report what's already there).
+- Fill mode → open the existing file and populate empty sections; never regenerate wholesale.
+- Refresh mode → targeted updates + changelog entry only.
+
 ---
 
 ## Index update
@@ -291,3 +354,22 @@ After generating the model file and updating the index, summarize in 4–6 lines
 5. **Optional next steps** — companion analysis docs, calculator plan, persona update.
 
 Keep it short. The user will read the model file directly; your job is to point them at the next move, not re-narrate what you wrote.
+
+---
+
+## Checklist
+
+Before declaring the work done:
+
+- [ ] Model file exists at `docs/business/models/{slug}.md` (scaffold / fill mode).
+- [ ] Funnel shape chosen and §2–§5 section count matches it.
+- [ ] §1 Inputs table populated with confidence stars (even if values are `_TODO_`).
+- [ ] §5.1 math chain present with ONE worked example.
+- [ ] §5.2 Implicit assumptions table has ≥3 rows with ⚠️/✅/❌ ratings.
+- [ ] §6 Scenario Matrix has Conservative / Base / Aggressive columns.
+- [ ] §7 Value capture has one quotable headline sentence at Base case.
+- [ ] §8 Key Unknowns populated with validation paths.
+- [ ] Models index updated with correct status.
+- [ ] No revenue figures or market-size numbers invented — `_TODO_` used for unknowns.
+- [ ] No strategic argument or process narrative leaked into the model doc.
+- [ ] Closing report delivered.

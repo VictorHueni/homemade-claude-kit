@@ -38,44 +38,90 @@ The doc is also descriptive prose — it does not have to be machine-readable. B
 
 ---
 
-## The job
+## The three modes of operation
 
-When the user asks you to document a process, you:
+The skill operates in one of three modes. Detect which mode the user wants from their prompt; ask if ambiguous.
 
-1. **Establish minimum inputs** — process name, one-line purpose, the domain it sits in. Ask only if missing.
-2. **Identify scope** — is this an end-to-end customer journey, an internal back-office flow, a regulatory submission, an integration? Affects how broad §3 Actors needs to be.
-3. **Identify upstream / downstream processes** — most processes are part of a chain. Cross-link to processes upstream (where the trigger comes from) and downstream (where the output goes).
-4. **Generate the file** at `{project's processes folder}/{slug}-process.md` from the canonical template (see `references/template.md`).
-5. **Pre-fill what's knowable** from the user's prompt and the project context. Where the user has already given you actors, data stores, KPIs, etc. — bake them in. Otherwise mark `_TODO_`.
-6. **Seed §8 KPIs** with 3–5 starter rows — these are mandatory and should never be left empty. A process without KPIs is a narrative, not a process.
-7. **Seed §11 TODOs** with the obvious gaps and the specific validation path for each (typically: interview, observe, primary source lookup).
-8. **Update the processes index** if the project has one (typically `docs/<domain>/index.md` or equivalent).
-9. **Report back** a summary: what's filled, what's TODO, top-3 validation priorities, which KPI matters most for monitoring.
+### Mode 1 — Scaffold
 
-**Do NOT:**
+**When:** the project has no processes folder yet, or has one but is missing a file for this specific process slug.
 
-- Invent specific actor names, KPI values, or system names — those are research, not template work. Use abstract placeholders if not given.
-- Conflate descriptive content with strategic argument. This doc says **what is**, not what should change. Strategic content belongs in an analysis doc (see [strategy-process-model lifecycle convention](#cross-reference-the-3-layer-artifact-lifecycle)).
-- Produce a BPMN XML file — that's a separate workflow. This skill produces the markdown source-of-truth.
-- Skip §8 KPIs because the user "doesn't have any yet" — flag KPI gaps in §11 TODOs and seed the table with the candidate KPIs the process *should* have.
-- Leave Mermaid diagrams empty. At minimum produce a master flow (§0) and a sequence diagram per side of the workflow (§6.x).
+**Output:** ONE file at `{processes folder}/{slug}-process.md` from the canonical template — all sections present, all cells `_TODO_`. Do NOT fill actors, activities, KPIs, or any substantive content in scaffold mode.
 
----
+Seed §8 KPIs with 3–5 starter candidate rows (values `_TODO_`) — a process without KPIs is a narrative, not a process.
+Seed §11 TODOs with the obvious gaps and their validation path.
+Update the processes index if the project has one.
 
-## Inputs
+### Mode 2 — Fill
+
+**When:** the scaffold exists (or the user wants to create + fill in one pass) and the user has enough context to describe the process.
+
+**Step 0 — Clarifying questions (ask BEFORE generating)**
+
+Ask the user the following 4 questions in a single message with lettered options. Users respond like `1A, 2C, 3B, 4A`:
+
+```text
+1. §6 decomposition axis?
+   A. Per-actor (default — one sub-section per actor / pool / lane; works for ~80% of processes)
+   B. Per-variant (3+ structurally distinct sub-flows sharing the same actors)
+   C. Per-channel (bifurcated into 2+ parallel channels with different actors / rules)
+   D. Per-jurisdiction (same process runs differently across regions / cantons / states)
+   E. Automated pipeline (no human actors — collapsed to system components)
+   F. Ongoing duties (continuous loop, no defined end)
+
+2. Process scope?
+   A. End-to-end stakeholder-facing flow (external trigger → delivered outcome)
+   B. Internal back-office / operational flow
+   C. Regulatory submission / compliance flow
+   D. Integration / system-to-system flow
+
+3. Audience?
+   A. Internal technical reference (default)
+   B. Audit-facing (regulatory / compliance reader)
+   C. Investor / executive-facing
+
+4. Known actors and systems?
+   A. Yes — I will provide them
+   B. Partial — some known, scaffold the rest as _TODO_
+   C. None yet — scaffold everything _TODO_; discover via research
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
+**Inputs needed before generating:**
 
 | Needed | What you ask if missing |
 |---|---|
-| **Process slug** (kebab-case, used in filename and references) | "What should we call the file? (e.g., `swiss-kostengutsprache-process`, `customer-onboarding-process`, `incident-response-process`)" |
-| **Display name** (the H1 title) | "And the human-readable display name? (e.g., 'Swiss Kostengutsprache (KG) Process — End-to-End')" |
-| **Domain / project area** (used to find the right folder) | Infer from project context — typically the user has a `docs/business/processes/` or `docs/operations/processes/` already. If multiple candidates, ask. |
+| **Process slug** (kebab-case, used in filename and references) | "What should we call the file? (e.g., `customer-onboarding-process`, `incident-response-process`)" |
+| **Display name** (the H1 title) | "And the human-readable display name?" |
 | **One-line purpose** | "One sentence — what does this process do, and for whom?" |
-| **Scope** | "What's the start point and the end point? (e.g., 'starts when a prescriber identifies a KG trigger, ends when the insurer reimburses')" |
-| **Known actors** (if any) | "Which roles / organisations are involved? (or 'I don't know yet — please discover from research')" |
-| **Known data stores / systems** (if any) | "Which systems are involved? (EHRs, claim platforms, registries, public portals, …)" |
-| **Audience** | Default: internal technical reference. Adjust if user says otherwise (e.g., 'audit-facing', 'investor-facing'). |
+| **Scope** | "What's the start point and the end point?" |
 
-Ask 2–4 questions max, in a single message, with lettered options where possible. Don't drag the user through a wizard.
+**Process:**
+1. If §6 axis is not default (per-actor), document the deviation + one-sentence rationale in the doc's frontmatter blockquote.
+2. Read project context to pre-fill what is knowable: persona IDs for actors, capability IDs for enabling systems, upstream / downstream process slugs.
+3. Fill the template end-to-end — pre-fill known content; mark the rest `_TODO_`.
+4. Seed §8 KPIs with concrete starter rows matched to the process type (see §8 KPI patterns below).
+5. Seed §11 TODOs with gaps + validation path (interview / observe / primary-source lookup).
+6. Update the processes index if the project has one.
+
+**Do NOT:**
+- Invent actor names, KPI values, or system names — those are research. Use abstract placeholders.
+- Conflate descriptive content with strategic argument — this doc says **what is**, not what should change.
+- Produce a BPMN XML file — this skill produces the markdown source-of-truth.
+- Skip §8 KPIs because the user "doesn't have any yet" — seed candidate rows with `_TODO_` values regardless.
+- Leave Mermaid diagrams empty — at minimum produce a master flow (§0) and one sequence diagram per actor or phase in §6.
+
+### Mode 3 — Update
+
+**When:** a process doc exists and needs a targeted change: a new section, a KPI value filled, a doc-version bump, an actor added, an index row updated.
+
+**Process:**
+1. Identify the specific section(s) to change.
+2. Make targeted edits only — do not regenerate the whole file.
+3. Bump `doc-version` in the HTML comment for structural changes (new section, deletion, renumbering). Add `last-updated: YYYY-MM-DD` for patches without structural change.
+4. Add a changelog entry for structural changes.
+5. Update the processes index row if the status changes.
 
 ---
 
@@ -287,6 +333,11 @@ Process docs typically live in:
 find docs -type d -name "processes" 2>/dev/null
 ```
 
+**Never overwrite an existing process file.** Switch modes if it exists:
+- Scaffold mode → skip (report what's already there).
+- Fill mode → open the existing file and fill empty sections; never regenerate wholesale.
+- Update mode → targeted edits + changelog only.
+
 If multiple candidates exist, ask the user. If none exists, ask whether to create one and where.
 
 If the project has an index file (e.g., `docs/business/index.md`) listing existing processes, append a row.
@@ -314,3 +365,22 @@ After generating the process file and updating any index, summarise in 4–6 lin
 5. **BPMN-readiness check** — confirm explicitly that actors, activities, data stores, data objects, triggers, and decisions are all present (even if some cells are `_TODO_`). This signals to the user that the doc is structurally complete for downstream BPMN work.
 
 Keep it short. The user will read the file directly; your job is to point them at the next move.
+
+---
+
+## Checklist
+
+Before declaring the work done:
+
+- [ ] Folder identified or created.
+- [ ] Process file exists at the correct path (scaffold / fill mode).
+- [ ] §6 decomposition axis chosen and documented if non-default (fill mode).
+- [ ] §0 Master flow Mermaid diagram present (not empty).
+- [ ] §2 Triggers table has at least one row.
+- [ ] §3 Actors table populated (or honest `_TODO_`).
+- [ ] §8 KPIs table has ≥3 starter rows (even if values are `_TODO_`).
+- [ ] §11 TODOs table populated with gaps + validation paths.
+- [ ] No strategic argument or "what should change" content leaked into the process doc.
+- [ ] No BPMN XML generated — markdown source-of-truth only.
+- [ ] Processes index updated if the project has one.
+- [ ] Closing report delivered.
