@@ -207,7 +207,7 @@ Ask 2–4 questions max in a single message.
 
 ---
 
-## Cross-link to other artefacts
+## Cross-reference — the architecture-artefact lifecycle
 
 | Workshop output | Soft-links to / updates |
 |---|---|

@@ -220,7 +220,7 @@ competitive-landscape/
 
 ---
 
-## Cross-link to existing artefacts (soft-links, optional)
+## Cross-reference — the architecture-artefact lifecycle
 
 | Competitive-landscape element | Soft-links to |
 |---|---|

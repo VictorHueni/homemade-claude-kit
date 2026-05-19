@@ -212,7 +212,7 @@ Changelog
 
 ---
 
-## Cross-doc traceability — the killer feature
+## Cross-reference — the architecture-artefact lifecycle
 
 A filled value stream is the bridge that connects three artefacts via mechanical IDs:
 
