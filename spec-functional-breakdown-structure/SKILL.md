@@ -1,7 +1,7 @@
 ---
 name: spec-functional-breakdown-structure
 description: "Create a Functional Breakdown Structure (FBS) — the functionality registry organised by product → capability → functionality, with status tracking (✅/🔄/⬜), optional code-path annotations, and optional value-stream-stage linkage. Synthesises BABOK §10.22 Functional Decomposition + NASA FBS + TOGAF Business Architecture + practitioner discipline. Use when the user asks to build an FBS, scaffold a functionality registry, decompose a product into functionalities, track feature status across the lifecycle, or extend a Business Capability Map with feature-level detail. Triggers on: FBS, functional breakdown structure, functionality registry, decompose product, feature inventory, what does the product do (concretely), capability-to-feature mapping, product decomposition. Domain-agnostic. Soft-links UP to the Business Capability Map (BC Map owns L0+L1 strategic; FBS adds L2 functionalities + status + code paths). Stays out of PRD/roadmap territory."
-version: "1.0.0"
+version: "1.1.0"
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"
@@ -54,6 +54,97 @@ An FBS is good when a reader can answer, without ambiguity:
 - FBS does **NOT** include cycle-time or operational metrics — that's process-doc territory.
 
 If the FBS doc starts to grow any of these, it has crossed scope. Pull the offending content out into its proper home and link instead.
+
+---
+
+## Granularity discipline — the registry principle
+
+The FBS is a **registry**, not a story list and not a sprint backlog. Every row
+must describe a discrete, independently testable system behaviour. The most
+common failure mode — especially when source material (Excel, user stories,
+PRDs) is provided — is translating source rows 1:1 into FBS rows, producing
+either over-fragmented attributes or under-decomposed coarse entries.
+
+### The three granularity tests
+
+Run all three before adding or keeping any row.
+
+**Test 1 — Independent testability (too atomic?)**
+
+Ask: "Can this row be tested in isolation, independently of any sibling row?"
+
+- If NO → the row is an *attribute* of another functionality and should be
+  merged into it. Colour codes, enable/disable flags, name fields, and other
+  entity properties are attributes — not functionalities.
+- If YES → keep the row.
+
+> Example: "Assign colour code per room" fails Test 1 — you cannot test colour
+> assignment without first having a room. Merge into "Configure OR room
+> (name, identifier, colour code, enabled status)".
+
+**Test 2 — Size ceiling (too coarse?)**
+
+Ask: "Could this row represent more than ~5 days of focused development?"
+
+- If YES → the row may need splitting. Use judgement: a complex algorithm
+  (schedule generation) is legitimately one row even if it takes weeks; a
+  "planning views" row that bundles 8 distinct UI screens is too coarse.
+- If NO → keep the row.
+
+> Example: "View planning grid" bundling day/week/month/semester/per-surgeon
+> views fails Test 2 — split into one row per distinct view.
+
+**Test 3 — System perspective (user-story phrasing?)**
+
+Ask: "Does this row describe what the *system does*, or what the *user can do*?"
+
+- Rows starting with "Allow user to…", "Let the surgeon…", "Enable admin to…"
+  are user-story phrasing — they belong in PRDs, not the FBS.
+- Rephrase to system perspective: the subject is the system, the verb
+  describes a system behaviour.
+
+> ❌ "Allow surgeon to signal absence on a specific slot"
+> ✅ "Absence signal intake and slot liberation"
+
+### The attribute vs functionality rule
+
+An **attribute** is a property of a data entity that always configures or
+modifies alongside the entity itself. Attributes do not belong as separate
+FBS rows — they belong as parenthetical annotations in the entity's
+configuration row.
+
+Common attribute mistakes:
+- Separate rows for name, colour code, identifier, enabled/disabled status
+  of the same entity → merge into one "Configure [entity]" row
+- Separate rows for "create" and "edit" of the same entity when they share
+  the same form/screen → merge into "Create and maintain [entity]"
+- Separate rows for "soft preference A" and "soft preference B" of the same
+  entity when they are configured in the same UI interaction → merge
+
+### The clustering rule — when source documents are provided
+
+When the user supplies source material (Excel, user stories, PRD draft,
+interview notes), **do not translate rows 1:1**. Instead:
+
+1. **Read all source rows** for a given capability before writing any FBS row.
+2. **Group source rows by the system behaviour they describe.** Multiple user
+   stories about the same underlying system action → one FBS row.
+3. **Name the row from the system's perspective**, not the user story's.
+4. **Parenthetical detail** (which attributes, which configurations) goes in
+   the row name as a brief annotation, not as separate rows.
+
+> Excel had 6 rows for surgeon profile fields (name, specialty, email, colour,
+> cabinet, notes). The FBS gets 2 rows:
+> "Create and maintain surgeon profile (identity, contact, colour, cabinet links)"
+> and "Add operational notes to surgeon profile" — because notes is a
+> meaningfully distinct interaction (free text, used differently by coordinators).
+
+### Non-functional requirements do not belong in the FBS
+
+Security constraints, compliance obligations, and infrastructure requirements
+(HTTPS enforcement, data residency, DPA management) are **not functionalities**
+— they are system-wide quality attributes. They belong in ADRs, technical
+specs, or compliance docs. Remove them from the FBS if found.
 
 ---
 
