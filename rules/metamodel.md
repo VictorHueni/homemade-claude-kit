@@ -23,7 +23,7 @@ what order, and where to put it**.
 | 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/business-model-canvas/business-model-canvas.md` or `lean-canvas.md` + optional `value-proposition-canvas-{segment}.md` | block IDs (CS-N, VP-N, …) |
 | 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/models/{slug}.md` | per-model slug |
 | 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/functional-breakdown-structure/FBS.md` | `C-N.M.FXX` (capability + functionality counter) |
-| 8 | **Epic Catalogue** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap.md` | `E-NN` |
+| 8 | **Epic Catalogue** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap/delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/quality-attributes/quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/[NNNN]_prd_[feature].md` | `PRD-NNNN` |
 | 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
@@ -226,9 +226,9 @@ moving on.
 - Order by pain index; assign E-NN IDs in priority order
 - Define Walking Skeleton: identify the primary VS to validate; select minimum functionalities per epic covering every VS stage end-to-end; write "can / cannot yet" statement
 - Define Phase Plan: declare which VS streams become fully operational per phase; write one-sentence goal per phase
-- Produce `docs/product-specs/delivery-roadmap.md`
+- Produce `docs/product-specs/delivery-roadmap/delivery-roadmap.md`
 - Coverage check: every Phase 1 FBS functionality in exactly one epic
-**Output verification:** `delivery-roadmap.md` exists; §Walking Skeleton covers every stage of primary VS; §Phase Plan has one goal per phase expressed as VS streams operational; every epic has a value statement; ★ functionalities each anchor their own epic; sizing within 5–25 FBS rows per epic; E-NN IDs in pain-index order.
+**Output verification:** `delivery-roadmap/delivery-roadmap.md` exists; §Walking Skeleton covers every stage of primary VS; §Phase Plan has one goal per phase expressed as VS streams operational; every epic has a value statement; ★ functionalities each anchor their own epic; sizing within 5–25 FBS rows per epic; E-NN IDs in pain-index order.
 
 ### Step 9 — Quality Attributes (how well the system performs)
 
@@ -343,7 +343,8 @@ docs/
 ├── product-specs/                                       ← `spec-` skills (product delivery)
 │   ├── functional-breakdown-structure/
 │   │   └── FBS.md
-│   ├── delivery-roadmap.md                                     ← spec-delivery-roadmap
+│   ├── delivery-roadmap/
+│   │   └── delivery-roadmap.md                              ← spec-delivery-roadmap
 │   ├── quality-attributes/
 │   │   └── quality-attributes.md
 │   └── {NNNN}_prd_{feature}.md (one per PRD)
