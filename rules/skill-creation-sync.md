@@ -39,6 +39,7 @@ Skill folder name + `name:` frontmatter field must follow this exact pattern:
 | `business-` | `docs/business/` | `business-persona`, `business-capability-map`, `business-value-stream`, `business-process`, `business-model-canvas`, `business-quantitative-model` |
 | `spec-` | `docs/product-specs/`, `docs/exec-plans/`, `docs/ideas/` (pre-PRD specs all live in the `spec-` family) | `spec-prd`, `spec-functional-breakdown-structure`, `spec-implementation-plan`, `spec-peer-review`, `spec-idea` |
 | `arch-` | `docs/architecture/` (subfolders per artefact type) | `arch-adr` (writes to `docs/architecture/decisions/`) |
+| `domain-` | `docs/domain/` | DDD artefacts — bounded contexts, glossary, domain model; the shared language between business and tech | `domain-bounded-context`, `domain-glossary`, `domain-model` |
 | `ops-` | `docs/ops/` (subfolders per artefact type) | `ops-runbook` (→ `docs/ops/runbooks/`), `ops-bug-rca` (→ `docs/ops/rcas/`) |
 | `dev-` | *(no doc folder — developer workflow utility)* | `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-slide-deck`, `dev-ralph-loop` |
 | `util-` | *(no doc folder — housekeeping)* | `util-docs-audit`, `util-toolkit-doctor` |

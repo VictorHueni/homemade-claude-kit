@@ -12,17 +12,20 @@ what order, and where to put it**.
 
 ---
 
-## The 11 artefacts and their skills
+## The 14 artefacts and their skills
 
 | # | Layer | Skill | Output file | Primary IDs |
 |---|---|---|---|---|
 | 1 | **Personas** (who) | `business-persona` | `docs/business/personas/personas.md` | `P-NN` |
 | 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/capability-map/capability-map.md` | `C1`, `C1.1`, `C1.1.1` (L2 rare) |
+| 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/bounded-contexts/bounded-contexts.md` + `context-map.md` | `BC-NN` |
+| 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/glossary/glossary.md` | `BC-NN.GT-NN` |
 | 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/value-streams/value-streams.md` + `value-proposition-canvas-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
 | 4 | **Business Processes** (operational how) | `business-process` | `docs/business/processes/{slug}-process.md` (one file per process) | per-process slug |
 | 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/business-model-canvas/business-model-canvas.md` or `lean-canvas.md` + optional `value-proposition-canvas-{segment}.md` | block IDs (CS-N, VP-N, …) |
 | 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/models/{slug}.md` | per-model slug |
 | 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/functional-breakdown-structure/FBS.md` | `C-N.M.FXX` (capability + functionality counter) |
+| 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/{bc-slug}/domain-model.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
 | 8 | **Epic Catalogue** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap/delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/quality-attributes/quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/[NNNN]_prd_[feature].md` | `PRD-NNNN` |
@@ -252,6 +255,25 @@ moving on.
 - Mode `fill` → per-capability blocks (Definition + Business Object + Strategic Importance + Outcomes + Boundaries)
 **Output verification:** capability map exists; `C1` through `C-N.M` assigned; ≥6 L1 capabilities filled; each capability passes noun test + tech-independence test + anti-overlap test.
 
+### Step 2b — Bounded Context Map (domain boundaries)
+
+**Skill:** `domain-bounded-context`
+**Prerequisites:** Step 2 (Capability Map — capabilities are the raw material for BC identification); Step 1 (Personas — personas ground the ubiquitous language scope); Step 3 (Value Streams — stage boundaries signal context boundaries; run after value streams are catalogued).
+**Process:**
+- Mode `discover` → read capability map + value streams; group capabilities by domain cohesion; identify boundary signals (where same word means different things; where data ownership changes; where team handoff happens); name bounded contexts
+- Classify each BC: Core (competitive differentiator) / Supporting (enables Core) / Generic (commodity — buy or outsource)
+- Mode `fill` → per-BC definition sections + context map with integration patterns (ACL, Shared Kernel, Customer-Supplier, Open Host Service, Published Language, Conformist)
+**Output verification:** `bounded-contexts.md` + `context-map.md` exist; every capability `C-N.M` assigned to exactly one `BC-NN`; each BC has subdomain type + rationale; context map names integration patterns (not just "they communicate"); 1–3 Core subdomains.
+
+### Step 2c — Domain Glossary (ubiquitous language)
+
+**Skill:** `domain-glossary`
+**Prerequisites:** Step 2b (Bounded contexts provide the namespace — one glossary section per BC).
+**Process:**
+- Mode `seed` → extract nouns from capability names + value stream stage names + process actor names; assign `GT-NN` IDs per BC; write one-line definitions
+- Mode `enrich` → full definitions in business language + example sentences + deprecated aliases + cross-context translations + code convention notes
+**Output verification:** `glossary.md` exists; every BC-NN has a glossary section; capability names have corresponding GT-NN entries; no living synonyms within a BC; definitions in business language only.
+
 ### Step 4 — Value Streams (how value flows)
 
 **Skill:** `business-value-stream`
@@ -290,6 +312,16 @@ moving on.
 - Mode `structure` → auto-import L0+L1 from BC Map; pre-fill per-capability sections
 - Mode `fill` → enumerate functionalities per capability with `C-N.M.FXX` IDs + status (✅/🔄/⬜) + optional VS-stage links + code paths
 **Output verification:** FBS exists; ≥1 capability has ≥1 functionality; status distribution shows initial state.
+
+### Step 7b — Domain Model (entities · aggregates · value objects · domain events)
+
+**Skill:** `domain-model`
+**Prerequisites:** Step 2b (Bounded contexts provide BC-NN namespace); Step 2c (Glossary terms — entity names MUST match GT-NN); Step 7 (FBS — functionalities reveal candidate entities and aggregates); Step 3 (Value Stream stages — stage transitions reveal domain events).
+**Process:**
+- One `domain-model.md` per bounded context: `docs/domain/{bc-slug}/domain-model.md`
+- Mode `fill` → per aggregate: root, invariants, lifecycle states, command→event pairs; per entity: identity, attributes, behaviour methods; per value object: attributes, equality rule, validation invariants; per domain event: trigger, payload, consumers, business significance
+- Mode `verify` → check for anemic model (entities must have behaviour); check aggregate sizing (≤5 members); check event naming (past tense + business-meaningful)
+**Output verification:** one `domain-model.md` per BC-NN; every aggregate has a named root + ≥2 documented invariants; all entity names match GT-NN glossary terms; all domain events are past tense + carry business significance; Mermaid class diagram present.
 
 ### Step 8 — Delivery Roadmap (Plan by Feature + Walking Skeleton + Phase Goals)
 
@@ -352,7 +384,7 @@ Start at **Step 3** (Business Capability Map), skip Steps 1–2 unless:
 - The capability touches a stakeholder group not yet documented (then do Step 1 lightweight for that persona).
 - The capability changes the commercial model (then do Step 2 — usually skipped).
 
-**Sequence:** Step 3 (BC Map) → Step 4 (value stream for the affected flow) → Step 5 (process docs for the as-is operational state) → Step 7 (FBS) → Step 8 (Delivery Roadmap) → Step 9 (Quality Attributes — at minimum Reliability entries for new differentiator features) → Step 10 (PRDs) → Step 11 (plans).
+**Sequence:** Step 3 (BC Map) → Step 4 (value stream for the affected flow) → Step 5 (process docs for the as-is operational state) → Step 2b (Bounded Context Map) → Step 2c (Glossary) → Step 7 (FBS) → Step 7b (Domain Model) → Step 8 (Delivery Roadmap) → Step 9 (Quality Attributes — at minimum Reliability entries for new differentiator features) → Step 10 (PRDs) → Step 11 (plans).
 
 ### Single feature (no full architecture work)
 
@@ -360,7 +392,7 @@ Skip Steps 1–8 entirely. Go straight to:
 - Step 10 (`spec-prd`) for the feature — manually define the E-NN scope inline in §0.
 - Step 11 (`spec-implementation-plan`) for the plan.
 
-Optionally: `spec-idea` first if the feature is still hypothetical. Write relevant ADRs before the PRD if architecture decisions are open.
+Optionally: `spec-idea` first if the feature is still hypothetical. Write relevant ADRs before the PRD if architecture decisions are open. Write domain model for the feature's aggregate (Step 7b) if the aggregate isn't already modelled.
 
 ### Strategy / investor / executive engagement only
 
@@ -380,6 +412,12 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `VS-N` | Value stream | `business-value-stream` |
 | `VS-N.M` | Value-stream stage | `business-value-stream` |
 | `C-N.M.FXX` | Functionality (capability + counter) | `spec-functional-breakdown-structure` |
+| `BC-NN` | Bounded Context | `domain-bounded-context` |
+| `BC-NN.GT-NN` | Glossary Term (scoped to bounded context) | `domain-glossary` |
+| `BC-NN.AGG-NN` | Aggregate root (scoped to bounded context) | `domain-model` |
+| `BC-NN.ENT-NN` | Entity (scoped to bounded context) | `domain-model` |
+| `BC-NN.VO-NN` | Value Object (scoped to bounded context) | `domain-model` |
+| `BC-NN.EVT-NN` | Domain Event (scoped to bounded context) | `domain-model` |
 | `E-NN` | Epic + walking skeleton + phase plan (delivery roadmap) | `spec-delivery-roadmap` |
 | `QA-XXNN` | Quality attribute (characteristic prefix + counter, e.g. `QA-PE01`, `QA-SE03`) | `spec-quality-attributes` |
 | `PRD-NNNN` | PRD ID | `spec-prd` |
@@ -387,6 +425,8 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `Inc-N` (within a plan) | Plan increment | `spec-implementation-plan` |
 | `ADR-NNNN` | Architecture decision | `arch-adr` |
 | Block ID in BMC (e.g., `CS-1`, `VP-1`) | Canvas block | `business-model-canvas` |
+
+**BC-NN namespace rule:** All tactical DDD IDs are scoped to their bounded context. `BC-01.AGG-03` and `BC-02.AGG-03` are different aggregates. Cross-references must always include the BC prefix — bare `AGG-03` is ambiguous and invalid.
 
 **Cross-doc linking rule:** any artefact that references another should use the ID + name + relative path:
 
@@ -429,6 +469,14 @@ docs/
 ├── architecture/                                        ← `arch-` skills
 │   └── decisions/                                       ← arch-adr writes here
 │       └── {NNNN}-{slug}.md
+├── domain/                                              ← `domain-` skills (DDD artefacts)
+│   ├── bounded-contexts/
+│   │   ├── bounded-contexts.md                         ← domain-bounded-context (BC-NN)
+│   │   └── context-map.md
+│   ├── glossary/
+│   │   └── glossary.md                                 ← domain-glossary (BC-NN.GT-NN)
+│   └── {bc-slug}/
+│       └── domain-model.md                             ← domain-model (per BC)
 ├── ops/                                                 ← `ops-` skills
 │   ├── runbooks/
 │   │   └── {slug}.md
@@ -445,6 +493,7 @@ docs/
 | `business-` | `docs/business/` | All BIZBOK Business Architecture artefacts |
 | `spec-` | `docs/product-specs/`, `docs/exec-plans/`, `docs/ideas/` | Product specs, plans, pre-PRD ideas |
 | `arch-` | `docs/architecture/` | Subfolders per artefact (e.g., `decisions/` for ADRs) |
+| `domain-` | `docs/domain/` | DDD artefacts — the shared language between business and tech (bounded contexts, glossary, domain model) |
 | `ops-` | `docs/ops/` | Subfolders per artefact (`runbooks/`, `rcas/`) |
 | `dev-` | *(no doc folder)* | Developer-workflow utilities |
 | `util-` | *(no doc folder)* | Housekeeping |

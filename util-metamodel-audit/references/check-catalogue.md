@@ -22,6 +22,9 @@ find docs -maxdepth 4 -name "epic-catalogue.md" 2>/dev/null
 find docs -maxdepth 5 -name "quality-attributes.md" 2>/dev/null
 find docs/product-specs -maxdepth 1 -name "*_prd_*.md" 2>/dev/null | head -1
 find docs/exec-plans/active -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1
+find docs/domain/bounded-contexts -name "bounded-contexts.md" 2>/dev/null  # Step 2b
+find docs/domain/glossary -name "glossary.md" 2>/dev/null                  # Step 2c
+find docs/domain -name "domain-model.md" 2>/dev/null | head -1              # Step 7b (per BC)
 ```
 
 **Status assignment:**
@@ -126,6 +129,12 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `VS-N` | `\bVS-[0-9]+\b` | `docs/business/value-streams/value-streams.md` |
 | `VS-N.M` | `\bVS-[0-9]+\.[0-9]+\b` | `docs/business/value-streams/value-streams.md` |
 | `C-N.M.FXX` | `\bC-[0-9]+\.[0-9]+\.F[0-9]+\b` | `docs/product-specs/functional-breakdown-structure/FBS.md` |
+| `BC-NN` | `\bBC-[0-9]{2}\b` | `docs/domain/bounded-contexts/bounded-contexts.md` |
+| `BC-NN.GT-NN` | `\bBC-[0-9]{2}\.GT-[0-9]{2}\b` | `docs/domain/glossary/glossary.md` |
+| `BC-NN.AGG-NN` | `\bBC-[0-9]{2}\.AGG-[0-9]{2}\b` | `docs/domain/{bc-slug}/domain-model.md` |
+| `BC-NN.ENT-NN` | `\bBC-[0-9]{2}\.ENT-[0-9]{2}\b` | `docs/domain/{bc-slug}/domain-model.md` |
+| `BC-NN.VO-NN` | `\bBC-[0-9]{2}\.VO-[0-9]{2}\b` | `docs/domain/{bc-slug}/domain-model.md` |
+| `BC-NN.EVT-NN` | `\bBC-[0-9]{2}\.EVT-[0-9]{2}\b` | `docs/domain/{bc-slug}/domain-model.md` |
 | `E-NN` | `\bE-[0-9]{2}\b` | `docs/product-specs/epic-catalogue.md` |
 | `QA-[A-Z]{2}[0-9]{2}` | `\bQA-[A-Z]{2}[0-9]{2}\b` | `docs/product-specs/quality-attributes/quality-attributes.md` |
 | `ADR-NNNN` | `\bADR-[0-9]{4}\b` | `docs/architecture/decisions/` |
@@ -191,12 +200,26 @@ grep -roh '\bQA-[^A-Z ]' docs/ --include="*.md"
 | Any `*_prd_*.md` | `epic-catalogue.md` (PRDs map to E-NN epics) |
 | Any `*_prd_*.md` | `quality-attributes.md` (PRDs reference QA-XXNN) |
 | Any `exec-plans/active/*/` plan | Corresponding `*_prd_*.md` |
+| `docs/domain/glossary/glossary.md` exists | `docs/domain/bounded-contexts/bounded-contexts.md` must also exist (glossary is scoped to BCs) |
+| `docs/domain/{bc-slug}/domain-model.md` exists | `docs/domain/bounded-contexts/bounded-contexts.md` must exist (domain model is namespaced by BC) |
+| `docs/domain/{bc-slug}/domain-model.md` exists | `docs/domain/glossary/glossary.md` must exist (entity names must match glossary terms) |
 
 **Detection (example):**
 ```bash
 [ -f "docs/product-specs/functional-breakdown-structure/FBS.md" ] && \
   [ ! -f "docs/business/capability-map/capability-map.md" ] && \
   echo "WARNING: FBS exists but capability-map.md missing"
+
+[ -f "docs/domain/glossary/glossary.md" ] && \
+  [ ! -f "docs/domain/bounded-contexts/bounded-contexts.md" ] && \
+  echo "WARNING: Glossary exists but bounded-contexts.md missing"
+
+find docs/domain -name "domain-model.md" 2>/dev/null | while read f; do
+  [ ! -f "docs/domain/bounded-contexts/bounded-contexts.md" ] && \
+    echo "WARNING: Domain model exists but bounded-contexts.md missing: $f"
+  [ ! -f "docs/domain/glossary/glossary.md" ] && \
+    echo "WARNING: Domain model exists but glossary missing: $f"
+done
 ```
 
 **Severity:** Warning
@@ -440,6 +463,15 @@ grep -oh '\bE-[0-9]\{2\}\b' docs/product-specs/epic-catalogue.md 2>/dev/null | s
   grep -rl "$epic" docs/product-specs --include="*_prd_*.md" 2>/dev/null | head -1 || \
     echo "NO PRD for $epic"
 done
+```
+
+**Detection — domain model completeness:**
+```bash
+# Domain model completeness
+bc_count=$(grep -c 'BC-[0-9][0-9]' docs/domain/bounded-contexts/bounded-contexts.md 2>/dev/null || echo 0)
+dm_count=$(find docs/domain -name "domain-model.md" 2>/dev/null | wc -l)
+echo "Bounded contexts: $bc_count | Domain models: $dm_count"
+[ "$dm_count" -lt "$bc_count" ] && echo "WARNING: $(($bc_count - $dm_count)) BC(s) missing domain model"
 ```
 
 **Severity:** Info

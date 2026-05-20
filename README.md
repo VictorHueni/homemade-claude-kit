@@ -15,6 +15,7 @@ Every skill produces a named artefact with a stable ID. Artefacts cross-link by 
 ```mermaid
 flowchart TD
     classDef business fill:#FEF3C7,stroke:#D97706,color:#92400E
+    classDef domain   fill:#EDE9FE,stroke:#7C3AED,color:#4C1D95
     classDef specs    fill:#DBEAFE,stroke:#3B82F6,color:#1E40AF
     classDef delivery fill:#D1FAE5,stroke:#10B981,color:#065F46
     classDef support  fill:#F3F4F6,stroke:#9CA3AF,color:#374151
@@ -26,6 +27,12 @@ flowchart TD
         S4["4 · business-value-stream · VS-N.M"]:::business
         S5["5 · business-process"]:::business
         S6["6 · business-quantitative-model"]:::business
+    end
+
+    subgraph DOM["Domain Layer — Steps 2b · 2c · 7b"]
+        S2b["2b · domain-bounded-context · BC-NN"]:::domain
+        S2c["2c · domain-glossary · BC-NN.GT-NN"]:::domain
+        S7b["7b · domain-model · BC-NN.AGG / ENT / VO / EVT"]:::domain
     end
 
     subgraph PS["Product Specs — Steps 7–10"]
@@ -52,8 +59,15 @@ flowchart TD
     S3 --> S4
     S4 --> S5
     S2 --> S6
+    S3 --> S2b
+    S4 --> S2b
+    S2b --> S2c
+    S2b --> S7b
     S3 --> S7
+    S7 --> S7b
+    S2c --> S7b
     S7 --> S8
+    S7b --> S10
     S8 --> S9
     S9 --> S10
     S10 --> S11
@@ -65,6 +79,8 @@ flowchart TD
     RES -.-> S2
     WS -.-> S3
 ```
+
+Purple = Domain layer (DDD artefacts)
 
 ---
 
@@ -123,6 +139,24 @@ erDiagram
         string Plan_NNNN PK
         string PRD_NNNN FK
     }
+    BOUNDED_CONTEXT {
+        string BC_NN PK
+        string C_NM FK
+        string subdomain_type
+    }
+    GLOSSARY_TERM {
+        string BC_NN_GT_NN PK
+        string BC_NN FK
+    }
+    DOMAIN_MODEL {
+        string BC_NN_AGG_NN PK
+        string BC_NN FK
+        string C_NM_FXX FK
+    }
+    DOMAIN_EVENT {
+        string BC_NN_EVT_NN PK
+        string BC_NN_AGG_NN FK
+    }
 
     PERSONA ||--o{ VALUE_STREAM : "triggers"
     PERSONA ||--o{ BMC : "Customer Segments"
@@ -141,6 +175,14 @@ erDiagram
     EPIC ||--|| PRD : "one PRD per epic"
     QUALITY_ATTRIBUTES ||--o{ PRD : "QA-XXNN in acceptance criteria"
     PRD ||--|| IMPLEMENTATION_PLAN : "one plan per PRD"
+    CAPABILITY_MAP ||--o{ BOUNDED_CONTEXT : "capabilities group into"
+    PERSONA }o--o{ BOUNDED_CONTEXT : "grounds ubiquitous language"
+    VALUE_STREAM }o--o{ BOUNDED_CONTEXT : "stage boundaries signal"
+    BOUNDED_CONTEXT ||--o{ GLOSSARY_TERM : "scopes GT-NN terms"
+    BOUNDED_CONTEXT ||--o{ DOMAIN_MODEL : "one model per BC"
+    FBS ||--o{ DOMAIN_MODEL : "functionalities become entities"
+    DOMAIN_MODEL ||--o{ DOMAIN_EVENT : "aggregates produce events"
+    PRD }o--o{ DOMAIN_MODEL : "references AGG-NN and EVT-NN"
 ```
 
 ---
@@ -158,6 +200,9 @@ erDiagram
 | `business-` | `business-competitive-landscape` | `docs/business/competitive-landscape/` | — |
 | `business-` | `business-research` | `docs/business/research/` | — |
 | `business-` | `business-workshop` | `docs/business/workshops/` | — |
+| `domain-` | `domain-bounded-context` | `docs/domain/bounded-contexts/` | `BC-NN` |
+| `domain-` | `domain-glossary` | `docs/domain/glossary/glossary.md` | `BC-NN.GT-NN` |
+| `domain-` | `domain-model` | `docs/domain/{bc-slug}/domain-model.md` | `BC-NN.AGG-NN` · `BC-NN.EVT-NN` |
 | `spec-` | `spec-functional-breakdown-structure` | `docs/product-specs/functional-breakdown-structure/FBS.md` | `C-N.M.FXX` |
 | `spec-` | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap.md` | `E-NN` |
 | `spec-` | `spec-quality-attributes` | `docs/product-specs/quality-attributes/quality-attributes.md` | `QA-XXNN` |
