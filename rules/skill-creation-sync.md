@@ -150,6 +150,20 @@ grep -niE "<project-specific terms>" SKILL.md references/*.md
 
 Should return zero matches.
 
+## Metamodel impact assessment (run before publishing any skill change)
+
+Before committing a new skill or a change to an existing artefact-producing skill, answer the five questions below. Each "yes" triggers a mandatory update to the files listed.
+
+| Question | If yes → update |
+|---|---|
+| Does the skill's **output path** change or is it a new skill with a new path? | `rules/metamodel.md` canonical paths + artefact table · `util-metamodel-audit/references/check-catalogue.md` Check 1 · `util-metamodel-migration/references/detection-signals.md` §Filename patterns + §Folder patterns |
+| Does the skill **mint a new ID format** (e.g. `XX-NN`)? | `rules/metamodel.md` cross-doc ID conventions · `util-metamodel-audit/references/check-catalogue.md` Check 5 · `util-metamodel-migration/references/detection-signals.md` §Filename patterns |
+| Does the skill **add or change a prerequisite** (upstream artefact it depends on)? | `rules/metamodel.md` DAG + build order step · `util-metamodel-audit/references/check-catalogue.md` Check 7 |
+| Does the skill **add, rename, or remove a mandatory section** from its template? | `util-metamodel-audit/references/check-catalogue.md` Check 9 · `util-metamodel-migration/references/detection-signals.md` §Content signals |
+| Is this a **brand-new artefact-producing skill** (new step in the build order)? | `rules/metamodel.md` artefact table + DAG + build order section + canonical paths + prefix mapping · README.md flowchart + ER diagram · `util-metamodel-audit/SKILL.md` step count · all four files above |
+
+**Scope filter:** this checklist applies to skills in the `business-`, `spec-`, `arch-`, and `domain-` families. `dev-*`, `util-*`, and `ops-*` skills that produce no metamodel artefact can skip it.
+
 ## Publish and install
 
 1. Commit + push in `$KIT_DIR` — convention: `feat(<skill-name>): <title>` or `chore(<skill-name>): <title>`
