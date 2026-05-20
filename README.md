@@ -14,28 +14,36 @@ Every skill produces a named artefact with a stable ID. Artefacts cross-link by 
 
 ```mermaid
 flowchart TD
+    classDef business fill:#FEF3C7,stroke:#D97706,color:#92400E
+    classDef specs    fill:#DBEAFE,stroke:#3B82F6,color:#1E40AF
+    classDef delivery fill:#D1FAE5,stroke:#10B981,color:#065F46
+    classDef support  fill:#F3F4F6,stroke:#9CA3AF,color:#374151
+
     subgraph BA["Business Architecture — Steps 1–6"]
-        S1["1 · business-persona · P-NN"]
-        S2["2 · business-model-canvas"]
-        S3["3 · business-capability-map · C-N.M"]
-        S4["4 · business-value-stream · VS-N.M"]
-        S5["5 · business-process"]
-        S6["6 · business-quantitative-model"]
+        S1["1 · business-persona · P-NN"]:::business
+        S2["2 · business-model-canvas"]:::business
+        S3["3 · business-capability-map · C-N.M"]:::business
+        S4["4 · business-value-stream · VS-N.M"]:::business
+        S5["5 · business-process"]:::business
+        S6["6 · business-quantitative-model"]:::business
     end
 
-    subgraph PS["Product Specs — Steps 7–11"]
-        S7["7 · spec-functional-breakdown-structure · C-N.M.FXX"]
-        S8["8 · spec-delivery-roadmap · E-NN"]
-        S9["9 · spec-quality-attributes · QA-XXNN"]
-        S10["10 · spec-prd · PRD-NNNN"]
-        S11["11 · spec-implementation-plan · Plan-NNNN"]
+    subgraph PS["Product Specs — Steps 7–10"]
+        S7["7 · spec-functional-breakdown-structure · C-N.M.FXX"]:::specs
+        S8["8 · spec-delivery-roadmap · E-NN"]:::specs
+        S9["9 · spec-quality-attributes · QA-XXNN"]:::specs
+        S10["10 · spec-prd · PRD-NNNN"]:::specs
+    end
+
+    subgraph EX["Execution — Step 11"]
+        S11["11 · spec-implementation-plan · Plan-NNNN"]:::delivery
     end
 
     subgraph SUP["Supporting Skills"]
-        ADR["arch-adr · ADR-NNNN"]
-        CL["business-competitive-landscape"]
-        RES["business-research"]
-        WS["business-workshop"]
+        ADR["arch-adr · ADR-NNNN"]:::support
+        CL["business-competitive-landscape"]:::support
+        RES["business-research"]:::support
+        WS["business-workshop"]:::support
     end
 
     S1 --> S2
