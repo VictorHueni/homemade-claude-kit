@@ -12,7 +12,7 @@ what order, and where to put it**.
 
 ---
 
-## The 9 artefacts and their skills
+## The 10 artefacts and their skills
 
 | # | Layer | Skill | Output file | Primary IDs |
 |---|---|---|---|---|
@@ -22,12 +22,13 @@ what order, and where to put it**.
 | 4 | **Business Processes** (operational how) | `business-process` | `docs/business/processes/{slug}-process.md` (one file per process) | per-process slug |
 | 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/business-model-canvas/business-model-canvas.md` or `lean-canvas.md` + optional `value-proposition-canvas-{segment}.md` | block IDs (CS-N, VP-N, …) |
 | 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/models/{slug}.md` | per-model slug |
-| 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/functional-breakdown-structure/FBS.md` | `C1.1.F01` (capability + functionality counter) |
-| 8 | **PRDs** (feature specs) | `spec-prd` | `docs/product-specs/[NNNN]_prd_[feature].md` | `PRD-NNNN` |
-| 9 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
+| 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/functional-breakdown-structure/FBS.md` | `C-N.M.FXX` (capability + functionality counter) |
+| 8 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/quality-attributes/quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
+| 9 | **PRDs** (feature specs) | `spec-prd` | `docs/product-specs/[NNNN]_prd_[feature].md` | `PRD-NNNN` |
+| 10 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
 
 **Supporting skills** (not in the main build order, used as needed):
-- `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/{NNNN}-{slug}.md`
+- `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 8 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 9 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
 - `spec-idea` — captures pre-PRD ideas → `docs/ideas/{slug}.md`
 - `spec-peer-review` — reviews PRDs / plans
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/competitive-landscape/`; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
@@ -81,13 +82,33 @@ what order, and where to put it**.
    │ Inherits L0+L1 from  │
    │   capability map     │
    └──────────┬───────────┘
-              │
-              ▼
+              │         ┌─────────────────────┐
+              │         │ arch-adr            │
+              │         │ (architecture       │
+              │         │  decisions)         │
+              │         │ Output: ADR-NNNN    │
+              │         │ Must precede Step 8 │
+              │         └──────────┬──────────┘
+              │                    │
+              ▼                    ▼
+   ┌──────────────────────────────────────────┐
+   │ spec-quality-attributes                  │
+   │ (how well the system performs — NFRs)    │
+   │ Output: QA-XXNN                          │
+   │ Reads: FBS differentiators (★) →         │
+   │   Reliability targets                    │
+   │ Reads: ADRs → Security/Flexibility QAs  │
+   │ Reads: Personas → IC/PE per-persona QAs │
+   │ Reads: VS pain index → PE priorities    │
+   └──────────────────┬───────────────────────┘
+                      │
+                      ▼
    ┌──────────────────────┐
    │ spec-prd             │
    │ (feature spec)       │
    │ Output: PRD-NNNN     │
    │ References C-N.M.FXX │
+   │ References QA-XXNN   │
    └──────────┬───────────┘
               │
               ▼
@@ -104,6 +125,7 @@ what order, and where to put it**.
 - An arrow `A → B` means *B soft-links to A by ID*. B can be scaffolded without A existing (placeholder `_TODO_`), but the link is filled when A arrives.
 - **No cycles.** B never feeds back into A.
 - The capability map (BC Map) is the **hub** — most other artefacts soft-link to it by `C-N.M` ID.
+- ADRs are **not in the linear chain** but must precede Step 8 (Quality Attributes) and Step 9 (PRDs) when their decisions affect those artefacts.
 
 ---
 
@@ -184,20 +206,29 @@ moving on.
 - Mode `fill` → enumerate functionalities per capability with `C-N.M.FXX` IDs + status (✅/🔄/⬜) + optional VS-stage links + code paths
 **Output verification:** FBS exists; ≥1 capability has ≥1 functionality; status distribution shows initial state.
 
-### Step 8 — PRDs (feature specs)
+### Step 8 — Quality Attributes (how well the system performs)
+
+**Skill:** `spec-quality-attributes`
+**Prerequisites:** Step 7 (FBS differentiators ★ drive Reliability targets); relevant ADRs written (Security, Flexibility, Maintainability QAs reference ADR decisions); Step 1 (Personas ground Interaction Capability and Performance Efficiency entries); Steps 3–4 (Value Stream pain index prioritises Performance Efficiency entries).
+**Process:**
+- Mode `scaffold` → create `docs/product-specs/quality-attributes/quality-attributes.md` with ISO/IEC 25010:2023 characteristic sections
+- Mode `fill` → populate one entry per sub-characteristic × product scope; each entry must have a measurable acceptance criterion + verification method; persona-grounded for IC and PE; reference ADR IDs for Security/Flexibility/Maintainability decisions
+**Output verification:** file exists; ≥1 entry per relevant ISO characteristic; all entries have measurable acceptance criteria (no vague aspirations); IC/PE entries reference P-NN personas; differentiator FBS features (★) have corresponding Reliability entries.
+
+### Step 9 — PRDs (feature specs)
 
 **Skill:** `spec-prd`
-**Prerequisites:** Step 7 (PRDs reference FBS functionality IDs `C-N.M.FXX` they deliver).
+**Prerequisites:** Step 7 (PRDs reference FBS functionality IDs `C-N.M.FXX` they deliver); Step 8 (PRDs reference Quality Attribute IDs `QA-XXNN` in acceptance criteria); relevant ADRs (PRDs do not re-open decided architectural choices).
 **Process:**
-- One PRD per feature slice you commit to building.
+- One PRD per feature slice (epic) you commit to building.
 - `docs/product-specs/[NNNN]_prd_[feature].md`.
-- Each PRD: problem · goals · non-goals · user stories · acceptance criteria · success metrics.
-**Output verification:** ≥1 PRD per active development thread; each PRD references the FBS functionality IDs it delivers; FBS functionality status promoted ⬜ → 🔄.
+- Each PRD: §0 Architecture Traceability (P-NN, C-N.M, QA-XXNN, FBS scope) · problem · goals · non-goals · user stories (persona-grounded, P-NN) · acceptance criteria · success metrics.
+**Output verification:** ≥1 PRD per active development thread; each PRD references FBS functionality IDs it delivers and QA IDs its acceptance criteria satisfy; FBS functionality status promoted ⬜ → 🔄.
 
-### Step 9 — Implementation Plans (atomic increments)
+### Step 10 — Implementation Plans (atomic increments)
 
 **Skill:** `spec-implementation-plan`
-**Prerequisites:** Step 8 (PRDs).
+**Prerequisites:** Step 9 (PRDs).
 **Process:**
 - One plan per PRD: `docs/exec-plans/active/{NNNN}_{slug}/`.
 - Each plan: numbered increments (Inc-1, Inc-2, …), each small + testable + reversible.
@@ -205,8 +236,8 @@ moving on.
 
 ### Ongoing — ADRs, runbooks, ideas, audit
 
-Not numbered in the build order; invoked as needed:
-- `arch-adr` → architecture decisions accumulating during planning + delivery
+Not numbered in the linear build order but sequencing matters:
+- `arch-adr` → invoke as soon as an architectural choice must be made; ADRs governing security, flexibility, or maintainability must precede Step 8 (Quality Attributes); all ADRs must precede Step 9 (PRDs) that depend on their decisions
 - `ops-runbook` → operational procedures captured post-ship
 - `ops-bug-rca` → root cause analyses post-incident
 - `spec-idea` → pre-PRD idea capture (becomes a PRD when committed)
@@ -223,19 +254,19 @@ Start at **Step 3** (Business Capability Map), skip Steps 1–2 unless:
 - The capability touches a stakeholder group not yet documented (then do Step 1 lightweight for that persona).
 - The capability changes the commercial model (then do Step 2 — usually skipped).
 
-**Sequence:** Step 3 (BC Map at LOB / domain scope) → Step 4 (value stream for the affected flow) → Step 5 (process docs for the as-is operational state) → Step 7 (FBS for the new capability + its functionalities) → Step 8 (PRDs) → Step 9 (plans).
+**Sequence:** Step 3 (BC Map at LOB / domain scope) → Step 4 (value stream for the affected flow) → Step 5 (process docs for the as-is operational state) → Step 7 (FBS for the new capability + its functionalities) → Step 8 (Quality Attributes — at minimum the Reliability entries for new differentiator features) → Step 9 (PRDs) → Step 10 (plans).
 
 ### Single feature (no full architecture work)
 
 Skip Steps 1–7 entirely. Go straight to:
-- Step 8 (`spec-prd`) for the feature.
-- Step 9 (`spec-implementation-plan`) for the plan.
+- Step 9 (`spec-prd`) for the feature.
+- Step 10 (`spec-implementation-plan`) for the plan.
 
-Optionally: `spec-idea` first if the feature is still hypothetical.
+Optionally: `spec-idea` first if the feature is still hypothetical. Write relevant ADRs before the PRD if architecture decisions are open.
 
 ### Strategy / investor / executive engagement only
 
-Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–9 entirely. Optionally add:
+Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–10 entirely. Optionally add:
 - Step 1 (personas) — investors love seeing customer specificity.
 - Step 6 (quantitative model) — TAM/SAM/SOM for the deck.
 - Step 3 (BC Map) — only if the strategic conversation needs the capability lens.
@@ -251,6 +282,7 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–9 entirely
 | `VS-N` | Value stream | `business-value-stream` |
 | `VS-N.M` | Value-stream stage | `business-value-stream` |
 | `C-N.M.FXX` | Functionality (capability + counter) | `spec-functional-breakdown-structure` |
+| `QA-XXNN` | Quality attribute (characteristic prefix + counter, e.g. `QA-PE01`, `QA-SE03`) | `spec-quality-attributes` |
 | `PRD-NNNN` | PRD ID | `spec-prd` |
 | `Plan-NNNN` | Implementation plan | `spec-implementation-plan` |
 | `Inc-N` (within a plan) | Plan increment | `spec-implementation-plan` |
@@ -287,6 +319,8 @@ docs/
 ├── product-specs/                                       ← `spec-` skills (product delivery)
 │   ├── functional-breakdown-structure/
 │   │   └── FBS.md
+│   ├── quality-attributes/
+│   │   └── quality-attributes.md
 │   └── {NNNN}_prd_{feature}.md (one per PRD)
 ├── exec-plans/                                          ← `spec-` skills (implementation)
 │   └── active/
