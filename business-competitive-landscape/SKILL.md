@@ -66,7 +66,7 @@ Ask the user the following 4 questions in a single message with lettered options
 ```text
 1. Starting competitor list source?
    A. I have a named list — I'll provide the competitors
-   B. Discover from project context (PRDs, BMC, persona docs)
+   B. Discover from project context (source docs, BMC, persona docs)
    C. Discover from market research (analyst lists, G2, Capterra, regulatory filings)
    D. Hybrid — I have some + please discover more
 
@@ -91,7 +91,7 @@ Ask the user the following 4 questions in a single message with lettered options
 If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
 
 **Process:**
-1. **Read project context** — PRDs, BMC, persona docs, market analysis if any. Identify the industry / scope.
+1. **Read project context** — source documents (`docs/sources/`), BMC, persona docs, market analysis if any. Identify the industry / scope. **Do not reference delivery PRDs** — they are downstream artefacts that do not yet exist when the competitive landscape is built; cite source documents instead.
 2. **Fill Porter's Five Forces** (5-row table in hub doc):
    - For each force: rating (`Low / Medium / High / Very High`), one-sentence rationale, key drivers, evidence sources.
 3. **Build competitor tier table:**
@@ -229,8 +229,18 @@ competitive-landscape/
 | Competitor capabilities | Capability Map (`C-N.M`) — where THEY have a capability YOU lack = differentiator opportunity |
 | Competitor revenue / funding | Quantitative model (TAM/SAM/SOM context) |
 | Industry rivalry intensity | BMC Customer Relationships (forced churn) + Channels (channel competition) |
+| Documentary evidence for factual claims (current workflow, pain) | **Source documents** (`docs/sources/`) — e.g. `[PRD §1.1](../../sources/BlocPlan_PRD_v1.docx)` |
 
 **Soft-link discipline:** mention the ID + name + relative path; don't duplicate content. The competitive landscape stands alone — cross-references add depth.
+
+**Reference direction rule — critical:** the competitive landscape is a **strategic artefact** that sits UPSTREAM of PRDs in the documentation stack. It must NEVER reference a `[NNNN]_prd_[feature].md` delivery spec — those are downstream outputs that don't yet exist when the competitive landscape is built. When citing documentary evidence from an internal source (e.g. current-state pain, market claims), reference the **source document** in `docs/sources/` directly:
+
+```markdown
+✅ [PRD §1.1 — current workflow pain](../../sources/BlocPlan_PRD_v1.docx) *(internal source)*
+❌ [PRD §1.1](../../prd.md)  ← wrong: delivery spec doesn't exist yet; wrong path convention
+```
+
+For references to project artefacts, use only upstream or peer artefacts: personas, BC Map, BMC, value streams, quantitative models.
 
 ---
 
