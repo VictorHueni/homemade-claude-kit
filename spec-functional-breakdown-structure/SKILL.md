@@ -1,7 +1,7 @@
 ---
 name: spec-functional-breakdown-structure
 description: "Create a Functional Breakdown Structure (FBS) — the functionality registry organised by product → capability → functionality, with status tracking (✅/🔄/⬜), optional code-path annotations, and optional value-stream-stage linkage. Synthesises BABOK §10.22 Functional Decomposition + NASA FBS + TOGAF Business Architecture + practitioner discipline. Use when the user asks to build an FBS, scaffold a functionality registry, decompose a product into functionalities, track feature status across the lifecycle, or extend a Business Capability Map with feature-level detail. Triggers on: FBS, functional breakdown structure, functionality registry, decompose product, feature inventory, what does the product do (concretely), capability-to-feature mapping, product decomposition. Domain-agnostic. Soft-links UP to the Business Capability Map (BC Map owns L0+L1 strategic; FBS adds L2 functionalities + status + code paths). Stays out of PRD/roadmap territory."
-version: "1.1.0"
+version: "1.2.0"
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"
@@ -130,11 +130,53 @@ configuration row.
 
 Common attribute mistakes:
 - Separate rows for name, colour code, identifier, enabled/disabled status
-  of the same entity → merge into one "Configure [entity]" row
-- Separate rows for "create" and "edit" of the same entity when they share
-  the same form/screen → merge into "Create and maintain [entity]"
+  of the same entity → merge into one row
 - Separate rows for "soft preference A" and "soft preference B" of the same
   entity when they are configured in the same UI interaction → merge
+
+### The CRUD splitting rule
+
+*Anchored in: RESTful resource design (Fielding, 2000); Wiegers & Beatty
+(2013) §operation decomposition; BABOK §10.22 functional decomposition*
+
+**Never merge Create, Update, and Delete into a single FBS row.** Each
+CRUD operation has distinct business logic, distinct API contract, and
+distinct test cases — they are independently testable and should be
+independently deliverable.
+
+**One row per CRUD operation on a significant entity:**
+
+| Operation | FBS row naming | Example |
+|---|---|---|
+| Create | "Create [entity] ([key fields])" | "Create surgeon profile (name, specialty, contact, colour code)" |
+| Update | "Update [entity]" | "Update surgeon profile" |
+| Delete / Archive | "Deactivate / archive [entity]" | "Deactivate surgeon profile (archive without delete)" |
+| List / Index | "List [entities] with [filter/sort]" | "List surgeons with search and filter" |
+| Detail view | "Display [entity] detail" | "Display surgeon profile detail" |
+
+**Exception — simple configuration entities:**
+For configuration items with no significant business logic (e.g. a time
+slot type with 2 fields, a room name), Create and Update may share a row
+as "Configure [item]" when the form and validation are identical and the
+operation has no side effects beyond persisting the value.
+
+> ❌ "Create and maintain surgeon profile (name, specialty, contact, colour code, cabinet links, secretary associations)"
+> — bundles Create + Update + association management in one row
+>
+> ✅ "Create surgeon profile (name, specialty, contact, colour code)"
+> ✅ "Update surgeon profile"
+> ✅ "Manage surgeon associations (cabinet links, secretary contacts)"
+> ✅ "Deactivate surgeon profile (archive without delete)"
+
+**Form field granularity:**
+When an entity has a form with multiple distinct sections covering
+different concerns, split by section — not by individual field.
+
+> A surgeon profile form has two sections: identity (name, specialty,
+> contact) and practice associations (cabinets, secretaries). These serve
+> different use cases and may have different permissions → two rows.
+> The individual fields within each section (name, specialty, email) are
+> attributes of that section — not separate rows.
 
 ### The clustering rule — when source documents are provided
 
