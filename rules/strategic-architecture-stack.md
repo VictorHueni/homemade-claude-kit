@@ -134,7 +134,7 @@ what order, and where to put it**.
 - An arrow `A → B` means *B soft-links to A by ID*. B can be scaffolded without A existing (placeholder `_TODO_`), but the link is filled when A arrives.
 - **No cycles.** B never feeds back into A.
 - The capability map (BC Map) is the **hub** — most other artefacts soft-link to it by `C-N.M` ID.
-- ADRs are **not in the linear chain** but must precede Step 8 (Quality Attributes) and Step 9 (PRDs) when their decisions affect those artefacts.
+- ADRs are **not in the linear chain** but must precede Step 9 (Quality Attributes) and Step 10 (PRDs) when their decisions affect those artefacts.
 
 ---
 
