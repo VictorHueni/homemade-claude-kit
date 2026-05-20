@@ -1,0 +1,259 @@
+---
+name: util-stack-audit
+description: "Audit the strategic-architecture documentation stack for a project. Checks 16 dimensions: stack progress (11-step completion), folder placement, internal links, external links, ID cross-references, ID integrity (collisions + format), dependency enforcement, _TODO_ density, mandatory section compliance, methodology pointer presence, confidence distribution, expiry + staleness, orphaned files, research sync, ADR supersession chains, FBS + epic delivery progress. Report-only with proposed fix column per finding. Triggers on: audit the stack, stack audit, check docs health, documentation audit, check links, validate dependencies, what steps are done, doc health check, stale links, broken links, check doc dependencies, audit documentation stack."
+version: "1.0.0"
+user-invocable: true
+allow_implicit_invocation: true
+impact: "low"
+metadata:
+  category: "utility"
+  complexity: "high"
+---
+
+# Stack Audit
+
+You are an expert at auditing strategic-architecture documentation stacks — systematically checking that the 11-step artefact stack (personas → implementation plans) is complete, internally consistent, and free of broken links, stale content, or dependency violations.
+
+The artifact produced by this skill is **a markdown report** at `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md`. It is NOT a design artefact, NOT a code review, NOT a living document — it is a **point-in-time health snapshot** of the documentation stack, with one finding per row and a proposed fix per finding.
+
+**Report-only discipline:** this skill reads files and runs read-only commands only. It never modifies any project file. Every finding has a "Proposed fix" that the user can apply manually or by invoking the relevant skill. An audit that fixes silently hides its own findings.
+
+---
+
+## What a "good audit report" means
+
+A report is good when a reader can answer, without ambiguity:
+
+| Question | Where it lives |
+|---|---|
+| **What fraction of the 11-step stack is complete?** | §1 Stack progress table (✅/🔄/⬜ per step) |
+| **Which files are in the wrong folder?** | §2 Folder placement findings |
+| **Which internal links are broken?** | §3 Internal link findings |
+| **Which external links are dead or unverified?** | §4 External link findings |
+| **Which ID references have no definition?** | §5 ID cross-reference findings |
+| **Which IDs are duplicated or malformed?** | §6 ID integrity findings |
+| **Which artefacts are missing prerequisites?** | §7 Dependency enforcement findings |
+| **Which files are mostly _TODO_?** | §8 _TODO_ density table |
+| **Which files are missing mandatory sections?** | §9 Mandatory section findings |
+| **Which files are missing methodology pointers?** | §10 Methodology pointer findings |
+| **How much of the strategy is still Assumed?** | §11 Confidence distribution table |
+| **Which proto-personas or competitive claims have expired?** | §12 Expiry + staleness findings |
+| **Which files are unreferenced?** | §13 Orphaned file findings |
+| **Which research synthesis updates were never applied upstream?** | §14 Research sync findings |
+| **Which ADR supersession chains are broken?** | §15 ADR chain findings |
+| **What is the FBS + epic delivery status?** | §16 Delivery progress table |
+
+---
+
+## The four modes of operation
+
+The skill operates in one of four modes. Detect which mode the user wants from their prompt; ask if ambiguous.
+
+### Mode 1 — Full audit
+
+**When:** comprehensive health check; run before a release, sprint planning, or quarterly review.
+
+**Step 0 — Clarifying questions (ask BEFORE running)**
+
+Ask the user the following 4 questions in a single message with lettered options. Users respond like `1A, 2B, 3C, 4A`:
+
+```text
+1. Audit scope?
+   A. Full docs/ tree — all 16 check categories (default)
+   B. Business architecture layer only (docs/business/)
+   C. Product specs layer only (docs/product-specs/, docs/exec-plans/)
+   D. Single file or folder — please name it
+
+2. External link checking?
+   A. Skip external links (faster — no network calls)
+   B. Check all external links (slower — requires curl)
+   C. Check only links missing a "Last verified" date
+
+3. Severity threshold for report?
+   A. All findings — Errors + Warnings + Info (default)
+   B. Errors + Warnings only
+   C. Errors only
+
+4. Output destination?
+   A. Save report to var/reports/stack-audit/ (default)
+   B. Print summary to terminal only
+   C. Both — save file and print summary
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
+**Process:**
+1. Run the bash detection patterns for each of the 16 check categories (see `references/check-catalogue.md`).
+2. Collect all findings; tag each with severity (Error / Warning / Info).
+3. Build executive summary counts.
+4. Fill the report template (see `references/template.md`).
+5. Save to `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md`.
+
+### Mode 2 — Progress snapshot
+
+**When:** quick "where are we in the build order?" check. No link, dependency, or freshness analysis.
+
+**Process:**
+1. For each of the 11 steps, check whether the canonical output path exists.
+2. For each existing file, retrieve last-modified date: `git log -1 --format="%ci" -- {file}`.
+3. Output a single table: `Step # | Artefact | Status | Path | Last modified | Age (days)`.
+4. Print to terminal. Save to file only if explicitly requested.
+
+### Mode 3 — Link + dependency check
+
+**When:** after a refactor, rename, or structural change. Runs checks §3–§7 only.
+
+**Process:**
+1. Run checks §3 (internal links), §4 (external links), §5 (ID cross-references), §6 (ID integrity), §7 (dependency enforcement).
+2. Output findings grouped by check category.
+3. Save to `var/reports/stack-audit/link-audit-{YYYY-MM-DD}.md`.
+
+### Mode 4 — Freshness check
+
+**When:** quarterly review, before a research wave, or before a stakeholder presentation. Runs checks §8, §11, §12, §14 only.
+
+**Process:**
+1. Run checks §8 (_TODO_ density), §11 (confidence distribution), §12 (expiry + staleness), §14 (research sync).
+2. Output a freshness dashboard: `File | Completeness % | Confidence (A/T/V) | Age (days) | Flags`.
+3. Save to `var/reports/stack-audit/freshness-{YYYY-MM-DD}.md`.
+
+---
+
+## The 16 check categories
+
+Full detection patterns and bash commands in `references/check-catalogue.md`. Brief descriptions here:
+
+| # | Category | What it detects | Severity |
+|---|---|---|---|
+| 1 | **Stack progress** | Which of the 11 canonical output paths exist | Info |
+| 2 | **Folder placement** | Files in wrong canonical location per the stack rule | Warning |
+| 3 | **Internal links** | Broken relative `[text](../path)` links | Error |
+| 4 | **External links** | Dead URLs (4xx/5xx), unresolved redirects (3xx), links missing `Last verified` date | Warning / Error |
+| 5 | **ID cross-references** | IDs used in one doc but not defined in their owning artefact | Error |
+| 6 | **ID integrity** | Duplicate IDs within a namespace; malformed ID formats | Error |
+| 7 | **Dependency enforcement** | Artefact exists but its required prerequisite artefact is absent | Warning |
+| 8 | **_TODO_ density** | Count of unfilled `_TODO_` fields; completeness % per file | Info |
+| 9 | **Mandatory sections** | Required sections absent (§8 KPIs in process docs, §5.2 in models, §Research Grounding in personas, etc.) | Error |
+| 10 | **Methodology pointers** | `business-*` docs missing the kit methodology blockquote in header | Warning |
+| 11 | **Confidence distribution** | Ratio of Assumed / Tested / Validated per file; flags 100% Assumed after 90 days | Warning |
+| 12 | **Expiry + staleness** | Proto-persona `Next review` dates passed; competitive claims past refresh window | Warning / Error |
+| 13 | **Orphaned files** | Markdown files in `docs/` unreferenced by any other doc | Info |
+| 14 | **Research sync** | Synthesis docs with "updates needed" sections where the upstream artefact has not been modified since | Warning |
+| 15 | **ADR chains** | One-sided supersession links (ADR-A supersedes ADR-B but ADR-B has no back-link) | Warning |
+| 16 | **Delivery progress** | FBS ✅/🔄/⬜ counts; epic ↔ PRD linkage completeness | Info |
+
+---
+
+## Report structure — the fixed template
+
+Full template in `references/template.md`. Top-level structure:
+
+```
+<!-- audit-version: 1.0 | generated: YYYY-MM-DD | scope: {scope} | mode: {mode} -->
+
+H1: Stack Audit — {project} — {YYYY-MM-DD}
+
+§ Executive summary
+  X/11 steps complete · N errors · N warnings · N info
+  Top 3 most urgent findings
+
+§1  Stack progress          Step # | Artefact | Status | Path | Last modified | Age (days)
+§2  Folder placement        File | Expected path | Actual path | Proposed fix
+§3  Internal links          Source file | Link text | Target | Status | Proposed fix
+§4  External links          Source file | URL | HTTP status | Last verified | Proposed fix
+§5  ID cross-references     Source file | ID | Owning artefact | Found? | Proposed fix
+§6  ID integrity            ID | Type | File(s) | Issue | Proposed fix
+§7  Dependency enforcement  Artefact | Missing prerequisite | Proposed fix
+§8  _TODO_ density          File | Total _TODO_ count | Completeness % | Top priority _TODOs
+§9  Mandatory sections      File | Missing section | Required by skill | Proposed fix
+§10 Methodology pointers    File | Issue | Proposed fix
+§11 Confidence distribution File | Assumed | Tested | Validated | Flag
+§12 Expiry + staleness      File | Item | Due / Threshold date | Days overdue | Proposed fix
+§13 Orphaned files          File | Last modified | Proposed fix
+§14 Research sync           Synthesis file | Upstream artefact | Last modified | Proposed fix
+§15 ADR chains              ADR | Supersedes | Back-link present? | Proposed fix
+§16 Delivery progress       FBS: ✅ N / 🔄 N / ⬜ N | Epics with PRD: N / N total
+
+Audit metadata
+  Generated: YYYY-MM-DD | Scope: {scope} | Files scanned: N | Checks run: N
+```
+
+Sections with zero findings are kept but show "No findings." — never omit a section, so readers know the check ran.
+
+---
+
+## Proposed fix discipline
+
+Every finding row has a **"Proposed fix"** column. Rules:
+
+1. **Name the skill to invoke** when the fix requires regenerating or filling an artefact. E.g., "Run `business-persona` Mode 3 to fill `P-02`."
+2. **Name the exact edit** when the fix is a small targeted change. E.g., "Add `[ADR-0003 supersedes this](../0003-auth.md)` to ADR-0001 §Status."
+3. **Never propose deleting content** — flag as "Review manually; delete if confirmed stale."
+4. **Severity drives urgency:** Errors → fix before proceeding to next step; Warnings → fix within current phase; Info → fix at convenience.
+5. **One proposed fix per row** — if the fix is complex, add a numbered note below the table.
+6. **No auto-fix** — this skill only reads and reports. Never write to any project file as a side-effect of running an audit.
+
+---
+
+## Sizing heuristics
+
+| Element | Recommended | Source |
+|---|---|---|
+| Full audit cadence | Monthly (active development) / Quarterly (maintenance) | Practitioner |
+| Freshness check cadence | Before each research wave or stakeholder presentation | Practitioner |
+| Max Errors before proceeding to next stack step | 0 | Hard rule |
+| Max Warnings before proceeding to next stack step | ≤3 | Practitioner |
+| _TODO_ density flag threshold | >50% _TODO_ remaining in a nominally filled artefact | Practitioner |
+| Confidence flag threshold | 100% Assumed after 90 days from file creation | Lean UX validate-or-retire |
+| External link re-verification cadence | 90 days (fast-moving markets) / 180 days (slow markets) | SCIP practitioner |
+
+---
+
+## Finding the right output folder
+
+Default: `var/reports/stack-audit/`. Check first:
+
+```bash
+find . -type d -name "stack-audit" 2>/dev/null
+```
+
+If the project uses a different reports root (`reports/`, `docs/reports/`), use the existing convention. Create `var/reports/stack-audit/` if no reports folder exists.
+
+**Never write the report inside `docs/`** — audit reports are not artefacts in the stack; they are ephemeral health snapshots and must not be indexed as documentation.
+
+---
+
+## Reference materials
+
+Three files in `references/`:
+- **`references/template.md`** — full markdown report template with all 16 section skeletons.
+- **`references/check-catalogue.md`** — for each of the 16 checks: bash detection pattern, interpretation rules, severity assignment, proposed fix template.
+- **`references/methodology-references.md`** — rationale for each check category (link rot research, BABOK traceability discipline, Lean UX hypothesis expiry, SCIP staleness cadence).
+
+---
+
+## Closing report to the user
+
+After running any mode, summarise in 4–6 lines:
+
+1. **Mode run** + **scope** + **files scanned**.
+2. **Error / Warning / Info counts** — headline numbers only.
+3. **Top 3 most urgent findings** (Errors first; Warnings if no Errors).
+4. **Stack progress** — X/11 steps complete; which step is next.
+5. **Report saved at** path (if output = file).
+
+---
+
+## Checklist
+
+Before declaring the work done:
+
+- [ ] Step 0 answered (Mode 1) or mode detected from context.
+- [ ] All selected check categories run.
+- [ ] Every section present in report, even if "No findings."
+- [ ] Executive summary counts accurate.
+- [ ] Every finding row has a non-blank "Proposed fix."
+- [ ] Severity correctly assigned per `references/check-catalogue.md`.
+- [ ] No project file modified — report-only discipline maintained.
+- [ ] Report saved to `var/reports/stack-audit/` (if output = file).
+- [ ] Closing report delivered to user.

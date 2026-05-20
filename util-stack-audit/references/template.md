@@ -1,0 +1,219 @@
+# Stack Audit Report Template
+
+Copy this skeleton to `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md` and fill each section.
+
+---
+
+```markdown
+<!-- audit-version: 1.0 | generated: YYYY-MM-DD | scope: {full|business|product-specs|custom} | mode: {full|progress|links|freshness} -->
+
+# Stack Audit — {project} — {YYYY-MM-DD}
+
+---
+
+## Executive summary
+
+| Metric | Count |
+|---|---|
+| Steps complete (✅) | {N} / 11 |
+| Steps in progress (🔄) | {N} / 11 |
+| Steps not started (⬜) | {N} / 11 |
+| **Errors** | **{N}** |
+| **Warnings** | **{N}** |
+| Info | {N} |
+| Files scanned | {N} |
+
+**Top 3 most urgent findings:**
+1. {Most critical error/warning — file + issue}
+2. {Second finding}
+3. {Third finding}
+
+---
+
+## §1 Stack progress
+
+| Step | Artefact | Skill | Status | Path | Last modified | Age (days) |
+|---|---|---|---|---|---|---|
+| 1 | Personas | `business-persona` | {✅/🔄/⬜} | `docs/business/personas/personas.md` | {date} | {N} |
+| 2 | Business Model Canvas | `business-model-canvas` | {✅/🔄/⬜} | `docs/business/business-model-canvas/` | {date} | {N} |
+| 3 | Business Capability Map | `business-capability-map` | {✅/🔄/⬜} | `docs/business/capability-map/capability-map.md` | {date} | {N} |
+| 4 | Value Streams | `business-value-stream` | {✅/🔄/⬜} | `docs/business/value-streams/value-streams.md` | {date} | {N} |
+| 5 | Business Processes | `business-process` | {✅/🔄/⬜} | `docs/business/processes/` ({N} files) | {date} | {N} |
+| 6 | Quantitative Models | `business-quantitative-model` | {✅/🔄/⬜} | `docs/business/models/` ({N} files) | {date} | {N} |
+| 7 | Functional Breakdown Structure | `spec-functional-breakdown-structure` | {✅/🔄/⬜} | `docs/product-specs/functional-breakdown-structure/FBS.md` | {date} | {N} |
+| 8 | Epic Catalogue | `spec-epic-catalogue` | {✅/🔄/⬜} | `docs/product-specs/epic-catalogue.md` | {date} | {N} |
+| 9 | Quality Attributes | `spec-quality-attributes` | {✅/🔄/⬜} | `docs/product-specs/quality-attributes/quality-attributes.md` | {date} | {N} |
+| 10 | PRDs | `spec-prd` | {✅/🔄/⬜} | `docs/product-specs/` ({N} PRD files) | {date} | {N} |
+| 11 | Implementation Plans | `spec-implementation-plan` | {✅/🔄/⬜} | `docs/exec-plans/active/` ({N} plans) | {date} | {N} |
+
+**Next step:** {Step N — Artefact name — invoke `{skill}` Mode 1}
+
+---
+
+## §2 Folder placement
+
+{No findings. / Table below:}
+
+| File (actual path) | Expected path | Proposed fix |
+|---|---|---|
+| `{actual}` | `{canonical}` | Move to `{canonical}`; update links in `{N}` referencing files |
+
+---
+
+## §3 Internal links
+
+{No findings. / Table below:}
+
+| Source file | Line | Link text | Target | Status | Proposed fix |
+|---|---|---|---|---|---|
+| `{file}` | {N} | `{text}` | `{target}` | ❌ Not found | Update or remove link |
+
+---
+
+## §4 External links
+
+{No findings. / Table below:}
+
+| Source file | URL | HTTP status | Last verified | Proposed fix |
+|---|---|---|---|---|
+| `{file}` | `{url}` | {4xx/3xx/—} | {date / missing} | {Replace URL / Add Last verified date} |
+
+---
+
+## §5 ID cross-references
+
+{No findings. / Table below:}
+
+| Source file | ID referenced | Owning artefact | Found? | Proposed fix |
+|---|---|---|---|---|
+| `{file}` | `{ID}` | `{owning file}` | ❌ | Define `{ID}` in `{owning file}` or correct the reference |
+
+---
+
+## §6 ID integrity
+
+{No findings. / Table below:}
+
+| ID | Type | File(s) | Issue | Proposed fix |
+|---|---|---|---|---|
+| `{ID}` | `{P-NN / C-N.M / …}` | `{file}` | Duplicate / Malformed | Renumber to `{correct}` and update all references |
+
+---
+
+## §7 Dependency enforcement
+
+{No findings. / Table below:}
+
+| Artefact present | Missing prerequisite | Proposed fix |
+|---|---|---|
+| `{file}` | `{prerequisite path}` | Run `{skill}` to create the prerequisite |
+
+---
+
+## §8 _TODO_ density
+
+| File | _TODO_ count | Est. completeness % | Priority _TODOs |
+|---|---|---|---|
+| `{file}` | {N} | {N}% | {field names still unfilled} |
+
+---
+
+## §9 Mandatory sections
+
+{No findings. / Table below:}
+
+| File | Missing section | Required by | Proposed fix |
+|---|---|---|---|
+| `{file}` | `{section name}` | `{skill}` checklist | Add section using `{skill} references/template.md §{N}` |
+
+---
+
+## §10 Methodology pointers
+
+{No findings. / Table below:}
+
+| File | Issue | Proposed fix |
+|---|---|---|
+| `{file}` | Missing methodology blockquote in header | Add 2-line pointer from `{skill}/references/methodology-references.md` |
+
+---
+
+## §11 Confidence distribution
+
+| File | Assumed | Tested | Validated | Total | Flag |
+|---|---|---|---|---|---|
+| `{file}` | {N} | {N} | {N} | {N} | {⚠️ 100% Assumed >90d / —} |
+
+---
+
+## §12 Expiry + staleness
+
+{No findings. / Table below:}
+
+| File | Item | Due / Threshold date | Days overdue | Proposed fix |
+|---|---|---|---|---|
+| `{file}` | `{persona / competitor claim}` | {YYYY-MM-DD} | {N} | Run `{skill}` to validate or retire |
+
+---
+
+## §13 Orphaned files
+
+{No findings. / Table below:}
+
+| File | Last modified | Proposed fix |
+|---|---|---|
+| `{file}` | {date} | Link from `{hub doc}` if intentional; delete if obsolete |
+
+---
+
+## §14 Research sync
+
+{No findings. / Table below:}
+
+| Synthesis file | Upstream artefact | Synthesis date | Artefact last modified | Proposed fix |
+|---|---|---|---|---|
+| `{synthesis}` | `{artefact}` | {date} | {date} | Apply updates from synthesis §"Per-artefact updates needed" |
+
+---
+
+## §15 ADR chains
+
+{No findings. / Table below:}
+
+| ADR | Supersedes | Back-link in target? | Proposed fix |
+|---|---|---|---|
+| `{adr}` | `{target}` | ❌ | Add `Superseded by: [{this ADR}]({path})` to `{target}` §Status |
+
+---
+
+## §16 Delivery progress
+
+**FBS status:**
+
+| Status | Count | % of total |
+|---|---|---|
+| ✅ Done | {N} | {N}% |
+| 🔄 In progress | {N} | {N}% |
+| ⬜ Not started | {N} | {N}% |
+| **Total functionalities** | **{N}** | 100% |
+
+**Epic ↔ PRD linkage:**
+
+| Epic | Title | PRD exists? | PRD file |
+|---|---|---|---|
+| `E-{NN}` | {title} | {✅ / ❌} | `{prd file / —}` |
+
+---
+
+## Audit metadata
+
+| Field | Value |
+|---|---|
+| Generated | {YYYY-MM-DD HH:MM} |
+| Skill version | util-stack-audit v1.0.0 |
+| Scope | {full / business / product-specs / custom} |
+| Mode | {full / progress / links / freshness} |
+| Files scanned | {N} |
+| Checks run | {N} / 16 |
+| Report path | `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md` |
+```

@@ -34,7 +34,8 @@ what order, and where to put it**.
 - `spec-peer-review` — reviews PRDs / plans
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/competitive-landscape/`; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
 - `ops-runbook`, `ops-bug-rca` — operational artefacts (post-ship)
-- `util-docs-audit` — periodic health check
+- `util-docs-audit` — general doc staleness scan (file-level freshness, dead prose)
+- `util-stack-audit` — deep stack health audit: 16 checks covering stack progress, folder placement, internal + external links, ID integrity + cross-references, dependency enforcement, _TODO_ density, mandatory sections, confidence distribution, expiry + staleness, orphaned files, research sync, ADR chains, FBS + epic delivery progress → report at `var/reports/stack-audit/`; report-only with proposed fix per finding; run monthly (active dev) or quarterly (maintenance)
 - `dev-*` skills — developer workflow (git, PR, worktree, slide deck)
 
 ---
