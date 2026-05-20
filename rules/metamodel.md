@@ -131,6 +131,81 @@ what order, and where to put it**.
    └──────────────────────┘
 ```
 
+### Entity-relationship view
+
+The ER diagram shows which ID each artefact **mints** (PK) and which upstream IDs it **consumes** (FK) as cross-references — treating the documentation system as a data model.
+
+```mermaid
+erDiagram
+    PERSONA {
+        string P_NN PK
+    }
+    CAPABILITY_MAP {
+        string C_NM PK
+    }
+    VALUE_STREAM {
+        string VS_NM PK
+        string P_NN FK
+        string C_NM FK
+    }
+    BUSINESS_PROCESS {
+        string slug PK
+        string VS_NM FK
+    }
+    BMC {
+        string id PK
+        string P_NN FK
+    }
+    QUANTITATIVE_MODEL {
+        string slug PK
+    }
+    FBS {
+        string C_NM_FXX PK
+        string C_NM FK
+    }
+    EPIC {
+        string E_NN PK
+        string C_NM_FXX FK
+        string VS_NM FK
+    }
+    ADR {
+        string ADR_NNNN PK
+    }
+    QUALITY_ATTRIBUTES {
+        string QA_XXNN PK
+        string ADR_NNNN FK
+        string P_NN FK
+    }
+    PRD {
+        string PRD_NNNN PK
+        string E_NN FK
+        string QA_XXNN FK
+        string ADR_NNNN FK
+    }
+    IMPLEMENTATION_PLAN {
+        string Plan_NNNN PK
+        string PRD_NNNN FK
+    }
+
+    PERSONA ||--o{ VALUE_STREAM : "triggers"
+    PERSONA ||--o{ BMC : "Customer Segments"
+    PERSONA }o--o{ QUALITY_ATTRIBUTES : "grounds IC and PE entries"
+    CAPABILITY_MAP ||--o{ VALUE_STREAM : "stages consume C-NM"
+    CAPABILITY_MAP ||--|| FBS : "inherits L0 and L1"
+    CAPABILITY_MAP }o--o{ BMC : "Key Resources"
+    VALUE_STREAM ||--o{ BUSINESS_PROCESS : "operationalised by"
+    VALUE_STREAM }o--o{ QUALITY_ATTRIBUTES : "pain index drives PE"
+    VALUE_STREAM }o--o{ EPIC : "VS stage anchor"
+    BMC ||--o{ QUANTITATIVE_MODEL : "Revenue and Cost"
+    FBS ||--o{ EPIC : "grouped into epics"
+    FBS }o--o{ QUALITY_ATTRIBUTES : "differentiators drive Reliability"
+    ADR }o--o{ QUALITY_ATTRIBUTES : "decisions inform Security and Flexibility"
+    ADR }o--o{ PRD : "decisions inform architecture"
+    EPIC ||--|| PRD : "one PRD per epic"
+    QUALITY_ATTRIBUTES ||--o{ PRD : "QA-XXNN in acceptance criteria"
+    PRD ||--|| IMPLEMENTATION_PLAN : "one plan per PRD"
+```
+
 **Hard rules of the graph:**
 - An arrow `A → B` means *B soft-links to A by ID*. B can be scaffolded without A existing (placeholder `_TODO_`), but the link is filled when A arrives.
 - **No cycles.** B never feeds back into A.
