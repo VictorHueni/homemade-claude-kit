@@ -1,3 +1,9 @@
+---
+paths:
+  - "docs/**"
+  - "rules/metamodel.md"
+---
+
 # Strategic Architecture Stack — Documentation Build Order
 
 This rule documents the **complete strategic-architecture artefact stack**
