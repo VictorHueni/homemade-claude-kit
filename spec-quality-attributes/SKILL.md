@@ -285,6 +285,12 @@ negatives"), the constraint goes here; the functional behaviour goes in the FBS.
 
 ---
 
+## Reference materials
+
+- **`references/nfr-definition-and-examples.md`** — canonical NFR definition (BABOK, Robertson, Bass), arc42-inspired examples per ISO/IEC 25010:2023 characteristic, and fit criterion vocabulary. **Read this before filling any quality attribute entry.** Lives only in the kit — never copied to projects.
+
+---
+
 ## Sources
 
 | Source | What it anchors |
