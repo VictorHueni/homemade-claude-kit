@@ -528,3 +528,17 @@ When asked *"build the documentation plan"* without further context, default to:
 This rule is the single source of truth for the strategic-architecture
 build order. When new skills join the kit, update the layer table and
 DAG here.
+
+**Maintenance coupling — update these files whenever this rule changes:**
+
+Every change to canonical paths, artefact steps, or ID formats in this file has downstream copies that must be kept in sync:
+
+| What changed | Also update |
+|---|---|
+| New artefact step, new canonical path | `util-metamodel-audit/references/check-catalogue.md` → Check 1 (stack progress paths) |
+| New ID format (e.g. new `XX-NN` pattern) | `util-metamodel-audit/references/check-catalogue.md` → Check 5 (ID cross-reference regex patterns) |
+| New prerequisite dependency in the DAG | `util-metamodel-audit/references/check-catalogue.md` → Check 7 (dependency enforcement rules) |
+| New artefact step, new canonical path | `util-metamodel-migration/references/detection-signals.md` → §Filename patterns + §Folder name patterns + §Content signals |
+| New mandatory section in a skill's template | `util-metamodel-audit/references/check-catalogue.md` → Check 9 (mandatory sections table) |
+
+Failing to update these files after a metamodel change will cause the audit and migration skills to silently miss the new artefact — the most dangerous kind of drift.
