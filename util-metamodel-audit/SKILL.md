@@ -94,7 +94,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** quick "where are we in the build order?" check. No link, dependency, or freshness analysis.
 
 **Process:**
-1. For each of the 11 steps, check whether the canonical output path exists.
+1. For each of the 14 steps (including 2b, 2c, 7b), check whether the canonical output path exists.
 2. For each existing file, retrieve last-modified date: `git log -1 --format="%ci" -- {file}`.
 3. Output a single table: `Step # | Artefact | Status | Path | Last modified | Age (days)`.
 4. Print to terminal. Save to file only if explicitly requested.
@@ -154,7 +154,7 @@ Full template in `references/template.md`. Top-level structure:
 H1: Stack Audit — {project} — {YYYY-MM-DD}
 
 § Executive summary
-  X/11 steps complete · N errors · N warnings · N info
+  X/14 steps complete · N errors · N warnings · N info
   Top 3 most urgent findings
 
 §1  Stack progress          Step # | Artefact | Status | Path | Last modified | Age (days)
@@ -239,7 +239,7 @@ After running any mode, summarise in 4–6 lines:
 1. **Mode run** + **scope** + **files scanned**.
 2. **Error / Warning / Info counts** — headline numbers only.
 3. **Top 3 most urgent findings** (Errors first; Warnings if no Errors).
-4. **Stack progress** — X/11 steps complete; which step is next.
+4. **Stack progress** — X/14 steps complete; which step is next.
 5. **Report saved at** path (if output = file).
 
 ---

@@ -270,6 +270,9 @@ done | sort -rn
 | `epic-catalogue.md` | Epic table with `E-NN` IDs | `grep -q 'E-[0-9][0-9]'` |
 | `quality-attributes.md` | ISO characteristic headings (`Performance Efficiency`, `Security`, `Reliability`, etc.) | `grep -q 'Performance Efficiency\|Security\|Reliability'` |
 | `*_prd_*.md` | `§0 Architecture Traceability` or traceability block, `## Acceptance criteria` | `grep -q 'Traceability\|Acceptance'` |
+| `bounded-contexts.md` | `## Subdomain catalogue`, at least one `BC-NN` entry | `grep -q 'BC-[0-9][0-9]'` |
+| `glossary.md` | At least one BC section, `## Changelog` | `grep -q '## Changelog'` |
+| `domain-model.md` | `## Aggregate catalogue`, `## Domain event catalogue`, Mermaid `classDiagram` | `grep -q 'Aggregate catalogue\|classDiagram'` |
 
 **Detection (example for process doc):**
 ```bash
@@ -355,9 +358,30 @@ done | sort
 - Competitive claim past threshold → Warning
 - Process doc not updated in >180 days → Info
 
+**Detection — glossary changelog discipline:**
+```bash
+# Glossary exists but has no Changelog section → living-doc discipline missing
+if [ -f "docs/domain/glossary/glossary.md" ]; then
+  grep -q '## Changelog' docs/domain/glossary/glossary.md || \
+    echo "WARNING: glossary.md missing Changelog section"
+  # Changelog exists but last entry is > 30 days ago for Core BC (sprint cadence)
+  last_entry=$(grep -m1 '^### [0-9]' docs/domain/glossary/glossary.md 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+  [ -n "$last_entry" ] && echo "Glossary last changelog entry: $last_entry"
+fi
+```
+
+**Severity:**
+- Proto-persona past next-review → Error (expired assumption)
+- Competitive claim past threshold → Warning
+- Process doc not updated in >180 days → Info
+- Glossary missing Changelog section → Warning (living-doc discipline missing)
+- Glossary changelog last entry >30 days ago → Info (may need sprint review)
+
 **Proposed fix template:**
 - Expired persona: "Run `business-research` Mode 2 to validate `{persona}` and update `Next review` date, or mark as retired."
 - Stale competitive claim: "Run `business-competitive-landscape` Mode 5 (refresh) for `{competitor}` claim in `{file}`."
+- Missing glossary changelog: "Run `domain-glossary` Mode 4 (Maintain) — add `## Changelog` section and log all terms added/retired to date."
+- Stale glossary changelog: "Run `domain-glossary` Mode 4 (Maintain, trigger 1D — scheduled sprint review) for the Core BC."
 
 ---
 
