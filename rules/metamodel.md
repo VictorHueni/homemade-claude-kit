@@ -273,6 +273,7 @@ moving on.
 - Mode `seed` → extract nouns from capability names + value stream stage names + process actor names; assign `GT-NN` IDs per BC; write one-line definitions
 - Mode `enrich` → full definitions in business language + example sentences + deprecated aliases + cross-context translations + code convention notes
 **Output verification:** `glossary.md` exists; every BC-NN has a glossary section; capability names have corresponding GT-NN entries; no living synonyms within a BC; definitions in business language only.
+**Living document:** the glossary is never "done" — run Mode `maintain` (Step 0: trigger type + scope) every sprint for Core BC; add changelog entry for every term added, deprecated, or retired; bump `glossary-version` on structural changes.
 
 ### Step 4 — Value Streams (how value flows)
 

@@ -10,7 +10,7 @@ Every skill produces a named artefact with a stable ID. Artefacts cross-link by 
 
 ## The artefact system
 
-11 artefacts in two layers, built in order. Solid arrows = hard dependency. Dashed arrows = supporting skills that validate or enrich without blocking.
+14 artefacts across three layers (Business Architecture · Domain · Product Specs), built in order. Solid arrows = hard dependency. Dashed arrows = supporting skills that validate or enrich without blocking.
 
 ```mermaid
 flowchart TD
