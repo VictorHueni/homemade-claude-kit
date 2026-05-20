@@ -99,15 +99,50 @@ Enrich is additive: never delete content, only extend or correct it.
 
 ### Mode 4 — Maintain
 
-Keep the glossary aligned with the evolving domain model.
+Keep the glossary aligned with the evolving domain model. This mode is a first-class recurring activity — not cleanup.
 
-**Retire an obsolete term:** change status to `Retired (YYYY-MM-DD)`, add a note explaining why the concept was retired or merged. Never delete the entry.
+**Step 0 — Clarifying questions (ask BEFORE making any change)**
 
-**Promote a new term:** full new entry with GT-NN ID (next available in the BC section), definition, example, and code convention note.
+Ask the user the following 2 questions in a single message with lettered options. Users respond like `1C, 2B`:
 
-**Update cross-context matrix:** when bounded contexts are split, merged, or renamed, update every GT-NN entry that referenced the changed BC.
+```text
+1. What triggered this maintenance run?
+   A. New term emerged in a PRD, story, or conversation
+   B. Synonym discovered in code review or sprint planning
+   C. Bounded context was split, renamed, or merged
+   D. Scheduled sprint glossary review (Core BC cadence)
+   E. Event Storming or workshop produced new domain events / commands
+   F. Existing docs were scanned and vocabulary drift was found
 
-**Deprecate a synonym discovered in the wild:** if a term surfaces in code review, sprint planning, or a PRD that doesn't match the glossary — add it as a deprecated alias and notify the team.
+2. Scope of this maintenance pass?
+   A. Single term — I will name it
+   B. Single bounded context — I will name it (BC-NN)
+   C. Full glossary pass — all BCs
+```
+
+If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
+
+**Process per trigger type:**
+
+- **New term (1A / 1E):** create full entry with next available `GT-NN` ID in the correct BC section; definition + example + code convention note mandatory; mark as `Active`; add changelog entry.
+- **Synonym discovered (1B):** add as `Deprecated` alias to the canonical term; add a migration note ("if you see X in code, it means GT-NN Y"); add changelog entry.
+- **BC restructure (1C):** update every `GT-NN` entry that referenced the changed BC; update the cross-context matrix; bump `glossary-version`; add changelog entry.
+- **Sprint review (1D):** scan last sprint's PRDs, ADRs, and commit messages for nouns not in the glossary; add new terms; deprecate any aliases found; add changelog entry.
+- **Vocabulary drift scan (1F):** grep the docs tree for candidate nouns (see discipline.md patterns); surface synonym clusters; propose canonical terms; add changelog entry per change.
+
+**Changelog discipline (mandatory for every Mode 4 run):**
+
+Every maintenance pass must add an entry to the `## Changelog` section at the bottom of `glossary.md`:
+
+```
+### YYYY-MM-DD — {trigger summary}
+- Added: BC-NN.GT-NN "{term}" — {one-line reason}
+- Deprecated: "{alias}" → BC-NN.GT-NN "{canonical}" — {one-line reason}
+- Retired: BC-NN.GT-NN "{term}" — {one-line reason}
+- Updated: BC-NN.GT-NN "{term}" — {what changed}
+```
+
+Bump the `glossary-version` in the HTML comment at the top of the file for any structural change (new term, BC rename, term retirement). Patch-level edits (typo fix, example improvement) do not require a version bump.
 
 ---
 
@@ -214,4 +249,7 @@ Next steps: [what Mode to run next, or what artefacts to update]
 - [ ] Every definition is in business language (zero tech-jargon words)
 - [ ] Every enriched term has a code convention note
 - [ ] Cross-context matrix populated for any term that spans BCs
+- [ ] Mode 4: Step 0 answered before any change made
+- [ ] Mode 4: changelog entry added for every term added / deprecated / retired
+- [ ] Mode 4: glossary-version bumped for structural changes
 - [ ] Closing report delivered
