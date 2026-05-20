@@ -1,0 +1,284 @@
+---
+name: util-metamodel-migration
+description: "Scan any existing docs/ folder structure and produce a migration report to align it with the strategic-architecture metamodel. Detects misplaced files using tiered confidence scoring (filename pattern → folder name → content signals), maps them to canonical metamodel paths, scans for inbound links that would break on move, and emits atomic fix blocks (git mv + sed commands) per file. Report-only — never modifies any file. Complement to util-metamodel-audit (audit = health check for compliant repos; migration = onboarding doctor for pre-metamodel repos). Triggers on: migrate docs, align docs to metamodel, migration doctor, docs migration, migrate folder structure, metamodel onboarding, fix docs structure, restructure docs."
+version: "1.0.0"
+user-invocable: true
+allow_implicit_invocation: false
+impact: "low"
+metadata:
+  category: "utility"
+  complexity: "high"
+---
+
+# Metamodel Migration Doctor
+
+You are an expert at scanning existing documentation structures and producing a safe, atomic migration plan to align them with the strategic-architecture metamodel defined in `rules/metamodel.md`.
+
+The artifact produced by this skill is **a markdown report** at `var/reports/metamodel-migration/migration-{YYYY-MM-DD}.md`. It is NOT a refactoring tool, NOT a content rewriter, NOT a link checker for already-compliant repos — it is a **one-time onboarding doctor** for repositories built before or without the metamodel.
+
+**Report-only discipline:** this skill reads files and runs read-only detection commands. It never modifies any file. Every finding includes an atomic fix block — a copy-pasteable set of shell commands (git mv + sed) that the user can review and apply. The user decides what to apply and when.
+
+**Complement to util-metamodel-audit:** run this skill once to migrate structure; then use `util-metamodel-audit` for ongoing health checks.
+
+---
+
+## What a good migration report means
+
+| Question | Where it lives |
+|---|---|
+| **Which files are in the wrong canonical location?** | §1 Folder mismatches — per-file migration blocks |
+| **Which file names don't follow the canonical convention?** | §2 Naming issues |
+| **Which metamodel folders don't exist yet?** | §3 Missing canonical folders |
+| **Which existing files look like pre-DDD domain artefacts?** | §4 DDD migration candidates |
+| **Which folders/files are outside the metamodel scope?** | §5 Outside scope (Info) |
+| **How confident is each detection?** | Per-finding confidence: High / Medium / Low |
+| **What will break if I move this file?** | Per-file inbound link count + sed repair commands |
+
+---
+
+## The three modes of operation
+
+### Mode 1 — Full scan
+
+**When:** first-time migration assessment of a repository.
+
+**Step 0 — Clarifying questions (ask BEFORE scanning)**
+
+Ask the user the following 4 questions in a single message with lettered options. Users respond like `1A, 2B, 3A, 4B`:
+
+```text
+1. Docs root location?
+   A. docs/ (default)
+   B. Other — please specify the path
+
+2. Flag ADR naming redundancy (e.g. 0001-adr-topic.md → 0001-topic.md)?
+   A. Yes — flag as a naming issue
+   B. No — accept as the project's own convention
+
+3. Flag PRDs organised in subdirectories under docs/product-specs/?
+   A. Yes — flag subdirectory organisation as misplacement (canonical = flat)
+   B. No — accept subdirectory organisation
+
+4. Severity threshold for report?
+   A. All findings — Warning + Info (default)
+   B. Warning only — skip Info (outside-scope + missing-folder notices)
+```
+
+**Process:**
+1. Scan the docs root recursively with `find`.
+2. For each file and folder, run the three-tier detection (see Detection methodology below).
+3. For every file flagged for a move, run inbound link scan and compute new relative paths.
+4. Assemble the report from `references/template.md`.
+5. Save to `var/reports/metamodel-migration/migration-{YYYY-MM-DD}.md`.
+
+### Mode 2 — Structure scan
+
+**When:** quick structural check — only folder/file mismatches and missing dirs. No DDD detection, no outside-scope listing, no content signals.
+
+Runs checks §1 + §2 + §3 only. No Step 0 needed — scans `docs/` by default.
+
+### Mode 3 — Missing inventory
+
+**When:** fast gap map — what canonical metamodel paths don't exist yet? No file analysis.
+
+Outputs a single checklist: 14 metamodel steps, each marked ✅ (exists) / ⬜ (missing), with the canonical path and the skill to run to create it. No proposed fixes — purely informational.
+
+---
+
+## Detection methodology — three-tier confidence scoring
+
+Detection runs three tiers in order. A finding requires ≥2 tiers to agree before it's reported. Single-tier matches are flagged as Low confidence with a manual-verification note.
+
+### Tier 1 — Filename patterns (High signal)
+
+Scan filenames against the patterns in `references/detection-signals.md §Filename patterns`. A filename match alone gives confidence Medium; combined with Tier 2 or 3 → High.
+
+Detection bash:
+```bash
+find {docs_root} -name "*.md" -o -name "*.md" | while read f; do
+  base=$(basename "$f")
+  # Apply each pattern from detection-signals.md §Filename patterns
+  # e.g. *_prd_* → spec-prd type
+done
+```
+
+### Tier 2 — Parent folder name (Medium signal)
+
+Check the immediate parent folder name against the patterns in `references/detection-signals.md §Folder name patterns`. A folder name match alone gives confidence Low; combined with Tier 1 or 3 → Medium/High.
+
+Detection bash:
+```bash
+find {docs_root} -type d | while read d; do
+  folder_name=$(basename "$d")
+  parent=$(dirname "$d")
+  # Apply each pattern from detection-signals.md §Folder name patterns
+  # e.g. runbooks/ outside docs/ops/ → ops-runbook type
+done
+```
+
+### Tier 3 — Content signals (Confirmation)
+
+Read only the **first 50 lines** of each file. Check for high-signal section headings from `references/detection-signals.md §Content signals`. Never read the full file — this keeps the scan fast on large repos.
+
+Detection bash:
+```bash
+head -50 "$file" | grep -E "^#{1,3} " | while read heading; do
+  # Apply each pattern from detection-signals.md §Content signals
+  # e.g. "## Porter's Five Forces" → business-competitive-landscape
+done
+```
+
+### Confidence rules
+
+| Tiers matching | Confidence | Action |
+|---|---|---|
+| 3 of 3 | High | Report as finding, emit fix block |
+| 2 of 3 | Medium | Report as finding, emit fix block, add verification note |
+| 1 of 3 | Low | Report as "possible match — verify manually", no fix block |
+| 0 | No detection | Skip (not a metamodel artefact) |
+
+---
+
+## Inbound link tracking — atomic fix blocks
+
+For every file flagged for a move, the skill:
+
+1. **Finds all inbound links:**
+```bash
+SOURCE_REL="docs/runbooks/my-runbook.md"
+grep -rln "$(basename $SOURCE_REL)" {docs_root}/ --include="*.md" | while read linking_file; do
+  grep -n "$SOURCE_REL\|$(basename $SOURCE_REL)" "$linking_file"
+done
+```
+
+2. **Computes new relative paths** from each linking file to the new target location:
+```bash
+python3 -c "import os; print(os.path.relpath('$TARGET', os.path.dirname('$LINKING_FILE')))"
+```
+
+3. **Emits an atomic fix block** per file — the complete set of commands to move the file AND repair all inbound links:
+
+```bash
+# ── Migration: docs/runbooks/my-runbook.md → docs/ops/runbooks/my-runbook.md ──
+# Confidence: High (filename match + folder match)
+# Inbound links: 2 files
+
+mkdir -p docs/ops/runbooks
+git mv docs/runbooks/my-runbook.md docs/ops/runbooks/my-runbook.md
+
+# Repair inbound links (2)
+# docs/architecture/overview.md:45
+sed -i 's|../runbooks/my-runbook.md|../ops/runbooks/my-runbook.md|g' docs/architecture/overview.md
+# docs/exec-plans/active/0042_deploy/README.md:12
+sed -i 's|../../runbooks/my-runbook.md|../../ops/runbooks/my-runbook.md|g' "docs/exec-plans/active/0042_deploy/README.md"
+```
+
+**If inbound links = 0:** the fix block contains only `mkdir -p` + `git mv`. Safe to apply immediately.
+**If inbound links > 0:** apply the entire block atomically — `git mv` first, then all `sed` repairs in the same shell session.
+
+---
+
+## Report structure — the fixed template
+
+Full template in `references/template.md`:
+
+```
+<!-- migration-version: 1.0 | generated: YYYY-MM-DD | docs-root: {root} | mode: {mode} -->
+
+H1: Metamodel Migration Report — {project} — {YYYY-MM-DD}
+
+§ Executive summary
+  N files to migrate · N naming fixes · N folders to create · N DDD candidates · N outside scope
+  Estimated migration effort: N atomic blocks (each = one copy-paste)
+
+§1  Folder mismatches    Per-file migration block (see format above)
+§2  Naming issues        File | Current name | Canonical name | git mv command
+§3  Missing folders      Canonical path | Needed for (step + skill) | mkdir -p command
+§4  DDD candidates       File | Current path | Suggested destination | Skill to run next
+§5  Outside scope        File/Folder | Why outside scope | No action needed
+
+Migration metadata
+  Generated: YYYY-MM-DD | Docs root: {root} | Files scanned: N | Findings: N
+```
+
+Every §1 and §2 finding is an **atomic fix block** — complete and self-contained.
+§3 findings are `mkdir -p` commands only (no content to move).
+§4 findings propose which domain- skill to run after the structural migration.
+§5 findings are Info only — listed for completeness, no action needed.
+
+---
+
+## Sizing heuristics
+
+| Element | Recommended | Source |
+|---|---|---|
+| Run cadence | Once per repo (migration is one-time) | Practitioner |
+| Files per atomic fix block | 1 move + N sed repairs | Design constraint |
+| Confidence threshold before auto-proposing a fix | ≥ Medium (2+ tiers) | Practitioner |
+| Max files to scan in one pass | No limit — but surface High/Medium findings first | Practitioner |
+| After migration | Run `util-metamodel-audit` to verify compliance | Complementary skill |
+
+---
+
+## Finding the right output folder
+
+Default: `var/reports/metamodel-migration/`
+
+```bash
+find . -type d -name "metamodel-migration" 2>/dev/null
+```
+
+Never write the report inside `docs/` — migration reports are not artefacts in the stack.
+
+---
+
+## Cross-reference — relationship to other skills
+
+| Skill | Relationship |
+|---|---|
+| `util-metamodel-audit` | Run AFTER migration to verify ongoing compliance. Audit assumes metamodel compliance; migration doctor assumes pre-compliance. |
+| `domain-bounded-context` | §4 DDD candidates → run this skill after moving glossary/info-model content to docs/domain/ |
+| `domain-glossary` | §4 DDD candidates — glossary migration target |
+| `domain-model` | §4 DDD candidates — information/domain model migration target |
+| `rules/metamodel.md` | The canonical source for all detection rules in references/detection-signals.md |
+
+---
+
+## Reference materials
+
+Three files in `references/`:
+- **`references/detection-signals.md`** — the complete tiered detection ruleset: filename patterns, folder name patterns, content signals, outside-scope patterns. Update this file when the metamodel gains new artefacts.
+- **`references/template.md`** — full migration report skeleton with atomic fix block format.
+- **`references/methodology-references.md`** — rationale for tiered detection, inbound link tracking, and the report-only discipline.
+
+---
+
+## Closing report to the user
+
+After running any mode, summarise in 4–6 lines:
+
+1. **Mode run** + **docs root** + **files scanned**.
+2. **Finding counts** — N folder mismatches · N naming issues · N missing folders · N DDD candidates · N outside scope.
+3. **Total atomic blocks** — how many copy-paste operations the full migration requires.
+4. **Top 3 most impactful migrations** (files with the most inbound links — highest risk if done wrong).
+5. **Report saved at** path.
+6. **Next step** — "After applying all blocks, run `util-metamodel-audit` Mode 1 to verify compliance."
+
+---
+
+## Checklist
+
+Before declaring the work done:
+
+- [ ] Step 0 answered (Mode 1) or mode detected from context.
+- [ ] Three-tier detection run for all files in docs root.
+- [ ] Every finding has confidence level (High / Medium / Low).
+- [ ] Every file-move finding has inbound link count.
+- [ ] Every atomic fix block includes git mv + all sed repairs.
+- [ ] No file modified — report-only discipline maintained.
+- [ ] Low-confidence findings marked "verify manually" — no fix block emitted.
+- [ ] §3 missing folders listed with mkdir -p commands.
+- [ ] §4 DDD candidates suggest the correct domain- skill to run next.
+- [ ] §5 outside-scope items listed as Info only.
+- [ ] Report saved to var/reports/metamodel-migration/.
+- [ ] Closing report delivered.
