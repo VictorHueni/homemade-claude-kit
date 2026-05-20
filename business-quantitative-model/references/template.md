@@ -387,6 +387,7 @@ Use relative links.
 - **Downstream:** [{{...}}]({{path}}) — {{relationship}}
 - **Companion process doc:** [{{...}}]({{path}}) — {{relationship}}
 - **Pitch artefact:** [{{...}}]({{path}}) — {{how the pitch uses this model}}
+- **Glossary:** [Methodology terms](glossary.md) — definitions for ARR, CAC, LTV, TAM/SAM/SOM, value-capture ratio, and other methodology-imported terms used across the model set.
 
 ---
 
