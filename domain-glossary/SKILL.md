@@ -30,6 +30,40 @@ Expert at producing and maintaining the Ubiquitous Language glossary — the sin
 
 ---
 
+## Term entry formatting (mandatory)
+
+Every field in a term entry **must be separated from the next by one blank line**. Markdown renderers collapse adjacent `**Field:**` lines into a single run-on paragraph when no blank line separates them. This is not optional — it is a rendering requirement.
+
+Correct:
+
+```markdown
+#### {term name} · BC-NN.GT-NN
+
+**Status:** Active
+
+**Definition:** [definition text]
+
+**Example:** "[example sentence]"
+
+**Aliases (deprecated):** [aliases or _(none)_]
+
+**Anti-patterns:**
+- [...]
+```
+
+Wrong (do not do this):
+
+```markdown
+**Status:** Active
+**Definition:** [definition text]
+**Example:** "[example sentence]"
+**Aliases (deprecated):** [aliases]
+```
+
+Apply this rule to every term entry in every mode (Seed, Enrich, Maintain). When updating an existing term, fix missing blank lines in the surrounding entry even if the task only targets one field.
+
+---
+
 ## Modes
 
 ### Mode 1 — Scaffold
