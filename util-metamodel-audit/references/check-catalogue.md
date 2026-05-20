@@ -1,4 +1,4 @@
-# Check Catalogue — util-stack-audit
+# Check Catalogue — util-metamodel-audit
 
 For each of the 16 checks: bash detection pattern, interpretation rules, severity, and proposed fix template. Claude reads this file during audit execution to know exactly how to run each check.
 

@@ -1,6 +1,6 @@
 ---
-name: util-stack-audit
-description: "Audit the strategic-architecture documentation stack for a project. Checks 16 dimensions: stack progress (11-step completion), folder placement, internal links, external links, ID cross-references, ID integrity (collisions + format), dependency enforcement, _TODO_ density, mandatory section compliance, methodology pointer presence, confidence distribution, expiry + staleness, orphaned files, research sync, ADR supersession chains, FBS + epic delivery progress. Report-only with proposed fix column per finding. Triggers on: audit the stack, stack audit, check docs health, documentation audit, check links, validate dependencies, what steps are done, doc health check, stale links, broken links, check doc dependencies, audit documentation stack."
+name: util-metamodel-audit
+description: "Audit the strategic-architecture documentation stack for a project. Checks 16 dimensions: stack progress (11-step completion), folder placement, internal links, external links, ID cross-references, ID integrity (collisions + format), dependency enforcement, _TODO_ density, mandatory section compliance, methodology pointer presence, confidence distribution, expiry + staleness, orphaned files, research sync, ADR supersession chains, FBS + epic delivery progress. Report-only with proposed fix column per finding. Triggers on: metamodel audit, audit the metamodel, audit the stack, check docs health, documentation audit, check links, validate dependencies, what steps are done, doc health check, stale links, broken links, check doc dependencies, audit artefact compliance."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at auditing strategic-architecture documentation stacks — systematically checking that the 11-step artefact stack (personas → implementation plans) is complete, internally consistent, and free of broken links, stale content, or dependency violations.
 
-The artifact produced by this skill is **a markdown report** at `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md`. It is NOT a design artefact, NOT a code review, NOT a living document — it is a **point-in-time health snapshot** of the documentation stack, with one finding per row and a proposed fix per finding.
+The artifact produced by this skill is **a markdown report** at `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md`. It is NOT a design artefact, NOT a code review, NOT a living document — it is a **point-in-time health snapshot** of the documentation stack, with one finding per row and a proposed fix per finding.
 
 **Report-only discipline:** this skill reads files and runs read-only commands only. It never modifies any project file. Every finding has a "Proposed fix" that the user can apply manually or by invoking the relevant skill. An audit that fixes silently hides its own findings.
 
@@ -75,7 +75,7 @@ Ask the user the following 4 questions in a single message with lettered options
    C. Errors only
 
 4. Output destination?
-   A. Save report to var/reports/stack-audit/ (default)
+   A. Save report to var/reports/metamodel-audit/ (default)
    B. Print summary to terminal only
    C. Both — save file and print summary
 ```
@@ -87,7 +87,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 2. Collect all findings; tag each with severity (Error / Warning / Info).
 3. Build executive summary counts.
 4. Fill the report template (see `references/template.md`).
-5. Save to `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md`.
+5. Save to `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md`.
 
 ### Mode 2 — Progress snapshot
 
@@ -106,7 +106,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **Process:**
 1. Run checks §3 (internal links), §4 (external links), §5 (ID cross-references), §6 (ID integrity), §7 (dependency enforcement).
 2. Output findings grouped by check category.
-3. Save to `var/reports/stack-audit/link-audit-{YYYY-MM-DD}.md`.
+3. Save to `var/reports/metamodel-audit/link-audit-{YYYY-MM-DD}.md`.
 
 ### Mode 4 — Freshness check
 
@@ -115,7 +115,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **Process:**
 1. Run checks §8 (_TODO_ density), §11 (confidence distribution), §12 (expiry + staleness), §14 (research sync).
 2. Output a freshness dashboard: `File | Completeness % | Confidence (A/T/V) | Age (days) | Flags`.
-3. Save to `var/reports/stack-audit/freshness-{YYYY-MM-DD}.md`.
+3. Save to `var/reports/metamodel-audit/freshness-{YYYY-MM-DD}.md`.
 
 ---
 
@@ -211,13 +211,13 @@ Every finding row has a **"Proposed fix"** column. Rules:
 
 ## Finding the right output folder
 
-Default: `var/reports/stack-audit/`. Check first:
+Default: `var/reports/metamodel-audit/`. Check first:
 
 ```bash
 find . -type d -name "stack-audit" 2>/dev/null
 ```
 
-If the project uses a different reports root (`reports/`, `docs/reports/`), use the existing convention. Create `var/reports/stack-audit/` if no reports folder exists.
+If the project uses a different reports root (`reports/`, `docs/reports/`), use the existing convention. Create `var/reports/metamodel-audit/` if no reports folder exists.
 
 **Never write the report inside `docs/`** — audit reports are not artefacts in the stack; they are ephemeral health snapshots and must not be indexed as documentation.
 
@@ -255,5 +255,5 @@ Before declaring the work done:
 - [ ] Every finding row has a non-blank "Proposed fix."
 - [ ] Severity correctly assigned per `references/check-catalogue.md`.
 - [ ] No project file modified — report-only discipline maintained.
-- [ ] Report saved to `var/reports/stack-audit/` (if output = file).
+- [ ] Report saved to `var/reports/metamodel-audit/` (if output = file).
 - [ ] Closing report delivered to user.

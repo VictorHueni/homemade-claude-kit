@@ -1,6 +1,6 @@
 # Stack Audit Report Template
 
-Copy this skeleton to `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md` and fill each section.
+Copy this skeleton to `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md` and fill each section.
 
 ---
 
@@ -210,10 +210,10 @@ Copy this skeleton to `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md` and 
 | Field | Value |
 |---|---|
 | Generated | {YYYY-MM-DD HH:MM} |
-| Skill version | util-stack-audit v1.0.0 |
+| Skill version | util-metamodel-audit v1.0.0 |
 | Scope | {full / business / product-specs / custom} |
 | Mode | {full / progress / links / freshness} |
 | Files scanned | {N} |
 | Checks run | {N} / 16 |
-| Report path | `var/reports/stack-audit/stack-audit-{YYYY-MM-DD}.md` |
+| Report path | `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md` |
 ```

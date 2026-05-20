@@ -23,7 +23,7 @@ what order, and where to put it**.
 | 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/business-model-canvas/business-model-canvas.md` or `lean-canvas.md` + optional `value-proposition-canvas-{segment}.md` | block IDs (CS-N, VP-N, …) |
 | 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/models/{slug}.md` | per-model slug |
 | 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/functional-breakdown-structure/FBS.md` | `C-N.M.FXX` (capability + functionality counter) |
-| 8 | **Epic Catalogue** (Plan by Feature — delivery grouping) | `spec-epic-catalogue` | `docs/product-specs/epic-catalogue.md` | `E-NN` |
+| 8 | **Epic Catalogue** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/quality-attributes/quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/[NNNN]_prd_[feature].md` | `PRD-NNNN` |
 | 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
@@ -35,7 +35,7 @@ what order, and where to put it**.
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/competitive-landscape/`; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
 - `ops-runbook`, `ops-bug-rca` — operational artefacts (post-ship)
 - `util-docs-audit` — general doc staleness scan (file-level freshness, dead prose)
-- `util-stack-audit` — deep stack health audit: 16 checks covering stack progress, folder placement, internal + external links, ID integrity + cross-references, dependency enforcement, _TODO_ density, mandatory sections, confidence distribution, expiry + staleness, orphaned files, research sync, ADR chains, FBS + epic delivery progress → report at `var/reports/stack-audit/`; report-only with proposed fix per finding; run monthly (active dev) or quarterly (maintenance)
+- `util-metamodel-audit` — deep metamodel compliance audit: 16 checks covering stack progress, folder placement, internal + external links, ID integrity + cross-references, dependency enforcement, _TODO_ density, mandatory sections, confidence distribution, expiry + staleness, orphaned files, research sync, ADR chains, FBS + epic delivery progress → report at `var/reports/metamodel-audit/`; report-only with proposed fix per finding; run monthly (active dev) or quarterly (maintenance)
 - `dev-*` skills — developer workflow (git, PR, worktree, slide deck)
 
 ---
@@ -87,7 +87,7 @@ what order, and where to put it**.
               │
               ▼
    ┌──────────────────────┐
-   │ spec-epic-catalogue  │
+   │ spec-delivery-roadmap  │
    │ (Plan by Feature)    │
    │ Output: E-NN         │
    │ Groups FBS by VS     │
@@ -216,14 +216,19 @@ moving on.
 - Mode `fill` → enumerate functionalities per capability with `C-N.M.FXX` IDs + status (✅/🔄/⬜) + optional VS-stage links + code paths
 **Output verification:** FBS exists; ≥1 capability has ≥1 functionality; status distribution shows initial state.
 
-### Step 8 — Epic Catalogue (Plan by Feature)
+### Step 8 — Delivery Roadmap (Plan by Feature + Walking Skeleton + Phase Goals)
 
-**Skill:** `spec-epic-catalogue`
-**Prerequisites:** Step 7 (FBS fully populated with VS stage links and phase tags); Steps 3–4 (Value Streams with pain index per stage).
+**Skill:** `spec-delivery-roadmap`
+**Prerequisites:** Step 7 (FBS — VS stage links + phase tags + ★ markers); Steps 3–4 (Value Streams — pain index + value propositions); Step 1 (Personas — for walking skeleton narrative).
 **Process:**
-- Mode `generate` → read FBS + value streams; group functionalities by VS stage affinity + capability cluster; name each group after the value delivered; order by pain index; assign E-NN IDs; produce `docs/product-specs/epic-catalogue.md`
-- Coverage check: every Phase 1 FBS functionality must appear in exactly one epic
-**Output verification:** `epic-catalogue.md` exists; every Phase 1 FBS row assigned to an epic; E-NN IDs assigned in pain-index priority order; every epic has a value statement; differentiator (★) functionalities each anchor their own epic; sizing within 5–25 FBS rows per epic.
+- Read FBS + value streams + personas
+- Group FBS functionalities by VS stage affinity + capability cluster → E-NN epics
+- Order by pain index; assign E-NN IDs in priority order
+- Define Walking Skeleton: identify the primary VS to validate; select minimum functionalities per epic covering every VS stage end-to-end; write "can / cannot yet" statement
+- Define Phase Plan: declare which VS streams become fully operational per phase; write one-sentence goal per phase
+- Produce `docs/product-specs/delivery-roadmap.md`
+- Coverage check: every Phase 1 FBS functionality in exactly one epic
+**Output verification:** `delivery-roadmap.md` exists; §Walking Skeleton covers every stage of primary VS; §Phase Plan has one goal per phase expressed as VS streams operational; every epic has a value statement; ★ functionalities each anchor their own epic; sizing within 5–25 FBS rows per epic; E-NN IDs in pain-index order.
 
 ### Step 9 — Quality Attributes (how well the system performs)
 
@@ -241,7 +246,7 @@ moving on.
 **Process:**
 - One PRD per epic: `docs/product-specs/[NNNN]_prd_[feature].md`
 - Each PRD: §0 Architecture Traceability (E-NN, P-NN, C-N.M, QA-XXNN, FBS scope) · problem · goals · non-goals · user stories (persona-grounded, P-NN) · acceptance criteria · success metrics
-**Output verification:** ≥1 PRD per active epic (E-NN); each PRD references its E-NN, FBS IDs, and QA IDs; FBS functionality status promoted ⬜ → 🔄; Epic Catalogue PRD link filled.
+**Output verification:** ≥1 PRD per active epic (E-NN); each PRD references its E-NN, FBS IDs, and QA IDs; FBS functionality status promoted ⬜ → 🔄; Delivery Roadmap PRD link filled.
 
 ### Step 11 — Implementation Plans (atomic increments)
 
@@ -272,7 +277,7 @@ Start at **Step 3** (Business Capability Map), skip Steps 1–2 unless:
 - The capability touches a stakeholder group not yet documented (then do Step 1 lightweight for that persona).
 - The capability changes the commercial model (then do Step 2 — usually skipped).
 
-**Sequence:** Step 3 (BC Map) → Step 4 (value stream for the affected flow) → Step 5 (process docs for the as-is operational state) → Step 7 (FBS) → Step 8 (Epic Catalogue) → Step 9 (Quality Attributes — at minimum Reliability entries for new differentiator features) → Step 10 (PRDs) → Step 11 (plans).
+**Sequence:** Step 3 (BC Map) → Step 4 (value stream for the affected flow) → Step 5 (process docs for the as-is operational state) → Step 7 (FBS) → Step 8 (Delivery Roadmap) → Step 9 (Quality Attributes — at minimum Reliability entries for new differentiator features) → Step 10 (PRDs) → Step 11 (plans).
 
 ### Single feature (no full architecture work)
 
@@ -300,7 +305,7 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `VS-N` | Value stream | `business-value-stream` |
 | `VS-N.M` | Value-stream stage | `business-value-stream` |
 | `C-N.M.FXX` | Functionality (capability + counter) | `spec-functional-breakdown-structure` |
-| `E-NN` | Epic (delivery cluster, Plan by Feature) | `spec-epic-catalogue` |
+| `E-NN` | Epic + walking skeleton + phase plan (delivery roadmap) | `spec-delivery-roadmap` |
 | `QA-XXNN` | Quality attribute (characteristic prefix + counter, e.g. `QA-PE01`, `QA-SE03`) | `spec-quality-attributes` |
 | `PRD-NNNN` | PRD ID | `spec-prd` |
 | `Plan-NNNN` | Implementation plan | `spec-implementation-plan` |
@@ -338,7 +343,7 @@ docs/
 ├── product-specs/                                       ← `spec-` skills (product delivery)
 │   ├── functional-breakdown-structure/
 │   │   └── FBS.md
-│   ├── epic-catalogue.md                                     ← spec-epic-catalogue
+│   ├── delivery-roadmap.md                                     ← spec-delivery-roadmap
 │   ├── quality-attributes/
 │   │   └── quality-attributes.md
 │   └── {NNNN}_prd_{feature}.md (one per PRD)
