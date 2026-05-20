@@ -28,7 +28,7 @@ For a solo founder or small team, one document serves both audiences. When
 audiences diverge (investors vs developers), extract a stakeholder copy —
 the delivery roadmap remains the source of truth.
 
-The artefact lives at `docs/product-specs/delivery-roadmap.md`.
+The artefact lives at `docs/product-specs/delivery-roadmap/delivery-roadmap.md`.
 
 ---
 
@@ -59,7 +59,7 @@ The artefact lives at `docs/product-specs/delivery-roadmap.md`.
 ## The two layers in one document
 
 ```
-docs/product-specs/delivery-roadmap.md
+docs/product-specs/delivery-roadmap/delivery-roadmap.md
 │
 ├── §Walking Skeleton — MVP        ← PRODUCT ROADMAP LAYER
 │   Hypothesis · VS anchor ·
@@ -223,7 +223,7 @@ Verify every Phase 1 FBS functionality appears in exactly one epic:
 
 ```bash
 grep -o "C[0-9]\.[0-9]\.F[0-9][0-9]" \
-  docs/product-specs/delivery-roadmap.md | sort | uniq | wc -l
+  docs/product-specs/delivery-roadmap/delivery-roadmap.md | sort | uniq | wc -l
 ```
 
 Compare to Phase 1 FBS total. Flag orphaned functionalities.
