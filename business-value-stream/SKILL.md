@@ -170,8 +170,8 @@ Lifted from BIZBOK common mistakes + TOGAF + practitioner literature. Run these 
 | **Project context location** | Look for `docs/product-specs/`. If unclear, ask. |
 | **Mode** (scaffold / catalogue / fill) | Detect from request. Confirm if ambiguous. |
 | **Scope name** | What scope is this value-stream catalogue for? A product? A product family? An enterprise? |
-| **Personas existence** | Check for `docs/business/01-personas.md` (or legacy `docs/product-specs/personas/personas.md`). If absent, warn: triggering stakeholders will be `_TODO_` and discipline is degraded. Suggest running `business-persona` first. |
-| **BC Map existence** | Check for `docs/business/03-capability-map.md`. If absent, warn: enabling-capabilities links will be `_TODO_`. Suggest running `business-capability-map` first. |
+| **Personas existence** | Check for `docs/business/01a-personas.md` (or legacy `docs/product-specs/personas/personas.md`). If absent, warn: triggering stakeholders will be `_TODO_` and discipline is degraded. Suggest running `business-persona` first. |
+| **BC Map existence** | Check for `docs/business/03a-capability-map.md`. If absent, warn: enabling-capabilities links will be `_TODO_`. Suggest running `business-capability-map` first. |
 | **VS ID** (mode 3 only) | Which row from the catalogue does the user want filled? |
 
 Ask 2–4 questions max, single message, lettered options where possible. Don't drag through a wizard.

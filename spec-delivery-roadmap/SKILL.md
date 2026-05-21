@@ -28,7 +28,7 @@ For a solo founder or small team, one document serves both audiences. When
 audiences diverge (investors vs developers), extract a stakeholder copy —
 the delivery roadmap remains the source of truth.
 
-The artefact lives at `docs/product-specs/08-delivery-roadmap.md`.
+The artefact lives at `docs/product-specs/08a-delivery-roadmap.md`.
 
 ---
 
@@ -59,7 +59,7 @@ The artefact lives at `docs/product-specs/08-delivery-roadmap.md`.
 ## The two layers in one document
 
 ```
-docs/product-specs/08-delivery-roadmap.md
+docs/product-specs/08a-delivery-roadmap.md
 │
 ├── §Walking Skeleton — MVP        ← PRODUCT ROADMAP LAYER
 │   Hypothesis · VS anchor ·
@@ -128,10 +128,10 @@ the persona cannot complete the journey — the skeleton is broken.
 
 ```bash
 cat docs/VISION.md 2>/dev/null                                     # optional: read if exists — phase goals should connect to vision north star
-cat docs/product-specs/07-fbs.md
-cat docs/business/04-value-streams.md
-cat docs/business/01-personas.md
-cat docs/product-specs/09-quality-attributes.md                   # optional
+cat docs/product-specs/07a-fbs.md
+cat docs/business/04a-value-streams.md
+cat docs/business/01a-personas.md
+cat docs/product-specs/09a-quality-attributes.md                   # optional
 ```
 
 **From FBS extract:**
@@ -224,7 +224,7 @@ Verify every Phase 1 FBS functionality appears in exactly one epic:
 
 ```bash
 grep -o "C[0-9]\.[0-9]\.F[0-9][0-9]" \
-  docs/product-specs/08-delivery-roadmap.md | sort | uniq | wc -l
+  docs/product-specs/08a-delivery-roadmap.md | sort | uniq | wc -l
 ```
 
 Compare to Phase 1 FBS total. Flag orphaned functionalities.

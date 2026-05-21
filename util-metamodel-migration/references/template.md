@@ -84,7 +84,7 @@ Canonical metamodel directories that don't exist in this repo yet. Creating them
 | `docs/business/value-streams/` | `business-value-stream` outputs | Step 3 | `mkdir -p docs/business/value-streams` |
 | `docs/business/processes/` | `business-process` outputs | Step 4 | `mkdir -p docs/business/processes` |
 | `docs/business/business-model-canvas/` | `business-model-canvas` outputs | Step 5 | `mkdir -p docs/business/business-model-canvas` |
-| `docs/business/models/` | `business-quantitative-model` outputs | Step 6 | `mkdir -p docs/business/models` |
+| `docs/business/06a-models/` | `business-quantitative-model` outputs | Step 6 | `mkdir -p docs/business/models` |
 | `docs/domain/` | All `domain-*` outputs | Steps 2b/2c/7b | `mkdir -p docs/domain` |
 | `docs/product-specs/functional-breakdown-structure/` | `spec-functional-breakdown-structure` | Step 7 | `mkdir -p docs/product-specs/functional-breakdown-structure` |
 | `docs/product-specs/delivery-roadmap/` | `spec-delivery-roadmap` | Step 8 | `mkdir -p docs/product-specs/delivery-roadmap` |

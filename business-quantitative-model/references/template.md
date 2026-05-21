@@ -4,13 +4,13 @@ BUSINESS MODEL TEMPLATE — clone-and-fill
 =============================================================================
 
 Purpose: provide a consistent shape for every quantitative business model
-under docs/business/models/ (or the project's equivalent directory). Use
+under docs/business/06a-models/ (or the project's equivalent directory). Use
 this as the starting point for every new model — TAM/SAM/SOM, recovery /
 restitution funnels, savings / automation models, customer-ROI calculators,
 etc.
 
 How to use:
-  1. cp template.md docs/business/models/NN-your-model-slug.md
+  1. cp template.md docs/business/06a-models/NN-your-model-slug.md
   2. Fill placeholders marked {{LIKE_THIS}}
   3. Drop sections that genuinely don't apply (don't pad)
   4. Keep §5 sub-sections (How to read + Implicit assumptions) — those are

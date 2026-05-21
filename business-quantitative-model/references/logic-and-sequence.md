@@ -78,7 +78,7 @@ The user-facing question changes per model, but the funnel doesn't:
 
 ## The sequence you follow when filling a new model
 
-1. **Clone the template** to `docs/business/models/{slug}.md`.
+1. **Clone the template** to `docs/business/06a-models/{slug}.md`.
 2. **Fill §1 inputs** first — what data do you actually have? Cite each with confidence stars.
 3. **Draft §5.2 assumptions** before any numeric figure. List every shortcut you're about to take.
 4. **Walk down the funnel** (§2 → §3 → §4 → §5), with each step deriving from the previous one.

@@ -50,15 +50,15 @@ find docs -name "*.md" | while read f; do echo "$f"; done
 ```
 Then compare each path against the canonical map:
 - `VISION.md` → must be directly under `docs/` (not nested deeper — singleton)
-- `01-personas.md` → must be at `docs/business/01-personas.md` (flat file)
+- `01-personas.md` → must be at `docs/business/01a-personas.md` (flat file)
 - `02-bmc.md` / `02-lean-canvas.md` → must be at `docs/business/` (flat file)
-- `03-capability-map.md` → must be at `docs/business/03-capability-map.md` (flat file)
-- `04-value-streams.md` → must be at `docs/business/04-value-streams.md` (flat file)
+- `03-capability-map.md` → must be at `docs/business/03a-capability-map.md` (flat file)
+- `04-value-streams.md` → must be at `docs/business/04a-value-streams.md` (flat file)
 - `04b-objectives.md` → must be at `docs/business/04b-objectives.md` (flat file)
 - `*-process.md` → must be under `docs/business/processes/`
-- `07-fbs.md` → must be at `docs/product-specs/07-fbs.md` (flat file)
-- `08-delivery-roadmap.md` → must be at `docs/product-specs/08-delivery-roadmap.md` (flat file)
-- `09-quality-attributes.md` → must be at `docs/product-specs/09-quality-attributes.md` (flat file)
+- `07-fbs.md` → must be at `docs/product-specs/07a-fbs.md` (flat file)
+- `08-delivery-roadmap.md` → must be at `docs/product-specs/08a-delivery-roadmap.md` (flat file)
+- `09-quality-attributes.md` → must be at `docs/product-specs/09a-quality-attributes.md` (flat file)
 - `*_prd_*.md` → must be under `docs/product-specs/`
 - `*.md` under `docs/architecture/decisions/` → ADRs, correct
 
@@ -128,11 +128,11 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 
 | ID format | Regex | Owning artefact |
 |---|---|---|
-| `P-NN` | `\bP-[0-9]{2}\b` | `docs/business/01-personas.md` |
-| `C-N.M` or `C1.1` | `\bC[0-9]+\.[0-9]+\b` | `docs/business/03-capability-map.md` |
-| `VS-N` | `\bVS-[0-9]+\b` | `docs/business/04-value-streams.md` |
-| `VS-N.M` | `\bVS-[0-9]+\.[0-9]+\b` | `docs/business/04-value-streams.md` |
-| `C-N.M.FXX` | `\bC-[0-9]+\.[0-9]+\.F[0-9]+\b` | `docs/product-specs/07-fbs.md` |
+| `P-NN` | `\bP-[0-9]{2}\b` | `docs/business/01a-personas.md` |
+| `C-N.M` or `C1.1` | `\bC[0-9]+\.[0-9]+\b` | `docs/business/03a-capability-map.md` |
+| `VS-N` | `\bVS-[0-9]+\b` | `docs/business/04a-value-streams.md` |
+| `VS-N.M` | `\bVS-[0-9]+\.[0-9]+\b` | `docs/business/04a-value-streams.md` |
+| `C-N.M.FXX` | `\bC-[0-9]+\.[0-9]+\.F[0-9]+\b` | `docs/product-specs/07a-fbs.md` |
 | `BC-NN` | `\bBC-[0-9]{2}\b` | `docs/domain/bounded-contexts.md` |
 | `BC-NN.GT-NN` | `\bBC-[0-9]{2}\.GT-[0-9]{2}\b` | `docs/domain/glossary.md` |
 | `BC-NN.AGG-NN` | `\bBC-[0-9]{2}\.AGG-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
@@ -141,8 +141,8 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `BC-NN.EVT-NN` | `\bBC-[0-9]{2}\.EVT-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
 | `OBJ-NN` | `\bOBJ-[0-9]{2}\b` | `docs/business/04b-objectives.md` |
 | `KR-NN.M` | `\bKR-[0-9]{2}\.[0-9]\b` | `docs/business/04b-objectives.md` |
-| `E-NN` | `\bE-[0-9]{2}\b` | `docs/product-specs/08-delivery-roadmap.md` |
-| `QA-[A-Z]{2}[0-9]{2}` | `\bQA-[A-Z]{2}[0-9]{2}\b` | `docs/product-specs/09-quality-attributes.md` |
+| `E-NN` | `\bE-[0-9]{2}\b` | `docs/product-specs/08a-delivery-roadmap.md` |
+| `QA-[A-Z]{2}[0-9]{2}` | `\bQA-[A-Z]{2}[0-9]{2}\b` | `docs/product-specs/09a-quality-attributes.md` |
 | `ADR-NNNN` | `\bADR-[0-9]{4}\b` | `docs/architecture/decisions/` |
 | `PRD-NNNN` | `\bPRD-[0-9]{4}\b` | `docs/product-specs/*_prd_*.md` |
 
@@ -151,7 +151,7 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 # Collect all P-NN references across all docs
 grep -roh '\bP-[0-9]\{2\}\b' docs/ --include="*.md" | grep -oP 'P-[0-9]{2}' | sort -u > /tmp/p_refs.txt
 # Collect all P-NN definitions in personas.md
-grep -oh '\bP-[0-9]\{2\}\b' docs/business/01-personas.md 2>/dev/null | sort -u > /tmp/p_defs.txt
+grep -oh '\bP-[0-9]\{2\}\b' docs/business/01a-personas.md 2>/dev/null | sort -u > /tmp/p_defs.txt
 # Find refs with no definition
 comm -23 /tmp/p_refs.txt /tmp/p_defs.txt
 ```
@@ -170,7 +170,7 @@ Repeat for each ID type.
 **Detection — duplicates:**
 ```bash
 # Example for P-NN in personas.md
-grep -oh '\bP-[0-9]\{2\}\b' docs/business/01-personas.md 2>/dev/null | sort | uniq -d
+grep -oh '\bP-[0-9]\{2\}\b' docs/business/01a-personas.md 2>/dev/null | sort | uniq -d
 ```
 
 **Detection — malformed format:**
@@ -199,23 +199,23 @@ grep -roh '\bQA-[^A-Z ]' docs/ --include="*.md"
 
 | If this exists | Then this must also exist |
 |---|---|
-| `docs/business/04-value-streams.md` | `docs/business/03-capability-map.md` (stages consume capabilities) |
-| `docs/product-specs/07-fbs.md` | `docs/business/03-capability-map.md` (FBS inherits L0+L1) |
-| `docs/product-specs/08-delivery-roadmap.md` | `docs/product-specs/07-fbs.md` (epics group FBS functionalities) |
-| `docs/product-specs/09-quality-attributes.md` | `docs/product-specs/07-fbs.md` (QA reads FBS differentiators) |
-| Any `*_prd_*.md` | `docs/product-specs/08-delivery-roadmap.md` (PRDs map to E-NN epics) |
-| Any `*_prd_*.md` | `docs/product-specs/09-quality-attributes.md` (PRDs reference QA-XXNN) |
+| `docs/business/04a-value-streams.md` | `docs/business/03a-capability-map.md` (stages consume capabilities) |
+| `docs/product-specs/07a-fbs.md` | `docs/business/03a-capability-map.md` (FBS inherits L0+L1) |
+| `docs/product-specs/08a-delivery-roadmap.md` | `docs/product-specs/07a-fbs.md` (epics group FBS functionalities) |
+| `docs/product-specs/09a-quality-attributes.md` | `docs/product-specs/07a-fbs.md` (QA reads FBS differentiators) |
+| Any `*_prd_*.md` | `docs/product-specs/08a-delivery-roadmap.md` (PRDs map to E-NN epics) |
+| Any `*_prd_*.md` | `docs/product-specs/09a-quality-attributes.md` (PRDs reference QA-XXNN) |
 | Any `exec-plans/active/*/` plan | Corresponding `*_prd_*.md` |
 | `docs/domain/glossary.md` exists | `docs/domain/bounded-contexts.md` must also exist (glossary is scoped to BCs) |
 | `docs/domain/models/{bc-slug}.md` exists | `docs/domain/bounded-contexts.md` must exist (domain model is namespaced by BC) |
 | `docs/domain/models/{bc-slug}.md` exists | `docs/domain/glossary.md` must exist (entity names must match glossary terms) |
-| `docs/business/04b-objectives.md` exists | `docs/business/04-value-streams.md` must also exist (objectives consume pain index from VS) |
+| `docs/business/04b-objectives.md` exists | `docs/business/04a-value-streams.md` must also exist (objectives consume pain index from VS) |
 | Any `*_prd_*.md` | If `docs/business/04b-objectives.md` exists, the PRD should reference ≥1 `OBJ-NN` in §0 |
 
 **Detection (example):**
 ```bash
-[ -f "docs/product-specs/07-fbs.md" ] && \
-  [ ! -f "docs/business/03-capability-map.md" ] && \
+[ -f "docs/product-specs/07a-fbs.md" ] && \
+  [ ! -f "docs/business/03a-capability-map.md" ] && \
   echo "WARNING: FBS exists but 03-capability-map.md missing"
 
 [ -f "docs/domain/glossary.md" ] && \
@@ -270,7 +270,7 @@ done | sort -rn
 | File type | Mandatory sections | Detection pattern |
 |---|---|---|
 | `*-process.md` | `## §8 KPIs` or `## KPIs`, `## §11` or `## Open TODOs`, `## §0 Master flow` | `grep -q 'KPI\|§8'` |
-| `docs/business/models/*.md` | `§5.2` or `Implicit assumptions`, `§6` or `Scenario Matrix`, `§7` or `Value capture` | `grep -q '5\.2\|Implicit assumptions'` |
+| `docs/business/06a-models/*.md` | `§5.2` or `Implicit assumptions`, `§6` or `Scenario Matrix`, `§7` or `Value capture` | `grep -q '5\.2\|Implicit assumptions'` |
 | `01-personas.md` | `## Persona Backlog`, `## Personas`, `## Persona Template` | `grep -q 'Persona Backlog'` |
 | `03-capability-map.md` | `## L0 axis`, `## Global overview`, `## Capability index` | `grep -q 'L0 axis\|Capability index'` |
 | `04-value-streams.md` | `## Catalogue`, `## Value Streams` | `grep -q '## Catalogue'` |
@@ -345,7 +345,7 @@ done
 
 **Detection — proto-persona expiry:**
 ```bash
-grep -n 'Next review' docs/business/01-personas.md 2>/dev/null
+grep -n 'Next review' docs/business/01a-personas.md 2>/dev/null
 # Compare each date against today
 ```
 
@@ -478,7 +478,7 @@ done
 
 **Detection — FBS status:**
 ```bash
-fbs="docs/product-specs/07-fbs.md"
+fbs="docs/product-specs/07a-fbs.md"
 if [ -f "$fbs" ]; then
   done=$(grep -c '✅' "$fbs" 2>/dev/null || echo 0)
   in_progress=$(grep -c '🔄' "$fbs" 2>/dev/null || echo 0)
@@ -489,11 +489,11 @@ fi
 
 **Detection — epic ↔ PRD linkage:**
 ```bash
-epic_count=$(grep -c '\bE-[0-9]\{2\}\b' docs/product-specs/08-delivery-roadmap.md 2>/dev/null || echo 0)
+epic_count=$(grep -c '\bE-[0-9]\{2\}\b' docs/product-specs/08a-delivery-roadmap.md 2>/dev/null || echo 0)
 prd_count=$(find docs/product-specs -maxdepth 1 -name "*_prd_*.md" 2>/dev/null | wc -l)
 echo "Epics: $epic_count | PRDs: $prd_count"
 # Find epics with no corresponding PRD link
-grep -oh '\bE-[0-9]\{2\}\b' docs/product-specs/08-delivery-roadmap.md 2>/dev/null | sort -u | while read epic; do
+grep -oh '\bE-[0-9]\{2\}\b' docs/product-specs/08a-delivery-roadmap.md 2>/dev/null | sort -u | while read epic; do
   grep -rl "$epic" docs/product-specs --include="*_prd_*.md" 2>/dev/null | head -1 || \
     echo "NO PRD for $epic"
 done

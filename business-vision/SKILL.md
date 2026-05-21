@@ -105,7 +105,7 @@ A vision document is good when any reader — including an agent with no prior c
 **When:** `docs/VISION.md` exists; the user wants to populate it.
 
 **Process:**
-1. **Read project context** — if any exist, read before writing: `docs/VISION.md` (current state), `docs/business/01-personas.md`, `docs/business/`, `docs/business/04-value-streams.md`, `docs/business/04b-objectives.md`. The vision synthesises these artefacts into a single orientation statement.
+1. **Read project context** — if any exist, read before writing: `docs/VISION.md` (current state), `docs/business/01a-personas.md`, `docs/business/`, `docs/business/04a-value-streams.md`, `docs/business/04b-objectives.md`. The vision synthesises these artefacts into a single orientation statement.
 2. **Fill §The Elevator Pitch** — apply the Moore positioning format. Test: if you remove the product name, the pitch should still uniquely identify the product type and audience.
 3. **Fill §The Problem We Solve** — 2–3 sentences. Describe the human cost of NOT having the product. NOT features — the world without the product.
 4. **Fill §The World We're Building Toward** — 1–2 sentences. Aspirational future state, timeless. Should still be true in 5 years.
@@ -189,8 +189,8 @@ A vision document is good when any reader — including an agent with no prior c
 
 | Vision section | Soft-links to |
 |---|---|
-| **Elevator pitch target** | Personas (`P-NN`) from `docs/business/01-personas.md` |
-| **Problem statement** | Value stream pain index (`VS-N.M` High/Critical stages) from `docs/business/04-value-streams.md` |
+| **Elevator pitch target** | Personas (`P-NN`) from `docs/business/01a-personas.md` |
+| **Problem statement** | Value stream pain index (`VS-N.M` High/Critical stages) from `docs/business/04a-value-streams.md` |
 | **North Star Metric** | Business Objectives (`OBJ-NN`, `KR-NN.M`) from `docs/business/04b-objectives.md` — OKRs are the measurable steps toward the North Star |
 | **§Linked Artefacts** | BMC Value Propositions (`VP-NN`) from `docs/business/` — VP blocks are the commercial expression of the vision per segment |
 

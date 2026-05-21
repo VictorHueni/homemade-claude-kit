@@ -1,6 +1,6 @@
 # Methodology Glossary — Seed
 
-This is the canonical seed the `business-quantitative-model` skill copies to `docs/business/models/glossary.md` on first use in a project. **Trim it to the terms actually used in the project's model set** — do not paste the full seed if many terms are unused.
+This is the canonical seed the `business-quantitative-model` skill copies to `docs/business/06a-models/glossary.md` on first use in a project. **Trim it to the terms actually used in the project's model set** — do not paste the full seed if many terms are unused.
 
 Two sections only:
 

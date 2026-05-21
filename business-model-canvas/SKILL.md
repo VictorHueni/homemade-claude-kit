@@ -165,15 +165,15 @@ The canvas is the commercial wrapper around the BIZBOK Business Architecture art
 
 | Canvas block | Soft-links to |
 |---|---|
-| **Customer Segments** | Personas (`P-NN`) from `docs/business/01-personas.md` |
-| **Value Propositions** | Value Streams (`VS-N`) from `docs/business/04-value-streams.md` + Value Proposition Canvases (one VPC per segment) |
+| **Customer Segments** | Personas (`P-NN`) from `docs/business/01a-personas.md` |
+| **Value Propositions** | Value Streams (`VS-N`) from `docs/business/04a-value-streams.md` + Value Proposition Canvases (one VPC per segment) |
 | **Channels** | Specific value-stream stages (`VS-N.M`) and process docs |
 | **Customer Relationships** | Value-stream stages and process docs (especially support / engagement processes) |
 | **Key Activities** | Business Processes from `docs/business/processes/` |
-| **Key Resources** | Business Capabilities (`C-N.M`) from `docs/business/03-capability-map.md` |
+| **Key Resources** | Business Capabilities (`C-N.M`) from `docs/business/03a-capability-map.md` |
 | **Key Partnerships** | (No standard artefact — could link to vendor / contract docs if they exist) |
-| **Revenue Streams** | Quantitative models from `docs/business/models/` (e.g., TAM/SAM/SOM, savings) |
-| **Cost Structure** | Quantitative models from `docs/business/models/` (e.g., unit economics, cost models) |
+| **Revenue Streams** | Quantitative models from `docs/business/06a-models/` (e.g., TAM/SAM/SOM, savings) |
+| **Cost Structure** | Quantitative models from `docs/business/06a-models/` (e.g., unit economics, cost models) |
 | **Value Propositions** (downstream) | Business Objectives (`OBJ-NN`) from `docs/business/04b-objectives.md` — VP-NN blocks are the commercial intent that Step 4.5 objectives operationalise. |
 
 **Soft-link discipline:** mention the ID + name + relative path. Don't duplicate the linked artefact's content. The canvas is a one-pager pointing to depth elsewhere.
@@ -313,7 +313,7 @@ The canvas sits at the **commercial-strategy layer**, consolidating the BIZBOK B
 | **FBS** | What product does | (No direct link; Solution in Lean Canvas hints) |
 | **Business Model Canvas** *(this skill)* | Commercial logic | — |
 | **VPC** *(this skill, optional)* | Segment value-fit | Drills into Value Propositions block |
-| **Quantitative models** | Numbers (TAM/SAM/SOM, ROI) | Revenue Streams + Cost Structure soft-link to `docs/business/models/` |
+| **Quantitative models** | Numbers (TAM/SAM/SOM, ROI) | Revenue Streams + Cost Structure soft-link to `docs/business/06a-models/` |
 
 ### Soft-reference principle
 

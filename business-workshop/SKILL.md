@@ -211,10 +211,10 @@ Ask 2–4 questions max in a single message.
 
 | Workshop output | Soft-links to / updates |
 |---|---|
-| BMC workshop | `docs/business/02-bmc.md` — blocks filled / refined |
-| Persona workshop | `docs/business/01-personas.md` — proto-personas elevated to research-grounded post-workshop |
-| Value stream workshop | `docs/business/04-value-streams.md` — stages confirmed / refined |
-| Capability map workshop | `docs/business/03-capability-map.md` — L0 axis decided; L1 enumerated |
+| BMC workshop | `docs/business/02a-bmc.md` — blocks filled / refined |
+| Persona workshop | `docs/business/01a-personas.md` — proto-personas elevated to research-grounded post-workshop |
+| Value stream workshop | `docs/business/04a-value-streams.md` — stages confirmed / refined |
+| Capability map workshop | `docs/business/03a-capability-map.md` — L0 axis decided; L1 enumerated |
 | Roadmap workshop | `docs/product-specs/` — MoSCoW prioritisation; MVP scope decided |
 | Discovery workshop | `docs/business/research/` — interview themes synthesised; problem framing aligned |
 

@@ -39,7 +39,7 @@ Copy this skeleton to `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md` 
 | 3 | Business Capability Map | `business-capability-map` | {✅/🔄/⬜} | `docs/business/capability-map/capability-map.md` | {date} | {N} |
 | 4 | Value Streams | `business-value-stream` | {✅/🔄/⬜} | `docs/business/value-streams/value-streams.md` | {date} | {N} |
 | 5 | Business Processes | `business-process` | {✅/🔄/⬜} | `docs/business/processes/` ({N} files) | {date} | {N} |
-| 6 | Quantitative Models | `business-quantitative-model` | {✅/🔄/⬜} | `docs/business/models/` ({N} files) | {date} | {N} |
+| 6 | Quantitative Models | `business-quantitative-model` | {✅/🔄/⬜} | `docs/business/06a-models/` ({N} files) | {date} | {N} |
 | 7 | Functional Breakdown Structure | `spec-functional-breakdown-structure` | {✅/🔄/⬜} | `docs/product-specs/functional-breakdown-structure/FBS.md` | {date} | {N} |
 | 8 | Epic Catalogue | `spec-epic-catalogue` | {✅/🔄/⬜} | `docs/product-specs/epic-catalogue.md` | {date} | {N} |
 | 9 | Quality Attributes | `spec-quality-attributes` | {✅/🔄/⬜} | `docs/product-specs/quality-attributes/quality-attributes.md` | {date} | {N} |

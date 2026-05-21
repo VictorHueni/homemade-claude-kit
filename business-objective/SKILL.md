@@ -118,7 +118,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** the objectives doc and delivery roadmap both exist; the user wants to verify epics trace back to objectives.
 
 **Process:**
-1. Read `docs/business/04b-objectives.md` and `docs/product-specs/08-delivery-roadmap.md`.
+1. Read `docs/business/04b-objectives.md` and `docs/product-specs/08a-delivery-roadmap.md`.
 2. For each E-NN epic, identify which OBJ-NN it serves (look for explicit references or infer from value statement + VS anchor).
 3. Build or update the §Objective × Epic traceability matrix.
 4. Flag epics with no OBJ-NN reference as **orphaned delivery** — work being built without a stated strategic objective.
@@ -181,10 +181,10 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 | Objectives field | Soft-links to |
 |---|---|
 | **Vision** (upstream root) | `docs/VISION.md` (singleton) — objectives should be measurable steps toward the vision's north star metric; if VISION.md exists, add a "Linked to vision" note on each OBJ-NN |
-| **"Linked from"** (OBJ-NN) | BMC Value Propositions (`VP-NN`) from `docs/business/` and/or VS pain index (`VS-N.M`) from `docs/business/04-value-streams.md` |
-| **Personas** (OBJ-NN "whose outcomes") | Personas (`P-NN`) from `docs/business/01-personas.md` |
-| **KR targets** | May ground QA acceptance criteria (`QA-XXNN`) in `docs/product-specs/09-quality-attributes.md` |
-| **§Objective × Epic matrix** | Epics (`E-NN`) from `docs/product-specs/08-delivery-roadmap.md` |
+| **"Linked from"** (OBJ-NN) | BMC Value Propositions (`VP-NN`) from `docs/business/` and/or VS pain index (`VS-N.M`) from `docs/business/04a-value-streams.md` |
+| **Personas** (OBJ-NN "whose outcomes") | Personas (`P-NN`) from `docs/business/01a-personas.md` |
+| **KR targets** | May ground QA acceptance criteria (`QA-XXNN`) in `docs/product-specs/09a-quality-attributes.md` |
+| **§Objective × Epic matrix** | Epics (`E-NN`) from `docs/product-specs/08a-delivery-roadmap.md` |
 | **OBJ-NN** | Referenced in PRD `§0 Architecture Traceability` in `docs/product-specs/` |
 
 ---

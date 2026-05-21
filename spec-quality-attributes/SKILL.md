@@ -17,7 +17,7 @@ non-functional requirements registry that defines how well the system performs
 its functions, as distinct from what functions it performs (FBS territory).
 
 The artifact produced by this skill is a markdown document at
-`docs/product-specs/09-quality-attributes.md`. It is NOT a
+`docs/product-specs/09a-quality-attributes.md`. It is NOT a
 feature registry (→ FBS), NOT an architectural decision (→ ADR), NOT a process
 doc — it is the **system quality specification**: measurable, verifiable
 quality requirements anchored to ISO/IEC 25010:2023.
@@ -147,7 +147,7 @@ evidence arrives. Promote confidence level (Assumed → Tested → Validated).
 ## Output structure
 
 ```
-docs/product-specs/09-quality-attributes.md
+docs/product-specs/09a-quality-attributes.md
 
 H1: {{product}} — Quality Attributes
 

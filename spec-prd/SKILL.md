@@ -27,10 +27,10 @@ them by stable ID so traceability is mechanical, not narrative.
 Before asking any questions, silently check which upstream artefacts exist:
 
 ```bash
-ls docs/business/01-personas.md 2>/dev/null
-ls docs/business/03-capability-map.md 2>/dev/null
-ls docs/product-specs/07-fbs.md 2>/dev/null
-ls docs/business/04-value-streams.md 2>/dev/null
+ls docs/business/01a-personas.md 2>/dev/null
+ls docs/business/03a-capability-map.md 2>/dev/null
+ls docs/product-specs/07a-fbs.md 2>/dev/null
+ls docs/business/04a-value-streams.md 2>/dev/null
 ```
 
 **If artefacts exist:** extract the relevant IDs and use them to enrich the PRD
@@ -326,7 +326,7 @@ if the FBS file is accessible:
 
 > "The following FBS functionalities are now committed by this PRD.
 > Update their status from ⬜ to 🔄 in
-> `docs/product-specs/07-fbs.md`."
+> `docs/product-specs/07a-fbs.md`."
 
 List each committed functionality with its ID and name. If you have write
 access, make the edits directly and commit the FBS alongside the PRD.

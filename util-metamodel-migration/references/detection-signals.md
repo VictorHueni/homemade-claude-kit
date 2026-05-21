@@ -18,18 +18,18 @@ A file whose name matches one of these patterns is likely the artefact type list
 | `*runbook*.md` | Runbook | `ops-runbook` | `docs/ops/runbooks/{slug}.md` |
 | `*-rca*.md` or `*-incident*.md` or `*-postmortem*.md` | Bug RCA | `ops-bug-rca` | `docs/ops/rcas/{date}-{slug}.md` |
 | `*-process.md` or `*-workflow.md` | Business process | `business-process` | `docs/business/processes/{slug}-process.md` |
-| `*persona*.md` or `*personas*.md` | Personas | `business-persona` | `docs/business/01-personas.md` |
-| `*capability-map*.md` or `*capabilities*.md` | Capability map | `business-capability-map` | `docs/business/03-capability-map.md` |
-| `*value-stream*.md` or `*value-streams*.md` | Value streams | `business-value-stream` | `docs/business/04-value-streams.md` |
-| `*business-model-canvas*.md` or `*lean-canvas*.md` or `*bmc*.md` | BMC / Lean Canvas | `business-model-canvas` | `docs/business/02-bmc.md or docs/business/02-lean-canvas.md` |
+| `*persona*.md` or `*personas*.md` | Personas | `business-persona` | `docs/business/01a-personas.md` |
+| `*capability-map*.md` or `*capabilities*.md` | Capability map | `business-capability-map` | `docs/business/03a-capability-map.md` |
+| `*value-stream*.md` or `*value-streams*.md` | Value streams | `business-value-stream` | `docs/business/04a-value-streams.md` |
+| `*business-model-canvas*.md` or `*lean-canvas*.md` or `*bmc*.md` | BMC / Lean Canvas | `business-model-canvas` | `docs/business/02a-bmc.md or docs/business/02a-lean-canvas.md` |
 | `*glossary*.md` | Domain glossary | `domain-glossary` | `docs/domain/glossary.md` |
 | `*information-model*.md` or `*domain-model*.md` or `*canonical*model*.md` | Domain model | `domain-model` | `docs/domain/models/{bc-slug}.md` |
 | `*bounded-context*.md` or `*context-map*.md` | Bounded context | `domain-bounded-context` | `docs/domain/bounded-contexts.md` + `docs/domain/context-map.md` |
-| `FBS.md` or `*functional-breakdown*.md` | FBS | `spec-functional-breakdown-structure` | `docs/product-specs/07-fbs.md` |
-| `*quality-attributes*.md` or `*nfr*.md` or `*non-functional*.md` | Quality attributes | `spec-quality-attributes` | `docs/product-specs/09-quality-attributes.md` |
-| `*delivery-roadmap*.md` or `*epic-catalogue*.md` or `*epic-catalog*.md` | Delivery roadmap | `spec-delivery-roadmap` | `docs/product-specs/08-delivery-roadmap.md` |
+| `FBS.md` or `*functional-breakdown*.md` | FBS | `spec-functional-breakdown-structure` | `docs/product-specs/07a-fbs.md` |
+| `*quality-attributes*.md` or `*nfr*.md` or `*non-functional*.md` | Quality attributes | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` |
+| `*delivery-roadmap*.md` or `*epic-catalogue*.md` or `*epic-catalog*.md` | Delivery roadmap | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` |
 | `*competitive-landscape*.md` or `*competitor*.md` | Competitive landscape | `business-competitive-landscape` | `docs/business/competitive-landscape/` |
-| `*quant-model*.md` or `*tam-*.md` or `*savings-model*.md` | Quantitative model | `business-quantitative-model` | `docs/business/models/{slug}.md` |
+| `*quant-model*.md` or `*tam-*.md` or `*savings-model*.md` | Quantitative model | `business-quantitative-model` | `docs/business/06a-models/{slug}.md` |
 | `VISION.md` or `*vision*.md` or `*north-star*.md` | Product vision | `business-vision` | `docs/VISION.md` (singleton at docs root) |
 | `*objectives*.md` or `*okr*.md` or `*key-results*.md` | Business objectives | `business-objective` | `docs/business/04b-objectives.md` |
 
@@ -49,13 +49,13 @@ A folder whose name matches one of these patterns, AND is not already at the can
 | `bugs/` or `bug-reports/` or `rcas/` or `incidents/` | `ops-bug-rca` | `docs/ops/rcas/` | `find docs -type d -iname "bug*" -o -type d -iname "rca*" -o -type d -iname "incident*" \| grep -v "docs/ops"` |
 | `workshop*/` or `workshops/` | `business-workshop` | `docs/business/workshops/` | `find docs -type d -iname "workshop*" \| grep -v "docs/business/workshops"` |
 | `objectives/` or `okr/` or `okrs/` | `business-objective` | `docs/business/04b-objectives.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "objective*" -o -type d -iname "okr*"` |
-| `personas/` or `persona/` | `business-persona` | `docs/business/01-personas.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "persona*"` |
-| `capabilities/` or `capability-map/` | `business-capability-map` | `docs/business/03-capability-map.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "capabilit*"` |
-| `value-streams/` or `journeys/` or `customer-journeys/` | `business-value-stream` | `docs/business/04-value-streams.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "value-stream*" -o -type d -iname "journey*"` |
+| `personas/` or `persona/` | `business-persona` | `docs/business/01a-personas.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "persona*"` |
+| `capabilities/` or `capability-map/` | `business-capability-map` | `docs/business/03a-capability-map.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "capabilit*"` |
+| `value-streams/` or `journeys/` or `customer-journeys/` | `business-value-stream` | `docs/business/04a-value-streams.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "value-stream*" -o -type d -iname "journey*"` |
 | `processes/` or `workflows/` | `business-process` | `docs/business/processes/` | `find docs -type d -iname "process*" -o -type d -iname "workflow*" \| grep -v "docs/business/processes"` |
 | `decisions/` or `adrs/` or `adr/` | `arch-adr` | `docs/architecture/decisions/` | `find docs -type d -iname "decision*" -o -type d -iname "adr*" \| grep -v "docs/architecture/decisions"` |
 | `glossary/` or `ubiquitous-language/` or `vocabulary/` | `domain-glossary` | `docs/domain/glossary.md` (flat — no subfolder in v2) | `find docs/domain -type d -iname "glossar*" -o -type d -iname "ubiquitous*"` |
-| `models/` containing `*model*.md` files | `business-quantitative-model` or `domain-model` | `docs/business/models/` or `docs/domain/` | Confirm with Tier 1 + Tier 3 |
+| `models/` containing `*model*.md` files | `business-quantitative-model` or `domain-model` | `docs/business/06a-models/` or `docs/domain/` | Confirm with Tier 1 + Tier 3 |
 | `ideas/` or `proposals/` | `spec-idea` | `docs/ideas/` | `find docs -type d -iname "idea*" -o -type d -iname "proposal*" \| grep -v "docs/ideas"` |
 
 ---

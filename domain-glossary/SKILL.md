@@ -105,7 +105,7 @@ Populate the glossary with an initial set of terms from existing artefacts. Requ
 
 **Process after Step 0:**
 
-1. Read capability map (`docs/business/03-capability-map.md`) and/or value streams + process docs per the answer to Q1.
+1. Read capability map (`docs/business/03a-capability-map.md`) and/or value streams + process docs per the answer to Q1.
 2. Extract nouns — every L1 capability name, every VS stage label, every process actor is a glossary candidate.
 3. Map each candidate to its bounded context (from `docs/domain/bounded-contexts/` or `domain-bounded-context` artefact).
 4. Assign GT-NN IDs sequentially within each BC section (GT-01, GT-02, …).

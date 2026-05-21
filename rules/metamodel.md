@@ -23,19 +23,19 @@ what order, and where to put it**.
 | # | Layer | Skill | Output file | Primary IDs |
 |---|---|---|---|---|
 | 0 | **Product Vision** (why — the north star) | `business-vision` | `docs/VISION.md` | *(singleton — no ID; referenced by path)* |
-| 1 | **Personas** (who) | `business-persona` | `docs/business/01-personas.md` | `P-NN` |
-| 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/03-capability-map.md` | `C1`, `C1.1`, `C1.1.1` (L2 rare) |
+| 1 | **Personas** (who) | `business-persona` | `docs/business/01a-personas.md` | `P-NN` |
+| 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/03a-capability-map.md` | `C1`, `C1.1`, `C1.1.1` (L2 rare) |
 | 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/bounded-contexts.md` + `docs/domain/context-map.md` | `BC-NN` |
 | 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/glossary.md` | `BC-NN.GT-NN` |
-| 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/04-value-streams.md` + `docs/business/04-vpc-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
+| 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/04a-value-streams.md` + `docs/business/04a-vpc-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
 | 4.5 | **Business Objectives** (why — strategic intent) | `business-objective` | `docs/business/04b-objectives.md` | `OBJ-NN`, `KR-NN.M` |
 | 4 | **Business Processes** (operational how) | `business-process` | `docs/business/processes/{slug}-process.md` (one file per process) | per-process slug |
-| 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/02-bmc.md` or `docs/business/02-lean-canvas.md` + optional `docs/business/02-vpc-{segment}.md` | block IDs (CS-N, VP-N, …) |
-| 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/models/{slug}.md` | per-model slug |
-| 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/07-fbs.md` | `C-N.M.FXX` (capability + functionality counter) |
+| 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/02a-bmc.md` or `docs/business/02a-lean-canvas.md` + optional `docs/business/02a-vpc-{segment}.md` | block IDs (CS-N, VP-N, …) |
+| 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/06a-models/{slug}.md` | per-model slug |
+| 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/07a-fbs.md` | `C-N.M.FXX` (capability + functionality counter) |
 | 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/models/{bc-slug}.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
-| 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08-delivery-roadmap.md` | `E-NN` |
-| 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
+| 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
+| 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/[NNNN]_prd_[feature].md` | `PRD-NNNN` |
 | 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
 
@@ -287,7 +287,7 @@ moving on.
 **Skill:** `business-persona`
 **Prerequisites:** Step 0 (Product Vision — if it exists, read it; personas should reflect the vision's target audience framing)
 **Process:**
-- Mode `scaffold` → create `docs/business/01-personas.md`
+- Mode `scaffold` → create `docs/business/01a-personas.md`
 - Mode `backlog` → identify Tier-1 / Tier-2 / Tier-3 personas with Cooper persona types
 - Mode `fill-one` → write 1–3 Tier-1 personas as proto-personas (Lean UX) or research-grounded (BABOK §10.43)
 **Output verification:** `personas.md` exists; ≥1 Tier-1 persona filled; `P-01` through `P-NN` assigned.
@@ -298,7 +298,7 @@ moving on.
 **Prerequisites:** Step 1 (personas exist for Customer Segments soft-link).
 **Process:**
 - Pick variant: BMC (established) or Lean Canvas (startup) at scaffold.
-- Mode `scaffold` → `docs/business/02-bmc.md` (or `docs/business/02-lean-canvas.md`)
+- Mode `scaffold` → `docs/business/02a-bmc.md` (or `docs/business/02a-lean-canvas.md`)
 - Mode `fill` → populate all 9 blocks with 3–7 terse bullets + confidence rating (Assumed/Tested/Validated)
 - Mode `vpc` (optional) → one VPC companion per Tier-1 segment
 **Output verification:** canvas file exists; Customer Segments link to `P-NN`; ≥1 segment populated.
@@ -309,7 +309,7 @@ moving on.
 **Prerequisites:** Steps 1–2 (personas for context; BMC for commercial framing).
 **Process:**
 - Choose L0 axis (product / value-stream / capability-domain / LOB / segment / custom). Default `capability domain` if unsure.
-- Mode `scaffold` → `docs/business/03-capability-map.md`
+- Mode `scaffold` → `docs/business/03a-capability-map.md`
 - Mode `structure` → enumerate L0 items (3–8) + L1 capabilities (5–12 per L0; ≤25 total)
 - Mode `fill` → per-capability blocks (Definition + Business Object + Strategic Importance + Outcomes + Boundaries)
 **Output verification:** capability map exists; `C1` through `C-N.M` assigned; ≥6 L1 capabilities filled; each capability passes noun test + tech-independence test + anti-overlap test.
@@ -339,7 +339,7 @@ moving on.
 **Skill:** `business-value-stream`
 **Prerequisites:** Step 1 (triggering stakeholders link to personas); Step 3 (stages consume capabilities by C-N.M ID).
 **Process:**
-- Mode `scaffold` → `docs/business/04-value-streams.md`
+- Mode `scaffold` → `docs/business/04a-value-streams.md`
 - Mode `catalogue` → enumerate 3–10 streams per product scope, one per Tier-1 persona × value-proposition pair
 - Mode `fill-one` → full stream body with 4–10 stages, each consuming 1–4 capabilities + pain index
 **Output verification:** value-streams file exists; ≥1 stream fully filled; each stage links to ≥1 capability by `C-N.M` ID.
@@ -373,7 +373,7 @@ moving on.
 **Prerequisites:** Step 2 (BMC's Revenue Streams + Cost Structure provide qualitative anchors); Step 1 (personas drive segmentation).
 **Process:**
 - One model per quantification need: TAM/SAM/SOM, savings, ROI, restitution, unit economics.
-- Each model file in `docs/business/models/{slug}.md`.
+- Each model file in `docs/business/06a-models/{slug}.md`.
 **Output verification:** ≥1 model exists; BMC's Revenue Streams + Cost Structure link to relevant models.
 
 ### Step 7 — Functional Breakdown Structure (what product does, status-tracked)
@@ -381,7 +381,7 @@ moving on.
 **Skill:** `spec-functional-breakdown-structure`
 **Prerequisites:** Step 3 (BC Map — FBS inherits L0+L1).
 **Process:**
-- Mode `scaffold` → `docs/product-specs/07-fbs.md`
+- Mode `scaffold` → `docs/product-specs/07a-fbs.md`
 - Mode `structure` → auto-import L0+L1 from BC Map; pre-fill per-capability sections
 - Mode `fill` → enumerate functionalities per capability with `C-N.M.FXX` IDs + status (✅/🔄/⬜) + optional VS-stage links + code paths
 **Output verification:** FBS exists; ≥1 capability has ≥1 functionality; status distribution shows initial state.
@@ -406,16 +406,16 @@ moving on.
 - Order by pain index; assign E-NN IDs in priority order
 - Define Walking Skeleton: identify the primary VS to validate; select minimum functionalities per epic covering every VS stage end-to-end; write "can / cannot yet" statement
 - Define Phase Plan: declare which VS streams become fully operational per phase; write one-sentence goal per phase
-- Produce `docs/product-specs/08-delivery-roadmap.md`
+- Produce `docs/product-specs/08a-delivery-roadmap.md`
 - Coverage check: every Phase 1 FBS functionality in exactly one epic
-**Output verification:** `docs/product-specs/08-delivery-roadmap.md` exists; §Walking Skeleton covers every stage of primary VS; §Phase Plan has one goal per phase expressed as VS streams operational; every epic has a value statement; ★ functionalities each anchor their own epic; sizing within 5–25 FBS rows per epic; E-NN IDs in pain-index order.
+**Output verification:** `docs/product-specs/08a-delivery-roadmap.md` exists; §Walking Skeleton covers every stage of primary VS; §Phase Plan has one goal per phase expressed as VS streams operational; every epic has a value statement; ★ functionalities each anchor their own epic; sizing within 5–25 FBS rows per epic; E-NN IDs in pain-index order.
 
 ### Step 9 — Quality Attributes (how well the system performs)
 
 **Skill:** `spec-quality-attributes`
 **Prerequisites:** Step 7 (FBS differentiators ★ drive Reliability targets); Step 8 (epic scope clarifies which QA entries apply to which delivery cluster); relevant ADRs (Security, Flexibility, Maintainability QAs reference ADR decisions); Step 1 (Personas ground IC and PE entries); Steps 3–4 (VS pain index prioritises PE entries).
 **Process:**
-- Mode `scaffold` → create `docs/product-specs/09-quality-attributes.md` with ISO/IEC 25010:2023 characteristic sections
+- Mode `scaffold` → create `docs/product-specs/09a-quality-attributes.md` with ISO/IEC 25010:2023 characteristic sections
 - Mode `fill` → one entry per sub-characteristic × product scope; measurable acceptance criterion + verification method; persona-grounded for IC and PE; reference ADR IDs for Security/Flexibility/Maintainability decisions
 **Output verification:** file exists; ≥1 entry per relevant ISO characteristic; all entries have measurable acceptance criteria; IC/PE entries reference P-NN personas; differentiator FBS features (★) have Reliability entries.
 

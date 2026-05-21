@@ -190,11 +190,11 @@ Ask 2–4 questions max in a single message.
 
 | Research output | Soft-links to / updates |
 |---|---|
-| Interview script for P-NN | `docs/business/01-personas.md#p-nn` — listed as hypothesis target |
-| Synthesis (BMC validation) | `docs/business/02-bmc.md` blocks — confidence ratings updated |
+| Interview script for P-NN | `docs/business/01a-personas.md#p-nn` — listed as hypothesis target |
+| Synthesis (BMC validation) | `docs/business/02a-bmc.md` blocks — confidence ratings updated |
 | Synthesis (competitive landscape) | `docs/business/competitive-landscape/competitor-{slug}.md` — claims gain `Last verified` + Source URL |
-| Synthesis (persona refinement) | `docs/business/01-personas.md` — proto → research-grounded transition; specific fields updated |
-| Synthesis (model recalibration) | `docs/business/models/{slug}.md` — input assumptions recalibrated; bands narrowed |
+| Synthesis (persona refinement) | `docs/business/01a-personas.md` — proto → research-grounded transition; specific fields updated |
+| Synthesis (model recalibration) | `docs/business/06a-models/{slug}.md` — input assumptions recalibrated; bands narrowed |
 
 **Mechanical traceability:** every synthesis names which artefact + which section + which claim ID gets updated. This closes the build-measure-learn loop for the design skills.
 

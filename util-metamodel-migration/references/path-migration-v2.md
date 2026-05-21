@@ -14,20 +14,23 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 
 | Context | Pattern | Example |
 |---|---|---|
-| Singleton business artefact | `docs/business/NN-{slug}.md` | `docs/business/01-personas.md` |
-| Fractional-step artefact | `docs/business/NNb-{slug}.md` | `docs/business/04b-objectives.md` |
-| BMC / VS companion VPC | `docs/business/NN-vpc-{segment}.md` | `docs/business/02-vpc-enterprise.md` |
-| Domain singleton | `docs/domain/{slug}.md` | `docs/domain/glossary.md` |
+| Primary singleton (business / spec) | `docs/{layer}/NNa-{slug}.md` | `docs/business/01a-personas.md` · `docs/product-specs/07a-fbs.md` |
+| Fractional / sub-step artefact | `docs/{layer}/NNb-{slug}.md` · `NNc-{slug}.md` ... | `docs/business/04b-objectives.md` · `docs/domain/02c-glossary.md` |
+| BMC / VS companion VPC | `docs/business/NNa-vpc-{segment}.md` | `docs/business/02a-vpc-enterprise.md` |
+| Domain singleton (sub-step) | `docs/domain/NNX-{slug}.md` | `docs/domain/02b-bounded-contexts.md` · `docs/domain/02c-glossary.md` |
 | Domain model (per BC) | `docs/domain/models/{bc-slug}.md` | `docs/domain/models/scheduling.md` |
-| Singleton spec artefact | `docs/product-specs/NN-{slug}.md` | `docs/product-specs/07-fbs.md` |
-| Multi-file artefact (slug) | unchanged | `docs/business/processes/{slug}-process.md` |
+| Multi-file artefact folder (step-scoped) | `docs/business/NNa-{slug}/` | `docs/business/06a-models/{slug}.md` |
+| Multi-file artefact (slug, no step prefix) | unchanged | `docs/business/processes/{slug}-process.md` |
 | Numbered multi-file artefact | unchanged | `docs/product-specs/{NNNN}_prd_{feature}.md` |
 
 **Rules:**
-- Step numbers zero-pad to 2 digits: `01`, `02`, `03`, `04`, `07`, `08`, `09`
-- Fractional steps use letter suffix: `04b` (not `04.5`)
-- Domain singletons have NO step prefix — they belong to the domain layer, not the business build sequence
-- `docs/VISION.md` stays at root regardless of numbering — agent context visibility takes priority
+- Step numbers zero-pad to 2 digits **plus a letter** to identify ordering: `01a`, `02a`, `03a`, `04a`, `07a`, `08a`, `09a` (primary singleton at each step).
+- The `a` letter is **explicit, not implicit** — `01a-personas.md` (primary), `01b-…` (secondary at the same step), `01c-…` (tertiary), etc. This avoids visual ambiguity where bare `01-` would silently mean "step 1 primary" alongside other `01b-` siblings.
+- **Fractional / sub-step artefacts** use letter increments: `04b` (between Step 4 and Step 5), `02b` / `02c` (Bounded Contexts and Glossary as sub-steps of Step 2's Capability-Map area).
+- **Domain singletons keep the step-letter prefix** (e.g. `02b-bounded-contexts.md`, `02c-glossary.md`). Sub-step letters are the discriminator that distinguishes them from primary singletons at the same parent step.
+- **Multi-file artefact folders** use the step-letter prefix on the FOLDER (e.g. `06a-models/`), and the files inside follow the originating skill's own naming (funnel `1a-`, `1b-`, `2a-` for quantitative models — no step collision because the parent folder scopes them).
+- **Domain model files** (`docs/domain/models/{bc-slug}.md`) skip the step prefix — the `bc-slug` itself is the scoping discriminator; adding `07b-` to every file would be redundant.
+- `docs/VISION.md` stays at root regardless of numbering — agent context visibility takes priority over filesystem ordering.
 
 ---
 
@@ -36,23 +39,23 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | Step | Artefact | v1 path (old) | v2 path (new) | Type |
 |---|---|---|---|---|
 | 0 | Product Vision | `docs/VISION.md` | `docs/VISION.md` | no-change |
-| 1 | Personas | `docs/business/personas/personas.md` | `docs/business/01-personas.md` | singleton |
-| 2 | Business Model Canvas | `docs/business/business-model-canvas/business-model-canvas.md` | `docs/business/02-bmc.md` | singleton |
-| 2 | Lean Canvas (variant) | `docs/business/business-model-canvas/lean-canvas.md` | `docs/business/02-lean-canvas.md` | singleton |
-| 2 | BMC Value Proposition Canvas | `docs/business/business-model-canvas/value-proposition-canvas-{segment}.md` | `docs/business/02-vpc-{segment}.md` | multi-slug |
+| 1 | Personas | `docs/business/personas/personas.md` | `docs/business/01a-personas.md` | singleton |
+| 2 | Business Model Canvas | `docs/business/business-model-canvas/business-model-canvas.md` | `docs/business/02a-bmc.md` | singleton |
+| 2 | Lean Canvas (variant) | `docs/business/business-model-canvas/lean-canvas.md` | `docs/business/02a-lean-canvas.md` | singleton |
+| 2 | BMC Value Proposition Canvas | `docs/business/business-model-canvas/value-proposition-canvas-{segment}.md` | `docs/business/02a-vpc-{segment}.md` | multi-slug |
 | 2b | Bounded Contexts | `docs/domain/bounded-contexts/bounded-contexts.md` | `docs/domain/bounded-contexts.md` | singleton |
 | 2b | Context Map | `docs/domain/bounded-contexts/context-map.md` | `docs/domain/context-map.md` | singleton |
 | 2c | Domain Glossary | `docs/domain/glossary/glossary.md` | `docs/domain/glossary.md` | singleton |
-| 3 | Capability Map | `docs/business/capability-map/capability-map.md` | `docs/business/03-capability-map.md` | singleton |
-| 4 | Value Streams | `docs/business/value-streams/value-streams.md` | `docs/business/04-value-streams.md` | singleton |
-| 4 | VS Value Proposition Canvas | `docs/business/value-streams/value-proposition-canvas-{segment}.md` | `docs/business/04-vpc-{segment}.md` | multi-slug |
+| 3 | Capability Map | `docs/business/capability-map/capability-map.md` | `docs/business/03a-capability-map.md` | singleton |
+| 4 | Value Streams | `docs/business/value-streams/value-streams.md` | `docs/business/04a-value-streams.md` | singleton |
+| 4 | VS Value Proposition Canvas | `docs/business/value-streams/value-proposition-canvas-{segment}.md` | `docs/business/04a-vpc-{segment}.md` | multi-slug |
 | 4b | Business Objectives | `docs/business/objectives/objectives.md` | `docs/business/04b-objectives.md` | singleton |
 | 5 | Business Processes | `docs/business/processes/{slug}-process.md` | `docs/business/processes/{slug}-process.md` | no-change |
-| 6 | Quantitative Models | `docs/business/models/{slug}.md` | `docs/business/models/{slug}.md` | no-change |
-| 7 | FBS | `docs/product-specs/functional-breakdown-structure/FBS.md` | `docs/product-specs/07-fbs.md` | singleton |
+| 6 | Quantitative Models | `docs/business/06a-models/{slug}.md` | `docs/business/06a-models/{slug}.md` | no-change |
+| 7 | FBS | `docs/product-specs/functional-breakdown-structure/FBS.md` | `docs/product-specs/07a-fbs.md` | singleton |
 | 7b | Domain Model (per BC) | `docs/domain/{bc-slug}/domain-model.md` | `docs/domain/models/{bc-slug}.md` | multi-slug |
-| 8 | Delivery Roadmap | `docs/product-specs/delivery-roadmap/delivery-roadmap.md` | `docs/product-specs/08-delivery-roadmap.md` | singleton |
-| 9 | Quality Attributes | `docs/product-specs/quality-attributes/quality-attributes.md` | `docs/product-specs/09-quality-attributes.md` | singleton |
+| 8 | Delivery Roadmap | `docs/product-specs/delivery-roadmap/delivery-roadmap.md` | `docs/product-specs/08a-delivery-roadmap.md` | singleton |
+| 9 | Quality Attributes | `docs/product-specs/quality-attributes/quality-attributes.md` | `docs/product-specs/09a-quality-attributes.md` | singleton |
 | 10 | PRDs | `docs/product-specs/{NNNN}_prd_{feature}.md` | `docs/product-specs/{NNNN}_prd_{feature}.md` | no-change |
 | 11 | Implementation Plans | `docs/exec-plans/active/{NNNN}_{slug}/` | `docs/exec-plans/active/{NNNN}_{slug}/` | no-change |
 | — | ADRs | `docs/architecture/decisions/{NNNN}-{slug}.md` | `docs/architecture/decisions/{NNNN}-{slug}.md` | no-change |
@@ -88,8 +91,8 @@ new_rel = os.path.relpath(F_new_abs, os.path.dirname(L_abs))
 ```
 
 Depth change examples:
-- `docs/business/personas/personas.md` (depth 3) → `docs/business/01-personas.md` (depth 2)
-  - A link from `docs/product-specs/07-fbs.md` was `../business/personas/personas.md`
+- `docs/business/personas/personas.md` (depth 3) → `docs/business/01a-personas.md` (depth 2)
+  - A link from `docs/product-specs/07a-fbs.md` was `../business/personas/personas.md`
   - After move: `../business/01-personas.md` (loses one `../`)
 - `docs/domain/glossary/glossary.md` (depth 3) → `docs/domain/glossary.md` (depth 2)
   - A link from `docs/domain/models/scheduling.md` was `../glossary/glossary.md`
