@@ -100,7 +100,7 @@ When running Mode 3 (Align), apply these checks in order:
 > Action: either add an epic to the delivery roadmap, or explicitly note that the objective will not be pursued in this cycle (add a "Status: deferred — no epic planned" note to the OBJ-NN block).
 
 **KR grounding a QA:**
-> When a KR states a measurable threshold (e.g., "response time < 500ms", "error rate < 0.1%"), check whether a corresponding `QA-XXNN` entry exists in `docs/product-specs/quality-attributes/quality-attributes.md`.
+> When a KR states a measurable threshold (e.g., "response time < 500ms", "error rate < 0.1%"), check whether a corresponding `QA-XXNN` entry exists in `docs/product-specs/09a-quality-attributes.md`.
 > If not, flag: "KR-NN.M target could ground a QA-PE or QA-RE entry — consider running `spec-quality-attributes` Mode 3 (Update)."
 
 **PRD traceability:**

@@ -194,7 +194,7 @@ write the headline finding in 1 sentence within 24h MAX.
 When the synthesis updates upstream artefacts, **cite the specific section**, not just the file:
 
 ❌ "Update personas.md"
-✅ "Update `docs/business/personas/personas.md` §P-02 → Frustrations item 3: change from 'Assumed: manual reconciliation is slow' to 'Tested: manual reconciliation takes 12h/week per analyst (Interview Marc, 2026-05-23)'"
+✅ "Update `docs/business/01a-personas.md` §P-02 → Frustrations item 3: change from 'Assumed: manual reconciliation is slow' to 'Tested: manual reconciliation takes 12h/week per analyst (Interview Marc, 2026-05-23)'"
 
 The next maintainer should be able to apply the update without
 re-reading the interview.

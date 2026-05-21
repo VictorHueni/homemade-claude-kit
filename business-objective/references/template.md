@@ -11,10 +11,10 @@
 **Timeframe:** {{period}} (e.g. Annual 2026 / Q3 2026 / Initiative: {{initiative-name}})
 **Owner:** {{role responsible for this objectives doc}}
 **Companion docs:**
-[BMC](../business-model-canvas/business-model-canvas.md) ·
-[Value Streams](../value-streams/value-streams.md) ·
-[Personas](../personas/personas.md) ·
-[Delivery Roadmap](../../product-specs/delivery-roadmap/delivery-roadmap.md)
+[BMC](../02a-bmc.md) ·
+[Value Streams](../04a-value-streams.md) ·
+[Personas](../01a-personas.md) ·
+[Delivery Roadmap](../../product-specs/08a-delivery-roadmap.md)
 
 ---
 
@@ -36,7 +36,7 @@
 **Timeframe:** {{period}}
 **Owner:** {{role}}
 **Why it matters:** {{1 sentence connecting to VP-NN from BMC, or to VS-N.M pain index — e.g. "VS-2 (Generate Schedule) is rated Critical pain — reducing this cycle time is the single biggest lever on coordinator retention."}}
-**Linked from:** _TODO_ *(VP-NN · [Value Proposition name](../business-model-canvas/business-model-canvas.md) · VS-N.M — pain index X/5)*
+**Linked from:** _TODO_ *(VP-NN · [Value Proposition name](../02a-bmc.md) · VS-N.M — pain index X/5)*
 
 | ID | Key Result | Baseline | Target | Measurement method | Confidence |
 |---|---|---|---|---|---|

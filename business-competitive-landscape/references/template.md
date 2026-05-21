@@ -29,9 +29,9 @@ companion files in this folder carry the per-competitor deep-dive
 - Tier-1 (Direct) competitors get their own `competitor-{slug}.md` file. Tier-2/3/4 stay in tables below.
 
 **Companion documents:**
-- Personas: [link to ../personas/personas.md if exists]
-- Business Capability Map: [link to ../capability-map/capability-map.md if exists]
-- Business Model Canvas: [link to ../business-model-canvas/business-model-canvas.md if exists]
+- Personas: [link to ../01a-personas.md if exists]
+- Business Capability Map: [link to ../03a-capability-map.md if exists]
+- Business Model Canvas: [link to ../02a-bmc.md if exists]
 - Quantitative models: [link to ../models/ if exists]
 
 ---

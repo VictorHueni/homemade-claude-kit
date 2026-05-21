@@ -43,12 +43,12 @@ This document catalogues the bounded contexts for {{product}}: the named islands
 **Rationale:** [One sentence: why this classification? E.g., "Core — this is where the business's pricing intelligence lives; no competitor replicates it the same way."]
 
 **Capabilities owned:**
-- [C-N.M](../../business/capability-map/capability-map.md#cNM) — [Capability name]
-- [C-N.M](../../business/capability-map/capability-map.md#cNM) — [Capability name]
+- [C-N.M](../../business/03a-capability-map.md#cNM) — [Capability name]
+- [C-N.M](../../business/03a-capability-map.md#cNM) — [Capability name]
 - _(Each capability appears in exactly one BC. No shared ownership.)_
 
 **Ubiquitous language scope:**
-- *[Term]* means [precise definition within this context] → see [glossary.md#bc-01](../glossary/glossary.md#bc-01)
+- *[Term]* means [precise definition within this context] → see [02c-glossary.md#bc-01](02c-glossary.md#bc-01)
 - _(List the 2–5 most important terms whose definition is specific to this context. Cross-context homonyms are especially important to call out.)_
 
 **Canonical data owned:**

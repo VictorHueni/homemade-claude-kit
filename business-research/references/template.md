@@ -218,11 +218,11 @@ Within 1 hour after the interview, fill this in. **Don't rely on memory beyond 2
 
 ### Personas — P-NN
 - [What changed about the persona from this interview]
-- File update needed at: `docs/business/personas/personas.md` (specify section)
+- File update needed at: `docs/business/01a-personas.md` (specify section)
 
 ### BMC — block X
 - [Confidence promotion from Assumed → Tested]
-- File update needed at: `docs/business/business-model-canvas/business-model-canvas.md` (specify block)
+- File update needed at: `docs/business/02a-bmc.md` (specify block)
 
 ### Models — model slug
 - [Input assumption recalibration: from ___ to ___]

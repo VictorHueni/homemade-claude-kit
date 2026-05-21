@@ -272,19 +272,19 @@ When the corresponding BA artefact exists, the canvas links to it:
 
 | Canvas block | Soft-link target | Format |
 |---|---|---|
-| Customer Segments | Personas | `[P-NN persona-name](../personas/personas.md#p-nn)` |
-| Value Propositions | Value streams + VPCs | `[VS-N stream-name](../value-streams/value-streams.md#vs-n)` + `[VPC for CS-1](value-proposition-canvas-cs-1.md)` |
-| Channels | Value-stream stages | `[VS-N.M stage-name](../value-streams/value-streams.md#vs-nm)` |
+| Customer Segments | Personas | `[P-NN persona-name](../01a-personas.md#p-nn)` |
+| Value Propositions | Value streams + VPCs | `[VS-N stream-name](../04a-value-streams.md#vs-n)` + `[VPC for CS-1](value-proposition-canvas-cs-1.md)` |
+| Channels | Value-stream stages | `[VS-N.M stage-name](../04a-value-streams.md#vs-nm)` |
 | Customer Relationships *(BMC)* | Support / engagement processes | `[Process](../processes/process-name.md)` |
 | Key Activities *(BMC)* | Processes | `[Process](../processes/process-name.md)` |
-| Key Resources *(BMC)* | Capabilities | `[C-N.M capability-name](../capability-map/capability-map.md#c-nm)` |
+| Key Resources *(BMC)* | Capabilities | `[C-N.M capability-name](../03a-capability-map.md#c-nm)` |
 | Key Partnerships *(BMC)* | (no standard artefact — link to vendor / contract docs if exist) | (free-form) |
 | Revenue Streams | Quantitative models | `[TAM/SAM/SOM](../models/...)` |
 | Cost Structure | Cost / unit-economics models | `[Cost model](../models/...)` |
-| Problem *(Lean)* | Persona pains + VPC | `[Persona pain](../personas/personas.md#p-nn) + [VPC pain](value-proposition-canvas-cs-1.md#pains)` |
-| Solution *(Lean)* | FBS functionalities | `[FBS C1.1.F01](../../product-specs/functional-breakdown-structure/FBS.md#c11f01)` |
+| Problem *(Lean)* | Persona pains + VPC | `[Persona pain](../01a-personas.md#p-nn) + [VPC pain](value-proposition-canvas-cs-1.md#pains)` |
+| Solution *(Lean)* | FBS functionalities | `[FBS C1.1.F01](../../product-specs/07a-fbs.md#c11f01)` |
 | Key Metrics *(Lean)* | Quantitative models | `[Metrics model](../models/...)` |
-| Unfair Advantage *(Lean)* | Differentiator-rated capabilities | `[C-N.M (Differentiator)](../capability-map/capability-map.md#c-nm)` |
+| Unfair Advantage *(Lean)* | Differentiator-rated capabilities | `[C-N.M (Differentiator)](../03a-capability-map.md#c-nm)` |
 
 Use these formats consistently so cross-doc traceability is mechanical.
 

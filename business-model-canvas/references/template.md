@@ -26,9 +26,9 @@ logic.
 - Each block carries a **confidence rating** — default `Assumed`; promote with evidence.
 
 **Companion documents:**
-- Personas: [link to ../personas/personas.md if exists]
-- Business Capability Map: [link to ../capability-map/capability-map.md if exists]
-- Value Streams: [link to ../value-streams/value-streams.md if exists]
+- Personas: [link to ../01a-personas.md if exists]
+- Business Capability Map: [link to ../03a-capability-map.md if exists]
+- Value Streams: [link to ../04a-value-streams.md if exists]
 - Business Processes: [link to ../processes/ if exists]
 - Quantitative models: [link to ../models/ if exists]
 - Value Proposition Canvases: [list of `value-proposition-canvas-{segment}.md` files in this folder]
@@ -61,7 +61,7 @@ Format each bullet as: "[role/firmographic] who [trigger/situation] AND
 - **CS-2** — _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Personas P-NN](../personas/personas.md#p-nn) (where defined)
+**Soft-links:** [Personas P-NN](../01a-personas.md#p-nn) (where defined)
 
 ---
 
@@ -77,7 +77,7 @@ can Y" — the Y is the value.*
 - **VP-2** for [CS-2] — _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Value streams VS-N](../value-streams/value-streams.md#vs-n) · [VPC drill-downs](#value-proposition-deep-dives) (where created)
+**Soft-links:** [Value streams VS-N](../04a-value-streams.md#vs-n) · [VPC drill-downs](#value-proposition-deep-dives) (where created)
 
 ---
 
@@ -92,7 +92,7 @@ cost-efficient? How are we integrating them with customer routines?*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Value-stream stages VS-N.M](../value-streams/value-streams.md) (customer-facing stages) · [Processes](../processes/)
+**Soft-links:** [Value-stream stages VS-N.M](../04a-value-streams.md) (customer-facing stages) · [Processes](../processes/)
 
 ---
 
@@ -127,7 +127,7 @@ unfair advantage today, that's fine — note it and keep building one".*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Differentiator-rated capabilities in BC Map](../capability-map/capability-map.md) (where applicable)
+**Soft-links:** [Differentiator-rated capabilities in BC Map](../03a-capability-map.md) (where applicable)
 
 ---
 
@@ -159,7 +159,7 @@ channels? Customer relationships? Revenue streams? Physical / intellectual
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Capabilities C-N.M](../capability-map/capability-map.md) — especially Differentiator-rated
+**Soft-links:** [Capabilities C-N.M](../03a-capability-map.md) — especially Differentiator-rated
 
 ---
 
@@ -193,7 +193,7 @@ value proposition.*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Business processes](../processes/) · [Capabilities](../capability-map/capability-map.md)
+**Soft-links:** [Business processes](../processes/) · [Capabilities](../03a-capability-map.md)
 
 ---
 
@@ -209,7 +209,7 @@ or capabilities that solve each problem. Resist over-engineering.*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [FBS functionalities](../../product-specs/functional-breakdown-structure/FBS.md) that realise the solution
+**Soft-links:** [FBS functionalities](../../product-specs/07a-fbs.md) that realise the solution
 
 ---
 
@@ -247,7 +247,7 @@ Generic statements like "slow processes" don't count.*
 - [What customers do today to solve these problems — e.g. "Excel macros + email + intern labour"]
 
 **Confidence:** Assumed
-**Soft-links:** [Persona frustrations / pains](../personas/personas.md) · [VPC pain detail](#value-proposition-deep-dives)
+**Soft-links:** [Persona frustrations / pains](../01a-personas.md) · [VPC pain detail](#value-proposition-deep-dives)
 
 ---
 

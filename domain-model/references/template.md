@@ -2,9 +2,9 @@
 
 # Domain Model — {BC-NN Name}
 
-**Bounded context:** [BC-NN {Name}](../../bounded-contexts/bounded-contexts.md#bc-nn)
+**Bounded context:** [BC-NN {Name}](../02b-bounded-contexts.md#bc-nn)
 **Subdomain type:** Core | Supporting | Generic
-**Ubiquitous language:** [Glossary — {BC Name}](../../glossary/glossary.md#bc-nn)
+**Ubiquitous language:** [Glossary — {BC Name}](../02c-glossary.md#bc-nn)
 
 > "An aggregate is a cluster of associated objects that we treat as a unit for the purpose of data changes. Each aggregate has a root and a boundary." — Evans, *Domain-Driven Design* (2003), Chapter 8
 

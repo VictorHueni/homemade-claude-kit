@@ -10,9 +10,9 @@
 **For:** {{one-line audience — e.g. "OR coordinators and surgical department heads in Swiss hospitals"}}
 **North Star:** {{metric name — e.g. "coordinator-hours saved per week per active clinic"}}
 **Companion docs:**
-[Objectives](docs/business/objectives/objectives.md) ·
-[BMC](docs/business/business-model-canvas/business-model-canvas.md) ·
-[Personas](docs/business/personas/personas.md)
+[Objectives](docs/business/04b-objectives.md) ·
+[BMC](docs/business/02a-bmc.md) ·
+[Personas](docs/business/01a-personas.md)
 
 ---
 
@@ -54,7 +54,7 @@ _TODO_ *(1–2 sentences. Aspirational future state. What does the world look li
 
 This is the single directional indicator that tells us the product is delivering real value over time.
 
-It is NOT a quarterly target — those live in [Business Objectives](docs/business/objectives/objectives.md) as `KR-NN.M`. The North Star is timeless and directional; Key Results are time-bound steps toward it. If this metric has a baseline and a target date, it is a KR — move it.
+It is NOT a quarterly target — those live in [Business Objectives](docs/business/04b-objectives.md) as `KR-NN.M`. The North Star is timeless and directional; Key Results are time-bound steps toward it. If this metric has a baseline and a target date, it is a KR — move it.
 
 ---
 
@@ -62,9 +62,9 @@ It is NOT a quarterly target — those live in [Business Objectives](docs/busine
 
 | Artefact | Relationship |
 |---|---|
-| [Business Objectives](docs/business/objectives/objectives.md) | `OBJ-NN` objectives are the measurable annual/quarterly steps toward this vision |
-| [BMC Value Propositions](docs/business/business-model-canvas/business-model-canvas.md) | `VP-NN` blocks are the commercial expression of this vision per customer segment |
-| [Personas](docs/business/personas/personas.md) | `P-NN` personas are the specific audience this vision serves |
+| [Business Objectives](docs/business/04b-objectives.md) | `OBJ-NN` objectives are the measurable annual/quarterly steps toward this vision |
+| [BMC Value Propositions](docs/business/02a-bmc.md) | `VP-NN` blocks are the commercial expression of this vision per customer segment |
+| [Personas](docs/business/01a-personas.md) | `P-NN` personas are the specific audience this vision serves |
 
 ---
 

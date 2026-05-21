@@ -117,10 +117,10 @@ per legal entity."]
 [Skip this field if the project isn't ready to assess maturity honestly.]
 
 **Soft-links:**
-- *Personas served:* [P-xx](../personas/personas.md#p-xx-name), [P-yy]
-- *Value streams enabled:* [VS-x](../value-streams/value-streams.md#vs-x)
+- *Personas served:* [P-xx](../01a-personas.md#p-xx-name), [P-yy]
+- *Value streams enabled:* [VS-x](../04a-value-streams.md#vs-x)
 - *Operationalised by processes:* [process-name](../../business/processes/process-name.md)
-- *FBS row:* [C1.1 in FBS](../../product-specs/functional-breakdown-structure/FBS.md#c11)
+- *FBS row:* [C1.1 in FBS](../../product-specs/07a-fbs.md#c11)
 
 ---
 

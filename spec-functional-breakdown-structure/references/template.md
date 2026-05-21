@@ -5,7 +5,7 @@
 This document is the functionality registry for {{product_or_scope}}: a
 canonical, status-tracked enumeration of what the product does, organised
 by the capabilities defined in the [Business Capability
-Map](../../business/capability-map/capability-map.md). Each capability
+Map](../../business/03a-capability-map.md). Each capability
 groups the functionalities that realise it; each functionality has a
 stable ID, a status (✅ Shipped / 🔄 Planned / ⬜ Backlog), and optional
 soft-links to value-stream stages.
@@ -27,9 +27,9 @@ soft-links to value-stream stages.
 - FBS does NOT contain operational metrics / cycle times — see process docs.
 
 **Companion documents:**
-- Business Capability Map: [link to ../../business/capability-map/capability-map.md if exists]
-- Personas: [link to ../../business/personas/personas.md if exists]
-- Value Streams: [link to ../../business/value-streams/value-streams.md if exists]
+- Business Capability Map: [link to ../../business/03a-capability-map.md if exists]
+- Personas: [link to ../../business/01a-personas.md if exists]
+- Value Streams: [link to ../../business/04a-value-streams.md if exists]
 - Business Processes: [link to ../../business/processes/ if exists]
 - PRDs: [link to ../ if exists]
 
@@ -93,7 +93,7 @@ Should mirror the BC Map's L0 description.*
 **Do NOT restate the BC Map definition.** Link to the BC Map row for the full
 definition.*
 
-**BC Map:** [C1.1 in capability-map.md](../../business/capability-map/capability-map.md#c11)
+**BC Map:** [C1.1 in capability-map.md](../../business/03a-capability-map.md#c11)
 **Backend:** [paths or `_TODO_`]
 **Frontend:** [paths or `_TODO_`]
 
@@ -108,7 +108,7 @@ definition.*
 
 *One-line capability summary.*
 
-**BC Map:** [C1.2 in capability-map.md](../../business/capability-map/capability-map.md#c12)
+**BC Map:** [C1.2 in capability-map.md](../../business/03a-capability-map.md#c12)
 **Backend:** _TODO_
 **Frontend:** _TODO_
 
@@ -126,7 +126,7 @@ definition.*
 
 *One-line capability summary.*
 
-**BC Map:** [C2.1 in capability-map.md](../../business/capability-map/capability-map.md#c21)
+**BC Map:** [C2.1 in capability-map.md](../../business/03a-capability-map.md#c21)
 **Backend:** _TODO_
 **Frontend:** _TODO_
 
