@@ -1,0 +1,53 @@
+name: docs-lint
+
+on:
+  push:
+    paths:
+      - "docs/**"
+  pull_request:
+    paths:
+      - "docs/**"
+
+concurrency:
+  group: docs-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: Markdown format (dprint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dprint/check@v2.2
+
+  prose:
+    name: Prose (Vale + Microsoft)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync glossary alias rules
+        run: |
+          if [ -f scripts/sync_glossary_rules.py ] && [ -f docs/domain/glossary.md ]; then
+            python3 scripts/sync_glossary_rules.py
+          fi
+      - uses: errata-ai/vale-action@reviewdog/v2
+        with:
+          files: docs/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  links:
+    name: Link check (markdown-link-check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: "yes"
+          use-verbose-mode: "yes"
+          config-file: ".mlc-config.json"
+          folder-path: "docs/"
