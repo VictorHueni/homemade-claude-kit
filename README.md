@@ -227,7 +227,7 @@ erDiagram
 | `business-` | `business-persona` | `docs/business/01a-personas.md` | `P-NN` |
 | `business-` | `business-capability-map` | `docs/business/03a-capability-map.md` | `C-N.M` |
 | `business-` | `business-value-stream` | `docs/business/04a-value-streams.md` | `VS-N` · `VS-N.M` |
-| `business-` | `business-process` | `docs/business/processes/{slug}-process.md` | slug |
+| `business-` | `business-process` | `docs/business/05a-processes/proc-NN-{slug}.md` | slug |
 | `business-` | `business-model-canvas` | `docs/business/02a-bmc.md` | block IDs |
 | `business-` | `business-quantitative-model` | `docs/business/06a-models/{slug}.md` | slug |
 | `business-` | `business-vision` | `docs/VISION.md` *(Step 0 — singleton, CLAUDE.md wired)* | *(path ref — no ID)* |
@@ -237,7 +237,7 @@ erDiagram
 | `business-` | `business-workshop` | `docs/business/workshops/` | — |
 | `domain-` | `domain-bounded-context` | `docs/domain/bounded-contexts.md + docs/domain/context-map.md` | `BC-NN` |
 | `domain-` | `domain-glossary` | `docs/domain/glossary.md` | `BC-NN.GT-NN` |
-| `domain-` | `domain-model` | `docs/domain/models/{bc-slug}.md` | `BC-NN.AGG-NN` · `BC-NN.EVT-NN` |
+| `domain-` | `domain-model` | `docs/domain/07b-models/{bc-slug}.md` | `BC-NN.AGG-NN` · `BC-NN.EVT-NN` |
 | `spec-` | `spec-functional-breakdown-structure` | `docs/product-specs/07a-fbs.md` | `C-N.M.FXX` |
 | `spec-` | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap.md` | `E-NN` |
 | `spec-` | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-XXNN` |

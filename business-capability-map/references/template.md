@@ -22,7 +22,7 @@ ID.
 - Personas: [link to personas.md if exists]
 - FBS: [link to functional-breakdown-structure if exists]
 - Value streams / journeys: [link if exists]
-- Processes: [link to docs/business/processes/ if exists]
+- Processes: [link to docs/business/05a-processes/ if exists]
 
 ---
 

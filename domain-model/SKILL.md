@@ -1,6 +1,6 @@
 ---
 name: domain-model
-description: "Create a tactical DDD domain model per bounded context — entities (identity + lifecycle + behaviour), value objects (immutable, equality by value), aggregates (consistency boundary + invariants + root), and domain events (past-tense business facts). Synthesises Evans Domain-Driven Design (2003) Chapters 5–8 + Vernon Implementing DDD (2013) Chapters 5–6 + Vernon DDD Distilled (2016) Chapter 5 + Fowler anemic domain model anti-pattern. Use when asked to define the domain model, document entities and aggregates, define domain events, model the business objects, or implement tactical DDD. Triggers on: domain model, aggregate, entity, value object, domain event, tactical DDD, aggregate root, invariants, domain objects, DDD model, entity model, bounded context model. Output: docs/domain/models/{bc-slug}.md (one file per bounded context). Reads BC-NN from domain-bounded-context; reads GT-NN from domain-glossary; reads C-N.M.FXX from FBS."
+description: "Create a tactical DDD domain model per bounded context — entities (identity + lifecycle + behaviour), value objects (immutable, equality by value), aggregates (consistency boundary + invariants + root), and domain events (past-tense business facts). Synthesises Evans Domain-Driven Design (2003) Chapters 5–8 + Vernon Implementing DDD (2013) Chapters 5–6 + Vernon DDD Distilled (2016) Chapter 5 + Fowler anemic domain model anti-pattern. Use when asked to define the domain model, document entities and aggregates, define domain events, model the business objects, or implement tactical DDD. Triggers on: domain model, aggregate, entity, value object, domain event, tactical DDD, aggregate root, invariants, domain objects, DDD model, entity model, bounded context model. Output: docs/domain/07b-models/{bc-slug}.md (one file per bounded context). Reads BC-NN from domain-bounded-context; reads GT-NN from domain-glossary; reads C-N.M.FXX from FBS."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -12,7 +12,7 @@ metadata:
 
 # Domain Model Builder
 
-Expert at producing tactical DDD domain models — the technical expression of the ubiquitous language as entities, aggregates, value objects, and domain events. Output is `docs/domain/models/{bc-slug}.md`, one file per bounded context. NOT a database schema (the model shapes the schema, not the reverse), NOT a class diagram for implementation (that lives in code), NOT an ERD — it is the **conceptual model of business objects** with identity, behaviour, consistency rules, and the events they produce when their state changes.
+Expert at producing tactical DDD domain models — the technical expression of the ubiquitous language as entities, aggregates, value objects, and domain events. Output is `docs/domain/07b-models/{bc-slug}.md`, one file per bounded context. NOT a database schema (the model shapes the schema, not the reverse), NOT a class diagram for implementation (that lives in code), NOT an ERD — it is the **conceptual model of business objects** with identity, behaviour, consistency rules, and the events they produce when their state changes.
 
 > "The basic symptom of an Anemic Domain Model is that at first blush it looks like the real thing. There are objects, many named after the nouns in the domain space, and these objects are connected with the rich relationships and structure that true domain models have. The catch comes when you look at the behaviour, and you realize that there is hardly any behaviour on these objects, making them little more than bags of getters and setters." — Martin Fowler, *Anemic Domain Model* (2003)
 
@@ -43,7 +43,7 @@ Create an empty `domain-model.md` for a bounded context. Seed section headings a
 
 Steps:
 1. Resolve the BC slug from the bounded-contexts.md (`docs/domain/bounded-contexts.md`).
-2. Create `docs/domain/models/{bc-slug}.md` from the template in `references/template.md`.
+2. Create `docs/domain/07b-models/{bc-slug}.md` from the template in `references/template.md`.
 3. Report: file path created, reminder to run Mode 2 (Fill) to populate.
 
 ### Mode 2 — Fill
@@ -158,7 +158,7 @@ Sourced from Evans (2003), Vernon IDDD (2013), and Fowler (2003).
 
 ## Finding the right folder
 
-Default output path: `docs/domain/models/{bc-slug}.md`
+Default output path: `docs/domain/07b-models/{bc-slug}.md`
 
 - `{bc-slug}` = kebab-case BC name from bounded-contexts.md (e.g. `claims-processing`, `policy-management`)
 - One file per bounded context
@@ -215,8 +215,8 @@ After each mode, deliver a report covering:
 
 ## Checklist
 
-- [ ] `docs/domain/models/` folder exists
-- [ ] `docs/domain/models/{bc-slug}.md` exists for the target BC
+- [ ] `docs/domain/07b-models/` folder exists
+- [ ] `docs/domain/07b-models/{bc-slug}.md` exists for the target BC
 - [ ] Aggregate catalogue table is populated (AGG-NN IDs assigned)
 - [ ] Every aggregate has exactly one named root + ≥2 documented invariants
 - [ ] Every aggregate has a consistency boundary rationale

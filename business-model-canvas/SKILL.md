@@ -33,7 +33,7 @@ The skill produces **one of two canonical variants**, chosen at scaffold time:
 | **Block emphasis** | Infrastructure + customer balance | Problem-first; everything emerges from the problem |
 | **Pick when…** | The business model is largely known; you're documenting / aligning stakeholders | The model is hypothetical; you're discovering / pivoting |
 
-**Rule:** one project, one canvas variant. Don't mix BMC and Lean blocks in the same doc. If you want both perspectives, create two separate files (e.g., `02-bmc.md` and `02-lean-canvas.md`) and cross-link.
+**Rule:** one project, one canvas variant. Don't mix BMC and Lean blocks in the same doc. If you want both perspectives, create two separate files (e.g., `02a-bmc.md` and `02a-lean-canvas.md`) and cross-link.
 
 The skill asks the user to choose at scaffold. Default suggestion: **BMC for established products, Lean Canvas for early-stage projects** — but the user picks.
 
@@ -103,7 +103,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 | **Scope name** | "What product / business / venture is this canvas for?" — used for `{{product_or_scope}}` substitution |
 
 **Output:** ONE file (or two if timeframe = Both) in `docs/business/` (or project-chosen folder):
-- `02-bmc.md` (BMC) or `02-lean-canvas.md` (Lean Canvas) — hub document with intro, kit-link methodology pointer, all 9 blocks scaffolded with `_TODO_` placeholders + confidence ratings + soft-link slots pre-populated where artefacts exist.
+- `02a-bmc.md` (BMC) or `02a-lean-canvas.md` (Lean Canvas) — hub document with intro, kit-link methodology pointer, all 9 blocks scaffolded with `_TODO_` placeholders + confidence ratings + soft-link slots pre-populated where artefacts exist.
 - If timeframe = Both: also create `business-model-canvas-future.md` (or `lean-canvas-future.md`) and cross-link the two files in each header.
 
 Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{variant}}` placeholders. Do NOT invent block content in scaffold mode.
@@ -169,7 +169,7 @@ The canvas is the commercial wrapper around the BIZBOK Business Architecture art
 | **Value Propositions** | Value Streams (`VS-N`) from `docs/business/04a-value-streams.md` + Value Proposition Canvases (one VPC per segment) |
 | **Channels** | Specific value-stream stages (`VS-N.M`) and process docs |
 | **Customer Relationships** | Value-stream stages and process docs (especially support / engagement processes) |
-| **Key Activities** | Business Processes from `docs/business/processes/` |
+| **Key Activities** | Business Processes from `docs/business/05a-processes/` |
 | **Key Resources** | Business Capabilities (`C-N.M`) from `docs/business/03a-capability-map.md` |
 | **Key Partnerships** | (No standard artefact — could link to vendor / contract docs if they exist) |
 | **Revenue Streams** | Quantitative models from `docs/business/06a-models/` (e.g., TAM/SAM/SOM, savings) |

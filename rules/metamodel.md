@@ -29,11 +29,11 @@ what order, and where to put it**.
 | 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/glossary.md` | `BC-NN.GT-NN` |
 | 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/04a-value-streams.md` + `docs/business/04a-vpc-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
 | 4.5 | **Business Objectives** (why — strategic intent) | `business-objective` | `docs/business/04b-objectives.md` | `OBJ-NN`, `KR-NN.M` |
-| 4 | **Business Processes** (operational how) | `business-process` | `docs/business/processes/{slug}-process.md` (one file per process) | per-process slug |
+| 4 | **Business Processes** (operational how) | `business-process` | `docs/business/05a-processes/proc-NN-{slug}.md` (one file per process) | per-process slug |
 | 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/02a-bmc.md` or `docs/business/02a-lean-canvas.md` + optional `docs/business/02a-vpc-{segment}.md` | block IDs (CS-N, VP-N, …) |
 | 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/06a-models/{slug}.md` | per-model slug |
 | 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/07a-fbs.md` | `C-N.M.FXX` (capability + functionality counter) |
-| 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/models/{bc-slug}.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
+| 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/07b-models/{bc-slug}.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
 | 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/[NNNN]_prd_[feature].md` | `PRD-NNNN` |
@@ -363,7 +363,7 @@ moving on.
 **Prerequisites:** Step 4 (processes operationalise value-stream stages — but processes can also exist independently for non-customer-facing operations).
 **Process:**
 - One process doc per major operational workflow.
-- Mode `scaffold` per process → `docs/business/processes/{slug}-process.md`
+- Mode `scaffold` per process → `docs/business/05a-processes/proc-NN-{slug}.md`
 - Fill BPMN-ready template (actors, activities, data, KPIs, decisions).
 **Output verification:** each Tier-1 value-stream stage has ≥1 process doc operationalising it.
 
@@ -391,7 +391,7 @@ moving on.
 **Skill:** `domain-model`
 **Prerequisites:** Step 2b (Bounded contexts provide BC-NN namespace); Step 2c (Glossary terms — entity names MUST match GT-NN); Step 7 (FBS — functionalities reveal candidate entities and aggregates); Step 3 (Value Stream stages — stage transitions reveal domain events).
 **Process:**
-- One `domain-model.md` per bounded context: `docs/domain/models/{bc-slug}.md`
+- One `domain-model.md` per bounded context: `docs/domain/07b-models/{bc-slug}.md`
 - Mode `fill` → per aggregate: root, invariants, lifecycle states, command→event pairs; per entity: identity, attributes, behaviour methods; per value object: attributes, equality rule, validation invariants; per domain event: trigger, payload, consumers, business significance
 - Mode `verify` → check for anemic model (entities must have behaviour); check aggregate sizing (≤5 members); check event naming (past tense + business-meaningful)
 **Output verification:** one `domain-model.md` per BC-NN; every aggregate has a named root + ≥2 documented invariants; all entity names match GT-NN glossary terms; all domain events are past tense + carry business significance; Mermaid class diagram present.
@@ -505,7 +505,7 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 
 **Cross-doc linking rule:** any artefact that references another should use the ID + name + relative path:
 
-> `[C3.2 KOGU prior-authorisation classification](../03-capability-map.md#c32)` 
+> `[C3.2 KOGU prior-authorisation classification](../03a-capability-map.md#c32)` 
 
 so that future renames (description text) don't break the link as long as the ID is stable.
 
@@ -517,11 +517,11 @@ so that future renames (description text) don't break the link as long as the ID
 docs/
 ├── VISION.md                                            ← business-vision (Step 0 — singleton, agent north star)
 ├── business/                                            ← Business Architecture artefacts (numbered = build order)
-│   ├── 01-personas.md                                   ← business-persona (P-NN)
-│   ├── 02-bmc.md  (or 02-lean-canvas.md)               ← business-model-canvas (Step 2)
+│   ├── 01a-personas.md                                   ← business-persona (P-NN)
+│   ├── 02a-bmc.md  (or 02a-lean-canvas.md)               ← business-model-canvas (Step 2)
 │   ├── 02-vpc-{segment}.md  (optional per CS)           ← BMC VPC companions
-│   ├── 03-capability-map.md                             ← business-capability-map (C-N.M)
-│   ├── 04-value-streams.md                              ← business-value-stream (VS-N.M)
+│   ├── 03a-capability-map.md                             ← business-capability-map (C-N.M)
+│   ├── 04a-value-streams.md                              ← business-value-stream (VS-N.M)
 │   ├── 04-vpc-{segment}.md  (optional per VS)           ← VS VPC companions
 │   ├── 04b-objectives.md                                ← business-objective (OBJ-NN, KR-NN.M)
 │   ├── processes/                                       ← multi-file; keep subfolder
@@ -529,9 +529,9 @@ docs/
 │   └── models/                                          ← multi-file; keep subfolder
 │       └── {slug}.md (TAM/SAM/SOM, savings, ROI per model)
 ├── product-specs/                                       ← `spec-` skills (product delivery)
-│   ├── 07-fbs.md                                        ← spec-functional-breakdown-structure (C-N.M.FXX)
-│   ├── 08-delivery-roadmap.md                           ← spec-delivery-roadmap (E-NN)
-│   ├── 09-quality-attributes.md                         ← spec-quality-attributes (QA-XXNN)
+│   ├── 07a-fbs.md                                        ← spec-functional-breakdown-structure (C-N.M.FXX)
+│   ├── 08a-delivery-roadmap.md                           ← spec-delivery-roadmap (E-NN)
+│   ├── 09a-quality-attributes.md                         ← spec-quality-attributes (QA-XXNN)
 │   └── {NNNN}_prd_{feature}.md (one per PRD)            ← spec-prd (PRD-NNNN) — already numbered
 ├── exec-plans/                                          ← `spec-` skills (implementation)
 │   └── active/

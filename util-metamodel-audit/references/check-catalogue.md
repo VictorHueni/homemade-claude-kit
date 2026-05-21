@@ -20,7 +20,7 @@ find docs/business -maxdepth 1 -name "04b-objectives.md" 2>/dev/null          # 
 find docs/business/processes -name "*-process.md" 2>/dev/null | head -1
 find docs/business/06a-models -name "*.md" 2>/dev/null | head -1
 find docs/product-specs -maxdepth 1 -name "07a-fbs.md" 2>/dev/null
-find docs/product-specs -maxdepth 1 -name "08a-delivery-roadmap.md" 2>/dev/null  # Step 8 (was 08-delivery-roadmap.md — bug fixed)
+find docs/product-specs -maxdepth 1 -name "08a-delivery-roadmap.md" 2>/dev/null  # Step 8 (was 08a-delivery-roadmap.md — bug fixed)
 find docs/product-specs -maxdepth 1 -name "09a-quality-attributes.md" 2>/dev/null
 find docs/product-specs -maxdepth 1 -name "*_prd_*.md" 2>/dev/null | head -1
 find docs/exec-plans/active -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1
@@ -55,7 +55,7 @@ Then compare each path against the canonical map:
 - `03a-capability-map.md` → must be at `docs/business/03a-capability-map.md` (flat file)
 - `04a-value-streams.md` → must be at `docs/business/04a-value-streams.md` (flat file)
 - `04b-objectives.md` → must be at `docs/business/04b-objectives.md` (flat file)
-- `*-process.md` → must be under `docs/business/processes/`
+- `*-process.md` → must be under `docs/business/05a-processes/`
 - `07a-fbs.md` → must be at `docs/product-specs/07a-fbs.md` (flat file)
 - `08a-delivery-roadmap.md` → must be at `docs/product-specs/08a-delivery-roadmap.md` (flat file)
 - `09a-quality-attributes.md` → must be at `docs/product-specs/09a-quality-attributes.md` (flat file)
@@ -135,10 +135,10 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `C-N.M.FXX` | `\bC-[0-9]+\.[0-9]+\.F[0-9]+\b` | `docs/product-specs/07a-fbs.md` |
 | `BC-NN` | `\bBC-[0-9]{2}\b` | `docs/domain/02b-bounded-contexts.md` |
 | `BC-NN.GT-NN` | `\bBC-[0-9]{2}\.GT-[0-9]{2}\b` | `docs/domain/02c-glossary.md` |
-| `BC-NN.AGG-NN` | `\bBC-[0-9]{2}\.AGG-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
-| `BC-NN.ENT-NN` | `\bBC-[0-9]{2}\.ENT-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
-| `BC-NN.VO-NN` | `\bBC-[0-9]{2}\.VO-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
-| `BC-NN.EVT-NN` | `\bBC-[0-9]{2}\.EVT-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
+| `BC-NN.AGG-NN` | `\bBC-[0-9]{2}\.AGG-[0-9]{2}\b` | `docs/domain/07b-models/{bc-slug}.md` |
+| `BC-NN.ENT-NN` | `\bBC-[0-9]{2}\.ENT-[0-9]{2}\b` | `docs/domain/07b-models/{bc-slug}.md` |
+| `BC-NN.VO-NN` | `\bBC-[0-9]{2}\.VO-[0-9]{2}\b` | `docs/domain/07b-models/{bc-slug}.md` |
+| `BC-NN.EVT-NN` | `\bBC-[0-9]{2}\.EVT-[0-9]{2}\b` | `docs/domain/07b-models/{bc-slug}.md` |
 | `OBJ-NN` | `\bOBJ-[0-9]{2}\b` | `docs/business/04b-objectives.md` |
 | `KR-NN.M` | `\bKR-[0-9]{2}\.[0-9]\b` | `docs/business/04b-objectives.md` |
 | `E-NN` | `\bE-[0-9]{2}\b` | `docs/product-specs/08a-delivery-roadmap.md` |
@@ -207,8 +207,8 @@ grep -roh '\bQA-[^A-Z ]' docs/ --include="*.md"
 | Any `*_prd_*.md` | `docs/product-specs/09a-quality-attributes.md` (PRDs reference QA-XXNN) |
 | Any `exec-plans/active/*/` plan | Corresponding `*_prd_*.md` |
 | `docs/domain/02c-glossary.md` exists | `docs/domain/02b-bounded-contexts.md` must also exist (glossary is scoped to BCs) |
-| `docs/domain/models/{bc-slug}.md` exists | `docs/domain/02b-bounded-contexts.md` must exist (domain model is namespaced by BC) |
-| `docs/domain/models/{bc-slug}.md` exists | `docs/domain/02c-glossary.md` must exist (entity names must match glossary terms) |
+| `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/02b-bounded-contexts.md` must exist (domain model is namespaced by BC) |
+| `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/02c-glossary.md` must exist (entity names must match glossary terms) |
 | `docs/business/04b-objectives.md` exists | `docs/business/04a-value-streams.md` must also exist (objectives consume pain index from VS) |
 | Any `*_prd_*.md` | If `docs/business/04b-objectives.md` exists, the PRD should reference ≥1 `OBJ-NN` in §0 |
 

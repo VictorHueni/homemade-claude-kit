@@ -46,7 +46,7 @@ The skill operates in one of three modes. Detect which mode the user wants from 
 
 **When:** the project has no processes folder yet, or has one but is missing a file for this specific process slug.
 
-**Output:** ONE file at `{processes folder}/{slug}-process.md` from the canonical template — all sections present, all cells `_TODO_`. Do NOT fill actors, activities, KPIs, or any substantive content in scaffold mode.
+**Output:** ONE file at `{processes folder}/proc-NN-{slug}.md` from the canonical template — all sections present, all cells `_TODO_`. Do NOT fill actors, activities, KPIs, or any substantive content in scaffold mode.
 
 Seed §8 KPIs with 3–5 starter candidate rows (values `_TODO_`) — a process without KPIs is a narrative, not a process.
 Seed §11 TODOs with the obvious gaps and their validation path.
@@ -127,7 +127,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 
 ## Output structure — the fixed template
 
-The skill produces ONE markdown file at `{processes folder}/{slug}-process.md` with this fixed structure (full template in `references/template.md`):
+The skill produces ONE markdown file at `{processes folder}/proc-NN-{slug}.md` with this fixed structure (full template in `references/template.md`):
 
 ```
 <!-- doc-version: 1.0 | created: YYYY-MM-DD -->
@@ -341,7 +341,7 @@ When the user asks you to produce a process doc but the conversation has been ab
 
 Process docs typically live in:
 
-- `docs/business/processes/` — when the project has a business/operations-oriented docs root
+- `docs/business/05a-processes/` — when the project has a business/operations-oriented docs root
 - `docs/operations/processes/` — for ops-heavy projects
 - `docs/<domain>/processes/` — when the domain is more specific
 
@@ -366,7 +366,7 @@ If the project has an index file (e.g., `docs/business/index.md`) listing existi
 
 Three files in `references/` carry the canonical content. Read them when needed:
 
-- **`references/template.md`** — the canonical process-doc skeleton. Copy this to `{processes folder}/{slug}-process.md` and fill placeholders.
+- **`references/template.md`** — the canonical process-doc skeleton. Copy this to `{processes folder}/proc-NN-{slug}.md` and fill placeholders.
 - **`references/logic-and-sequence.md`** — plain-English explanation of why each section exists, how the sections map to BPMN, and the 9-step sequence you follow when filling the template.
 - **`references/examples.md`** — abstract worked examples for two common process shapes (regulatory-submission process; back-office triage process), showing how the template gets filled.
 

@@ -82,7 +82,7 @@ Canonical metamodel directories that don't exist in this repo yet. Creating them
 | `docs/business/personas/` | `business-persona` outputs | Step 1 | `mkdir -p docs/business/personas` |
 | `docs/business/capability-map/` | `business-capability-map` outputs | Step 2 | `mkdir -p docs/business/capability-map` |
 | `docs/business/value-streams/` | `business-value-stream` outputs | Step 3 | `mkdir -p docs/business/value-streams` |
-| `docs/business/processes/` | `business-process` outputs | Step 4 | `mkdir -p docs/business/processes` |
+| `docs/business/05a-processes/` | `business-process` outputs | Step 4 | `mkdir -p docs/business/processes` |
 | `docs/business/business-model-canvas/` | `business-model-canvas` outputs | Step 5 | `mkdir -p docs/business/business-model-canvas` |
 | `docs/business/06a-models/` | `business-quantitative-model` outputs | Step 6 | `mkdir -p docs/business/models` |
 | `docs/domain/` | All `domain-*` outputs | Steps 2b/2c/7b | `mkdir -p docs/domain` |

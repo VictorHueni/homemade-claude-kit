@@ -69,7 +69,7 @@ A value stream is good when a reader can answer, without ambiguity:
 **When:** the project has no `value-streams/` folder, or has one but is missing the canonical template + methodology.
 
 **Output:** ONE file in `docs/business/` (or project-chosen folder):
-- `04-value-streams.md` — hub doc with intro, kit-link methodology pointer, catalogue table scaffold, template block, "no streams yet" placeholder.
+- `04a-value-streams.md` — hub doc with intro, kit-link methodology pointer, catalogue table scaffold, template block, "no streams yet" placeholder.
 
 Source from `references/template.md`. Substitute `{{product_or_scope}}` placeholders. Do NOT invent streams in scaffold mode.
 
@@ -113,7 +113,7 @@ Ask the user the following 4 questions in a single message with lettered options
    C. Skip — leave all pain index as _TODO_
 
 4. Process doc linkage?
-   A. Process docs exist — link "Operationalised by" to existing docs/business/processes/ files
+   A. Process docs exist — link "Operationalised by" to existing docs/business/05a-processes/ files
    B. No process docs yet — all "Operationalised by" stay _TODO_
    C. Partial — some exist; I will name them
 ```
@@ -180,7 +180,7 @@ Ask 2–4 questions max, single message, lettered options where possible. Don't 
 
 ## Output structure — the fixed template
 
-The skill produces ONE markdown file at `docs/business/04-04-value-streams.md` with this fixed structure (full template in `references/template.md`):
+The skill produces ONE markdown file at `docs/business/04-04a-value-streams.md` with this fixed structure (full template in `references/template.md`):
 
 ```
 <!-- doc-version: 1.0 | created: YYYY-MM-DD -->
@@ -288,7 +288,7 @@ find docs -type d -iname "*value-stream*" 2>/dev/null
 
 If a folder exists at a non-default location, use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none exists, default to `docs/business/` and confirm with the user.
 
-**Never overwrite an existing `04-value-streams.md`.** Switch modes if it exists:
+**Never overwrite an existing `04a-value-streams.md`.** Switch modes if it exists:
 - Scaffold mode → skip (report what's there).
 - Catalogue mode → append/update catalogue rows only.
 - Fill mode → append a new H2 under "## Value Streams".
@@ -299,7 +299,7 @@ If a folder exists at a non-default location, use it — don't move existing wor
 
 Three files in `references/` carry the canonical content:
 
-- **`references/template.md`** — the canonical `04-value-streams.md` skeleton. Copy to `docs/business/04-04-value-streams.md` and fill.
+- **`references/template.md`** — the canonical `04a-value-streams.md` skeleton. Copy to `docs/business/04-04a-value-streams.md` and fill.
 - **`references/methodology-references.md`** — the canonical bibliography (TOGAF, BIZBOK, Ulrich/Kuehn, EA-vs-Lean stance). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
 - **`references/value-stream-discipline.md`** — internal Claude guidance: 7 anti-patterns, EA-vs-Lean stance, scope-vs-process boundary, naming rules, quality checks. Never copied into the project.
 
@@ -323,8 +323,8 @@ After running any mode, summarise in 4–6 lines:
 Before declaring the work done:
 
 - [ ] Folder exists or was created.
-- [ ] `04-value-streams.md` exists (scaffold mode).
-- [ ] Methodology pointer in `04-value-streams.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
+- [ ] `04a-value-streams.md` exists (scaffold mode).
+- [ ] Methodology pointer in `04a-value-streams.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
 - [ ] Catalogue table populated with naming-rule-compliant stream names (catalogue mode).
 - [ ] Every stream has a triggering stakeholder linking to a persona ID (or honest `_TODO_` if personas absent).
 - [ ] Every stream has exactly one value proposition (no "AND" in the value).

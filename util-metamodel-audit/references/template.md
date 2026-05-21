@@ -38,7 +38,7 @@ Copy this skeleton to `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md` 
 | 2 | Business Model Canvas | `business-model-canvas` | {✅/🔄/⬜} | `docs/business/` | {date} | {N} |
 | 3 | Business Capability Map | `business-capability-map` | {✅/🔄/⬜} | `docs/business/03a-capability-map.md` | {date} | {N} |
 | 4 | Value Streams | `business-value-stream` | {✅/🔄/⬜} | `docs/business/04a-value-streams.md` | {date} | {N} |
-| 5 | Business Processes | `business-process` | {✅/🔄/⬜} | `docs/business/processes/` ({N} files) | {date} | {N} |
+| 5 | Business Processes | `business-process` | {✅/🔄/⬜} | `docs/business/05a-processes/` ({N} files) | {date} | {N} |
 | 6 | Quantitative Models | `business-quantitative-model` | {✅/🔄/⬜} | `docs/business/06a-models/` ({N} files) | {date} | {N} |
 | 7 | Functional Breakdown Structure | `spec-functional-breakdown-structure` | {✅/🔄/⬜} | `docs/product-specs/07a-fbs.md` | {date} | {N} |
 | 8 | Delivery Roadmap | `spec-delivery-roadmap` | {✅/🔄/⬜} | `docs/product-specs/08a-delivery-roadmap.md` | {date} | {N} |

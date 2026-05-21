@@ -48,7 +48,7 @@ The skill operates in one of three modes. Detect from the user's prompt; ask if 
 **When:** the project has no BC Map folder yet, or has one but is missing the template + methodology references.
 
 **Output:** ONE file in the project's chosen folder:
-- `03-capability-map.md` — the hub doc (intro + kit-link methodology pointer + axis declaration + tree + index + per-capability blocks + changelog).
+- `03a-capability-map.md` — the hub doc (intro + kit-link methodology pointer + axis declaration + tree + index + per-capability blocks + changelog).
 
 Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{L0_axis_label}}` placeholders. Do NOT invent capabilities in scaffold mode — leave the tree as a `_TODO_` skeleton.
 
@@ -119,7 +119,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 3. **Soft-links footer** — populate ONLY links to artefacts that actually exist:
    - Personas served (link by persona ID from `personas.md`)
    - Value streams enabled (link by VS ID if value-stream doc exists)
-   - Processes that operationalise it (link to `docs/business/processes/*.md`)
+   - Processes that operationalise it (link to `docs/business/05a-processes/*.md`)
    - FBS row (link to the same capability ID in the FBS if it exists)
 
 **Run the discipline checks** in `references/capability-discipline.md` §"Quality checks" before declaring a capability complete.
@@ -166,7 +166,7 @@ Ask 2–4 questions max, single message, lettered options where possible.
 
 ## Output structure — the fixed template
 
-The skill produces ONE markdown file at `docs/business/03-03-capability-map.md` with this fixed structure (full template in `references/template.md`):
+The skill produces ONE markdown file at `docs/business/03a-capability-map.md` with this fixed structure (full template in `references/template.md`):
 
 ```
 <!-- doc-version: 1.0 | created: YYYY-MM-DD -->
@@ -303,7 +303,7 @@ find docs -type d -iname "*capabilit*" 2>/dev/null
 
 If a folder exists at a non-default location, use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none exists, default to `docs/business/` and confirm with the user.
 
-**Never overwrite an existing `03-capability-map.md`.** Switch modes if it exists:
+**Never overwrite an existing `03a-capability-map.md`.** Switch modes if it exists:
 - Scaffold mode → skip (report what's there).
 - Structure mode → only fill empty tree/index; preserve existing capabilities.
 - Fill mode → append/update per-capability blocks; preserve existing content.
@@ -314,7 +314,7 @@ If a folder exists at a non-default location, use it — don't move existing wor
 
 Three files in `references/` carry the canonical content. Read when needed:
 
-- **`references/template.md`** — the canonical `03-capability-map.md` skeleton. Copy to `docs/business/03-03-capability-map.md` and fill placeholders.
+- **`references/template.md`** — the canonical `03a-capability-map.md` skeleton. Copy to `docs/business/03a-capability-map.md` and fill placeholders.
 - **`references/methodology-references.md`** — the canonical bibliography (TOGAF G189, Cutter, SAP, BABOK, Gonzalez naming, Miller sizing). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
 - **`references/capability-discipline.md`** — internal Claude guidance: noun test, technology-independence test, anti-overlap test, capability-vs-process-vs-function-vs-unit decision tree, common mistakes from Cutter. Never copied into the project.
 
@@ -339,8 +339,8 @@ Keep it short. Point the user at the next move.
 Before declaring the work done:
 
 - [ ] Folder identified or created (with user confirmation if new).
-- [ ] `03-capability-map.md` exists (scaffold mode).
-- [ ] Methodology pointer in `03-capability-map.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
+- [ ] `03a-capability-map.md` exists (scaffold mode).
+- [ ] Methodology pointer in `03a-capability-map.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
 - [ ] L0 axis explicitly chosen + rationale documented (structure / fill mode).
 - [ ] ASCII tree + Capability Index table populated (structure mode).
 - [ ] L0 count: 3–8. L1 count per L0: 5–12. L1 total: ≤25.

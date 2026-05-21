@@ -114,7 +114,7 @@ Outputs a single checklist: 14 metamodel steps, each marked ✅ (exists) / ⬜ (
    d. For each linking file, compute the new relative path: `python3 -c "import os; print(os.path.relpath('$v2_abs', os.path.dirname('$linker_abs')))"`
    e. Emit: `mkdir -p $(dirname $v2_path)` + `git mv $v1_path $v2_path` + `sed` repairs
 3. **For domain model consolidation (`type = multi-slug`, domain models)**:
-   - `find docs/domain -mindepth 2 -name "domain-model.md"` → each found file at `docs/domain/{bc-slug}/domain-model.md` → moves to `docs/domain/models/{bc-slug}.md`
+   - `find docs/domain -mindepth 2 -name "domain-model.md"` → each found file at `docs/domain/{bc-slug}/domain-model.md` → moves to `docs/domain/07b-models/{bc-slug}.md`
    - After all moves: check if any non-domain-model files remain in `docs/domain/{bc-slug}/` folders; if the folder is empty, emit `rm -rf`; if not empty, warn and skip folder deletion
 4. **Relative path recomputation rule:** NEVER string-substitute `../` chains. When folder depth changes (e.g. depth 3 → depth 2), every inbound link's `../` count must be recomputed from scratch using `os.path.relpath()`. String substitution produces wrong paths.
 5. **VISION.md special case:** `docs/VISION.md` stays at root — no move, no link rewriting. BUT check if any CLAUDE.md pointer uses a wrong path (e.g. `vision/VISION.md`) and fix it.
