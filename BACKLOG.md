@@ -1,6 +1,18 @@
 # Skill backlog
 
-Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-05-20 from a gap analysis of the 14-artefact strategic-architecture stack.
+Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-05-20 from a gap analysis of the 14-artefact stack; updated 2026-05-21 after shipping 5 items (see §Shipped below).
+
+---
+
+## Shipped — 2026-05-21
+
+| Skill / task | What was done |
+|---|---|
+| **`business-vision`** | Step 0 — singleton `docs/VISION.md`, Moore elevator pitch + Sinek WHY + Pichler Vision Board + North Star metric. Wire mode appends agent context pointer to project CLAUDE.md. |
+| **`business-objective`** | Step 4.5 — `docs/business/04b-objectives.md`, OKR structure (OBJ-NN + KR-NN.M), outcome discipline gate, BSC 4-perspective tag, Align mode for epic traceability. |
+| **`com-slide-deck`** | Renamed from `dev-slide-deck`. Introduced new `com-` prefix category for communication artefacts. install.sh dangling-symlink prune bug fixed. |
+| **v2 path simplification** | All 11 singleton artefacts flattened to numbered files (`01-personas.md`, `02-bmc.md`, `03-capability-map.md`, `04-value-streams.md`, `04b-objectives.md`, `07-fbs.md`, `08-delivery-roadmap.md`, `09-quality-attributes.md`; domain singletons flattened; domain models consolidated into `docs/domain/models/{bc-slug}.md`). Kit fully updated: 15 SKILL.md files, metamodel.md, README.md, check-catalogue.md, detection-signals.md. 4 pre-existing `epic-catalogue.md` bugs fixed. |
+| **`util-metamodel-migration` Mode 4** | Schema migration mode — reads `references/path-migration-v2.md`, generates atomic `git mv` + `sed` script for v1→v2 project migration. Dry-run default; `--apply` opt-in; post-migration audit hook. |
 
 ---
 
@@ -49,105 +61,3 @@ ops-slo                     ← closes the QA-XXNN → day-2 operational loop
 ```
 
 Tier 2 and Tier 3 candidates improve completeness but are not structural gaps in the current metamodel.
-
----
-
-## Design tasks — metamodel housekeeping
-
-Non-skill work that improves the kit's internal consistency or usability.
-
----
-
-### Output path audit + simplification (2026-05-21)
-
-**Problem:** The current canonical output paths have inconsistent nesting depth and no ordering signal. A user browsing `docs/` cannot tell the build sequence from the filenames alone. Some paths are over-nested for no structural reason.
-
-**Specific pain points observed:**
-
-| Current path | Problem |
-|---|---|
-| `docs/business/personas/personas.md` | Redundant subfolder — one file, one folder, same name. Could be `docs/business/01-personas.md` |
-| `docs/business/business-model-canvas/business-model-canvas.md` | Doubly redundant — folder name = file name = artefact name. |
-| `docs/domain/{bc-slug}/domain-model.md` | One file per BC, scattered across slug-named subfolders. Finding all domain models requires globbing. Could consolidate into `docs/domain/models/{bc-slug}.md` |
-| `docs/domain/bounded-contexts/bounded-contexts.md` + `context-map.md` | Two files in a `bounded-contexts/` subfolder. Could live directly in `docs/domain/`. |
-| `docs/domain/glossary/glossary.md` | Same redundancy — `docs/domain/glossary.md` is simpler. |
-| `docs/product-specs/functional-breakdown-structure/FBS.md` | Long subfolder for one file. |
-| `docs/product-specs/quality-attributes/quality-attributes.md` | Same pattern. |
-
-**Proposed direction (to validate in the design task):**
-
-1. **Numbered flat files per layer** — files carry a step-number prefix so they sort in metamodel build order in any file browser:
-   ```
-   docs/
-   ├── VISION.md                    ← Step 0 (already flat — good)
-   ├── business/
-   │   ├── 01-personas.md
-   │   ├── 02-bmc.md               (or lean-canvas.md)
-   │   ├── 03-capability-map.md
-   │   ├── 04-value-streams.md
-   │   ├── 04.5-objectives.md
-   │   ├── 05-processes/           ← keep subfolder (one file per process)
-   │   └── 06-models/              ← keep subfolder (one file per model)
-   ├── domain/
-   │   ├── bounded-contexts.md     ← flat
-   │   ├── context-map.md          ← flat
-   │   ├── glossary.md             ← flat
-   │   └── models/                 ← one file per BC: {bc-slug}.md
-   ├── product-specs/
-   │   ├── 07-fbs.md
-   │   ├── 08-delivery-roadmap.md
-   │   ├── 09-quality-attributes.md
-   │   └── {NNNN}_prd_{feature}.md
-   └── architecture/
-       └── decisions/              ← keep (one file per ADR)
-   ```
-
-2. **Rule:** subfolders only when there are genuinely multiple files of the same type (processes, models, PRDs, ADRs, domain models). Singletons live as flat files.
-
-3. **Numbering convention:** prefix mirrors the metamodel step number (`01`, `02`, `03`, `04`, `04.5`, ...). Domain layer steps (`2b`, `2c`, `7b`) use their step numbers too.
-
-**Impact if adopted:** HIGH — all canonical paths in `rules/metamodel.md`, every skill's output path, `check-catalogue.md`, `detection-signals.md`, and all cross-reference links in generated project docs would need updating.
-
-**Prerequisite decision:** keep `docs/VISION.md` at root (maximum agent visibility) or move to `docs/00-vision.md` (consistent numbering)? The two goals are in slight tension and must be resolved before any migration work begins.
-
----
-
-### util-metamodel-migration — Mode 4: Schema migration (2026-05-21)
-
-**Dependency of:** Output path audit + simplification above. Must be built before any project migration can happen safely.
-
-**Why the current skill is insufficient:**
-
-The current `util-metamodel-migration` is a *detection* tool — it scans unknown pre-metamodel repos and guesses canonical paths using 3-tier confidence scoring. A schema migration (v1 paths → v2 paths) is a *transformation* tool. Three fundamental differences:
-
-| Dimension | Current Mode 1–3 (detection) | New Mode 4 (schema migration) |
-|---|---|---|
-| **Path mapping** | Unknown → inferred from signals | Fully known before/after table |
-| **Confidence tiers** | Required (guessing) | Not needed (deterministic) |
-| **Scope** | Project docs only | Project docs + kit-internal files (skills, metamodel, audit/migration references) |
-| **Relative path arithmetic** | Source folder depth is stable | Depth CHANGES (e.g. `business/personas/personas.md` → `business/01-personas.md`) — every `../` chain must be recomputed |
-| **Run cadence** | Once per repo (onboarding) | Once per schema version bump |
-
-**What Mode 4 needs:**
-
-1. **Path mapping table** — a new reference file (e.g. `references/path-migration-v2.md`) containing the full before/after mapping for every artefact. Sourced from the output path audit design task above.
-
-2. **Two-phase execution:**
-   - Phase A — **Project migration**: for each project that uses the metamodel, generate `git mv` + relative-path-corrected `sed` commands for all docs. The relative path arithmetic is the hard part — when a file moves up or down in the tree, every inbound link changes its `../` depth.
-   - Phase B — **Kit migration**: update the kit's own files — each skill's SKILL.md output path, `rules/metamodel.md` canonical paths, `README.md` skill index, `check-catalogue.md` Check 1/2, `detection-signals.md` filename/folder patterns. This is a separate pass because kit files live outside `docs/` and have different link patterns.
-
-3. **CLAUDE.md awareness** — if `docs/VISION.md` moves, the skill must detect and rewrite the `CLAUDE.md` pointer that `business-vision` Wire mode injected.
-
-4. **Dry-run and apply modes:**
-   - `--dry-run` (default): emit the full migration script to a report file, never modify anything
-   - `--apply` (explicit opt-in): execute the generated script atomically after user confirmation
-
-5. **Verification hook** — after apply, automatically run `util-metamodel-audit` Mode 1 to confirm zero misplaced files.
-
-**Implementation note:** the relative path rewriting is significantly harder than the current skill's link tracking. When `docs/business/personas/personas.md` moves to `docs/business/01-personas.md` (depth -1), every file that linked with `../../personas/personas.md` must now use `../01-personas.md`. This requires computing the new relative path from each linking file's location to the new target — the current skill does this with a `python3 os.path.relpath()` call, but the schema migration must do it for every artefact in every project simultaneously.
-
-**Recommended build order:**
-1. Finish the output path audit design task (settle numbering convention + before/after table)
-2. Build Mode 4 against the agreed-upon path mapping table
-3. Test on a sample project before running against production repos
-4. Update the kit atomically in one branch (Phase B) after all projects are migrated (Phase A)
