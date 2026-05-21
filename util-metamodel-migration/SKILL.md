@@ -83,6 +83,47 @@ Runs checks §1 + §2 + §3 only. No Step 0 needed — scans `docs/` by default.
 
 Outputs a single checklist: 14 metamodel steps, each marked ✅ (exists) / ⬜ (missing), with the canonical path and the skill to run to create it. No proposed fixes — purely informational.
 
+### Mode 4 — Schema migration (v1 paths → v2 numbered flat structure)
+
+**When:** a project was built with the v1 canonical paths (nested subfolders like `docs/business/personas/personas.md`) and needs to migrate to the v2 numbered flat structure (e.g. `docs/business/01-personas.md`) defined in `references/path-migration-v2.md`.
+
+**Key difference from Modes 1–3:** those modes detect and guess — they scan unknown repos and infer canonical placement using 3-tier confidence scoring. Mode 4 is deterministic — the before/after mapping is fully known from `path-migration-v2.md`, no detection needed.
+
+**Step 0 — Clarifying questions (ask BEFORE scanning)**
+
+```text
+1. Project docs root?
+   A. docs/ (default)
+   B. Other — please specify
+
+2. Output format?
+   A. Dry-run — print migration script to console and report file (default, safe)
+   B. Generate an executable .sh script at var/reports/metamodel-migration/schema-v2-migration-{date}.sh
+
+3. Verify after migration?
+   A. Yes — run util-metamodel-audit Mode 1 after apply to confirm zero misplacements
+   B. No — skip verification
+```
+
+**Process:**
+1. **Read `references/path-migration-v2.md`** to load the full v1 → v2 mapping table. Every row with `type ≠ no-change` is a migration candidate.
+2. **For each singleton candidate (`type = singleton`)**:
+   a. Check if the v1 file exists in the project docs root
+   b. If yes: compute the new path from the mapping
+   c. Scan all docs for inbound links: `grep -rln "$(basename $v1_path)\|$v1_path" docs/ --include="*.md"`
+   d. For each linking file, compute the new relative path: `python3 -c "import os; print(os.path.relpath('$v2_abs', os.path.dirname('$linker_abs')))"`
+   e. Emit: `mkdir -p $(dirname $v2_path)` + `git mv $v1_path $v2_path` + `sed` repairs
+3. **For domain model consolidation (`type = multi-slug`, domain models)**:
+   - `find docs/domain -mindepth 2 -name "domain-model.md"` → each found file at `docs/domain/{bc-slug}/domain-model.md` → moves to `docs/domain/models/{bc-slug}.md`
+   - After all moves: check if any non-domain-model files remain in `docs/domain/{bc-slug}/` folders; if the folder is empty, emit `rm -rf`; if not empty, warn and skip folder deletion
+4. **Relative path recomputation rule:** NEVER string-substitute `../` chains. When folder depth changes (e.g. depth 3 → depth 2), every inbound link's `../` count must be recomputed from scratch using `os.path.relpath()`. String substitution produces wrong paths.
+5. **VISION.md special case:** `docs/VISION.md` stays at root — no move, no link rewriting. BUT check if any CLAUDE.md pointer uses a wrong path (e.g. `vision/VISION.md`) and fix it.
+6. **Assemble the migration script** in atomic blocks: each file migration is one block (`mkdir` + `git mv` + all `sed` repairs for that file). If inbound links = 0, the block is just `git mv`.
+7. **Save to** `var/reports/metamodel-migration/schema-v2-migration-{date}.sh` (Mode 4 output, not the same as Mode 1 markdown report).
+8. **Summary:** N files to move · N links to repair · N sed commands · N warnings (non-empty bc-slug folders, CLAUDE.md issues).
+
+**If `--apply` (explicit opt-in only):** execute the script, then run `util-metamodel-audit` Mode 1 to verify zero misplacements. Never apply automatically — always dry-run first.
+
 ---
 
 ## Detection methodology — three-tier confidence scoring
