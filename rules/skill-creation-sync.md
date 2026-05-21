@@ -152,17 +152,146 @@ Should return zero matches.
 
 ## Metamodel impact assessment (run before publishing any skill change)
 
-Before committing a new skill or a change to an existing artefact-producing skill, answer the five questions below. Each "yes" triggers a mandatory update to the files listed.
+Two mandatory stages. Never skip Stage 1 — the classification determines which updates are required and prevents both over-engineering (updating everything for a utility skill) and under-engineering (missing downstream wiring for a real metamodel artefact).
 
-| Question | If yes → update |
+---
+
+### Stage 1 — Classify: does this skill need metamodel integration?
+
+Answer this question first, before any design work:
+
+> **"Does this skill produce a new named artefact that other skills or agents need to know about and reference?"**
+
+| Classification | Description | Examples | Stage 2 |
+|---|---|---|---|
+| **New metamodel step** | Produces a new artefact type with its own step in the build order; other skills should read or reference it | `business-vision` (Step 0), `business-objective` (Step 4.5) | → Stage 2A (full blast radius) |
+| **Variant / refinement** | New skill for an artefact type that already exists in the metamodel; no new step, no new IDs | A second review skill for PRDs, a new canvas variant | → Stage 2B (targeted updates only) |
+| **No metamodel impact** | Developer workflow, housekeeping, post-ship operational artefact with no cross-references | `dev-*`, `util-*`, `ops-runbook`, `ops-bug-rca` | → Stage 2C (skip metamodel) |
+
+**Decision rule for "New metamodel step":** if you find yourself saying "other skills should read this doc before doing their work" or "PRDs / epics / quality attributes should reference this ID" — it's a new metamodel step.
+
+---
+
+### Stage 2A — Brand-new artefact step (full blast radius)
+
+Run this **before writing a single line of the new skill** — it is a design preview, not post-hoc documentation. Present the full blast radius to the user and confirm before building.
+
+#### Part 1: Design the skill itself
+
+Before touching any file, answer:
+
+1. **Output path** — where does the artefact live? Is there a naming convention exception? (e.g. `business-vision` → `docs/VISION.md` instead of `docs/business/`)
+2. **IDs minted** — does it mint stable IDs (e.g. `OBJ-NN`, `KR-NN.M`) or is it a singleton (path-referenced only)?
+3. **Modes** — Scaffold / Fill / Align / Refresh / Wire? What does each mode do?
+4. **Reference files** — `template.md` (canonical output skeleton), `methodology-references.md` (bibliography), `{discipline}.md` (internal Claude guidance)?
+5. **Special behaviours** — does any mode write to files outside `docs/` (e.g. `CLAUDE.md`)? If yes, set `impact: "medium"` not `"low"`.
+
+#### Part 2: Blast radius map
+
+For every brand-new artefact step, the following files require updates. Work through them in order.
+
+**Core metamodel files (always — 7 change points in `rules/metamodel.md`):**
+
+| Change point | What to update |
 |---|---|
-| Does the skill's **output path** change or is it a new skill with a new path? | `rules/metamodel.md` canonical paths + artefact table · `util-metamodel-audit/references/check-catalogue.md` Check 1 · `util-metamodel-migration/references/detection-signals.md` §Filename patterns + §Folder patterns |
-| Does the skill **mint a new ID format** (e.g. `XX-NN`)? | `rules/metamodel.md` cross-doc ID conventions · `util-metamodel-audit/references/check-catalogue.md` Check 5 · `util-metamodel-migration/references/detection-signals.md` §Filename patterns |
-| Does the skill **add or change a prerequisite** (upstream artefact it depends on)? | `rules/metamodel.md` DAG + build order step · `util-metamodel-audit/references/check-catalogue.md` Check 7 |
-| Does the skill **add, rename, or remove a mandatory section** from its template? | `util-metamodel-audit/references/check-catalogue.md` Check 9 · `util-metamodel-migration/references/detection-signals.md` §Content signals |
-| Is this a **brand-new artefact-producing skill** (new step in the build order)? | `rules/metamodel.md` artefact table + DAG + build order section + canonical paths + prefix mapping · README.md flowchart + ER diagram · `util-metamodel-audit/SKILL.md` step count · all four files above |
+| Artefact table header | Update count ("The N artefacts") |
+| Artefact table row | Add `\| step \| **Name** (tagline) \| \`skill-name\` \| output path \| IDs or *(singleton)* \|` |
+| Build order step section | Add `### Step N` with: Skill, Prerequisites, Process (modes), Output verification criteria |
+| DAG flowchart (text art) | Add node box + edges showing what it consumes (solid) and what soft-links to it (dashed) |
+| ER diagram | Add entity + FK fields + relationship lines |
+| Cross-doc ID conventions table | Add `\| \`ID-NN\` \| meaning \| owning skill \|` row — or note "singleton — no ID" |
+| Canonical output paths | Add the output path in the correct position in the `docs/` tree |
+| Prefix → folder mapping | Note any exception if the output location breaks the prefix convention |
+| Maintenance coupling log | Add a dated entry listing every file updated |
 
-**Scope filter:** this checklist applies to skills in the `business-`, `spec-`, `arch-`, and `domain-` families. `dev-*`, `util-*`, and `ops-*` skills that produce no metamodel artefact can skip it.
+**README.md (always — 4 change points):**
+
+| Change point | What to update |
+|---|---|
+| Intro line | Update artefact count ("N artefacts across…") |
+| Flowchart | Add node (inside or outside a subgraph based on layer) + update subgraph label + add edges |
+| ER diagram | Add entity + relationships (same changes as in `rules/metamodel.md`) |
+| Skill index table | Add row |
+
+**Existing skills — upstream reads (contextual):**
+
+For each skill that *should read the new artefact before doing its work*, add a note to its process step that checks for the new file and reads it if present. Identify these by asking: "which existing skills produce output that the new artefact depends on, or that should be consistent with it?"
+
+Common patterns:
+- New artefact is **upstream of everything** (e.g. vision) → add "read `docs/VISION.md` first" to every `business-*` + `spec-*` skill's context-reading step
+- New artefact is **a mid-stack layer** (e.g. objectives) → add read note only to skills that build deliverables objectives are supposed to guide (delivery roadmap, PRDs, quality attributes)
+
+**Existing skills — downstream references (contextual):**
+
+For each skill whose output *should reference the new artefact's IDs or path*, add the new ID/path to:
+- The `§0 Architecture Traceability` block template (PRDs, implementation plans)
+- The value statement / epic template (delivery roadmap)
+- The cross-references section (quality attributes)
+- The soft-links table (any canvas or objectives doc)
+
+**Audit tool (always):**
+
+| File | Checks to update |
+|---|---|
+| `util-metamodel-audit/references/check-catalogue.md` | Check 1: add `find` command for new output path · Check 2: add canonical placement rule · Check 5: add ID regex + owning artefact (skip if singleton) · Check 7: add dependency enforcement rule · Check 9: add mandatory sections detection |
+| `util-metamodel-migration/references/detection-signals.md` | §Filename patterns: add glob + artefact type + canonical path · §Folder name patterns: add if applicable · §Content signals: add heading pattern or ID pattern |
+
+#### Part 3: After building — verify
+
+```bash
+# 1. Naming consistency
+for skill in */; do
+  skill_name="${skill%/}"
+  [ -f "$skill/SKILL.md" ] && name=$(grep "^name:" "$skill/SKILL.md" | sed -E 's/name: *//; s/^"//; s/"$//')
+  [ "$skill_name" != "$name" ] && echo "MISMATCH: folder=$skill_name name=$name"
+done
+# Should return zero lines (excluding non-skill folders like commands/, rules/)
+
+# 2. Install
+./install.sh
+
+# 3. Confirm symlink
+ls -la ~/.claude/skills/<new-skill-name>
+```
+
+---
+
+### Stage 2B — Variant or refinement of existing artefact (targeted updates)
+
+No new build order step. Run only the checks that apply:
+
+| Changed? | Update |
+|---|---|
+| Output path changed | `rules/metamodel.md` canonical paths · Check 1 · §Filename patterns |
+| New ID format minted | `rules/metamodel.md` ID conventions · Check 5 · §Filename patterns |
+| Prerequisite added/removed | `rules/metamodel.md` DAG + build order step · Check 7 |
+| Mandatory section added/renamed/removed | Check 9 · §Content signals |
+
+---
+
+### Stage 2C — No metamodel impact
+
+`dev-*`, `util-*`, and `ops-*` skills that produce no metamodel artefact skip all of the above. Run only:
+
+```bash
+./install.sh   # confirm symlink created
+```
+
+---
+
+### Worked examples
+
+**`business-vision` (2026-05-21) — Stage 2A, singleton, naming exception:**
+- New Step 0 in build order
+- Singleton — no IDs, path-referenced only → skip Check 5 + skip ID conventions row (add note instead)
+- Naming exception: `business-` prefix but output is `docs/VISION.md`, not `docs/business/` → document in prefix mapping table
+- Wire mode writes to `CLAUDE.md` → `impact: "medium"`
+- Upstream reads added to: `business-persona`, `business-model-canvas`, `business-objective`, `spec-delivery-roadmap`, `spec-prd`
+
+**`business-objective` (2026-05-21) — Stage 2A, ID-minting:**
+- New Step 4.5 in build order
+- Mints `OBJ-NN` + `KR-NN.M` → add to ID conventions table + Check 5
+- Downstream references added to: `spec-delivery-roadmap` (epic template), `spec-prd` (§0 traceability), `spec-quality-attributes` (KR grounding), `business-model-canvas` (VP → OBJ soft-link), `business-value-stream` (pain index note)
 
 ## Publish and install
 
