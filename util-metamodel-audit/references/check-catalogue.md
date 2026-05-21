@@ -12,20 +12,20 @@ For each of the 16 checks: bash detection pattern, interpretation rules, severit
 ```bash
 # Run for each step — adapt path per step number
 find docs -maxdepth 1 -name "VISION.md" 2>/dev/null                              # Step 0
-find docs/business -maxdepth 1 -name "01-personas.md" 2>/dev/null
+find docs/business -maxdepth 1 -name "01a-personas.md" 2>/dev/null
 find docs -maxdepth 4 \( -name "business-model-canvas.md" -o -name "lean-canvas.md" \) 2>/dev/null
-find docs/business -maxdepth 1 -name "03-capability-map.md" 2>/dev/null
-find docs/business -maxdepth 1 -name "04-value-streams.md" 2>/dev/null
+find docs/business -maxdepth 1 -name "03a-capability-map.md" 2>/dev/null
+find docs/business -maxdepth 1 -name "04a-value-streams.md" 2>/dev/null
 find docs/business -maxdepth 1 -name "04b-objectives.md" 2>/dev/null          # Step 4.5
 find docs/business/processes -name "*-process.md" 2>/dev/null | head -1
-find docs/business/models -name "*.md" 2>/dev/null | head -1
-find docs/product-specs -maxdepth 1 -name "07-fbs.md" 2>/dev/null
-find docs/product-specs -maxdepth 1 -name "08-delivery-roadmap.md" 2>/dev/null  # Step 8 (was 08-delivery-roadmap.md — bug fixed)
-find docs/product-specs -maxdepth 1 -name "09-quality-attributes.md" 2>/dev/null
+find docs/business/06a-models -name "*.md" 2>/dev/null | head -1
+find docs/product-specs -maxdepth 1 -name "07a-fbs.md" 2>/dev/null
+find docs/product-specs -maxdepth 1 -name "08a-delivery-roadmap.md" 2>/dev/null  # Step 8 (was 08-delivery-roadmap.md — bug fixed)
+find docs/product-specs -maxdepth 1 -name "09a-quality-attributes.md" 2>/dev/null
 find docs/product-specs -maxdepth 1 -name "*_prd_*.md" 2>/dev/null | head -1
 find docs/exec-plans/active -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1
-find docs/domain -maxdepth 1 -name "bounded-contexts.md" 2>/dev/null            # Step 2b
-find docs/domain -maxdepth 1 -name "glossary.md" 2>/dev/null                  # Step 2c
+find docs/domain -maxdepth 1 -name "02b-bounded-contexts.md" 2>/dev/null            # Step 2b
+find docs/domain -maxdepth 1 -name "02c-glossary.md" 2>/dev/null                  # Step 2c
 find docs/domain -name "domain-model.md" 2>/dev/null | head -1              # Step 7b (per BC)
 ```
 
@@ -50,15 +50,15 @@ find docs -name "*.md" | while read f; do echo "$f"; done
 ```
 Then compare each path against the canonical map:
 - `VISION.md` → must be directly under `docs/` (not nested deeper — singleton)
-- `01-personas.md` → must be at `docs/business/01a-personas.md` (flat file)
-- `02-bmc.md` / `02-lean-canvas.md` → must be at `docs/business/` (flat file)
-- `03-capability-map.md` → must be at `docs/business/03a-capability-map.md` (flat file)
-- `04-value-streams.md` → must be at `docs/business/04a-value-streams.md` (flat file)
+- `01a-personas.md` → must be at `docs/business/01a-personas.md` (flat file)
+- `02a-bmc.md` / `02a-lean-canvas.md` → must be at `docs/business/` (flat file)
+- `03a-capability-map.md` → must be at `docs/business/03a-capability-map.md` (flat file)
+- `04a-value-streams.md` → must be at `docs/business/04a-value-streams.md` (flat file)
 - `04b-objectives.md` → must be at `docs/business/04b-objectives.md` (flat file)
 - `*-process.md` → must be under `docs/business/processes/`
-- `07-fbs.md` → must be at `docs/product-specs/07a-fbs.md` (flat file)
-- `08-delivery-roadmap.md` → must be at `docs/product-specs/08a-delivery-roadmap.md` (flat file)
-- `09-quality-attributes.md` → must be at `docs/product-specs/09a-quality-attributes.md` (flat file)
+- `07a-fbs.md` → must be at `docs/product-specs/07a-fbs.md` (flat file)
+- `08a-delivery-roadmap.md` → must be at `docs/product-specs/08a-delivery-roadmap.md` (flat file)
+- `09a-quality-attributes.md` → must be at `docs/product-specs/09a-quality-attributes.md` (flat file)
 - `*_prd_*.md` → must be under `docs/product-specs/`
 - `*.md` under `docs/architecture/decisions/` → ADRs, correct
 
@@ -133,8 +133,8 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `VS-N` | `\bVS-[0-9]+\b` | `docs/business/04a-value-streams.md` |
 | `VS-N.M` | `\bVS-[0-9]+\.[0-9]+\b` | `docs/business/04a-value-streams.md` |
 | `C-N.M.FXX` | `\bC-[0-9]+\.[0-9]+\.F[0-9]+\b` | `docs/product-specs/07a-fbs.md` |
-| `BC-NN` | `\bBC-[0-9]{2}\b` | `docs/domain/bounded-contexts.md` |
-| `BC-NN.GT-NN` | `\bBC-[0-9]{2}\.GT-[0-9]{2}\b` | `docs/domain/glossary.md` |
+| `BC-NN` | `\bBC-[0-9]{2}\b` | `docs/domain/02b-bounded-contexts.md` |
+| `BC-NN.GT-NN` | `\bBC-[0-9]{2}\.GT-[0-9]{2}\b` | `docs/domain/02c-glossary.md` |
 | `BC-NN.AGG-NN` | `\bBC-[0-9]{2}\.AGG-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
 | `BC-NN.ENT-NN` | `\bBC-[0-9]{2}\.ENT-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
 | `BC-NN.VO-NN` | `\bBC-[0-9]{2}\.VO-[0-9]{2}\b` | `docs/domain/models/{bc-slug}.md` |
@@ -206,9 +206,9 @@ grep -roh '\bQA-[^A-Z ]' docs/ --include="*.md"
 | Any `*_prd_*.md` | `docs/product-specs/08a-delivery-roadmap.md` (PRDs map to E-NN epics) |
 | Any `*_prd_*.md` | `docs/product-specs/09a-quality-attributes.md` (PRDs reference QA-XXNN) |
 | Any `exec-plans/active/*/` plan | Corresponding `*_prd_*.md` |
-| `docs/domain/glossary.md` exists | `docs/domain/bounded-contexts.md` must also exist (glossary is scoped to BCs) |
-| `docs/domain/models/{bc-slug}.md` exists | `docs/domain/bounded-contexts.md` must exist (domain model is namespaced by BC) |
-| `docs/domain/models/{bc-slug}.md` exists | `docs/domain/glossary.md` must exist (entity names must match glossary terms) |
+| `docs/domain/02c-glossary.md` exists | `docs/domain/02b-bounded-contexts.md` must also exist (glossary is scoped to BCs) |
+| `docs/domain/models/{bc-slug}.md` exists | `docs/domain/02b-bounded-contexts.md` must exist (domain model is namespaced by BC) |
+| `docs/domain/models/{bc-slug}.md` exists | `docs/domain/02c-glossary.md` must exist (entity names must match glossary terms) |
 | `docs/business/04b-objectives.md` exists | `docs/business/04a-value-streams.md` must also exist (objectives consume pain index from VS) |
 | Any `*_prd_*.md` | If `docs/business/04b-objectives.md` exists, the PRD should reference ≥1 `OBJ-NN` in §0 |
 
@@ -216,16 +216,16 @@ grep -roh '\bQA-[^A-Z ]' docs/ --include="*.md"
 ```bash
 [ -f "docs/product-specs/07a-fbs.md" ] && \
   [ ! -f "docs/business/03a-capability-map.md" ] && \
-  echo "WARNING: FBS exists but 03-capability-map.md missing"
+  echo "WARNING: FBS exists but 03a-capability-map.md missing"
 
-[ -f "docs/domain/glossary.md" ] && \
-  [ ! -f "docs/domain/bounded-contexts.md" ] && \
+[ -f "docs/domain/02c-glossary.md" ] && \
+  [ ! -f "docs/domain/02b-bounded-contexts.md" ] && \
   echo "WARNING: Glossary exists but bounded-contexts.md missing"
 
 find docs/domain/models -name "*.md" 2>/dev/null | while read f; do
-  [ ! -f "docs/domain/bounded-contexts.md" ] && \
+  [ ! -f "docs/domain/02b-bounded-contexts.md" ] && \
     echo "WARNING: Domain model exists but bounded-contexts.md missing: $f"
-  [ ! -f "docs/domain/glossary.md" ] && \
+  [ ! -f "docs/domain/02c-glossary.md" ] && \
     echo "WARNING: Domain model exists but glossary missing: $f"
 done
 ```
@@ -271,12 +271,12 @@ done | sort -rn
 |---|---|---|
 | `*-process.md` | `## §8 KPIs` or `## KPIs`, `## §11` or `## Open TODOs`, `## §0 Master flow` | `grep -q 'KPI\|§8'` |
 | `docs/business/06a-models/*.md` | `§5.2` or `Implicit assumptions`, `§6` or `Scenario Matrix`, `§7` or `Value capture` | `grep -q '5\.2\|Implicit assumptions'` |
-| `01-personas.md` | `## Persona Backlog`, `## Personas`, `## Persona Template` | `grep -q 'Persona Backlog'` |
-| `03-capability-map.md` | `## L0 axis`, `## Global overview`, `## Capability index` | `grep -q 'L0 axis\|Capability index'` |
-| `04-value-streams.md` | `## Catalogue`, `## Value Streams` | `grep -q '## Catalogue'` |
-| `07-fbs.md` | At least one `### C` capability heading with a functionality table | `grep -q '### C[0-9]'` |
-| `08-delivery-roadmap.md` | Epic table with `E-NN` IDs | `grep -q 'E-[0-9][0-9]'` |
-| `09-quality-attributes.md` | ISO characteristic headings (`Performance Efficiency`, `Security`, `Reliability`, etc.) | `grep -q 'Performance Efficiency\|Security\|Reliability'` |
+| `01a-personas.md` | `## Persona Backlog`, `## Personas`, `## Persona Template` | `grep -q 'Persona Backlog'` |
+| `03a-capability-map.md` | `## L0 axis`, `## Global overview`, `## Capability index` | `grep -q 'L0 axis\|Capability index'` |
+| `04a-value-streams.md` | `## Catalogue`, `## Value Streams` | `grep -q '## Catalogue'` |
+| `07a-fbs.md` | At least one `### C` capability heading with a functionality table | `grep -q '### C[0-9]'` |
+| `08a-delivery-roadmap.md` | Epic table with `E-NN` IDs | `grep -q 'E-[0-9][0-9]'` |
+| `09a-quality-attributes.md` | ISO characteristic headings (`Performance Efficiency`, `Security`, `Reliability`, etc.) | `grep -q 'Performance Efficiency\|Security\|Reliability'` |
 | `*_prd_*.md` | `§0 Architecture Traceability` or traceability block, `## Acceptance criteria` | `grep -q 'Traceability\|Acceptance'` |
 | `04b-objectives.md` | At least one `OBJ-NN` heading, `## Changelog`, `## Objective × Epic` section | `grep -q 'OBJ-[0-9][0-9]\|Changelog'` |
 | `VISION.md` | `## The Elevator Pitch`, `## What We Are NOT`, `## North Star Metric`, `## Changelog` | `grep -q 'Elevator Pitch\|North Star'` |
@@ -371,11 +371,11 @@ done | sort
 **Detection — glossary changelog discipline:**
 ```bash
 # Glossary exists but has no Changelog section → living-doc discipline missing
-if [ -f "docs/domain/glossary.md" ]; then
-  grep -q '## Changelog' docs/domain/glossary.md || \
+if [ -f "docs/domain/02c-glossary.md" ]; then
+  grep -q '## Changelog' docs/domain/02c-glossary.md || \
     echo "WARNING: glossary.md missing Changelog section"
   # Changelog exists but last entry is > 30 days ago for Core BC (sprint cadence)
-  last_entry=$(grep -m1 '^### [0-9]' docs/domain/glossary.md 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+  last_entry=$(grep -m1 '^### [0-9]' docs/domain/02c-glossary.md 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}')
   [ -n "$last_entry" ] && echo "Glossary last changelog entry: $last_entry"
 fi
 ```
@@ -410,7 +410,7 @@ done
 ```
 
 **Exclusions (never flag as orphaned):**
-- Hub docs: `personas.md`, `capability-map.md`, `value-streams.md`, `08-delivery-roadmap.md`, `quality-attributes.md`, `FBS.md`
+- Hub docs: `01a-personas.md`, `03a-capability-map.md`, `04a-value-streams.md`, `08a-delivery-roadmap.md`, `09a-quality-attributes.md`, `07a-fbs.md`
 - README.md files
 - Index files
 
@@ -502,7 +502,7 @@ done
 **Detection — domain model completeness:**
 ```bash
 # Domain model completeness
-bc_count=$(grep -c 'BC-[0-9][0-9]' docs/domain/bounded-contexts.md 2>/dev/null || echo 0)
+bc_count=$(grep -c 'BC-[0-9][0-9]' docs/domain/02b-bounded-contexts.md 2>/dev/null || echo 0)
 dm_count=$(find docs/domain -name "domain-model.md" 2>/dev/null | wc -l)
 echo "Bounded contexts: $bc_count | Domain models: $dm_count"
 [ "$dm_count" -lt "$bc_count" ] && echo "WARNING: $(($bc_count - $dm_count)) BC(s) missing domain model"

@@ -43,15 +43,15 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | 2 | Business Model Canvas | `docs/business/business-model-canvas/business-model-canvas.md` | `docs/business/02a-bmc.md` | singleton |
 | 2 | Lean Canvas (variant) | `docs/business/business-model-canvas/lean-canvas.md` | `docs/business/02a-lean-canvas.md` | singleton |
 | 2 | BMC Value Proposition Canvas | `docs/business/business-model-canvas/value-proposition-canvas-{segment}.md` | `docs/business/02a-vpc-{segment}.md` | multi-slug |
-| 2b | Bounded Contexts | `docs/domain/bounded-contexts/bounded-contexts.md` | `docs/domain/bounded-contexts.md` | singleton |
-| 2b | Context Map | `docs/domain/bounded-contexts/context-map.md` | `docs/domain/context-map.md` | singleton |
-| 2c | Domain Glossary | `docs/domain/glossary/glossary.md` | `docs/domain/glossary.md` | singleton |
+| 2b | Bounded Contexts | `docs/domain/bounded-contexts/bounded-contexts.md` | `docs/domain/02b-bounded-contexts.md` | singleton |
+| 2b | Context Map | `docs/domain/bounded-contexts/context-map.md` | `docs/domain/02b-context-map.md` | singleton |
+| 2c | Domain Glossary | `docs/domain/glossary/glossary.md` | `docs/domain/02c-glossary.md` | singleton |
 | 3 | Capability Map | `docs/business/capability-map/capability-map.md` | `docs/business/03a-capability-map.md` | singleton |
 | 4 | Value Streams | `docs/business/value-streams/value-streams.md` | `docs/business/04a-value-streams.md` | singleton |
 | 4 | VS Value Proposition Canvas | `docs/business/value-streams/value-proposition-canvas-{segment}.md` | `docs/business/04a-vpc-{segment}.md` | multi-slug |
 | 4b | Business Objectives | `docs/business/objectives/objectives.md` | `docs/business/04b-objectives.md` | singleton |
 | 5 | Business Processes | `docs/business/processes/{slug}-process.md` | `docs/business/processes/{slug}-process.md` | no-change |
-| 6 | Quantitative Models | `docs/business/06a-models/{slug}.md` | `docs/business/06a-models/{slug}.md` | no-change |
+| 6 | Quantitative Models | `docs/business/models/{slug}.md` | `docs/business/06a-models/{slug}.md` | singleton-folder |
 | 7 | FBS | `docs/product-specs/functional-breakdown-structure/FBS.md` | `docs/product-specs/07a-fbs.md` | singleton |
 | 7b | Domain Model (per BC) | `docs/domain/{bc-slug}/domain-model.md` | `docs/domain/models/{bc-slug}.md` | multi-slug |
 | 8 | Delivery Roadmap | `docs/product-specs/delivery-roadmap/delivery-roadmap.md` | `docs/product-specs/08a-delivery-roadmap.md` | singleton |
@@ -93,10 +93,10 @@ new_rel = os.path.relpath(F_new_abs, os.path.dirname(L_abs))
 Depth change examples:
 - `docs/business/personas/personas.md` (depth 3) → `docs/business/01a-personas.md` (depth 2)
   - A link from `docs/product-specs/07a-fbs.md` was `../business/personas/personas.md`
-  - After move: `../business/01-personas.md` (loses one `../`)
-- `docs/domain/glossary/glossary.md` (depth 3) → `docs/domain/glossary.md` (depth 2)
+  - After move: `../business/01a-personas.md` (loses one `../`)
+- `docs/domain/glossary/glossary.md` (depth 3) → `docs/domain/02c-glossary.md` (depth 2)
   - A link from `docs/domain/models/scheduling.md` was `../glossary/glossary.md`
-  - After move: `../glossary.md`
+  - After move: `../02c-glossary.md`
 
 ### Domain model consolidation (special case)
 
