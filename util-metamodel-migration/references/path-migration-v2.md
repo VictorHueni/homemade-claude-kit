@@ -51,7 +51,8 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | 4 | VS Value Proposition Canvas | `docs/business/value-streams/value-proposition-canvas-{segment}.md` | `docs/business/04a-vpc-{segment}.md` | multi-slug |
 | 4b | Business Objectives | `docs/business/objectives/objectives.md` | `docs/business/04b-objectives.md` | singleton |
 | 5 | Business Processes | `docs/business/processes/{slug}-process.md` | `docs/business/05a-processes/proc-NN-{slug}.md` | singleton-folder (Pattern B inside) |
-| 6 | Quantitative Models | `docs/business/models/{slug}.md` | `docs/business/06a-models/{slug}.md` | singleton-folder |
+| 6 | Quantitative Models | `docs/business/models/{slug}.md` | `docs/business/06a-models/qm-NN-{topic}.md` | singleton-folder (Pattern B inside) |
+| 6 (supporting) | Competitive Landscape | `docs/business/competitive-landscape/competitive-landscape.md` | `docs/business/01b-competitive-landscape/cl-NN-{slug}.md` + `CO-NN-{slug}.md` for competitor profiles | singleton-folder (Pattern B inside) |
 | 7 | FBS | `docs/product-specs/functional-breakdown-structure/FBS.md` | `docs/product-specs/07a-fbs.md` | singleton |
 | 7b | Domain Model (per BC) | `docs/domain/{bc-slug}/domain-model.md` | `docs/domain/07b-models/{bc-slug}.md` | singleton-folder (Pattern B inside) |
 | 8 | Delivery Roadmap | `docs/product-specs/delivery-roadmap/delivery-roadmap.md` | `docs/product-specs/08a-delivery-roadmap.md` | singleton |

@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **competitive landscape analyses** in the canonical strategy-consulting tradition: **Porter's Five Forces** (industry structure), **Blue Ocean Strategy Canvas + Value Curve** (positioning), **Strategic Group Mapping** (competitor clustering), and **per-competitor profiles** (Tier-1 depth). Synthesises Michael Porter's industry-economics framework, Kim & Mauborgne's value-innovation framework, SCIP (Strategic and Competitive Intelligence Professionals) practitioner discipline, and structured competitive-profile templates.
 
-The artifact produced by this skill is **a folder of markdown documents** at `docs/business/competitive-landscape/`. It is NOT a quantitative market-sizing model (use `business-quantitative-model` for TAM/SAM/SOM), NOT a feature comparison (that's product-marketing material), NOT a sales-positioning deck (that's downstream) — it is **the strategic-analysis layer** that captures industry attractiveness, competitor positioning, and differentiation opportunities, with evidence + confidence + freshness baked in.
+The artifact produced by this skill is **a folder of markdown documents** at `docs/business/01b-competitive-landscape/`. It is NOT a quantitative market-sizing model (use `business-quantitative-model` for TAM/SAM/SOM), NOT a feature comparison (that's product-marketing material), NOT a sales-positioning deck (that's downstream) — it is **the strategic-analysis layer** that captures industry attractiveness, competitor positioning, and differentiation opportunities, with evidence + confidence + freshness baked in.
 
 This skill is **domain-agnostic**. When activated inside a project, it picks up personas, capability map, value streams, BMC, and quantitative models, and soft-links them into the analysis where applicable.
 
@@ -28,9 +28,9 @@ A competitive landscape doc is good when a reader can answer, without ambiguity:
 |---|---|
 | **How attractive is this industry?** | Hub doc §Porter's Five Forces (5-row table with rating per force) |
 | **Who are our competitors, tiered by threat?** | Hub doc §Competitor Tiers (Direct / Indirect / Substitute / Potential) |
-| **Which competitors cluster together strategically?** | `strategic-group-map.md` (2-axis cluster diagram with rationale) |
-| **How do we position vs them on the dimensions buyers care about?** | `value-curve.md` (Strategy Canvas: factors of competition × offering level) |
-| **What does Tier-1 competitor X do specifically?** | `competitor-{slug}.md` (one file per Tier-1 competitor) |
+| **Which competitors cluster together strategically?** | `cl-02-strategic-group-map.md` (2-axis cluster diagram with rationale) |
+| **How do we position vs them on the dimensions buyers care about?** | `cl-03-value-curve.md` (Strategy Canvas: factors of competition × offering level) |
+| **What does Tier-1 competitor X do specifically?** | `CO-NN-{slug}.md` (one file per Tier-1 competitor) |
 | **What is each claim's evidence?** | Per-claim `Source: [url]` + `Last verified: YYYY-MM-DD` |
 | **How confident are we in each claim?** | Per-claim `Confidence: Assumed | Tested | Validated` |
 
@@ -48,8 +48,8 @@ A competitive landscape doc is good when a reader can answer, without ambiguity:
 
 **When:** the project has no competitive-landscape folder yet.
 
-**Output:** ONE file in `docs/business/competitive-landscape/` (or project-chosen folder):
-- `competitive-landscape.md` — hub document with intro, kit-link methodology pointer, empty Porter Five Forces table, empty Tier table, placeholder sections for strategic-group + value-curve references.
+**Output:** ONE file in `docs/business/01b-competitive-landscape/` (or project-chosen folder):
+- `cl-01-five-forces.md` — hub document with intro, kit-link methodology pointer, empty Porter Five Forces table, empty Tier table, placeholder sections for strategic-group + value-curve references.
 
 Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{industry}}` placeholders. Do NOT invent competitors in scaffold mode.
 
@@ -110,7 +110,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 
 **Process:**
 1. **Pick the competitor** — must be one of the Tier-1 Direct or Indirect competitors listed in the hub doc.
-2. **Create** `competitor-{slug}.md` in the same folder.
+2. **Create** `CO-NN-{slug}.md` in the same folder.
 3. **Fill the canonical profile** (see `references/template.md` for the structure):
    - **Basics:** HQ, founded year, ownership (public/private/PE-backed/etc), employees, latest funding/revenue if known.
    - **ICP / Target segments:** specific firmographic + role + trigger context (mirrors the persona-builder discipline).
@@ -128,13 +128,13 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** the hub has Tier-1 competitors enumerated; the user wants the visual / positioning analyses.
 
 **Process:**
-1. **Build Strategic Group Map** (`strategic-group-map.md`):
+1. **Build Strategic Group Map** (`cl-02-strategic-group-map.md`):
    - Pick 2 strategic dimensions (NOT correlated — e.g., price × breadth-of-offering, NOT price × premium-positioning).
    - Plot competitors as text-based bubbles (ASCII or markdown table with positioning).
    - Identify 2–4 strategic groups (clusters).
    - Per group: name, members, shared strategic profile, group-level rivalry.
    - **Validate with a second map** on different dimensions (per practitioner guidance — one map can mislead).
-2. **Build Strategy Canvas / Value Curve** (`value-curve.md`):
+2. **Build Strategy Canvas / Value Curve** (`cl-03-value-curve.md`):
    - **Horizontal axis:** factors of competition (5–8 factors that this industry competes on and invests in — derived from Tier-1 competitor profiles).
    - **Vertical axis:** offering level on each factor (Low / Medium / High).
    - Plot value curves: own product + 2–4 key competitors.
@@ -190,7 +190,7 @@ Ask 2–4 questions max, single message, lettered options where possible.
 
 ## Output structure — the canonical artefacts
 
-The skill produces up to 4 markdown files in `docs/business/competitive-landscape/`:
+The skill produces up to 4 markdown files in `docs/business/01b-competitive-landscape/`:
 
 ```
 competitive-landscape/
@@ -201,7 +201,7 @@ competitive-landscape/
 │                                     · Cross-links to strategic-group-map.md + value-curve.md + competitor-*.md files
 │                                     · Changelog
 │
-├── competitor-{slug}.md            ← per Tier-1 competitor (mode 3)
+├── CO-NN-{slug}.md            ← per Tier-1 competitor (mode 3)
 │                                     · Basics + ICP + Value Prop + GTM + Pricing + Product scope
 │                                     · SWOT (relative to own product)
 │                                     · Evidence sources + confidence + last verified
@@ -284,7 +284,7 @@ For references to project artefacts, use only upstream or peer artefacts: person
 
 ## Finding the right folder
 
-Default: `docs/business/competitive-landscape/`. Alternatives:
+Default: `docs/business/01b-competitive-landscape/`. Alternatives:
 - `docs/business/competition/` (shorter)
 - `docs/strategy/competitive-landscape/` when strategy has its own root
 
@@ -309,7 +309,7 @@ If a folder exists at a non-default location, use it. If multiple candidates exi
 
 Three files in `references/` carry the canonical content:
 
-- **`references/template.md`** — the canonical skeleton: `competitive-landscape.md` hub + `competitor-{slug}.md` profile + `strategic-group-map.md` + `value-curve.md`. Copy and fill.
+- **`references/template.md`** — the canonical skeleton: `cl-01-five-forces.md` hub + `CO-NN-{slug}.md` profile + `cl-02-strategic-group-map.md` + `cl-03-value-curve.md`. Copy and fill.
 - **`references/methodology-references.md`** — canonical bibliography (Porter 1979/1980, Kim & Mauborgne 2005, SCIP practitioner literature, Strategic Group Mapping consultancy sources). **Lives only in the kit** — never copied to projects.
 - **`references/landscape-discipline.md`** — internal Claude guidance: 8 anti-patterns with detection cues, framework decision tree, tiering rules, confidence promotion, sizing heuristics. Never copied to projects.
 
@@ -333,7 +333,7 @@ After running any mode, summarise in 4–6 lines:
 Before declaring the work done:
 
 - [ ] Folder exists or was created.
-- [ ] Hub doc `competitive-landscape.md` has executive summary + Porter Five Forces + Tier table (scaffold + industry-analysis modes).
+- [ ] Hub doc `cl-01-five-forces.md` has executive summary + Porter Five Forces + Tier table (scaffold + industry-analysis modes).
 - [ ] Methodology pointer in hub header links to the kit's canonical bibliography.
 - [ ] Every claim has `Source:` + `Last verified:` + `Confidence:`.
 - [ ] Competitor Tiers explicitly assigned with rationale (Direct / Indirect / Substitute / Potential).

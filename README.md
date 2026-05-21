@@ -229,10 +229,10 @@ erDiagram
 | `business-` | `business-value-stream` | `docs/business/04a-value-streams.md` | `VS-N` · `VS-N.M` |
 | `business-` | `business-process` | `docs/business/05a-processes/proc-NN-{slug}.md` | slug |
 | `business-` | `business-model-canvas` | `docs/business/02a-bmc.md` | block IDs |
-| `business-` | `business-quantitative-model` | `docs/business/06a-models/{slug}.md` | slug |
+| `business-` | `business-quantitative-model` | `docs/business/06a-models/qm-NN-{topic}.md` | slug |
 | `business-` | `business-vision` | `docs/VISION.md` *(Step 0 — singleton, CLAUDE.md wired)* | *(path ref — no ID)* |
 | `business-` | `business-objective` | `docs/business/04b-objectives.md` | `OBJ-NN` · `KR-NN.M` |
-| `business-` | `business-competitive-landscape` | `docs/business/competitive-landscape/` | — |
+| `business-` | `business-competitive-landscape` | `docs/business/01b-competitive-landscape/` | — |
 | `business-` | `business-research` | `docs/business/research/` | — |
 | `business-` | `business-workshop` | `docs/business/workshops/` | — |
 | `domain-` | `domain-bounded-context` | `docs/domain/bounded-contexts.md + docs/domain/context-map.md` | `BC-NN` |

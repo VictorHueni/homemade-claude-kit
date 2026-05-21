@@ -226,11 +226,11 @@ Within 1 hour after the interview, fill this in. **Don't rely on memory beyond 2
 
 ### Models — model slug
 - [Input assumption recalibration: from ___ to ___]
-- File update needed at: `docs/business/06a-models/{slug}.md` (specify section)
+- File update needed at: `docs/business/06a-models/qm-NN-{topic}.md` (specify section)
 
 ### Competitive landscape
 - [New competitor mention / claim verification]
-- File update needed at: `docs/business/competitive-landscape/competitor-{slug}.md` (specify section)
+- File update needed at: `docs/business/01b-competitive-landscape/CO-NN-{slug}.md` (specify section)
 ```
 
 ---

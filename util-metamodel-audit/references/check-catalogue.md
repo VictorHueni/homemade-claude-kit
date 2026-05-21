@@ -351,7 +351,7 @@ grep -n 'Next review' docs/business/01a-personas.md 2>/dev/null
 
 **Detection — competitive landscape staleness:**
 ```bash
-grep -rn 'Last verified' docs/business/competitive-landscape/ 2>/dev/null
+grep -rn 'Last verified' docs/business/01b-competitive-landscape/ 2>/dev/null
 # For each date, compute days since; flag if > 90 days (fast market) or > 180 days (slow)
 ```
 

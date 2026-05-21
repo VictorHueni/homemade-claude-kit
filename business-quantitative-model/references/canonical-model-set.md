@@ -43,7 +43,7 @@ canonical set.
 Full convention lives in `SKILL.md`. Summary:
 
 ```
-{phase-digit}{letter}-{topic}-model.md
+qm-NN-{topic}.md
 ```
 
 - **Phase 1** = per-customer value (ROI, pricing, headroom, willingness-to-pay, BoM)

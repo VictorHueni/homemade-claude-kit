@@ -1,6 +1,6 @@
 ---
 name: business-quantitative-model
-description: "Create or plan quantitative business model documents under docs/business/06a-models/. Four modes: (catalogue) recommend the full model set + build order for the venture shape before any file is created; (scaffold) generate a single empty model file from the canonical template; (fill) populate the funnel sections with project context; (refresh) recalibrate inputs and assumptions when new evidence arrives. Use when the user asks to create a TAM/SAM/SOM model, a savings model, a recovery / restitution model, a customer-ROI model, plan the quant models, or any other revenue-quantified funnel that feeds an investor or sales pitch. Triggers on: create a business model, plan the models, which models do we need, scaffold a TAM, bootstrap a quant model, fill in a model from the template, write a market-sizing doc, turn this idea into a model doc, model for the {product/feature/flow}, new model under docs/business/models. Encodes the canonical 4-step funnel, mandatory §5 implicit-assumptions table, scenario matrix, value-capture sections, the venture-shape catalogue (B2B SaaS / savings-recovery / marketplace / hardware), and the {phase-digit}{letter}-{topic} naming convention."
+description: "Create or plan quantitative business model documents under docs/business/06a-models/. Four modes: (catalogue) recommend the full model set + build order for the venture shape before any file is created; (scaffold) generate a single empty model file from the canonical template; (fill) populate the funnel sections with project context; (refresh) recalibrate inputs and assumptions when new evidence arrives. Use when the user asks to create a TAM/SAM/SOM model, a savings model, a recovery / restitution model, a customer-ROI model, plan the quant models, or any other revenue-quantified funnel that feeds an investor or sales pitch. Triggers on: create a business model, plan the models, which models do we need, scaffold a TAM, bootstrap a quant model, fill in a model from the template, write a market-sizing doc, turn this idea into a model doc, model for the {product/feature/flow}, new model under docs/business/models. Encodes the canonical 4-step funnel, mandatory §5 implicit-assumptions table, scenario matrix, value-capture sections, the venture-shape catalogue (B2B SaaS / savings-recovery / marketplace / hardware), and the qm-NN-{topic} naming convention."
 version: "1.2.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -43,7 +43,7 @@ The skill operates in one of four modes. Detect which mode the user wants from t
 | Mode | Question it answers | Output |
 |---|---|---|
 | **0 — Catalogue** | Which models does this project need, and in what order? | Chat-message plan (no files) |
-| **1 — Scaffold** | Create one empty model file from the template | `docs/business/06a-models/{slug}.md` with all numerics `_TODO_` |
+| **1 — Scaffold** | Create one empty model file from the template | `docs/business/06a-models/qm-NN-{topic}.md` with all numerics `_TODO_` |
 | **2 — Fill** | Populate the funnel sections with project context | The scaffold, with knowable cells pre-filled |
 | **3 — Refresh** | Recalibrate inputs when new evidence arrives | Targeted updates + changelog entry |
 
@@ -83,7 +83,7 @@ The skill operates in one of four modes. Detect which mode the user wants from t
 
 **When:** no model file exists yet for this slug.
 
-**Output:** ONE file at `docs/business/06a-models/{slug}.md` from the canonical template — all numeric cells `_TODO_`, structure complete.
+**Output:** ONE file at `docs/business/06a-models/qm-NN-{topic}.md` from the canonical template — all numeric cells `_TODO_`, structure complete.
 
 Seed §5.2 (implicit assumptions) with 3–5 starter rows matched to the funnel type — this section is mandatory and must never be left empty.
 Seed §8 (key unknowns) with the obvious gaps and their validation path.
@@ -163,7 +163,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 
 ## Output structure
 
-The skill produces ONE markdown file at `docs/business/06a-models/{slug}.md` with this fixed structure (from `references/template.md`):
+The skill produces ONE markdown file at `docs/business/06a-models/qm-NN-{topic}.md` with this fixed structure (from `references/template.md`):
 
 ```
 H1 title
@@ -351,7 +351,7 @@ When the user asks you to produce a model doc but the conversation has been abou
 The slug is the model's first piece of documentation — it should self-describe what the model is for, without requiring the reader to open the file. Use this pattern for every new model:
 
 ```
-{phase-digit}{letter}-{topic}-model.md
+qm-NN-{topic}.md
 ```
 
 **Phase digit semantics — *value before market before economics*:**
@@ -389,7 +389,7 @@ The digit order is not arbitrary. You cannot defend market sizing until you know
 ### Display name (H1) discipline
 
 The H1 is the slug, transformed:
-- Strip `{phase-digit}{letter}-` and `-model.md`
+- Strip `qm-NN-` and `.md`
 - Title Case the remainder
 - Add "Model" suffix
 
@@ -483,7 +483,7 @@ If the glossary does not yet exist at the time of writing, create it first, then
 Four files in `references/` carry the canonical content. Read them when needed:
 
 - **`references/canonical-model-set.md`** — the venture-shape catalogue used by `mode: catalogue`. Defines the four shapes (B2B SaaS / savings-recovery / marketplace / hardware) and their recommended model sets, slugs, dependency DAGs, and external gates. **Read this whenever the user asks "which models do we need?" or starts model work on a fresh project.**
-- **`references/template.md`** — the canonical model skeleton. Copy this to `docs/business/06a-models/{slug}.md` and fill placeholders. If the project has its own `_template_business_model.md`, prefer that as the source of truth (it may have project-specific tweaks).
+- **`references/template.md`** — the canonical model skeleton. Copy this to `docs/business/06a-models/qm-NN-{topic}.md` and fill placeholders. If the project has its own `_template_business_model.md`, prefer that as the source of truth (it may have project-specific tweaks).
 - **`references/logic-and-sequence.md`** — the plain-English explanation of why each section exists and the 9-step sequence you follow when filling the template. Reference this when explaining the structure to the user.
 - **`references/examples.md`** — abstract worked examples for a 4-step funnel (recovery / restitution shape) and a 3-step funnel (TAM/SAM/SOM shape), showing how the template gets filled for different funnel shapes.
 - **`references/glossary-seed.md`** — canonical pre-populated list of all methodology-imported acronyms and pricing-methodology jargon the skill uses. Copy and trim this to create a new project's `docs/business/06a-models/glossary.md` on first scaffold. Read this to check whether a new term warrants a glossary entry.
@@ -494,7 +494,7 @@ Four files in `references/` carry the canonical content. Read them when needed:
 
 After generating the model file and updating the index, summarize in 4–6 lines:
 
-1. **File created** at `docs/business/06a-models/{slug}.md` (and the index updated).
+1. **File created** at `docs/business/06a-models/qm-NN-{topic}.md` (and the index updated).
 2. **What got pre-filled** vs `_TODO_` — be specific.
 3. **Top 3 next research / interview tasks** — usually the §8 Key Unknowns priority 🔴 rows.
 4. **Which §5.2 assumption is most consequential** — the one to challenge first in a stakeholder conversation.
@@ -508,7 +508,7 @@ Keep it short. The user will read the model file directly; your job is to point 
 
 Before declaring the work done:
 
-- [ ] Model file exists at `docs/business/06a-models/{slug}.md` (scaffold / fill mode).
+- [ ] Model file exists at `docs/business/06a-models/qm-NN-{topic}.md` (scaffold / fill mode).
 - [ ] Funnel shape chosen and §2–§5 section count matches it.
 - [ ] §1 Inputs table populated with confidence stars (even if values are `_TODO_`).
 - [ ] §5.1 math chain present with ONE worked example.

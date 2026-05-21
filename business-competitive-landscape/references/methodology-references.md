@@ -82,7 +82,7 @@ Create Uncontested Market Space and Make the Competition Irrelevant*
 
 ### Discipline encoded in the skill
 
-- `value-curve.md` artefact has 5–8 factors of competition + own + ≥2
+- `cl-03-value-curve.md` artefact has 5–8 factors of competition + own + ≥2
   competitor curves + Four Actions section as the canonical structure.
 - Mode 4 explicitly forces "what to eliminate / reduce / raise / create"
   thinking to break mirror-matching ("we do X better").

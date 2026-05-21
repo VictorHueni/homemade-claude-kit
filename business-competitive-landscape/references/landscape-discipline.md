@@ -76,7 +76,7 @@ Marginal differentiation is fragile — competitors match it within
 quarters. True differentiation changes WHICH factors matter, not the
 LEVEL on existing factors.
 
-**Fix:** apply the Four Actions Framework in `value-curve.md`:
+**Fix:** apply the Four Actions Framework in `cl-03-value-curve.md`:
 - What can we **Eliminate** that everyone competes on but no one needs?
 - What can we **Reduce** below industry standard (less is more)?
 - What can we **Raise** dramatically above industry standard where
@@ -179,7 +179,7 @@ When triaging a competitor candidate, work through:
 ```
 Does this competitor sell the same value proposition to the same customer segment?
 ├── Yes → TIER 1 (Direct)
-│         → Create competitor-{slug}.md profile
+│         → Create CO-NN-{slug}.md profile
 │
 └── No
     │

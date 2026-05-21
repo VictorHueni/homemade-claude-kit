@@ -7,7 +7,7 @@ landscape: industry structure (Porter's Five Forces), competitor tiering
 (Direct / Indirect / Substitute / Potential), strategic group clustering,
 and positioning (Strategy Canvas + Value Curve). Per Tier-1 competitor,
 companion files in this folder carry the per-competitor deep-dive
-(`competitor-{slug}.md`).
+(`CO-NN-{slug}.md`).
 
 > **Methodology:** built using the canonical synthesis of [Porter's Five
 > Forces (1979/80) + Kim & Mauborgne Blue Ocean Strategy (2005) +
@@ -26,7 +26,7 @@ companion files in this folder carry the per-competitor deep-dive
 **Scope discipline:**
 - Captures **current state** of the market. Future projections go in a separate strategic doc.
 - Every claim carries `Source:` + `Last verified:` + `Confidence:` ratings.
-- Tier-1 (Direct) competitors get their own `competitor-{slug}.md` file. Tier-2/3/4 stay in tables below.
+- Tier-1 (Direct) competitors get their own `CO-NN-{slug}.md` file. Tier-2/3/4 stay in tables below.
 
 **Companion documents:**
 - Personas: [link to ../01a-personas.md if exists]
@@ -73,11 +73,11 @@ Lead with "so what" — what should we do given this landscape?*
 
 ### Tier 1 — Direct competitors
 
-*Compete on the same value proposition for the same customer segment. Per-competitor deep-dive in `competitor-{slug}.md`.*
+*Compete on the same value proposition for the same customer segment. Per-competitor deep-dive in `CO-NN-{slug}.md`.*
 
 | Competitor | HQ | Segment served | Value proposition | Profile link | Last verified |
 |---|---|---|---|---|---|
-| _TODO_ | _TODO_ | _TODO_ | _TODO_ | [competitor-{slug}.md](competitor-{slug}.md) | _YYYY-MM-DD_ |
+| _TODO_ | _TODO_ | _TODO_ | _TODO_ | [CO-NN-{slug}.md](CO-NN-{slug}.md) | _YYYY-MM-DD_ |
 
 ### Tier 2 — Indirect competitors
 
@@ -137,7 +137,7 @@ Lead with "so what" — what should we do given this landscape?*
 
 ## 5. SWOT (own product relative to competitive landscape)
 
-*High-level summary; per-competitor SWOT lives in each `competitor-{slug}.md` file.*
+*High-level summary; per-competitor SWOT lives in each `CO-NN-{slug}.md` file.*
 
 | Dimension | Items |
 |---|---|
