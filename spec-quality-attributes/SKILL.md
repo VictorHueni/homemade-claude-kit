@@ -278,6 +278,7 @@ Flag Phase 2 Safety requirements early.
 | **FBS differentiators** (★) | Differentiator features have zero-defect Reliability targets. |
 | **Personas** | Interaction Capability and Performance Efficiency are persona-grounded. |
 | **Value stream pain index** | Critical-pain stages drive Performance Efficiency priorities. |
+| **Business objectives** (`KR-NN.M`) | Key Results that state measurable thresholds (e.g. "response time < 500ms") can ground QA-PE or QA-RE acceptance criteria. When filling QAs, check `docs/business/objectives/objectives.md` for KR targets that should become QA entries. Link bidirectionally: QA entry → KR-NN.M. |
 
 Quality attributes must NOT appear in the FBS. If a functional capability
 has a quality constraint (e.g. "conflict detection must have zero false
@@ -315,6 +316,7 @@ Before declaring the work done:
 - [ ] Acceptance criteria are measurable (threshold, %, verifiable condition) — never vague aspirations
 - [ ] Interaction Capability entries are persona-grounded (P-NN)
 - [ ] Performance Efficiency entries reference value stream pain index where applicable
+- [ ] KR-NN.M targets that specify measurable thresholds have corresponding QA-XXNN entries (check `docs/business/objectives/objectives.md` if it exists)
 - [ ] Differentiator FBS features have Reliability entries
 - [ ] Security entries reference nFADP and relevant ADRs (0001, 0003, 0004)
 - [ ] No functional requirements leaked in (→ FBS)

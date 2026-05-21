@@ -313,8 +313,8 @@ After running any mode, summarise in 4–6 lines:
 2. **Streams identified / filled** with VS-IDs.
 3. **Persona-link health** — did every triggering stakeholder link to a real persona ID, or are there `_TODO_`s pending?
 4. **Capability-link health** — did every stage's enabling capabilities resolve, or are there `_TODO_`s pending?
-5. **Pain index summary** (fill mode) — which stages are `High` or `Critical`? These are transformation priorities.
-6. **Cross-link opportunities** — which artefacts (personas, BC Map, processes) the value streams should pull into traceability.
+5. **Pain index summary** (fill mode) — which stages are `High` or `Critical`? These are transformation priorities. High/Critical stages are the primary input for Step 4.5 (`business-objective`) — the pain index prioritises which objectives to set.
+6. **Cross-link opportunities** — which artefacts (personas, BC Map, processes, business objectives) the value streams should pull into traceability.
 
 ---
 
