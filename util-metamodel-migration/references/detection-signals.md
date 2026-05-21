@@ -94,7 +94,7 @@ Folders/files that are valid project docs but have NO equivalent metamodel artef
 | Pattern | Why outside scope |
 |---|---|
 | `docs/developer/` or `docs/dev-guide/` or `docs/contributing/` | Developer guides — not a metamodel artefact |
-| `docs/design/` or `docs/ui/` or `docs/ux/` | Design system — not in metamodel (dev-slide-deck handles presentations) |
+| `docs/design/` or `docs/ui/` or `docs/ux/` | Design system — not in metamodel (com-slide-deck handles presentations) |
 | `docs/ci-cd/` or `docs/deployment/` or `docs/infra/` | CI/CD and infra docs — not in metamodel |
 | `docs/data/` (excluding glossary/info-model files) | Data engineering docs — not in metamodel (glossary/info-model are DDD candidates) |
 | `docs/codebase/` or `docs/valuation/` | Business/financial analysis — not in metamodel |

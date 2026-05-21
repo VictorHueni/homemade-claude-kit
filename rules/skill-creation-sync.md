@@ -41,7 +41,8 @@ Skill folder name + `name:` frontmatter field must follow this exact pattern:
 | `arch-` | `docs/architecture/` (subfolders per artefact type) | `arch-adr` (writes to `docs/architecture/decisions/`) |
 | `domain-` | `docs/domain/` | DDD artefacts — bounded contexts, glossary, domain model; the shared language between business and tech | `domain-bounded-context`, `domain-glossary`, `domain-model` |
 | `ops-` | `docs/ops/` (subfolders per artefact type) | `ops-runbook` (→ `docs/ops/runbooks/`), `ops-bug-rca` (→ `docs/ops/rcas/`) |
-| `dev-` | *(no doc folder — developer workflow utility)* | `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-slide-deck`, `dev-ralph-loop` |
+| `dev-` | *(no doc folder — developer workflow utility)* | `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-ralph-loop` |
+| `com-` | *(no doc folder — communication artefacts)* | `com-slide-deck` |
 | `util-` | *(no doc folder — housekeeping)* | `util-docs-audit`, `util-toolkit-doctor` |
 
 **Why this matters:** when you (or Claude) see a skill name, the prefix immediately tells you (a) which folder its output goes into, or (b) that it's a non-doc utility. No ambiguity.
@@ -99,7 +100,7 @@ When only ONE skill exists per artefact, **drop the verb suffix**. The "build" i
 | Anti-pattern | Why | Fix |
 |---|---|---|
 | Missing category prefix (`docs-auditor`) | No discoverability axis | Add prefix → `util-docs-audit` |
-| `-skill` suffix (`slide-builder-skill`) | Tautological | Drop suffix → `dev-slide-deck` |
+| `-skill` suffix (`slide-builder-skill`) | Tautological | Drop suffix → `com-slide-deck` |
 | `using-` prefix (`using-git-worktrees`) | Verb-led, plural noun | Reframe → `dev-git-worktree` |
 | Synonym verbs (`-creator`, `-generator`, `-builder` interchangeably) | Pick-one inconsistency | Standardise on `-builder`, drop others |
 | Folder name ≠ `name:` field | Hidden inconsistency | Always align both |

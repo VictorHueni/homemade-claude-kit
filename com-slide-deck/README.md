@@ -16,10 +16,10 @@ Copy or clone this folder into your skills directory:
 
 ```bash
 # Personal skill (all projects)
-cp -r dev-slide-deck ~/.claude/skills/slide-builder
+cp -r com-slide-deck ~/.claude/skills/slide-builder
 
 # Project skill (this repo only)
-cp -r dev-slide-deck .claude/skills/slide-builder
+cp -r com-slide-deck .claude/skills/slide-builder
 ```
 
 The agent will pick it up automatically via the `SKILL.md` frontmatter.
@@ -29,7 +29,7 @@ The agent will pick it up automatically via the `SKILL.md` frontmatter.
 ## Folder Structure
 
 ```
-dev-slide-deck/
+com-slide-deck/
   SKILL.md                       Agent instructions (with frontmatter)
   README.md                      This file
   templates/
@@ -92,7 +92,7 @@ my-presentation/
 # Create slide partials in output/slides/
 # Add them to config.yaml
 # Then build:
-python path/to/dev-slide-deck/scripts/build.py --config ./my-presentation/config.yaml
+python path/to/com-slide-deck/scripts/build.py --config ./my-presentation/config.yaml
 ```
 
 Output: `my-presentation/output/slide-deck/presentation.html`

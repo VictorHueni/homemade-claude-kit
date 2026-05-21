@@ -48,7 +48,8 @@ what order, and where to put it**.
 - `util-docs-audit` — general doc staleness scan (file-level freshness, dead prose)
 - `util-metamodel-audit` — deep metamodel compliance audit: 16 checks covering stack progress, folder placement, internal + external links, ID integrity + cross-references, dependency enforcement, _TODO_ density, mandatory sections, confidence distribution, expiry + staleness, orphaned files, research sync, ADR chains, FBS + epic delivery progress → report at `var/reports/metamodel-audit/`; report-only with proposed fix per finding; run monthly (active dev) or quarterly (maintenance)
 - `util-metamodel-migration` — one-time migration doctor for repos built before the metamodel: scans any docs/ folder, detects misplaced files using tiered confidence scoring (filename → folder name → content signals), emits atomic fix blocks (git mv + sed link repairs) per file → report at `var/reports/metamodel-migration/`; report-only; run once before the first `util-metamodel-audit`
-- `dev-*` skills — developer workflow (git, PR, worktree, slide deck)
+- `dev-*` skills — developer workflow (git, PR, worktree, ralph loop)
+- `com-*` skills — communication artefacts (slide decks, presentations)
 
 ---
 

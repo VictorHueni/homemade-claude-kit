@@ -1,5 +1,5 @@
 ---
-name: dev-slide-deck
+name: com-slide-deck
 description: >
   Build single-file HTML slide presentations from modular partials, a shared
   design system, and a Python build pipeline. Use this skill any time the user
@@ -41,7 +41,7 @@ project-specific content.
 This skill contains only reusable, versionable assets:
 
 ```
-dev-slide-deck/           <-- VERSION THIS (Git repo or .claude/skills/)
+com-slide-deck/           <-- VERSION THIS (Git repo or .claude/skills/)
   SKILL.md                     This file
   README.md                    Human-readable docs
   templates/
@@ -92,7 +92,7 @@ prerequisite is missing, you stop and fix it before proceeding.**
 1. Identify the project directory (the folder containing `config.yaml`).
 2. If no project exists yet, scaffold one:
    ```bash
-   python path/to/dev-slide-deck/scripts/init.py ./target-dir --name "Title" --author "Name"
+   python path/to/com-slide-deck/scripts/init.py ./target-dir --name "Title" --author "Name"
    ```
 3. Confirm the project has `context/`, `design/`, `output/`, and `config.yaml`.
 
@@ -235,7 +235,7 @@ Rules:
    ```
 4. Build and verify:
    ```bash
-   python path/to/dev-slide-deck/scripts/build.py --config path/to/config.yaml
+   python path/to/com-slide-deck/scripts/build.py --config path/to/config.yaml
    ```
 
 ### CSS conventions

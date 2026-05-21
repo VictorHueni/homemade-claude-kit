@@ -252,7 +252,7 @@ erDiagram
 | `dev-` | `dev-pr` | GitHub pull request | — |
 | `dev-` | `dev-git-worktree` | git worktree | — |
 | `dev-` | `dev-ralph-loop` | autonomous increment execution | — |
-| `dev-` | `dev-slide-deck` | HTML slide deck | — |
+| `com-` | `com-slide-deck` | HTML slide deck | — |
 | `util-` | `util-metamodel-audit` | `var/reports/metamodel-audit/` | — |
 | `util-` | `util-docs-audit` | doc health report | — |
 | `util-` | `util-toolkit-doctor` | setup health report | — |
