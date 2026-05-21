@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **business objectives and key results** — the strategic-intent layer that answers the question *"Why are we building this, and how will we know it's working?"* before any product or delivery planning begins.
 
-The artefact produced by this skill is **a markdown document** at `docs/business/objectives/objectives.md`. It is NOT a feature list (→ FBS), NOT a delivery plan (→ delivery roadmap), NOT a quality spec (→ quality-attributes) — it is the **strategic-intent layer**: a small set of qualitative objectives and their measurable outcomes, connecting commercial intent (BMC) and value stream pain to delivery decisions.
+The artefact produced by this skill is **a markdown document** at `docs/business/04b-objectives.md`. It is NOT a feature list (→ FBS), NOT a delivery plan (→ delivery roadmap), NOT a quality spec (→ quality-attributes) — it is the **strategic-intent layer**: a small set of qualitative objectives and their measurable outcomes, connecting commercial intent (BMC) and value stream pain to delivery decisions.
 
 This skill is **domain-agnostic**. When activated inside a project it picks up the project's own personas, value streams, and BMC blocks and uses them as the grounding for objectives.
 
@@ -61,7 +61,7 @@ A objectives document is good when a reader can answer, without ambiguity:
 
 ### Mode 1 — Scaffold
 
-**When:** the project has no `docs/business/objectives/` folder yet.
+**When:** the project has no `docs/business/` folder yet.
 
 **Step 0 — Clarifying questions (ask BEFORE generating)**
 
@@ -92,7 +92,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 |---|---|
 | **Scope name** | "What product / business / initiative is this objectives doc for?" — used for `{{product_or_scope}}` |
 
-**Output:** `docs/business/objectives/objectives.md` sourced from `references/template.md`. Substitute `{{product_or_scope}}` and `{{period}}` placeholders. Do NOT invent objective content in scaffold mode — placeholders only.
+**Output:** `docs/business/04b-objectives.md` sourced from `references/template.md`. Substitute `{{product_or_scope}}` and `{{period}}` placeholders. Do NOT invent objective content in scaffold mode — placeholders only.
 
 **Do NOT** ship a project-side `methodology-references.md`. The canonical bibliography lives in the skill at `references/methodology-references.md` and is linked from the project doc's header.
 
@@ -118,7 +118,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** the objectives doc and delivery roadmap both exist; the user wants to verify epics trace back to objectives.
 
 **Process:**
-1. Read `docs/business/objectives/objectives.md` and `docs/product-specs/delivery-roadmap/delivery-roadmap.md`.
+1. Read `docs/business/04b-objectives.md` and `docs/product-specs/08-delivery-roadmap.md`.
 2. For each E-NN epic, identify which OBJ-NN it serves (look for explicit references or infer from value statement + VS anchor).
 3. Build or update the §Objective × Epic traceability matrix.
 4. Flag epics with no OBJ-NN reference as **orphaned delivery** — work being built without a stated strategic objective.
@@ -181,10 +181,10 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 | Objectives field | Soft-links to |
 |---|---|
 | **Vision** (upstream root) | `docs/VISION.md` (singleton) — objectives should be measurable steps toward the vision's north star metric; if VISION.md exists, add a "Linked to vision" note on each OBJ-NN |
-| **"Linked from"** (OBJ-NN) | BMC Value Propositions (`VP-NN`) from `docs/business/business-model-canvas/` and/or VS pain index (`VS-N.M`) from `docs/business/value-streams/value-streams.md` |
-| **Personas** (OBJ-NN "whose outcomes") | Personas (`P-NN`) from `docs/business/personas/personas.md` |
-| **KR targets** | May ground QA acceptance criteria (`QA-XXNN`) in `docs/product-specs/quality-attributes/quality-attributes.md` |
-| **§Objective × Epic matrix** | Epics (`E-NN`) from `docs/product-specs/delivery-roadmap/delivery-roadmap.md` |
+| **"Linked from"** (OBJ-NN) | BMC Value Propositions (`VP-NN`) from `docs/business/` and/or VS pain index (`VS-N.M`) from `docs/business/04-value-streams.md` |
+| **Personas** (OBJ-NN "whose outcomes") | Personas (`P-NN`) from `docs/business/01-personas.md` |
+| **KR targets** | May ground QA acceptance criteria (`QA-XXNN`) in `docs/product-specs/09-quality-attributes.md` |
+| **§Objective × Epic matrix** | Epics (`E-NN`) from `docs/product-specs/08-delivery-roadmap.md` |
 | **OBJ-NN** | Referenced in PRD `§0 Architecture Traceability` in `docs/product-specs/` |
 
 ---
@@ -262,7 +262,7 @@ The objectives doc sits at the **strategic-intent layer**, above the delivery st
 
 ## Finding the right folder
 
-Default: `docs/business/objectives/`.
+Default: `docs/business/`.
 
 **Always check first:**
 ```bash
@@ -281,7 +281,7 @@ If a folder exists at a non-default location, use it. If none exists, default an
 
 ## Reference materials
 
-- **`references/template.md`** — canonical objectives document skeleton. Copy to `docs/business/objectives/objectives.md` and fill placeholders.
+- **`references/template.md`** — canonical objectives document skeleton. Copy to `docs/business/04b-objectives.md` and fill placeholders.
 - **`references/methodology-references.md`** — canonical bibliography (Doerr, BABOK, Adzic, Kaplan & Norton). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
 - **`references/objective-discipline.md`** — internal Claude guidance: outcome vs output test, anti-pattern detection cues, BSC perspective decision tree, KR sizing rules, traceability alignment checks. Never copied into the project.
 

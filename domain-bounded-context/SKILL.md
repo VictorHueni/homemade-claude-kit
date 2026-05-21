@@ -1,6 +1,6 @@
 ---
 name: domain-bounded-context
-description: "Create a Bounded Context Map + Context Map for a project using strategic DDD. Identifies bounded contexts from the capability map, classifies each as Core / Supporting / Generic subdomain (Vernon), maps integration patterns between contexts (Evans: ACL, Shared Kernel, Customer-Supplier, Open Host Service, Published Language, Conformist). Synthesises Evans Domain-Driven Design (2003) Chapter 14 + Vernon DDD Distilled (2016) Chapter 3-4 + Nick Tune Architecture Modernization (2024). Use when asked to identify bounded contexts, define system boundaries, map context relationships, classify subdomains, or align team topology with domain boundaries. Triggers on: bounded context, context map, subdomain, DDD boundaries, domain boundaries, core domain, supporting domain, generic subdomain, context mapping, anti-corruption layer, domain-driven design boundaries. Output: docs/domain/bounded-contexts/. Soft-links to capability map (C-N.M), personas (P-NN), value streams (VS-N.M)."
+description: "Create a Bounded Context Map + Context Map for a project using strategic DDD. Identifies bounded contexts from the capability map, classifies each as Core / Supporting / Generic subdomain (Vernon), maps integration patterns between contexts (Evans: ACL, Shared Kernel, Customer-Supplier, Open Host Service, Published Language, Conformist). Synthesises Evans Domain-Driven Design (2003) Chapter 14 + Vernon DDD Distilled (2016) Chapter 3-4 + Nick Tune Architecture Modernization (2024). Use when asked to identify bounded contexts, define system boundaries, map context relationships, classify subdomains, or align team topology with domain boundaries. Triggers on: bounded context, context map, subdomain, DDD boundaries, domain boundaries, core domain, supporting domain, generic subdomain, context mapping, anti-corruption layer, domain-driven design boundaries. Output: docs/domain/. Soft-links to capability map (C-N.M), personas (P-NN), value streams (VS-N.M)."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **strategic DDD Bounded Context Maps** — the artefacts that answer one question: *"where does the domain model change meaning, and what are the explicit relationships between those islands of meaning?"*
 
-The artifacts produced by this skill are **two markdown documents** in the project's domain folder (default `docs/domain/bounded-contexts/`):
+The artifacts produced by this skill are **two markdown documents** in the project's domain folder (default `docs/domain/`):
 - `bounded-contexts.md` — the catalogue of bounded contexts, their subdomain type, owned capabilities, and team ownership.
 - `context-map.md` — the integration pattern map showing how bounded contexts relate to each other.
 
@@ -47,7 +47,7 @@ The skill operates in one of four modes. Detect from the user's prompt; ask if a
 
 ### Mode 1 — Scaffold
 
-**When:** the project has no `docs/domain/bounded-contexts/` folder yet, or has the folder but no files.
+**When:** the project has no `docs/domain/` folder yet, or has the folder but no files.
 
 **Output:** two empty template files:
 - `bounded-contexts.md` — catalogue skeleton with placeholder BC-01 / BC-02 rows.
@@ -159,7 +159,7 @@ If a BC has >4 integration relationships, examine whether it is playing the role
 
 ## Finding the right folder
 
-**Default:** `docs/domain/bounded-contexts/`
+**Default:** `docs/domain/`
 
 **Always check for an existing folder first:**
 

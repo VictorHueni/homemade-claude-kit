@@ -27,10 +27,10 @@ them by stable ID so traceability is mechanical, not narrative.
 Before asking any questions, silently check which upstream artefacts exist:
 
 ```bash
-ls docs/business/personas/personas.md 2>/dev/null
-ls docs/business/capability-map/capability-map.md 2>/dev/null
-ls docs/product-specs/functional-breakdown-structure/FBS.md 2>/dev/null
-ls docs/business/value-streams/value-streams.md 2>/dev/null
+ls docs/business/01-personas.md 2>/dev/null
+ls docs/business/03-capability-map.md 2>/dev/null
+ls docs/product-specs/07-fbs.md 2>/dev/null
+ls docs/business/04-value-streams.md 2>/dev/null
 ```
 
 **If artefacts exist:** extract the relevant IDs and use them to enrich the PRD
@@ -326,7 +326,7 @@ if the FBS file is accessible:
 
 > "The following FBS functionalities are now committed by this PRD.
 > Update their status from ⬜ to 🔄 in
-> `docs/product-specs/functional-breakdown-structure/FBS.md`."
+> `docs/product-specs/07-fbs.md`."
 
 List each committed functionality with its ID and name. If you have write
 access, make the edits directly and commit the FBS alongside the PRD.
@@ -347,7 +347,7 @@ Before saving the PRD:
 
 - [ ] Upstream artefacts checked (BC Map, FBS, personas, value streams)
 - [ ] §0 Architecture Traceability block filled (or omitted if no artefacts exist)
-- [ ] OBJ-NN referenced in §0 if `docs/business/objectives/objectives.md` exists
+- [ ] OBJ-NN referenced in §0 if `docs/business/04b-objectives.md` exists
 - [ ] Clarifying questions asked with lettered options
 - [ ] User answers incorporated
 - [ ] Every user story references a specific persona role + P-NN ID

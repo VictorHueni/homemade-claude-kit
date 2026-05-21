@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **research-grounded persona artifacts** — structured archetypes of the real user groups a product serves, written so they survive design decisions, onboarding, and stakeholder engagement planning without further interviews.
 
-The artifact produced by this skill is **a markdown document** in the project's personas folder (default `docs/business/personas/`, adapt to project convention). It is NOT a marketing buyer-persona, NOT a one-pager poster, NOT a JTBD outcome statement on its own — it is **the descriptive source-of-truth** about who the product serves, written for product, engineering, and business-analysis consumption simultaneously.
+The artifact produced by this skill is **a markdown document** in the project's personas folder (default `docs/business/`, adapt to project convention). It is NOT a marketing buyer-persona, NOT a one-pager poster, NOT a JTBD outcome statement on its own — it is **the descriptive source-of-truth** about who the product serves, written for product, engineering, and business-analysis consumption simultaneously.
 
 Personas are one of the four canonical **Business Architecture artefacts** (BIZBOK / TOGAF), alongside the capability map, value streams, and business processes — which is why they all sit together under `docs/business/`.
 
@@ -309,7 +309,7 @@ When linking, prefer **persona ID + artefact-row ID** ("P-02 consumes BC4.3 acro
 
 ## Finding the right folder
 
-**Default:** `docs/business/personas/` — aligns personas with the other Business Architecture artefacts (capability map, value streams, processes).
+**Default:** `docs/business/` — aligns personas with the other Business Architecture artefacts (capability map, value streams, processes).
 
 **Always check for an existing folder first:**
 
@@ -317,7 +317,7 @@ When linking, prefer **persona ID + artefact-row ID** ("P-02 consumes BC4.3 acro
 find docs -type d -name "personas" 2>/dev/null
 ```
 
-If a folder exists at a non-default location (e.g., `docs/product-specs/personas/`, `docs/<domain>/personas/`), use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none exists, default to `docs/business/personas/` and confirm with the user.
+If a folder exists at a non-default location (e.g., `docs/product-specs/personas/`, `docs/<domain>/personas/`), use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none exists, default to `docs/business/` and confirm with the user.
 
 **Never overwrite an existing `personas.md`.** If it exists, switch modes:
 - Scaffold mode → skip (report what's already there).

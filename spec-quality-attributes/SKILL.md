@@ -17,7 +17,7 @@ non-functional requirements registry that defines how well the system performs
 its functions, as distinct from what functions it performs (FBS territory).
 
 The artifact produced by this skill is a markdown document at
-`docs/product-specs/quality-attributes/quality-attributes.md`. It is NOT a
+`docs/product-specs/09-quality-attributes.md`. It is NOT a
 feature registry (→ FBS), NOT an architectural decision (→ ADR), NOT a process
 doc — it is the **system quality specification**: measurable, verifiable
 quality requirements anchored to ISO/IEC 25010:2023.
@@ -147,7 +147,7 @@ evidence arrives. Promote confidence level (Assumed → Tested → Validated).
 ## Output structure
 
 ```
-docs/product-specs/quality-attributes/quality-attributes.md
+docs/product-specs/09-quality-attributes.md
 
 H1: {{product}} — Quality Attributes
 
@@ -278,7 +278,7 @@ Flag Phase 2 Safety requirements early.
 | **FBS differentiators** (★) | Differentiator features have zero-defect Reliability targets. |
 | **Personas** | Interaction Capability and Performance Efficiency are persona-grounded. |
 | **Value stream pain index** | Critical-pain stages drive Performance Efficiency priorities. |
-| **Business objectives** (`KR-NN.M`) | Key Results that state measurable thresholds (e.g. "response time < 500ms") can ground QA-PE or QA-RE acceptance criteria. When filling QAs, check `docs/business/objectives/objectives.md` for KR targets that should become QA entries. Link bidirectionally: QA entry → KR-NN.M. |
+| **Business objectives** (`KR-NN.M`) | Key Results that state measurable thresholds (e.g. "response time < 500ms") can ground QA-PE or QA-RE acceptance criteria. When filling QAs, check `docs/business/04b-objectives.md` for KR targets that should become QA entries. Link bidirectionally: QA entry → KR-NN.M. |
 
 Quality attributes must NOT appear in the FBS. If a functional capability
 has a quality constraint (e.g. "conflict detection must have zero false
@@ -316,7 +316,7 @@ Before declaring the work done:
 - [ ] Acceptance criteria are measurable (threshold, %, verifiable condition) — never vague aspirations
 - [ ] Interaction Capability entries are persona-grounded (P-NN)
 - [ ] Performance Efficiency entries reference value stream pain index where applicable
-- [ ] KR-NN.M targets that specify measurable thresholds have corresponding QA-XXNN entries (check `docs/business/objectives/objectives.md` if it exists)
+- [ ] KR-NN.M targets that specify measurable thresholds have corresponding QA-XXNN entries (check `docs/business/04b-objectives.md` if it exists)
 - [ ] Differentiator FBS features have Reliability entries
 - [ ] Security entries reference nFADP and relevant ADRs (0001, 0003, 0004)
 - [ ] No functional requirements leaked in (→ FBS)

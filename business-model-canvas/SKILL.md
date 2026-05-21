@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **strategic-design canvases** in the Osterwalder/Strategyzer tradition: the **Business Model Canvas (BMC)** (Osterwalder & Pigneur, *Business Model Generation*, 2010), the **Lean Canvas** (Ash Maurya, *Running Lean*, 2010), and the **Value Proposition Canvas (VPC)** (Osterwalder, *Value Proposition Design*, 2014).
 
-The artifact produced by this skill is **a markdown document** in the project's business-model folder (default `docs/business/business-model-canvas/`). It is NOT a quantitative model (TAM/SAM/SOM, ROI, savings — those live in the `business-quantitative-model` skill), NOT a feature spec, NOT a roadmap — it is **the strategic-design one-pager** that consolidates customer + value + infrastructure + financial logic into 9 inter-connected blocks.
+The artifact produced by this skill is **a markdown document** in the project's business-model folder (default `docs/business/`). It is NOT a quantitative model (TAM/SAM/SOM, ROI, savings — those live in the `business-quantitative-model` skill), NOT a feature spec, NOT a roadmap — it is **the strategic-design one-pager** that consolidates customer + value + infrastructure + financial logic into 9 inter-connected blocks.
 
 This skill is **domain-agnostic**. When activated inside a project, it picks up the project's own personas, capability map, value streams, and processes, and soft-links them into the canvas blocks.
 
@@ -33,7 +33,7 @@ The skill produces **one of two canonical variants**, chosen at scaffold time:
 | **Block emphasis** | Infrastructure + customer balance | Problem-first; everything emerges from the problem |
 | **Pick when…** | The business model is largely known; you're documenting / aligning stakeholders | The model is hypothetical; you're discovering / pivoting |
 
-**Rule:** one project, one canvas variant. Don't mix BMC and Lean blocks in the same doc. If you want both perspectives, create two separate files (e.g., `business-model-canvas.md` and `lean-canvas.md`) and cross-link.
+**Rule:** one project, one canvas variant. Don't mix BMC and Lean blocks in the same doc. If you want both perspectives, create two separate files (e.g., `02-bmc.md` and `02-lean-canvas.md`) and cross-link.
 
 The skill asks the user to choose at scaffold. Default suggestion: **BMC for established products, Lean Canvas for early-stage projects** — but the user picks.
 
@@ -102,8 +102,8 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 |---|---|
 | **Scope name** | "What product / business / venture is this canvas for?" — used for `{{product_or_scope}}` substitution |
 
-**Output:** ONE file (or two if timeframe = Both) in `docs/business/business-model-canvas/` (or project-chosen folder):
-- `business-model-canvas.md` (BMC) or `lean-canvas.md` (Lean Canvas) — hub document with intro, kit-link methodology pointer, all 9 blocks scaffolded with `_TODO_` placeholders + confidence ratings + soft-link slots pre-populated where artefacts exist.
+**Output:** ONE file (or two if timeframe = Both) in `docs/business/` (or project-chosen folder):
+- `02-bmc.md` (BMC) or `02-lean-canvas.md` (Lean Canvas) — hub document with intro, kit-link methodology pointer, all 9 blocks scaffolded with `_TODO_` placeholders + confidence ratings + soft-link slots pre-populated where artefacts exist.
 - If timeframe = Both: also create `business-model-canvas-future.md` (or `lean-canvas-future.md`) and cross-link the two files in each header.
 
 Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{variant}}` placeholders. Do NOT invent block content in scaffold mode.
@@ -165,16 +165,16 @@ The canvas is the commercial wrapper around the BIZBOK Business Architecture art
 
 | Canvas block | Soft-links to |
 |---|---|
-| **Customer Segments** | Personas (`P-NN`) from `docs/business/personas/personas.md` |
-| **Value Propositions** | Value Streams (`VS-N`) from `docs/business/value-streams/value-streams.md` + Value Proposition Canvases (one VPC per segment) |
+| **Customer Segments** | Personas (`P-NN`) from `docs/business/01-personas.md` |
+| **Value Propositions** | Value Streams (`VS-N`) from `docs/business/04-value-streams.md` + Value Proposition Canvases (one VPC per segment) |
 | **Channels** | Specific value-stream stages (`VS-N.M`) and process docs |
 | **Customer Relationships** | Value-stream stages and process docs (especially support / engagement processes) |
 | **Key Activities** | Business Processes from `docs/business/processes/` |
-| **Key Resources** | Business Capabilities (`C-N.M`) from `docs/business/capability-map/capability-map.md` |
+| **Key Resources** | Business Capabilities (`C-N.M`) from `docs/business/03-capability-map.md` |
 | **Key Partnerships** | (No standard artefact — could link to vendor / contract docs if they exist) |
 | **Revenue Streams** | Quantitative models from `docs/business/models/` (e.g., TAM/SAM/SOM, savings) |
 | **Cost Structure** | Quantitative models from `docs/business/models/` (e.g., unit economics, cost models) |
-| **Value Propositions** (downstream) | Business Objectives (`OBJ-NN`) from `docs/business/objectives/objectives.md` — VP-NN blocks are the commercial intent that Step 4.5 objectives operationalise. |
+| **Value Propositions** (downstream) | Business Objectives (`OBJ-NN`) from `docs/business/04b-objectives.md` — VP-NN blocks are the commercial intent that Step 4.5 objectives operationalise. |
 
 **Soft-link discipline:** mention the ID + name + relative path. Don't duplicate the linked artefact's content. The canvas is a one-pager pointing to depth elsewhere.
 
@@ -208,7 +208,7 @@ Lifted from Strategyzer canon + multiple practitioner sources. Run these checks 
 
 | Needed | What you ask if missing |
 |---|---|
-| **Folder location** | Default `docs/business/business-model-canvas/`. Ask if alternative. |
+| **Folder location** | Default `docs/business/`. Ask if alternative. |
 | **Variant** (BMC / Lean Canvas) | Required at scaffold. Suggest based on project type (BMC for established; Lean for startup) but user picks. |
 | **Scope name** | What product / business / venture? Used for `{{product_or_scope}}` substitution. |
 | **Other artefact existence** | Check for `personas.md`, `capability-map.md`, `value-streams.md`, `processes/`. If absent, soft-links will be `_TODO_`. |
@@ -323,7 +323,7 @@ The canvas references other artefacts as pointers, not as dependencies. It must 
 
 ## Finding the right folder
 
-Default: `docs/business/business-model-canvas/`. Alternatives:
+Default: `docs/business/`. Alternatives:
 - `docs/strategy/business-model-canvas/` when strategy has its own root.
 - `docs/business/canvases/` when multiple canvases (BMC + Lean + Mission Model + …) co-exist.
 

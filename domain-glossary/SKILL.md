@@ -1,6 +1,6 @@
 ---
 name: domain-glossary
-description: "Create and maintain the Ubiquitous Language glossary — the shared vocabulary between domain experts and developers scoped per bounded context. Each term has a stable GT-NN ID, canonical definition, examples, deprecated aliases, cross-context translations, and code convention note. Synthesises Evans Domain-Driven Design (2003) Chapter 2 + Vernon DDD Distilled (2016) Chapter 2 + Martin Fowler ubiquitous language pattern. Use when asked to define domain vocabulary, create a glossary, document ubiquitous language, deprecate synonyms, manage domain terms, or align terminology between business and engineering. Triggers on: ubiquitous language, domain glossary, domain vocabulary, shared language, term definition, domain terms, DDD glossary, terminology alignment, domain dictionary, term deprecation, glossary management. Output: docs/domain/glossary/glossary.md. Scoped to bounded contexts (BC-NN from domain-bounded-context)."
+description: "Create and maintain the Ubiquitous Language glossary — the shared vocabulary between domain experts and developers scoped per bounded context. Each term has a stable GT-NN ID, canonical definition, examples, deprecated aliases, cross-context translations, and code convention note. Synthesises Evans Domain-Driven Design (2003) Chapter 2 + Vernon DDD Distilled (2016) Chapter 2 + Martin Fowler ubiquitous language pattern. Use when asked to define domain vocabulary, create a glossary, document ubiquitous language, deprecate synonyms, manage domain terms, or align terminology between business and engineering. Triggers on: ubiquitous language, domain glossary, domain vocabulary, shared language, term definition, domain terms, DDD glossary, terminology alignment, domain dictionary, term deprecation, glossary management. Output: docs/domain/glossary.md. Scoped to bounded contexts (BC-NN from domain-bounded-context)."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -12,7 +12,7 @@ metadata:
 
 # Domain Glossary Builder
 
-Expert at producing and maintaining the Ubiquitous Language glossary — the single source of truth for domain vocabulary. Output is `docs/domain/glossary/glossary.md`. NOT a technical dictionary, NOT a database schema, NOT a marketing glossary — it is the contractual vocabulary that domain experts and developers BOTH use in every conversation, every document, every line of code, every test name. Evans: "Use the model as the backbone of a language. Commit the team to exercising that language relentlessly in all communication within the team and in the code."
+Expert at producing and maintaining the Ubiquitous Language glossary — the single source of truth for domain vocabulary. Output is `docs/domain/glossary.md`. NOT a technical dictionary, NOT a database schema, NOT a marketing glossary — it is the contractual vocabulary that domain experts and developers BOTH use in every conversation, every document, every line of code, every test name. Evans: "Use the model as the backbone of a language. Commit the team to exercising that language relentlessly in all communication within the team and in the code."
 
 ---
 
@@ -68,7 +68,7 @@ Apply this rule to every term entry in every mode (Seed, Enrich, Maintain). When
 
 ### Mode 1 — Scaffold
 
-Create an empty `glossary.md` with the canonical structure, BC section stubs, and the methodology pointer. Do NOT invent terms — leave all term entries as `_TODO_`. Output: `docs/domain/glossary/glossary.md` using `references/template.md` as the skeleton.
+Create an empty `glossary.md` with the canonical structure, BC section stubs, and the methodology pointer. Do NOT invent terms — leave all term entries as `_TODO_`. Output: `docs/domain/glossary.md` using `references/template.md` as the skeleton.
 
 Scaffold is idempotent: if `glossary.md` already exists, report its current state and skip creation.
 
@@ -105,7 +105,7 @@ Populate the glossary with an initial set of terms from existing artefacts. Requ
 
 **Process after Step 0:**
 
-1. Read capability map (`docs/business/capability-map/capability-map.md`) and/or value streams + process docs per the answer to Q1.
+1. Read capability map (`docs/business/03-capability-map.md`) and/or value streams + process docs per the answer to Q1.
 2. Extract nouns — every L1 capability name, every VS stage label, every process actor is a glossary candidate.
 3. Map each candidate to its bounded context (from `docs/domain/bounded-contexts/` or `domain-bounded-context` artefact).
 4. Assign GT-NN IDs sequentially within each BC section (GT-01, GT-02, …).
@@ -213,7 +213,7 @@ Bump the `glossary-version` in the HTML comment at the top of the file for any s
 
 ## Finding the right folder
 
-Default output path: `docs/domain/glossary/glossary.md`.
+Default output path: `docs/domain/glossary.md`.
 
 Before writing, check for existing glossary artefacts:
 
@@ -261,7 +261,7 @@ After every mode, emit a structured closing report:
 
 ```
 Mode executed: [Scaffold | Seed | Enrich | Maintain]
-File: docs/domain/glossary/glossary.md
+File: docs/domain/glossary.md
 Terms seeded/enriched/retired: N
 GT-NN IDs assigned: [GT-01 … GT-NN list]
 Alias deprecations: [list term → deprecated alias pairs]
@@ -274,7 +274,7 @@ Next steps: [what Mode to run next, or what artefacts to update]
 
 ## Checklist (verify before closing)
 
-- [ ] `docs/domain/glossary/` folder exists
+- [ ] `docs/domain/` folder exists
 - [ ] `glossary.md` exists with the canonical structure from `template.md`
 - [ ] Methodology pointer blockquote present at the top of the file
 - [ ] Every BC-NN from the bounded-context map has a glossary section

@@ -28,7 +28,7 @@ For a solo founder or small team, one document serves both audiences. When
 audiences diverge (investors vs developers), extract a stakeholder copy —
 the delivery roadmap remains the source of truth.
 
-The artefact lives at `docs/product-specs/delivery-roadmap/delivery-roadmap.md`.
+The artefact lives at `docs/product-specs/08-delivery-roadmap.md`.
 
 ---
 
@@ -59,7 +59,7 @@ The artefact lives at `docs/product-specs/delivery-roadmap/delivery-roadmap.md`.
 ## The two layers in one document
 
 ```
-docs/product-specs/delivery-roadmap/delivery-roadmap.md
+docs/product-specs/08-delivery-roadmap.md
 │
 ├── §Walking Skeleton — MVP        ← PRODUCT ROADMAP LAYER
 │   Hypothesis · VS anchor ·
@@ -128,10 +128,10 @@ the persona cannot complete the journey — the skeleton is broken.
 
 ```bash
 cat docs/VISION.md 2>/dev/null                                     # optional: read if exists — phase goals should connect to vision north star
-cat docs/product-specs/functional-breakdown-structure/FBS.md
-cat docs/business/value-streams/value-streams.md
-cat docs/business/personas/personas.md
-cat docs/product-specs/quality-attributes/quality-attributes.md   # optional
+cat docs/product-specs/07-fbs.md
+cat docs/business/04-value-streams.md
+cat docs/business/01-personas.md
+cat docs/product-specs/09-quality-attributes.md                   # optional
 ```
 
 **From FBS extract:**
@@ -224,7 +224,7 @@ Verify every Phase 1 FBS functionality appears in exactly one epic:
 
 ```bash
 grep -o "C[0-9]\.[0-9]\.F[0-9][0-9]" \
-  docs/product-specs/delivery-roadmap/delivery-roadmap.md | sort | uniq | wc -l
+  docs/product-specs/08-delivery-roadmap.md | sort | uniq | wc -l
 ```
 
 Compare to Phase 1 FBS total. Flag orphaned functionalities.
@@ -328,7 +328,7 @@ Before declaring complete:
 - [ ] Walking skeleton covers every stage of target VS end-to-end (no broken stages)
 - [ ] "Cannot yet" block is explicit — no false completeness in MVP framing
 - [ ] Every epic has a value statement ("when this ships, P-NN can…")
-- [ ] Every epic references ≥1 OBJ-NN (when objectives doc exists at `docs/business/objectives/objectives.md`)
+- [ ] Every epic references ≥1 OBJ-NN (when objectives doc exists at `docs/business/04b-objectives.md`)
 - [ ] Phase goals express VS streams operational, not feature lists
 - [ ] Differentiator (★) functionalities each anchor their own epic
 - [ ] E-NN IDs in pain-index priority order (Critical before High before Medium)

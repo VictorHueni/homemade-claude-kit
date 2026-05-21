@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **Functional Breakdown Structures (FBS)** — the canonical functionality registry that answers, for any product: *"does this product do X, and where in the codebase does it live?"* Synthesises BABOK §10.22 (Functional Decomposition), NASA's FBS doctrine, TOGAF's capability-to-feature mapping, and practitioner discipline from software product literature.
 
-The artifact produced by this skill is **a markdown document** at `docs/product-specs/functional-breakdown-structure/FBS.md` (adapt to project convention). It is NOT a feature backlog, NOT a roadmap, NOT a PRD, NOT a capability map — it is **the functionality registry**: comprehensive, status-tracked, and traceable to capabilities (UP) and PRDs (DOWN).
+The artifact produced by this skill is **a markdown document** at `docs/product-specs/07-fbs.md` (adapt to project convention). It is NOT a feature backlog, NOT a roadmap, NOT a PRD, NOT a capability map — it is **the functionality registry**: comprehensive, status-tracked, and traceable to capabilities (UP) and PRDs (DOWN).
 
 This skill is **domain-agnostic**. When activated inside a project, it inherits the project's BC Map (capability IDs + names) and produces an FBS that extends the capability hierarchy with functionality-level detail.
 
@@ -233,7 +233,7 @@ The three tests synthesise the following primary sources:
 
 **When:** the project has no FBS folder yet, or has one missing the canonical template.
 
-**Output:** ONE file in `docs/product-specs/functional-breakdown-structure/` (or project-chosen folder):
+**Output:** ONE file in `docs/product-specs/` (or project-chosen folder):
 - `FBS.md` — hub document with intro, kit-link methodology pointer, L0 axis declaration, ASCII tree placeholder, empty per-capability sections.
 
 Source from `references/template.md`. Substitute `{{product_or_scope}}` and `{{L0_axis_label}}` placeholders. Do NOT invent functionalities in scaffold mode.
@@ -245,7 +245,7 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}` and `{{L
 **When:** the scaffold exists but the per-capability sections are empty.
 
 **Process:**
-1. **Read the BC Map** at `docs/business/capability-map/capability-map.md`. If absent, warn and ask whether to proceed with manual capability-list entry (degrades discipline — the FBS becomes the source of truth for capability names instead of soft-linking).
+1. **Read the BC Map** at `docs/business/03-capability-map.md`. If absent, warn and ask whether to proceed with manual capability-list entry (degrades discipline — the FBS becomes the source of truth for capability names instead of soft-linking).
 2. **Import L0 + L1 wholesale** — every L0 item from the BC Map becomes an L0 section in the FBS; every L1 capability becomes a `### C-N.M · {Name}` sub-section.
 3. **Render the ASCII tree** at the top of the FBS, mirroring the BC Map structure but adding a functionality-count placeholder per capability:
    ```
@@ -311,10 +311,10 @@ If you find yourself writing any of these in the FBS, pull the content into its 
 |---|---|
 | **Project context location** | Look for `docs/product-specs/`. If unclear, ask. |
 | **Mode** (scaffold / structure / fill) | Detect from request. Confirm if ambiguous. |
-| **BC Map existence** | Check for `docs/business/capability-map/capability-map.md`. If absent, warn: structure mode will degrade to manual capability entry. Suggest running `business-capability-map` first. |
+| **BC Map existence** | Check for `docs/business/03-capability-map.md`. If absent, warn: structure mode will degrade to manual capability entry. Suggest running `business-capability-map` first. |
 | **Scope name** | What product / product family / domain does this FBS cover? Used for `{{product_or_scope}}` substitution. |
 | **Capability ID** (fill mode) | Which capability does the user want populated? Single ID or batch (e.g., "all of C1" or "C1.1, C1.2, C1.3"). |
-| **Value-streams existence** | Check for `docs/business/value-streams/value-streams.md`. If absent, VS-stage column will be `_TODO_` placeholders. |
+| **Value-streams existence** | Check for `docs/business/04-value-streams.md`. If absent, VS-stage column will be `_TODO_` placeholders. |
 
 Ask 2–4 questions max, single message, lettered options where possible. Don't drag through a wizard.
 
@@ -422,7 +422,7 @@ When linking, use stable IDs: `C1.1 ↔ value-stream VS-3.2 ↔ FBS functionalit
 
 ## Finding the right folder
 
-Default: `docs/product-specs/functional-breakdown-structure/`. Alternatives:
+Default: `docs/product-specs/`. Alternatives:
 - `docs/architecture/functional-breakdown-structure/` when architecture artefacts have their own root.
 - `docs/<domain>/functional-breakdown-structure/` when scoped narrowly.
 
@@ -432,7 +432,7 @@ Default: `docs/product-specs/functional-breakdown-structure/`. Alternatives:
 find docs -type d -iname "*functional*" -o -type d -iname "*fbs*" 2>/dev/null
 ```
 
-If a folder exists at a non-default location, use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none, default to `docs/product-specs/functional-breakdown-structure/` and confirm.
+If a folder exists at a non-default location, use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none, default to `docs/product-specs/` and confirm.
 
 **Never overwrite an existing `FBS.md`.** Switch modes if it exists:
 - Scaffold mode → skip (report what's there).
