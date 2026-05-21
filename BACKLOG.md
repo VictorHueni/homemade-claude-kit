@@ -106,12 +106,48 @@ Non-skill work that improves the kit's internal consistency or usability.
 
 3. **Numbering convention:** prefix mirrors the metamodel step number (`01`, `02`, `03`, `04`, `04.5`, ...). Domain layer steps (`2b`, `2c`, `7b`) use their step numbers too.
 
-**Impact if adopted:** HIGH — all canonical paths in `rules/metamodel.md`, every skill's output path, `check-catalogue.md`, `detection-signals.md`, and all cross-reference links in generated project docs would need updating. Requires a `util-metamodel-migration` run on existing projects.
+**Impact if adopted:** HIGH — all canonical paths in `rules/metamodel.md`, every skill's output path, `check-catalogue.md`, `detection-signals.md`, and all cross-reference links in generated project docs would need updating.
 
-**Recommended approach:**
-- Design task first: produce a complete before/after path mapping + validate the numbering convention
-- Build a migration guide (git mv commands per artefact)
-- Update all skills and metamodel files atomically in one branch
-- Run `util-metamodel-migration` on any existing projects before upgrading
+**Prerequisite decision:** keep `docs/VISION.md` at root (maximum agent visibility) or move to `docs/00-vision.md` (consistent numbering)? The two goals are in slight tension and must be resolved before any migration work begins.
 
-**Prerequisite:** decide whether to keep `docs/VISION.md` at root or move to `docs/00-vision.md` (consistent numbering vs maximum agent visibility — the two goals are in slight tension).
+---
+
+### util-metamodel-migration — Mode 4: Schema migration (2026-05-21)
+
+**Dependency of:** Output path audit + simplification above. Must be built before any project migration can happen safely.
+
+**Why the current skill is insufficient:**
+
+The current `util-metamodel-migration` is a *detection* tool — it scans unknown pre-metamodel repos and guesses canonical paths using 3-tier confidence scoring. A schema migration (v1 paths → v2 paths) is a *transformation* tool. Three fundamental differences:
+
+| Dimension | Current Mode 1–3 (detection) | New Mode 4 (schema migration) |
+|---|---|---|
+| **Path mapping** | Unknown → inferred from signals | Fully known before/after table |
+| **Confidence tiers** | Required (guessing) | Not needed (deterministic) |
+| **Scope** | Project docs only | Project docs + kit-internal files (skills, metamodel, audit/migration references) |
+| **Relative path arithmetic** | Source folder depth is stable | Depth CHANGES (e.g. `business/personas/personas.md` → `business/01-personas.md`) — every `../` chain must be recomputed |
+| **Run cadence** | Once per repo (onboarding) | Once per schema version bump |
+
+**What Mode 4 needs:**
+
+1. **Path mapping table** — a new reference file (e.g. `references/path-migration-v2.md`) containing the full before/after mapping for every artefact. Sourced from the output path audit design task above.
+
+2. **Two-phase execution:**
+   - Phase A — **Project migration**: for each project that uses the metamodel, generate `git mv` + relative-path-corrected `sed` commands for all docs. The relative path arithmetic is the hard part — when a file moves up or down in the tree, every inbound link changes its `../` depth.
+   - Phase B — **Kit migration**: update the kit's own files — each skill's SKILL.md output path, `rules/metamodel.md` canonical paths, `README.md` skill index, `check-catalogue.md` Check 1/2, `detection-signals.md` filename/folder patterns. This is a separate pass because kit files live outside `docs/` and have different link patterns.
+
+3. **CLAUDE.md awareness** — if `docs/VISION.md` moves, the skill must detect and rewrite the `CLAUDE.md` pointer that `business-vision` Wire mode injected.
+
+4. **Dry-run and apply modes:**
+   - `--dry-run` (default): emit the full migration script to a report file, never modify anything
+   - `--apply` (explicit opt-in): execute the generated script atomically after user confirmation
+
+5. **Verification hook** — after apply, automatically run `util-metamodel-audit` Mode 1 to confirm zero misplaced files.
+
+**Implementation note:** the relative path rewriting is significantly harder than the current skill's link tracking. When `docs/business/personas/personas.md` moves to `docs/business/01-personas.md` (depth -1), every file that linked with `../../personas/personas.md` must now use `../01-personas.md`. This requires computing the new relative path from each linking file's location to the new target — the current skill does this with a `python3 os.path.relpath()` call, but the schema migration must do it for every artefact in every project simultaneously.
+
+**Recommended build order:**
+1. Finish the output path audit design task (settle numbering convention + before/after table)
+2. Build Mode 4 against the agreed-upon path mapping table
+3. Test on a sample project before running against production repos
+4. Update the kit atomically in one branch (Phase B) after all projects are migrated (Phase A)
