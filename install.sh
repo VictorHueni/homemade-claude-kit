@@ -75,10 +75,10 @@ for skill_dir in "$SCRIPT_DIR"/*/; do
     installed_skills=$(( installed_skills + 1 ))
 done
 
-for link in "$SKILLS_TARGET"/*/; do
-    skill_name="$(basename "${link%/}")"
-    if [[ -L "${link%/}" ]] && [[ ! -d "$SCRIPT_DIR/$skill_name" ]]; then
-        rm "${link%/}"
+for link in "$SKILLS_TARGET"/*; do
+    skill_name="$(basename "$link")"
+    if [[ -L "$link" ]] && [[ ! -d "$SCRIPT_DIR/$skill_name" ]]; then
+        rm "$link"
         echo "  ✗ pruned skill:   $skill_name"
         pruned_skills=$(( pruned_skills + 1 ))
     fi
