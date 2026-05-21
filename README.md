@@ -224,23 +224,23 @@ erDiagram
 
 | Prefix | Skill | Output | ID minted |
 |---|---|---|---|
-| `business-` | `business-persona` | `docs/business/personas/personas.md` | `P-NN` |
-| `business-` | `business-capability-map` | `docs/business/capability-map/capability-map.md` | `C-N.M` |
-| `business-` | `business-value-stream` | `docs/business/value-streams/value-streams.md` | `VS-N` · `VS-N.M` |
+| `business-` | `business-persona` | `docs/business/01-personas.md` | `P-NN` |
+| `business-` | `business-capability-map` | `docs/business/03-capability-map.md` | `C-N.M` |
+| `business-` | `business-value-stream` | `docs/business/04-value-streams.md` | `VS-N` · `VS-N.M` |
 | `business-` | `business-process` | `docs/business/processes/{slug}-process.md` | slug |
-| `business-` | `business-model-canvas` | `docs/business/business-model-canvas/` | block IDs |
+| `business-` | `business-model-canvas` | `docs/business/02-bmc.md` | block IDs |
 | `business-` | `business-quantitative-model` | `docs/business/models/{slug}.md` | slug |
 | `business-` | `business-vision` | `docs/VISION.md` *(Step 0 — singleton, CLAUDE.md wired)* | *(path ref — no ID)* |
-| `business-` | `business-objective` | `docs/business/objectives/objectives.md` | `OBJ-NN` · `KR-NN.M` |
+| `business-` | `business-objective` | `docs/business/04b-objectives.md` | `OBJ-NN` · `KR-NN.M` |
 | `business-` | `business-competitive-landscape` | `docs/business/competitive-landscape/` | — |
 | `business-` | `business-research` | `docs/business/research/` | — |
 | `business-` | `business-workshop` | `docs/business/workshops/` | — |
-| `domain-` | `domain-bounded-context` | `docs/domain/bounded-contexts/` | `BC-NN` |
-| `domain-` | `domain-glossary` | `docs/domain/glossary/glossary.md` | `BC-NN.GT-NN` |
-| `domain-` | `domain-model` | `docs/domain/{bc-slug}/domain-model.md` | `BC-NN.AGG-NN` · `BC-NN.EVT-NN` |
-| `spec-` | `spec-functional-breakdown-structure` | `docs/product-specs/functional-breakdown-structure/FBS.md` | `C-N.M.FXX` |
+| `domain-` | `domain-bounded-context` | `docs/domain/bounded-contexts.md + docs/domain/context-map.md` | `BC-NN` |
+| `domain-` | `domain-glossary` | `docs/domain/glossary.md` | `BC-NN.GT-NN` |
+| `domain-` | `domain-model` | `docs/domain/models/{bc-slug}.md` | `BC-NN.AGG-NN` · `BC-NN.EVT-NN` |
+| `spec-` | `spec-functional-breakdown-structure` | `docs/product-specs/07-fbs.md` | `C-N.M.FXX` |
 | `spec-` | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap.md` | `E-NN` |
-| `spec-` | `spec-quality-attributes` | `docs/product-specs/quality-attributes/quality-attributes.md` | `QA-XXNN` |
+| `spec-` | `spec-quality-attributes` | `docs/product-specs/09-quality-attributes.md` | `QA-XXNN` |
 | `spec-` | `spec-prd` | `docs/product-specs/{NNNN}_prd_{feature}.md` | `PRD-NNNN` |
 | `spec-` | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN` |
 | `spec-` | `spec-idea` | `docs/ideas/{slug}.md` | — |
