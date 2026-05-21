@@ -49,3 +49,69 @@ ops-slo                     ← closes the QA-XXNN → day-2 operational loop
 ```
 
 Tier 2 and Tier 3 candidates improve completeness but are not structural gaps in the current metamodel.
+
+---
+
+## Design tasks — metamodel housekeeping
+
+Non-skill work that improves the kit's internal consistency or usability.
+
+---
+
+### Output path audit + simplification (2026-05-21)
+
+**Problem:** The current canonical output paths have inconsistent nesting depth and no ordering signal. A user browsing `docs/` cannot tell the build sequence from the filenames alone. Some paths are over-nested for no structural reason.
+
+**Specific pain points observed:**
+
+| Current path | Problem |
+|---|---|
+| `docs/business/personas/personas.md` | Redundant subfolder — one file, one folder, same name. Could be `docs/business/01-personas.md` |
+| `docs/business/business-model-canvas/business-model-canvas.md` | Doubly redundant — folder name = file name = artefact name. |
+| `docs/domain/{bc-slug}/domain-model.md` | One file per BC, scattered across slug-named subfolders. Finding all domain models requires globbing. Could consolidate into `docs/domain/models/{bc-slug}.md` |
+| `docs/domain/bounded-contexts/bounded-contexts.md` + `context-map.md` | Two files in a `bounded-contexts/` subfolder. Could live directly in `docs/domain/`. |
+| `docs/domain/glossary/glossary.md` | Same redundancy — `docs/domain/glossary.md` is simpler. |
+| `docs/product-specs/functional-breakdown-structure/FBS.md` | Long subfolder for one file. |
+| `docs/product-specs/quality-attributes/quality-attributes.md` | Same pattern. |
+
+**Proposed direction (to validate in the design task):**
+
+1. **Numbered flat files per layer** — files carry a step-number prefix so they sort in metamodel build order in any file browser:
+   ```
+   docs/
+   ├── VISION.md                    ← Step 0 (already flat — good)
+   ├── business/
+   │   ├── 01-personas.md
+   │   ├── 02-bmc.md               (or lean-canvas.md)
+   │   ├── 03-capability-map.md
+   │   ├── 04-value-streams.md
+   │   ├── 04.5-objectives.md
+   │   ├── 05-processes/           ← keep subfolder (one file per process)
+   │   └── 06-models/              ← keep subfolder (one file per model)
+   ├── domain/
+   │   ├── bounded-contexts.md     ← flat
+   │   ├── context-map.md          ← flat
+   │   ├── glossary.md             ← flat
+   │   └── models/                 ← one file per BC: {bc-slug}.md
+   ├── product-specs/
+   │   ├── 07-fbs.md
+   │   ├── 08-delivery-roadmap.md
+   │   ├── 09-quality-attributes.md
+   │   └── {NNNN}_prd_{feature}.md
+   └── architecture/
+       └── decisions/              ← keep (one file per ADR)
+   ```
+
+2. **Rule:** subfolders only when there are genuinely multiple files of the same type (processes, models, PRDs, ADRs, domain models). Singletons live as flat files.
+
+3. **Numbering convention:** prefix mirrors the metamodel step number (`01`, `02`, `03`, `04`, `04.5`, ...). Domain layer steps (`2b`, `2c`, `7b`) use their step numbers too.
+
+**Impact if adopted:** HIGH — all canonical paths in `rules/metamodel.md`, every skill's output path, `check-catalogue.md`, `detection-signals.md`, and all cross-reference links in generated project docs would need updating. Requires a `util-metamodel-migration` run on existing projects.
+
+**Recommended approach:**
+- Design task first: produce a complete before/after path mapping + validate the numbering convention
+- Build a migration guide (git mv commands per artefact)
+- Update all skills and metamodel files atomically in one branch
+- Run `util-metamodel-migration` on any existing projects before upgrading
+
+**Prerequisite:** decide whether to keep `docs/VISION.md` at root or move to `docs/00-vision.md` (consistent numbering vs maximum agent visibility — the two goals are in slight tension).
