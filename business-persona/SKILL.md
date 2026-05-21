@@ -18,7 +18,7 @@ The artifact produced by this skill is **a markdown document** in the project's 
 
 Personas are one of the four canonical **Business Architecture artefacts** (BIZBOK / TOGAF), alongside the capability map, value streams, and business processes — which is why they all sit together under `docs/business/`.
 
-This skill is **domain-agnostic**. The template patterns work for any product or industry; the references use abstract placeholders. When activated inside a project, the skill picks up the project's own product names, organisational vocabulary, and existing research artefacts.
+This skill is **domain-agnostic**. The template patterns work for any product or industry; the references use abstract placeholders. When activated inside a project, the skill picks up the project's own product names, organisational vocabulary, and existing research artefacts. If `docs/VISION.md` exists at the project root, read it first — personas should reflect the vision's target audience framing and the problem the product solves.
 
 ---
 
