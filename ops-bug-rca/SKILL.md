@@ -5,6 +5,7 @@ description: >
   Use when: debugging errors, investigating bugs, analyzing failures, troubleshooting unexpected behavior,
   reviewing stack traces, or when the user mentions bug, error, crash, broken, regression, or "not working".
 argument-hint: "[bug description or error message]"
+version: "1.0.0"
 ---
 
 # Bug Root Cause Analysis & Fix Recommendations

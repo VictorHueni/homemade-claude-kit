@@ -279,11 +279,11 @@ When the corresponding BA artefact exists, the canvas links to it:
 | Key Activities *(BMC)* | Processes | `[Process](../processes/process-name.md)` |
 | Key Resources *(BMC)* | Capabilities | `[C-N.M capability-name](../03a-capability-map.md#c-nm)` |
 | Key Partnerships *(BMC)* | (no standard artefact — link to vendor / contract docs if exist) | (free-form) |
-| Revenue Streams | Quantitative models | `[TAM/SAM/SOM](../models/...)` |
-| Cost Structure | Cost / unit-economics models | `[Cost model](../models/...)` |
+| Revenue Streams | Quantitative models | `[TAM/SAM/SOM](../06a-models/...)` |
+| Cost Structure | Cost / unit-economics models | `[Cost model](../06a-models/...)` |
 | Problem *(Lean)* | Persona pains + VPC | `[Persona pain](../01a-personas.md#p-nn) + [VPC pain](value-proposition-canvas-cs-1.md#pains)` |
 | Solution *(Lean)* | FBS functionalities | `[FBS C1.1.F01](../../product-specs/07a-fbs.md#c11f01)` |
-| Key Metrics *(Lean)* | Quantitative models | `[Metrics model](../models/...)` |
+| Key Metrics *(Lean)* | Quantitative models | `[Metrics model](../06a-models/...)` |
 | Unfair Advantage *(Lean)* | Differentiator-rated capabilities | `[C-N.M (Differentiator)](../03a-capability-map.md#c-nm)` |
 
 Use these formats consistently so cross-doc traceability is mechanical.

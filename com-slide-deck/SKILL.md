@@ -9,6 +9,7 @@ description: >
   variations, or working with the slide-builder folder. Also use when the user
   asks to define or update a design system for a presentation. Do NOT use for
   PowerPoint (.pptx) files, PDF exports, or Google Slides.
+version: "1.0.0"
 ---
 
 # Slide Builder

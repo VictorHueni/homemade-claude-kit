@@ -30,7 +30,7 @@ logic.
 - Business Capability Map: [link to ../03a-capability-map.md if exists]
 - Value Streams: [link to ../04a-value-streams.md if exists]
 - Business Processes: [link to ../processes/ if exists]
-- Quantitative models: [link to ../models/ if exists]
+- Quantitative models: [link to ../06a-models/ if exists]
 - Value Proposition Canvases: [list of `value-proposition-canvas-{segment}.md` files in this folder]
 
 ---
@@ -142,7 +142,7 @@ contribute to overall revenues?*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [TAM/SAM/SOM / ROI model](../models/) (where exists)
+**Soft-links:** [TAM/SAM/SOM / ROI model](../06a-models/) (where exists)
 
 ---
 
@@ -176,7 +176,7 @@ AARRR). North-star metric.*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Quantitative models](../models/) where the metrics are computed
+**Soft-links:** [Quantitative models](../06a-models/) where the metrics are computed
 
 ---
 
@@ -262,7 +262,7 @@ Cost-driven vs value-driven?*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Cost / unit-economics model](../models/) (where exists)
+**Soft-links:** [Cost / unit-economics model](../06a-models/) (where exists)
 
 ---
 

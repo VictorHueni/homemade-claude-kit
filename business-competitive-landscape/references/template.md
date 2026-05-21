@@ -32,7 +32,7 @@ companion files in this folder carry the per-competitor deep-dive
 - Personas: [link to ../01a-personas.md if exists]
 - Business Capability Map: [link to ../03a-capability-map.md if exists]
 - Business Model Canvas: [link to ../02a-bmc.md if exists]
-- Quantitative models: [link to ../models/ if exists]
+- Quantitative models: [link to ../06a-models/ if exists]
 
 ---
 
