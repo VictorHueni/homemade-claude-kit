@@ -30,6 +30,8 @@ A file whose name matches one of these patterns is likely the artefact type list
 | `*delivery-roadmap*.md` or `*epic-catalogue*.md` or `*epic-catalog*.md` | Delivery roadmap | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap/delivery-roadmap.md` |
 | `*competitive-landscape*.md` or `*competitor*.md` | Competitive landscape | `business-competitive-landscape` | `docs/business/competitive-landscape/` |
 | `*quant-model*.md` or `*tam-*.md` or `*savings-model*.md` | Quantitative model | `business-quantitative-model` | `docs/business/models/{slug}.md` |
+| `VISION.md` or `*vision*.md` or `*north-star*.md` | Product vision | `business-vision` | `docs/VISION.md` (singleton at docs root) |
+| `*objectives*.md` or `*okr*.md` or `*key-results*.md` | Business objectives | `business-objective` | `docs/business/objectives/objectives.md` |
 
 **ADR naming redundancy rule:** if a file is already in `docs/architecture/decisions/` and its name contains `-adr-` (e.g. `0003-adr-clean-architecture.md`), flag as Tier 1 naming issue. Proposed fix: `git mv 0003-adr-clean-architecture.md 0003-clean-architecture.md`. The `-adr-` prefix is redundant since the folder already signals the type.
 
@@ -46,6 +48,7 @@ A folder whose name matches one of these patterns, AND is not already at the can
 | `runbooks/` or `runbook/` | `ops-runbook` | `docs/ops/runbooks/` | `find docs -type d -iname "runbook*" \| grep -v "docs/ops/runbooks"` |
 | `bugs/` or `bug-reports/` or `rcas/` or `incidents/` | `ops-bug-rca` | `docs/ops/rcas/` | `find docs -type d -iname "bug*" -o -type d -iname "rca*" -o -type d -iname "incident*" \| grep -v "docs/ops"` |
 | `workshop*/` or `workshops/` | `business-workshop` | `docs/business/workshops/` | `find docs -type d -iname "workshop*" \| grep -v "docs/business/workshops"` |
+| `objectives/` or `okr/` or `okrs/` | `business-objective` | `docs/business/objectives/` | `find docs -type d -iname "objective*" -o -type d -iname "okr*" \| grep -v "docs/business/objectives"` |
 | `personas/` or `persona/` | `business-persona` | `docs/business/personas/` | `find docs -type d -iname "persona*" \| grep -v "docs/business/personas"` |
 | `capabilities/` or `capability-map/` | `business-capability-map` | `docs/business/capability-map/` | `find docs -type d -iname "capabilit*" \| grep -v "docs/business/capability-map"` |
 | `value-streams/` or `journeys/` or `customer-journeys/` | `business-value-stream` | `docs/business/value-streams/` | `find docs -type d -iname "value-stream*" -o -type d -iname "journey*" \| grep -v "docs/business/value-streams"` |
@@ -78,6 +81,9 @@ Read only `head -50 {file}`. Check for these high-signal headings. A content sig
 | `✅\|🔄\|⬜` in functionality table rows | `spec-functional-breakdown-structure` |
 | `QA-[A-Z]{2}[0-9]{2}` pattern | `spec-quality-attributes` |
 | `E-[0-9][0-9].*epic` | `spec-delivery-roadmap` |
+| `## The Elevator Pitch` or `## North Star Metric` heading | `business-vision` |
+| `OBJ-[0-9][0-9]` pattern or `KR-[0-9][0-9]\.[0-9]` pattern | `business-objective` |
+| `## Objective.*Epic traceability` | `business-objective` |
 
 ---
 

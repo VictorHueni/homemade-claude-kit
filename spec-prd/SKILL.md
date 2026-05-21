@@ -103,9 +103,11 @@ Include an overall status at the top: `**Status:** draft | approved | in-progres
 
 | Field | Value |
 |---|---|
+| **Vision** | [Product Vision](../../VISION.md) *(if `docs/VISION.md` exists)* |
 | **Personas served** | [P-01 · Francine](link) · [P-03 · Dr. Favre](link) |
 | **Capabilities covered** | [C3.1 Schedule Generation](link) · [C3.2 Conflict Detection](link) |
 | **Primary value stream** | [VS-1.2 · Generate Schedule Draft](link) — Pain: Critical |
+| **Objective** | [OBJ-NN · Objective title](link to objectives.md) *(if objectives doc exists)* |
 
 **FBS functionalities delivered by this PRD:**
 
@@ -345,6 +347,7 @@ Before saving the PRD:
 
 - [ ] Upstream artefacts checked (BC Map, FBS, personas, value streams)
 - [ ] §0 Architecture Traceability block filled (or omitted if no artefacts exist)
+- [ ] OBJ-NN referenced in §0 if `docs/business/objectives/objectives.md` exists
 - [ ] Clarifying questions asked with lettered options
 - [ ] User answers incorporated
 - [ ] Every user story references a specific persona role + P-NN ID

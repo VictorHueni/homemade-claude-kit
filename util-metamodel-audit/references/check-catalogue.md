@@ -11,10 +11,12 @@ For each of the 16 checks: bash detection pattern, interpretation rules, severit
 **Detection:**
 ```bash
 # Run for each step — adapt path per step number
+find docs -maxdepth 1 -name "VISION.md" 2>/dev/null                              # Step 0
 find docs -maxdepth 4 -name "personas.md" -path "*/personas/*" 2>/dev/null
 find docs -maxdepth 4 \( -name "business-model-canvas.md" -o -name "lean-canvas.md" \) 2>/dev/null
 find docs -maxdepth 4 -name "capability-map.md" 2>/dev/null
 find docs -maxdepth 4 -name "value-streams.md" 2>/dev/null
+find docs/business/objectives -name "objectives.md" 2>/dev/null              # Step 4.5
 find docs/business/processes -name "*-process.md" 2>/dev/null | head -1
 find docs/business/models -name "*.md" 2>/dev/null | head -1
 find docs -maxdepth 5 -name "FBS.md" 2>/dev/null
@@ -47,9 +49,11 @@ find docs/domain -name "domain-model.md" 2>/dev/null | head -1              # St
 find docs -name "*.md" | while read f; do echo "$f"; done
 ```
 Then compare each path against the canonical map:
+- `VISION.md` → must be directly under `docs/` (not nested deeper — singleton)
 - `personas.md` → must be under `docs/business/personas/`
 - `capability-map.md` → must be under `docs/business/capability-map/`
 - `value-streams.md` → must be under `docs/business/value-streams/`
+- `objectives.md` → must be under `docs/business/objectives/`
 - `*-process.md` → must be under `docs/business/processes/`
 - `business-model-canvas.md` / `lean-canvas.md` → must be under `docs/business/business-model-canvas/`
 - `FBS.md` → must be under `docs/product-specs/functional-breakdown-structure/`
@@ -135,6 +139,8 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `BC-NN.ENT-NN` | `\bBC-[0-9]{2}\.ENT-[0-9]{2}\b` | `docs/domain/{bc-slug}/domain-model.md` |
 | `BC-NN.VO-NN` | `\bBC-[0-9]{2}\.VO-[0-9]{2}\b` | `docs/domain/{bc-slug}/domain-model.md` |
 | `BC-NN.EVT-NN` | `\bBC-[0-9]{2}\.EVT-[0-9]{2}\b` | `docs/domain/{bc-slug}/domain-model.md` |
+| `OBJ-NN` | `\bOBJ-[0-9]{2}\b` | `docs/business/objectives/objectives.md` |
+| `KR-NN.M` | `\bKR-[0-9]{2}\.[0-9]\b` | `docs/business/objectives/objectives.md` |
 | `E-NN` | `\bE-[0-9]{2}\b` | `docs/product-specs/epic-catalogue.md` |
 | `QA-[A-Z]{2}[0-9]{2}` | `\bQA-[A-Z]{2}[0-9]{2}\b` | `docs/product-specs/quality-attributes/quality-attributes.md` |
 | `ADR-NNNN` | `\bADR-[0-9]{4}\b` | `docs/architecture/decisions/` |
@@ -203,6 +209,8 @@ grep -roh '\bQA-[^A-Z ]' docs/ --include="*.md"
 | `docs/domain/glossary/glossary.md` exists | `docs/domain/bounded-contexts/bounded-contexts.md` must also exist (glossary is scoped to BCs) |
 | `docs/domain/{bc-slug}/domain-model.md` exists | `docs/domain/bounded-contexts/bounded-contexts.md` must exist (domain model is namespaced by BC) |
 | `docs/domain/{bc-slug}/domain-model.md` exists | `docs/domain/glossary/glossary.md` must exist (entity names must match glossary terms) |
+| `docs/business/objectives/objectives.md` exists | `docs/business/value-streams/value-streams.md` must also exist (objectives consume pain index from VS) |
+| Any `*_prd_*.md` | If `docs/business/objectives/objectives.md` exists, the PRD should reference ≥1 `OBJ-NN` in §0 |
 
 **Detection (example):**
 ```bash
@@ -270,6 +278,8 @@ done | sort -rn
 | `epic-catalogue.md` | Epic table with `E-NN` IDs | `grep -q 'E-[0-9][0-9]'` |
 | `quality-attributes.md` | ISO characteristic headings (`Performance Efficiency`, `Security`, `Reliability`, etc.) | `grep -q 'Performance Efficiency\|Security\|Reliability'` |
 | `*_prd_*.md` | `§0 Architecture Traceability` or traceability block, `## Acceptance criteria` | `grep -q 'Traceability\|Acceptance'` |
+| `objectives.md` | At least one `OBJ-NN` heading, `## Changelog`, `## Objective × Epic` section | `grep -q 'OBJ-[0-9][0-9]\|Changelog'` |
+| `VISION.md` | `## The Elevator Pitch`, `## What We Are NOT`, `## North Star Metric`, `## Changelog` | `grep -q 'Elevator Pitch\|North Star'` |
 | `bounded-contexts.md` | `## Subdomain catalogue`, at least one `BC-NN` entry | `grep -q 'BC-[0-9][0-9]'` |
 | `glossary.md` | At least one BC section, `## Changelog` | `grep -q '## Changelog'` |
 | `domain-model.md` | `## Aggregate catalogue`, `## Domain event catalogue`, Mermaid `classDiagram` | `grep -q 'Aggregate catalogue\|classDiagram'` |

@@ -115,7 +115,7 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{vari
 **When:** the scaffold exists; the user wants to populate some or all blocks.
 
 **Process:**
-1. **Read project context** — PRDs, personas, BC map, value streams, processes, roadmap. The canvas synthesises content that lives in those other artefacts.
+1. **Read project context** — If `docs/VISION.md` exists, read it first — the VP blocks must be the commercial expression of the vision, not independent inventions. Then read: PRDs, personas, BC map, value streams, processes, roadmap. The canvas synthesises content that lives in those other artefacts.
 2. **For each block the user wants populated:**
    - Write 3–7 terse bullets (sticky-note brevity — NOT paragraphs).
    - Add the confidence rating: `Assumed` (default), `Tested` (some evidence), `Validated` (strong evidence).
@@ -174,6 +174,7 @@ The canvas is the commercial wrapper around the BIZBOK Business Architecture art
 | **Key Partnerships** | (No standard artefact — could link to vendor / contract docs if they exist) |
 | **Revenue Streams** | Quantitative models from `docs/business/models/` (e.g., TAM/SAM/SOM, savings) |
 | **Cost Structure** | Quantitative models from `docs/business/models/` (e.g., unit economics, cost models) |
+| **Value Propositions** (downstream) | Business Objectives (`OBJ-NN`) from `docs/business/objectives/objectives.md` — VP-NN blocks are the commercial intent that Step 4.5 objectives operationalise. |
 
 **Soft-link discipline:** mention the ID + name + relative path. Don't duplicate the linked artefact's content. The canvas is a one-pager pointing to depth elsewhere.
 

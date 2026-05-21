@@ -18,15 +18,17 @@ what order, and where to put it**.
 
 ---
 
-## The 14 artefacts and their skills
+## The 16 artefacts and their skills
 
 | # | Layer | Skill | Output file | Primary IDs |
 |---|---|---|---|---|
+| 0 | **Product Vision** (why — the north star) | `business-vision` | `docs/VISION.md` | *(singleton — no ID; referenced by path)* |
 | 1 | **Personas** (who) | `business-persona` | `docs/business/personas/personas.md` | `P-NN` |
 | 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/capability-map/capability-map.md` | `C1`, `C1.1`, `C1.1.1` (L2 rare) |
 | 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/bounded-contexts/bounded-contexts.md` + `context-map.md` | `BC-NN` |
 | 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/glossary/glossary.md` | `BC-NN.GT-NN` |
 | 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/value-streams/value-streams.md` + `value-proposition-canvas-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
+| 4.5 | **Business Objectives** (why — strategic intent) | `business-objective` | `docs/business/objectives/objectives.md` | `OBJ-NN`, `KR-NN.M` |
 | 4 | **Business Processes** (operational how) | `business-process` | `docs/business/processes/{slug}-process.md` (one file per process) | per-process slug |
 | 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/business-model-canvas/business-model-canvas.md` or `lean-canvas.md` + optional `value-proposition-canvas-{segment}.md` | block IDs (CS-N, VP-N, …) |
 | 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/models/{slug}.md` | per-model slug |
@@ -53,7 +55,15 @@ what order, and where to put it**.
 ## Dependency graph (DAG)
 
 ```
-                       ┌────────────────────────┐
+   ┌──────────────────────────────────────────────────┐
+   │  business-vision (Step 0)                        │
+   │  (why — the north star)                          │
+   │  Output: docs/VISION.md (singleton)              │
+   │  Wires to: CLAUDE.md (agent context injection)   │
+   └──────────────────────┬───────────────────────────┘
+                          │ soft-links to all downstream artefacts
+                          │
+                       ┌──┴─────────────────────┐
                        │  business-persona      │
                        │  (who we serve)        │
                        │  Output: P-NN          │
@@ -84,6 +94,14 @@ what order, and where to put it**.
               │             │  quantitative-model│
               │             │ (numbers / TAM)    │
               │             └────────────────────┘
+              │
+              │   ┌──────────────────────────────────────────┐
+              │   │ business-objective (Step 4.5)            │
+              │   │ (strategic intent — why)                 │
+              │   │ Output: OBJ-NN, KR-NN.M                  │
+              │   │ Reads: P-NN · VS-N.M pain · VP-NN (BMC)  │
+              │   │ Soft-links to: E-NN · QA-XXNN · PRD-NNNN │
+              │   └──────────────────────────────────────────┘
               │
               ▼
    ┌──────────────────────┐
@@ -147,6 +165,9 @@ The ER diagram shows which ID each artefact **mints** (PK) and which upstream ID
 
 ```mermaid
 erDiagram
+    VISION {
+        string file PK
+    }
     PERSONA {
         string P_NN PK
     }
@@ -168,6 +189,15 @@ erDiagram
     }
     QUANTITATIVE_MODEL {
         string slug PK
+    }
+    OBJECTIVE {
+        string OBJ_NN PK
+        string VS_NM FK
+        string P_NN FK
+    }
+    KEY_RESULT {
+        string KR_NNM PK
+        string OBJ_NN FK
     }
     FBS {
         string C_NM_FXX PK
@@ -207,6 +237,14 @@ erDiagram
     VALUE_STREAM }o--o{ QUALITY_ATTRIBUTES : "pain index drives PE"
     VALUE_STREAM }o--o{ EPIC : "VS stage anchor"
     BMC ||--o{ QUANTITATIVE_MODEL : "Revenue and Cost"
+    VISION }o--o{ PERSONA : "audience scope"
+    VISION }o--o{ OBJECTIVE : "objectives operationalise"
+    VISION }o--o{ BMC : "VP blocks express commercially"
+    VALUE_STREAM }o--o{ OBJECTIVE : "pain index informs priority"
+    PERSONA }o--o{ OBJECTIVE : "whose outcomes"
+    OBJECTIVE ||--o{ KEY_RESULT : "measures progress via"
+    OBJECTIVE }o--o{ EPIC : "epics serve"
+    KEY_RESULT }o--o{ QUALITY_ATTRIBUTES : "KR targets ground"
     FBS ||--o{ EPIC : "grouped into epics"
     FBS }o--o{ QUALITY_ATTRIBUTES : "differentiators drive Reliability"
     ADR }o--o{ QUALITY_ATTRIBUTES : "decisions inform Security and Flexibility"
@@ -230,10 +268,23 @@ When starting a new software product or venture from scratch, follow this
 order. Each step has prerequisites + outputs Claude can verify before
 moving on.
 
+### Step 0 — Product Vision (why — the north star)
+
+**Skill:** `business-vision`
+**Prerequisites:** minimal project context (product name + target audience is enough to scaffold).
+**Process:**
+- Mode `scaffold` → create `docs/VISION.md` with `_TODO_` placeholders
+- Mode `fill` → populate §Elevator Pitch (Moore format) · §Problem We Solve · §World We're Building Toward · §What We Are NOT · §North Star Metric
+- Mode `wire` → append vision pointer to project `CLAUDE.md` so every agent session auto-loads the vision
+- Mode `refresh` → update when strategy pivots; check cascading effects on personas, objectives, and BMC VPs
+**Output verification:** `docs/VISION.md` exists; ≤ 400 words / ≤ 1 page; §Elevator Pitch uses Moore format; §North Star is directional (no baseline/target/deadline — those are KRs); ≥ 3 specific "NOT" guardrails; `CLAUDE.md` contains a vision pointer (Wire mode).
+
+---
+
 ### Step 1 — Personas (who)
 
 **Skill:** `business-persona`
-**Prerequisites:** project context (PRD-equivalent doc, README, vision statement, or interview notes)
+**Prerequisites:** Step 0 (Product Vision — if it exists, read it; personas should reflect the vision's target audience framing)
 **Process:**
 - Mode `scaffold` → create `docs/business/personas/personas.md`
 - Mode `backlog` → identify Tier-1 / Tier-2 / Tier-3 personas with Cooper persona types
@@ -291,6 +342,19 @@ moving on.
 - Mode `catalogue` → enumerate 3–10 streams per product scope, one per Tier-1 persona × value-proposition pair
 - Mode `fill-one` → full stream body with 4–10 stages, each consuming 1–4 capabilities + pain index
 **Output verification:** value-streams file exists; ≥1 stream fully filled; each stage links to ≥1 capability by `C-N.M` ID.
+
+### Step 4.5 — Business Objectives (why — strategic intent)
+
+**Skill:** `business-objective`
+**Prerequisites:** Step 1 (Personas — whose outcomes the objectives serve); Step 2 (BMC — `VP-NN` Value Propositions are the commercial intent that objectives operationalise); Step 4 (Value Streams — pain index per `VS-N.M` prioritises which objectives matter most).
+**Process:**
+- Mode `scaffold` → create `docs/business/objectives/objectives.md` with OBJ-NN placeholder blocks
+- Mode `fill` → populate each OBJ-NN: qualitative title, BSC perspective tag, timeframe, owner, "why it matters" sentence linked to `VP-NN` or `VS-N.M` pain index; 3–5 Key Results per objective (outcome statements with baseline, target, measurement method)
+- Mode `align` → after the delivery roadmap exists, build the §Objective × Epic traceability matrix; flag orphaned epics (no OBJ-NN) and undelivered objectives (no E-NN)
+- Mode `refresh` → update KR baselines/targets when evidence arrives; add changelog entry
+**Output verification:** `objectives.md` exists; ≥1 OBJ-NN filled with qualitative title + BSC perspective + timeframe + owner; every KR is an outcome (metric change), not an output (feature delivery); every OBJ-NN traces to ≥1 `VP-NN` or `VS-N.M`; 2–5 objectives total; ≥1 Customer-perspective objective.
+
+---
 
 ### Step 5 — Business Processes (operational how)
 
@@ -419,6 +483,8 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `C1`, `C1.1`, `C1.1.1` | Capability (L0 / L1 / L2) | `business-capability-map` |
 | `VS-N` | Value stream | `business-value-stream` |
 | `VS-N.M` | Value-stream stage | `business-value-stream` |
+| `OBJ-NN` | Business Objective | `business-objective` |
+| `KR-NN.M` | Key Result (M under Objective N) | `business-objective` |
 | `C-N.M.FXX` | Functionality (capability + counter) | `spec-functional-breakdown-structure` |
 | `BC-NN` | Bounded Context | `domain-bounded-context` |
 | `BC-NN.GT-NN` | Glossary Term (scoped to bounded context) | `domain-glossary` |
@@ -448,6 +514,7 @@ so that future renames (description text) don't break the link as long as the ID
 
 ```
 docs/
+├── VISION.md                                            ← business-vision (Step 0 — singleton, agent north star)
 ├── business/                                            ← Business Architecture artefacts
 │   ├── personas/
 │   │   └── personas.md
@@ -461,6 +528,8 @@ docs/
 │   ├── business-model-canvas/
 │   │   ├── business-model-canvas.md  (or lean-canvas.md)
 │   │   └── value-proposition-canvas-{segment}.md (optional, per CS)
+│   ├── objectives/
+│   │   └── objectives.md                                ← business-objective (OBJ-NN, KR-NN.M)
 │   └── models/
 │       └── {slug}.md (TAM/SAM/SOM, savings, ROI per model)
 ├── product-specs/                                       ← `spec-` skills (product delivery)
@@ -498,7 +567,7 @@ docs/
 
 | Prefix | Folder | Note |
 |---|---|---|
-| `business-` | `docs/business/` | All BIZBOK Business Architecture artefacts |
+| `business-` | `docs/business/` | All BIZBOK Business Architecture artefacts. **Exception:** `business-vision` outputs to `docs/VISION.md` (project root level) for agent-context visibility — the only `business-` skill whose output is not under `docs/business/`. |
 | `spec-` | `docs/product-specs/`, `docs/exec-plans/`, `docs/ideas/` | Product specs, plans, pre-PRD ideas |
 | `arch-` | `docs/architecture/` | Subfolders per artefact (e.g., `decisions/` for ADRs) |
 | `domain-` | `docs/domain/` | DDD artefacts — the shared language between business and tech (bounded contexts, glossary, domain model) |
@@ -542,3 +611,9 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 | New mandatory section in a skill's template | `util-metamodel-audit/references/check-catalogue.md` → Check 9 (mandatory sections table) |
 
 Failing to update these files after a metamodel change will cause the audit and migration skills to silently miss the new artefact — the most dangerous kind of drift.
+
+**Already-updated coupling (business-vision, Step 0, 2026-05-21):**
+`rules/metamodel.md` artefact table (row 0) + build order §0 + DAG + ER diagram + canonical paths + prefix exception note + this table · `README.md` flowchart (S0 node + edges) + ER diagram + skill index · `util-metamodel-audit/references/check-catalogue.md` Checks 1, 2 · `util-metamodel-migration/references/detection-signals.md` §Filename + §Content signals · `business-persona/SKILL.md` · `business-model-canvas/SKILL.md` · `business-objective/SKILL.md` · `spec-delivery-roadmap/SKILL.md` · `spec-prd/SKILL.md`
+
+**Already-updated coupling (business-objective, Step 4.5, 2026-05-21):**
+`rules/metamodel.md` artefact table + build order §4.5 + DAG + ER diagram + ID conventions + canonical paths + this table · `README.md` flowchart + ER diagram + skill index · `util-metamodel-audit/references/check-catalogue.md` Checks 1, 2, 5, 7, 9 · `util-metamodel-migration/references/detection-signals.md` §Filename + §Folder + §Content signals · `spec-delivery-roadmap/SKILL.md` · `spec-prd/SKILL.md` · `spec-quality-attributes/SKILL.md` · `business-value-stream/SKILL.md` · `business-model-canvas/SKILL.md`

@@ -127,6 +127,7 @@ the persona cannot complete the journey — the skeleton is broken.
 ### Step 0 — Read all upstream artefacts
 
 ```bash
+cat docs/VISION.md 2>/dev/null                                     # optional: read if exists — phase goals should connect to vision north star
 cat docs/product-specs/functional-breakdown-structure/FBS.md
 cat docs/business/value-streams/value-streams.md
 cat docs/business/personas/personas.md
@@ -285,6 +286,7 @@ pointer, companion docs (FBS, VS, QA, personas).
 ### E-01 · [Name]
 
 **Value statement:** When this epic ships, [P-NN] can [outcome].
+**Objective:** [OBJ-NN · Objective title](link to objectives.md) *(if objectives doc exists)*
 **VS anchor:** [VS-N.M · Stage name](link) — Pain: Critical / High / Medium
 **Personas:** [P-NN](link)
 **Capabilities:** [C-N.M](link to BC Map)
@@ -326,6 +328,7 @@ Before declaring complete:
 - [ ] Walking skeleton covers every stage of target VS end-to-end (no broken stages)
 - [ ] "Cannot yet" block is explicit — no false completeness in MVP framing
 - [ ] Every epic has a value statement ("when this ships, P-NN can…")
+- [ ] Every epic references ≥1 OBJ-NN (when objectives doc exists at `docs/business/objectives/objectives.md`)
 - [ ] Phase goals express VS streams operational, not feature lists
 - [ ] Differentiator (★) functionalities each anchor their own epic
 - [ ] E-NN IDs in pain-index priority order (Critical before High before Medium)
@@ -342,6 +345,7 @@ Before declaring complete:
 | Value streams (`VS-N.M` pain index + value proposition per VS) | Epic priority + phase goal vocabulary |
 | Personas (`P-NN` device + context) | Walking skeleton "can/cannot yet" narrative |
 | Quality attributes (`QA-XXNN`) | Optional — which QA entries apply per epic scope |
+| Business objectives (`OBJ-NN` + `KR-NN.M`) | Optional — epics reference `OBJ-NN` in value statement; traceability matrix links each E-NN to the objective it serves |
 
 | Feeds | How |
 |---|---|

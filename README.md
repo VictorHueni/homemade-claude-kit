@@ -10,7 +10,7 @@ Every skill produces a named artefact with a stable ID. Artefacts cross-link by 
 
 ## The artefact system
 
-14 artefacts across three layers (Business Architecture · Domain · Product Specs), built in order. Solid arrows = hard dependency. Dashed arrows = supporting skills that validate or enrich without blocking.
+16 artefacts across three layers (Business Architecture · Domain · Product Specs) plus a root Step 0, built in order. Solid arrows = hard dependency. Dashed arrows = supporting skills that validate or enrich without blocking.
 
 ```mermaid
 flowchart TD
@@ -20,11 +20,14 @@ flowchart TD
     classDef delivery fill:#D1FAE5,stroke:#10B981,color:#065F46
     classDef support  fill:#F3F4F6,stroke:#9CA3AF,color:#374151
 
-    subgraph BA["Business Architecture — Steps 1–6"]
+    S0["0 · business-vision · VISION.md · north star"]:::business
+
+    subgraph BA["Business Architecture — Steps 1–6 + 4.5"]
         S1["1 · business-persona · P-NN"]:::business
         S2["2 · business-model-canvas"]:::business
         S3["3 · business-capability-map · C-N.M"]:::business
         S4["4 · business-value-stream · VS-N.M"]:::business
+        S4b["4.5 · business-objective · OBJ-NN · KR-NN.M"]:::business
         S5["5 · business-process"]:::business
         S6["6 · business-quantitative-model"]:::business
     end
@@ -53,12 +56,22 @@ flowchart TD
         WS["business-workshop"]:::support
     end
 
+    S0 -.-> S1
+    S0 -.-> S2
+    S0 -.-> S4b
+    S0 -.-> S8
     S1 --> S2
     S1 --> S3
     S1 --> S4
     S3 --> S4
     S4 --> S5
     S2 --> S6
+    S1 -.-> S4b
+    S2 -.-> S4b
+    S4 --> S4b
+    S4b -.-> S8
+    S4b -.-> S9
+    S4b -.-> S10
     S3 --> S2b
     S4 --> S2b
     S2b --> S2c
@@ -90,6 +103,9 @@ Each artefact **mints** a primary ID and **consumes** upstream IDs as cross-refe
 
 ```mermaid
 erDiagram
+    VISION {
+        string file PK
+    }
     PERSONA {
         string P_NN PK
     }
@@ -111,6 +127,15 @@ erDiagram
     }
     QUANTITATIVE_MODEL {
         string slug PK
+    }
+    OBJECTIVE {
+        string OBJ_NN PK
+        string VS_NM FK
+        string P_NN FK
+    }
+    KEY_RESULT {
+        string KR_NNM PK
+        string OBJ_NN FK
     }
     FBS {
         string C_NM_FXX PK
@@ -168,6 +193,14 @@ erDiagram
     VALUE_STREAM }o--o{ QUALITY_ATTRIBUTES : "pain index drives PE"
     VALUE_STREAM }o--o{ EPIC : "VS stage anchor"
     BMC ||--o{ QUANTITATIVE_MODEL : "Revenue and Cost"
+    VISION }o--o{ PERSONA : "audience scope"
+    VISION }o--o{ OBJECTIVE : "objectives operationalise"
+    VISION }o--o{ BMC : "VP blocks express commercially"
+    VALUE_STREAM }o--o{ OBJECTIVE : "pain index informs priority"
+    PERSONA }o--o{ OBJECTIVE : "whose outcomes"
+    OBJECTIVE ||--o{ KEY_RESULT : "measures progress via"
+    OBJECTIVE }o--o{ EPIC : "epics serve"
+    KEY_RESULT }o--o{ QUALITY_ATTRIBUTES : "KR targets ground"
     FBS ||--o{ EPIC : "grouped into epics"
     FBS }o--o{ QUALITY_ATTRIBUTES : "differentiators drive Reliability"
     ADR }o--o{ QUALITY_ATTRIBUTES : "decisions inform Security and Flexibility"
@@ -197,6 +230,8 @@ erDiagram
 | `business-` | `business-process` | `docs/business/processes/{slug}-process.md` | slug |
 | `business-` | `business-model-canvas` | `docs/business/business-model-canvas/` | block IDs |
 | `business-` | `business-quantitative-model` | `docs/business/models/{slug}.md` | slug |
+| `business-` | `business-vision` | `docs/VISION.md` *(Step 0 — singleton, CLAUDE.md wired)* | *(path ref — no ID)* |
+| `business-` | `business-objective` | `docs/business/objectives/objectives.md` | `OBJ-NN` · `KR-NN.M` |
 | `business-` | `business-competitive-landscape` | `docs/business/competitive-landscape/` | — |
 | `business-` | `business-research` | `docs/business/research/` | — |
 | `business-` | `business-workshop` | `docs/business/workshops/` | — |
