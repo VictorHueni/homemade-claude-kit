@@ -42,7 +42,7 @@ Skill folder name + `name:` frontmatter field must follow this exact pattern:
 | `domain-` | `docs/domain/` | DDD artefacts — bounded contexts, glossary, domain model; the shared language between business and tech | `domain-bounded-context`, `domain-glossary`, `domain-model` |
 | `ops-` | `docs/ops/` (subfolders per artefact type) | `ops-runbook` (→ `docs/ops/runbooks/`), `ops-bug-rca` (→ `docs/ops/rcas/`) |
 | `dev-` | *(no doc folder — developer workflow utility)* | `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-ralph-loop` |
-| `com-` | *(no doc folder — communication artefacts)* | `com-slide-deck` |
+| `com-` | `docs/communication/` (subfolders per artefact type, e.g. `slides/`) | `com-slide-deck` (→ `docs/communication/slides/{slug}/`) |
 | `util-` | *(no doc folder — housekeeping)* | `util-docs-audit`, `util-toolkit-doctor` |
 
 **Why this matters:** when you (or Claude) see a skill name, the prefix immediately tells you (a) which folder its output goes into, or (b) that it's a non-doc utility. No ambiguity.

@@ -50,7 +50,7 @@ what order, and where to put it**.
 - `util-metamodel-audit` — deep metamodel compliance audit: 16 checks covering stack progress, folder placement, internal + external links, ID integrity + cross-references, dependency enforcement, _TODO_ density, mandatory sections, confidence distribution, expiry + staleness, orphaned files, research sync, ADR chains, FBS + epic delivery progress → report at `var/reports/metamodel-audit/`; report-only with proposed fix per finding; run monthly (active dev) or quarterly (maintenance)
 - `util-metamodel-migration` — one-time migration doctor for repos built before the metamodel: scans any docs/ folder, detects misplaced files using tiered confidence scoring (filename → folder name → content signals), emits atomic fix blocks (git mv + sed link repairs) per file → report at `var/reports/metamodel-migration/`; report-only; run once before the first `util-metamodel-audit`
 - `dev-*` skills — developer workflow (git, PR, worktree, ralph loop)
-- `com-*` skills — communication artefacts (slide decks, presentations)
+- `com-slide-deck` — HTML slide presentations → `docs/communication/slides/{slug}/` (one folder per deck, named after the presentation in kebab-case)
 
 ---
 
@@ -553,6 +553,14 @@ docs/
 │   │   └── {slug}.md
 │   └── rcas/
 │       └── {YYYY-MM-DD}-{slug}.md
+├── communication/                                       ← `com-` skills
+│   └── slides/
+│       └── {slug}/                                      ← com-slide-deck (one folder per deck)
+│           ├── context/
+│           ├── design/
+│           ├── src/                                     ← slide partials (source of truth)
+│           ├── dist/                                    ← built HTML + prototypes/
+│           └── config.yaml
 └── ideas/                                               ← `spec-idea` (pre-PRD)
     └── {slug}.md
 ```
@@ -566,6 +574,7 @@ docs/
 | `arch-` | `docs/architecture/` | Subfolders per artefact (e.g., `decisions/` for ADRs) |
 | `domain-` | `docs/domain/` | DDD artefacts — the shared language between business and tech (bounded contexts, glossary, domain model) |
 | `ops-` | `docs/ops/` | Subfolders per artefact (`runbooks/`, `rcas/`) |
+| `com-` | `docs/communication/` | Communication artefacts (slide decks, presentations). Subfolders per artefact type (e.g. `slides/`). |
 | `dev-` | *(no doc folder)* | Developer-workflow utilities |
 | `util-` | *(no doc folder)* | Housekeeping |
 
