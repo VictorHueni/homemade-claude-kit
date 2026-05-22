@@ -1,6 +1,6 @@
 ---
 name: util-metamodel-audit
-description: "Audit the strategic-architecture documentation stack for a project. Checks 16 dimensions: stack progress (11-step completion), folder placement, internal links, external links, ID cross-references, ID integrity (collisions + format), dependency enforcement, _TODO_ density, mandatory section compliance, methodology pointer presence, confidence distribution, expiry + staleness, orphaned files, research sync, ADR supersession chains, FBS + epic delivery progress. Report-only with proposed fix column per finding. Triggers on: metamodel audit, audit the metamodel, audit the stack, check docs health, documentation audit, check links, validate dependencies, what steps are done, doc health check, stale links, broken links, check doc dependencies, audit artefact compliance."
+description: "Audit the strategic-architecture documentation stack for a project. Checks 17 dimensions: stack progress (11-step completion), folder placement, internal links, external links, ID cross-references, ID integrity (collisions + format), dependency enforcement, _TODO_ density, mandatory section compliance, methodology pointer presence, confidence distribution, expiry + staleness, orphaned files, research sync, ADR supersession chains, FBS + epic delivery progress, frontmatter validity (presence + field completeness + status enum + supersession link integrity). Report-only with proposed fix column per finding. Triggers on: metamodel audit, audit the metamodel, audit the stack, check docs health, documentation audit, check links, validate dependencies, what steps are done, doc health check, stale links, broken links, check doc dependencies, audit artefact compliance."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -227,7 +227,7 @@ If the project uses a different reports root (`reports/`, `docs/reports/`), use 
 
 Three files in `references/`:
 - **`references/template.md`** — full markdown report template with all 16 section skeletons.
-- **`references/check-catalogue.md`** — for each of the 16 checks: bash detection pattern, interpretation rules, severity assignment, proposed fix template.
+- **`references/check-catalogue.md`** — for each of the 17 checks: bash detection pattern, interpretation rules, severity assignment, proposed fix template.
 - **`references/methodology-references.md`** — rationale for each check category (link rot research, BABOK traceability discipline, Lean UX hypothesis expiry, SCIP staleness cadence).
 
 ---
