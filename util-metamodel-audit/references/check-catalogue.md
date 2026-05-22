@@ -300,28 +300,6 @@ done | sort -rn
 | `docs/architecture/research/*.md` | `## Questions`, `## Findings`, `## Changelog` | `grep -q '## Questions\|## Findings'` |
 | `docs/business/01b-competitive-landscape/*.md` | `## Porter Five Forces`, `## Competitor Profiles` or `## CO-` heading | `grep -q 'Five Forces\|CO-[0-9]'` |
 
-**Frontmatter validity — all `docs/**/*.md` files:**
-```bash
-find docs -name "*.md" | while read f; do
-  # Must start with ---
-  head -1 "$f" | grep -q '^---' || echo "MISSING FRONTMATTER: $f"
-  # Must have all 5 required fields
-  for field in title status owner last_reviewed review_interval; do
-    grep -q "^${field}:" "$f" || echo "MISSING FIELD ${field}: $f"
-  done
-  # status must be one of four allowed values
-  status=$(grep "^status:" "$f" | head -1 | sed 's/status: *//')
-  case "$status" in
-    draft|active|superseded|deprecated) ;;
-    *) echo "INVALID STATUS '${status}': $f" ;;
-  esac
-  # when status: superseded, superseded_by must be present
-  if echo "$status" | grep -q "^superseded$"; then
-    grep -q "^superseded_by:" "$f" || echo "MISSING superseded_by ON SUPERSEDED DOC: $f"
-  fi
-done
-```
-
 **Detection (example for process doc):**
 ```bash
 find docs/business/processes -name "*-process.md" 2>/dev/null | while read f; do
@@ -562,3 +540,73 @@ echo "Bounded contexts: $bc_count | Domain models: $dm_count"
 **Severity:** Info
 
 **Proposed fix template:** "Run `spec-prd` for epic `{E-NN}` to create the missing PRD. Promote FBS rows from ⬜ → 🔄 as the PRD is written."
+
+---
+
+## Check 17 — Frontmatter validity
+
+**What:** verifies that every `docs/**/*.md` file opens with the standard artefact frontmatter block and that all required fields are present, valid, and consistent.
+
+**Schema (canonical — defined in `rules/artefact-frontmatter.md`):**
+- Always present: `title`, `status`, `owner`, `last_reviewed`, `review_interval`
+- Conditional: `superseded_by` required when `status: superseded`; `supersedes` present only on documents created to replace another
+- Valid `status` values: `draft`, `active`, `superseded`, `deprecated`
+
+**Detection:**
+```bash
+find docs -name "*.md" | sort | while read f; do
+  # 1. Frontmatter block must be present (file must start with ---)
+  head -1 "$f" | grep -q '^---' || { echo "MISSING FRONTMATTER: $f"; continue; }
+
+  # 2. All 5 required fields must exist
+  for field in title status owner last_reviewed review_interval; do
+    grep -q "^${field}:" "$f" || echo "MISSING FIELD '${field}': $f"
+  done
+
+  # 3. status must be one of the four allowed values
+  status=$(grep "^status:" "$f" | head -1 | sed 's/status: *//')
+  case "$status" in
+    draft|active|superseded|deprecated) ;;
+    *) echo "INVALID STATUS '${status}': $f" ;;
+  esac
+
+  # 4. When status: superseded, superseded_by must be present and target must exist
+  if [ "$status" = "superseded" ]; then
+    sb=$(grep "^superseded_by:" "$f" 2>/dev/null | sed 's/superseded_by: *//')
+    [ -z "$sb" ] && echo "MISSING superseded_by (status is superseded): $f"
+    [ -n "$sb" ] && [ ! -f "$sb" ] && echo "DEAD superseded_by TARGET '$sb': $f"
+  fi
+
+  # 5. When supersedes: present, target must exist and have status: superseded
+  sup=$(grep "^supersedes:" "$f" 2>/dev/null | sed 's/supersedes: *//')
+  if [ -n "$sup" ]; then
+    [ ! -f "$sup" ] && echo "DEAD supersedes TARGET '$sup': $f"
+    [ -f "$sup" ] && ! grep -q "^status: superseded" "$sup" && \
+      echo "supersedes TARGET NOT SUPERSEDED '$sup': $f"
+  fi
+
+  # 6. owner must not be empty or a placeholder
+  owner=$(grep "^owner:" "$f" | head -1 | sed 's/owner: *//')
+  [ -z "$owner" ] && echo "EMPTY owner: $f"
+
+  # 7. last_reviewed must be a valid YYYY-MM-DD date
+  lr=$(grep "^last_reviewed:" "$f" | head -1 | sed 's/last_reviewed: *//')
+  echo "$lr" | grep -qP '^\d{4}-\d{2}-\d{2}$' || echo "INVALID last_reviewed '${lr}': $f"
+done
+```
+
+**Severity:**
+- Missing frontmatter block → Error
+- Missing required field → Error
+- Invalid `status` value → Error
+- `superseded` without `superseded_by` → Error
+- Dead `superseded_by` or `supersedes` target → Error
+- Empty `owner` → Warning
+- Invalid `last_reviewed` date format → Warning
+
+**Proposed fix template:**
+- Missing block: "Add standard frontmatter to `{file}` using `rules/artefact-frontmatter.md` schema. Run `git config user.name` for owner."
+- Missing field: "Add `{field}:` to the frontmatter of `{file}`."
+- Invalid status: "Set `status:` in `{file}` to one of: `draft`, `active`, `superseded`, `deprecated`."
+- Missing `superseded_by`: "Add `superseded_by: <path-to-replacement>` to `{file}` frontmatter."
+- Dead target: "Update `superseded_by` / `supersedes` path in `{file}` — target file no longer exists at `{path}`."
