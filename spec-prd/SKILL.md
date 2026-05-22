@@ -306,14 +306,17 @@ Remaining questions or areas needing clarification. Include:
 
 ## Step 3: Save the PRD
 
-Find the next available ID:
+Determine the next `PRD-NNNN` ID — 4-digit zero-padded, monotonically increasing:
 
 ```bash
-python skills/spec-prd/scripts/get-next-id.py
-# or: check docs/product-specs/ for the highest 4-digit prefix
+find docs/product-specs/ -name "[0-9]*.md" | sort | tail -1
+# take the NNNN prefix from the result and add 1; first PRD is 0001
 ```
 
-Save to: `docs/product-specs/[NNNN]_prd_[feature-name].md`
+The same NNNN is used in:
+- The filename: `docs/product-specs/[NNNN]_prd_[feature-name].md`
+- The frontmatter title: `PRD-NNNN — Feature Name`
+- The `**PRD-ID:** PRD-NNNN` field in §0 Architecture Traceability
 
 **Important:** Do NOT start implementing. Just create the PRD.
 

@@ -161,6 +161,30 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{vari
 
 ## Soft-links — connecting the canvas to your BA stack
 
+## Block IDs
+
+Each item within a BMC block carries a stable ID — two-letter block prefix + sequential integer. Assign on first mention; never renumber.
+
+| Block | Prefix | Example |
+|---|---|---|
+| Customer Segments | `CS-N` | `CS-1`, `CS-2` |
+| Value Propositions | `VP-N` | `VP-1` |
+| Channels | `CH-N` | `CH-1` |
+| Customer Relationships | `CR-N` | `CR-1` |
+| Revenue Streams | `RS-N` | `RS-1` |
+| Key Resources | `KR-N` | `KR-1` |
+| Key Activities | `KA-N` | `KA-1` |
+| Key Partners | `KP-N` | `KP-1` |
+| Cost Structure | `CT-N` | `CT-1` |
+
+**Lean Canvas prefixes:** Problem `PR-N` · Solution `SO-N` · Key Metrics `KM-N` · Unique Value Proposition `UVP-N` · Unfair Advantage `UA-N` · (Channels, Customer Segments, Cost Structure, Revenue Streams share BMC prefixes above).
+
+**Disambiguation note:** `KR-N` (Key Resource) differs from `KR-NN.M` (Key Result from `business-objective`) by the absence of the `.M` sub-number. When citing cross-doc, always include the block name: "Key Resource KR-1" not bare "KR-1".
+
+---
+
+## Soft-links
+
 The canvas is the commercial wrapper around the BIZBOK Business Architecture artefacts. Where they exist, soft-link them:
 
 | Canvas block | Soft-links to |

@@ -164,6 +164,20 @@ Ask 2–4 questions max, single message, lettered options where possible.
 
 ---
 
+## Capability ID convention
+
+IDs follow the `C-N.M` format — the same ID must be used consistently across every artefact that references a capability (FBS, value streams, processes, PRDs, domain model).
+
+| Level | Format | Examples |
+|---|---|---|
+| L0 | `C{N}` | `C1`, `C2`, `C3` |
+| L1 | `C{N}.{M}` | `C1.1`, `C1.2`, `C3.4` |
+| L2 (rare) | `C{N}.{M}.{K}` | `C1.1.1`, `C3.4.2` |
+
+**Assignment rule:** scan existing IDs in the capability map (`grep "C[0-9]" docs/business/03a-capability-map.md`) before assigning. Take the next integer at each level. IDs are permanent once assigned — never renumber, even if a capability is deprecated. L2 is only added when an L1 has ≥5 genuinely distinct sub-capabilities.
+
+---
+
 ## Output structure — the fixed template
 
 - Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 180d`. Full schema: `rules/artefact-frontmatter.md`.
