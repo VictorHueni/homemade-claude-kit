@@ -144,7 +144,17 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `E-NN` | `\bE-[0-9]{2}\b` | `docs/product-specs/08a-delivery-roadmap.md` |
 | `QA-[A-Z]{2}[0-9]{2}` | `\bQA-[A-Z]{2}[0-9]{2}\b` | `docs/product-specs/09a-quality-attributes.md` |
 | `ADR-NNNN` | `\bADR-[0-9]{4}\b` | `docs/architecture/decisions/` |
+| `Research-NNNN` | `\bResearch-[0-9]{4}\b` | `docs/architecture/research/` |
+| `CO-NN` | `\bCO-[0-9]{2}\b` | `docs/business/01b-competitive-landscape/` |
 | `PRD-NNNN` | `\bPRD-[0-9]{4}\b` | `docs/product-specs/prd-*.md` |
+| `CS-N` | `\bCS-[0-9]+\b` | `docs/business/02a-bmc.md` |
+| `VP-N` | `\bVP-[0-9]+\b` | `docs/business/02a-bmc.md` |
+| `CH-N` | `\bCH-[0-9]+\b` | `docs/business/02a-bmc.md` |
+| `CR-N` | `\bCR-[0-9]+\b` | `docs/business/02a-bmc.md` |
+| `RS-N` | `\bRS-[0-9]+\b` | `docs/business/02a-bmc.md` |
+| `KA-N` | `\bKA-[0-9]+\b` | `docs/business/02a-bmc.md` |
+| `KP-N` | `\bKP-[0-9]+\b` | `docs/business/02a-bmc.md` |
+| `CT-N` | `\bCT-[0-9]+\b` | `docs/business/02a-bmc.md` |
 
 **Detection (example for P-NN):**
 ```bash
@@ -181,6 +191,10 @@ grep -roh '\bP-[0-9]\b' docs/ --include="*.md"
 grep -roh '\bE-[0-9]\b' docs/ --include="*.md"
 # QA IDs with wrong format
 grep -roh '\bQA-[^A-Z ]' docs/ --include="*.md"
+# Research IDs with wrong digit count (must be 4-digit)
+grep -roh '\bResearch-[0-9]\{1,3\}\b' docs/ --include="*.md"
+# Competitor IDs with wrong digit count (must be 2-digit)
+grep -roh '\bCO-[0-9]\b' docs/ --include="*.md"
 ```
 
 **Severity:** Error
@@ -283,6 +297,30 @@ done | sort -rn
 | `bounded-contexts.md` | `## Subdomain catalogue`, at least one `BC-NN` entry | `grep -q 'BC-[0-9][0-9]'` |
 | `glossary.md` | At least one BC section, `## Changelog` | `grep -q '## Changelog'` |
 | `domain-model.md` | `## Aggregate catalogue`, `## Domain event catalogue`, Mermaid `classDiagram` | `grep -q 'Aggregate catalogue\|classDiagram'` |
+| `docs/architecture/research/*.md` | `## Questions`, `## Findings`, `## Changelog` | `grep -q '## Questions\|## Findings'` |
+| `docs/business/01b-competitive-landscape/*.md` | `## Porter Five Forces`, `## Competitor Profiles` or `## CO-` heading | `grep -q 'Five Forces\|CO-[0-9]'` |
+
+**Frontmatter validity — all `docs/**/*.md` files:**
+```bash
+find docs -name "*.md" | while read f; do
+  # Must start with ---
+  head -1 "$f" | grep -q '^---' || echo "MISSING FRONTMATTER: $f"
+  # Must have all 5 required fields
+  for field in title status owner last_reviewed review_interval; do
+    grep -q "^${field}:" "$f" || echo "MISSING FIELD ${field}: $f"
+  done
+  # status must be one of four allowed values
+  status=$(grep "^status:" "$f" | head -1 | sed 's/status: *//')
+  case "$status" in
+    draft|active|superseded|deprecated) ;;
+    *) echo "INVALID STATUS '${status}': $f" ;;
+  esac
+  # when status: superseded, superseded_by must be present
+  if echo "$status" | grep -q "^superseded$"; then
+    grep -q "^superseded_by:" "$f" || echo "MISSING superseded_by ON SUPERSEDED DOC: $f"
+  fi
+done
+```
 
 **Detection (example for process doc):**
 ```bash
@@ -341,32 +379,27 @@ done
 
 ## Check 12 — Expiry + staleness
 
-**What:** finds proto-persona next-review dates that have passed, and competitive landscape claims past their refresh window.
+**What:** flags artefacts overdue for review based on `last_reviewed` + `review_interval` frontmatter fields, plus proto-persona expiry and glossary changelog discipline.
+
+**Detection — frontmatter staleness (all docs):**
+```bash
+today=$(date +%s)
+find docs -name "*.md" | while read f; do
+  last=$(grep "^last_reviewed:" "$f" 2>/dev/null | sed 's/last_reviewed: *//')
+  interval=$(grep "^review_interval:" "$f" 2>/dev/null | sed 's/review_interval: *//' | grep -oP '[0-9]+')
+  [ -z "$last" ] || [ -z "$interval" ] && continue
+  last_ts=$(date -d "$last" +%s 2>/dev/null) || continue
+  due=$(( last_ts + interval * 86400 ))
+  [ "$today" -gt "$due" ] && \
+    echo "OVERDUE ($(( (today - due) / 86400 ))d past): $f (last_reviewed: $last, interval: ${interval}d)"
+done | sort
+```
 
 **Detection — proto-persona expiry:**
 ```bash
 grep -n 'Next review' docs/business/01a-personas.md 2>/dev/null
-# Compare each date against today
+# Compare each date against today; proto-personas past next-review are expired assumptions
 ```
-
-**Detection — competitive landscape staleness:**
-```bash
-grep -rn 'Last verified' docs/business/01b-competitive-landscape/ 2>/dev/null
-# For each date, compute days since; flag if > 90 days (fast market) or > 180 days (slow)
-```
-
-**Detection — process doc last-updated:**
-```bash
-find docs/business/processes -name "*-process.md" | while read f; do
-  last=$(git log -1 --format="%ci" -- "$f" 2>/dev/null | cut -d' ' -f1)
-  echo "$last $f"
-done | sort
-```
-
-**Severity:**
-- Proto-persona past next-review → Error (expired assumption)
-- Competitive claim past threshold → Warning
-- Process doc not updated in >180 days → Info
 
 **Detection — glossary changelog discipline:**
 ```bash
@@ -447,28 +480,46 @@ done
 
 ## Check 15 — ADR supersession chains
 
-**What:** finds one-sided ADR supersession links.
+**What:** finds broken or one-sided ADR supersession links in frontmatter.
+
+ADR supersession is tracked via frontmatter fields only — there is no `## Status` body section. Two checks:
+1. When a new ADR has `supersedes: <path>`, the target file must have `status: superseded` and `superseded_by:` pointing back.
+2. When an ADR has `status: superseded`, it must have `superseded_by:` pointing to an existing file.
 
 **Detection:**
 ```bash
-find docs/architecture/decisions -name "*.md" 2>/dev/null | while read adr; do
-  # Find ADRs this one supersedes
-  superseded=$(grep -oh 'ADR-[0-9]\{4\}' "$adr" | sort -u)
-  for target_id in $superseded; do
-    target=$(find docs/architecture/decisions -name "${target_id}-*.md" 2>/dev/null | head -1)
+find docs/architecture/decisions -name "[0-9]*.md" 2>/dev/null | while read adr; do
+  # Check 1: ADR body still contains ## Status section (should have been removed)
+  grep -q '^## Status' "$adr" && \
+    echo "STALE BODY STATUS: $adr — ## Status section must be removed; use frontmatter status field"
+
+  # Check 2: if supersedes: present, verify target has status: superseded + superseded_by
+  supersedes_path=$(grep "^supersedes:" "$adr" 2>/dev/null | sed 's/supersedes: *//')
+  if [ -n "$supersedes_path" ]; then
+    target=$(find . -path "*/$supersedes_path" -o -name "$(basename $supersedes_path)" 2>/dev/null | head -1)
     if [ -n "$target" ]; then
-      # Check target has back-link to this ADR
-      this_id=$(basename "$adr" | grep -oh 'ADR-[0-9]\{4\}')
-      grep -q "$this_id\|superseded" "$target" || \
-        echo "BROKEN CHAIN: $(basename $adr) supersedes $(basename $target) but no back-link"
+      grep -q "^status: superseded" "$target" || \
+        echo "BROKEN CHAIN: $(basename $adr) supersedes $(basename $target) but target status is not superseded"
+      grep -q "^superseded_by:" "$target" || \
+        echo "BROKEN CHAIN: $(basename $adr) supersedes $(basename $target) but target missing superseded_by"
+    else
+      echo "DEAD SUPERSEDES LINK: $(basename $adr) → $supersedes_path (file not found)"
     fi
-  done
+  fi
+
+  # Check 3: if status: superseded, superseded_by must resolve to an existing file
+  if grep -q "^status: superseded" "$adr"; then
+    sb_path=$(grep "^superseded_by:" "$adr" 2>/dev/null | sed 's/superseded_by: *//')
+    [ -z "$sb_path" ] && echo "MISSING superseded_by: $adr has status: superseded but no superseded_by field"
+    [ -n "$sb_path" ] && [ ! -f "$sb_path" ] && \
+      echo "DEAD superseded_by LINK: $adr → $sb_path (file not found)"
+  fi
 done
 ```
 
 **Severity:** Warning
 
-**Proposed fix template:** "Add `Superseded by: [ADR-{NNNN} {title}]({path})` to §Status in `{adr_file}`."
+**Proposed fix template:** "Set `status: superseded` and add `superseded_by: <path>` in frontmatter of `{adr_file}`. Remove any `## Status` body section."
 
 ---
 
