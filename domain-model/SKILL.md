@@ -227,4 +227,5 @@ After each mode, deliver a report covering:
 - [ ] Cross-aggregate references use IDs only (not object references)
 - [ ] Mermaid classDiagram present and renders correctly
 - [ ] Sizing heuristics checked (aggregates 3–7 per BC, entities 1–5 per aggregate)
+- [ ] Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 180d`. Full schema: `rules/artefact-frontmatter.md`.
 - [ ] Closing report delivered

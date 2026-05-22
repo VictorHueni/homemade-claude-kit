@@ -187,6 +187,8 @@ Frontmatter block (Status / Date / Author / Last verified / Feeds ADRs / Superse
 §Changelog (dated rows)
 ```
 
+- Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
+
 ---
 
 ## The seven anti-patterns

@@ -6,6 +6,14 @@ Source: <https://adr.github.io/madr/> and <https://github.com/adr/madr>.
 ## Full Template
 
 ```markdown
+---
+title: <short title>
+status: draft
+owner: <git config user.name>
+last_reviewed: YYYY-MM-DD
+review_interval: 180d
+---
+
 # <short title>
 
 ## Context and Problem Statement
@@ -86,6 +94,14 @@ Chosen option: "<option x>", because <summarize why this option is best against 
 ## Minimal Template
 
 ```markdown
+---
+title: <short title>
+status: draft
+owner: <git config user.name>
+last_reviewed: YYYY-MM-DD
+review_interval: 180d
+---
+
 # <short title>
 
 ## Context and Problem Statement

@@ -338,6 +338,7 @@ access, make the edits directly and commit the FBS alongside the PRD.
 - **Format:** Markdown (`.md`)
 - **Location:** `docs/product-specs/`
 - **Filename:** `[NNNN]_prd_[feature-name].md` (e.g., `0001_prd_semester-schedule-generation.md`)
+- Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 30d`. Full schema: `rules/artefact-frontmatter.md`.
 
 ---
 

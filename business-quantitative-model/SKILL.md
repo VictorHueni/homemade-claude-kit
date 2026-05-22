@@ -521,4 +521,5 @@ Before declaring the work done:
 - [ ] §9 Related Documents includes a pointer to `glossary.md`.
 - [ ] No revenue figures or market-size numbers invented — `_TODO_` used for unknowns.
 - [ ] No strategic argument or process narrative leaked into the model doc.
+- [ ] Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
 - [ ] Closing report delivered.

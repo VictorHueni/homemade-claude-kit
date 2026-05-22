@@ -123,6 +123,7 @@ Tell the user:
 - File path
 - Which existing runbooks were updated with cross-links
 - Any `<PLACEHOLDER>` values left in the draft that need the user's input to fill
+- Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
 
 ## Quality checklist
 

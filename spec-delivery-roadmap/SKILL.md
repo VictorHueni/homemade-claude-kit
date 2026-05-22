@@ -310,6 +310,8 @@ pointer, companion docs (FBS, VS, QA, personas).
 | YYYY-MM-DD | Initial generation | … |
 ```
 
+- Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 60d`. Full schema: `rules/artefact-frontmatter.md`.
+
 ---
 
 ## Epic ID convention

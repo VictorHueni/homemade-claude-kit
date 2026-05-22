@@ -286,4 +286,5 @@ Next steps: [what Mode to run next, or what artefacts to update]
 - [ ] Mode 4: Step 0 answered before any change made
 - [ ] Mode 4: changelog entry added for every term added / deprecated / retired
 - [ ] Mode 4: glossary-version bumped for structural changes
+- [ ] Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 180d`. Full schema: `rules/artefact-frontmatter.md`.
 - [ ] Closing report delivered

@@ -45,10 +45,9 @@ docs/ideas/
 title: Short descriptive title
 domain: frontend | backend | infra | data | design | dx
 status: idea | decided | done | abandoned
-created: YYYY-MM-DD
-decided_at:
-exec_plan:
-prd:
+owner: <git config user.name>
+last_reviewed: YYYY-MM-DD
+review_interval: 90d
 ---
 
 ## Problem
@@ -117,7 +116,7 @@ abandoned
 ```
 
 - **idea** — Under consideration. May have multiple options.
-- **decided** — Approach chosen. Set `decided_at`. When taken for implementation, link `exec_plan` or `prd`.
+- **decided** — Approach chosen. Update `last_reviewed`.
 - **done** — Implemented and shipped.
 - **abandoned** — Dropped. Add a short reason in the Decision section.
 
@@ -139,11 +138,10 @@ abandoned
 1. Read the current idea file.
 2. Apply the requested change (update status, add decision, add options, link exec plan).
 3. When status changes to `decided`:
-   - Set `decided_at` to today's date.
+   - Update `last_reviewed` to today's date.
    - Move the chosen approach from Ideas to Decision.
    - Remove the Ideas section.
-4. When linking an exec plan or PRD, update the frontmatter field.
-5. Update INDEX.md to reflect the new status/summary.
+4. Update INDEX.md to reflect the new status/summary.
 
 ### Mode 3: List ideas
 
@@ -166,7 +164,7 @@ When the user asks to see ideas for a domain, read and display the INDEX.md for 
 
 Before saving:
 
-- [ ] Frontmatter is complete (title, domain, status, created)
+- [ ] Frontmatter is complete (title, domain, status, owner, last_reviewed, review_interval)
 - [ ] Problem section explains user impact
 - [ ] Ideas or Decision section is present (not both)
 - [ ] References section has at least one link

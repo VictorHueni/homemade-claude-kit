@@ -356,6 +356,8 @@ Changelog
 
 **Section count is fixed; ordering is fixed.** The ASCII tree + per-capability sections are mandatory.
 
+- Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
+
 ---
 
 ## Sizing heuristics

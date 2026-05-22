@@ -28,6 +28,7 @@ This skill guides you through creating a high-quality, structured implementation
 - **Format:** Markdown (`.md`)
 - **Location:** `docs/exec-plans/active/`
 - **Filename:** `[NNNN]_exec_[feature-name].md` (e.g., 0001_exec_onboard-agent.md)
+- Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 30d`. Full schema: `rules/artefact-frontmatter.md`.
 
 ## Implementation Plan Template
 

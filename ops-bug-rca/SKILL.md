@@ -248,6 +248,8 @@ Structure every RCA report as:
 - [Monitoring or logging gap to close]
 ```
 
+- Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
+
 ## Principles
 
 - **Evidence over intuition.** Every hypothesis must cite evidence.

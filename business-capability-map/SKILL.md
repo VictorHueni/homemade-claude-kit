@@ -166,6 +166,8 @@ Ask 2–4 questions max, single message, lettered options where possible.
 
 ## Output structure — the fixed template
 
+- Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 180d`. Full schema: `rules/artefact-frontmatter.md`.
+
 The skill produces ONE markdown file at `docs/business/03a-capability-map.md` with this fixed structure (full template in `references/template.md`):
 
 ```
