@@ -1,6 +1,20 @@
 # Skill backlog
 
-Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-05-20 from a gap analysis of the 14-artefact stack; updated 2026-05-21 after shipping 5 items (see §Shipped below).
+Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-05-20 from a gap analysis of the 14-artefact stack; updated 2026-05-22 after shipping further items (see §Shipped below).
+
+---
+
+## Shipped — 2026-05-22
+
+| Skill / task | What was done |
+|---|---|
+| **`util-docs-lint`** | New skill — scaffolds GitHub Actions CI workflow (3 parallel jobs: dprint formatting, Vale + Microsoft style prose, markdown-link-check links). Templates for `.vale.ini`, `dprint.json`, `.mlc-config.json`. Glossary alias sync script. |
+| **`arch-adr` v1.1** | Added `init` mode (bootstraps `docs/architecture/decisions/` + writes `0001` meta-ADR), `supersede` mode (atomic two-file operation: new ADR + old ADR frontmatter update), auto-numbering via `find`. |
+| **Artefact frontmatter convention** | New `rules/artefact-frontmatter.md` — canonical 5-field schema (`title`, `status`, `owner`, `last_reviewed`, `review_interval`) + conditional `superseded_by` / `supersedes` fields. All 21 skills updated with frontmatter output bullet + skill-specific `review_interval` default. `spec-idea` schema aligned (removed `created`, `decided_at`, `exec_plan`, `prd`; added standard fields). ADR `## Status` body section replaced by frontmatter `status` field. |
+| **`util-metamodel-audit` Check 17** | Dedicated frontmatter validity check extracted from Check 9 — covers block presence, 5 required fields, valid status enum, `superseded_by` enforcement, supersession link integrity, `owner` non-empty, `last_reviewed` date format. Count updated 16 → 17. |
+| **Metamodel ID audit + fixes** | Cross-checked all skill SKILL.md files against metamodel ID declarations. Fixed: `arch-research` → `Research-NNNN` added; `business-competitive-landscape` → `CO-NN` added; capability map notation unified to `C-N.M`; `business-model-canvas` block IDs (`CS-N`–`CT-N`) defined; `spec-prd` explicit auto-numbering rule added. Check-catalogue updated (Checks 5, 6, 9, 12, 15). |
+| **PRD path + naming** | PRDs moved to `docs/product-specs/prds/prd-NNNN-{feature}.md`. Skill, metamodel, and all 6 audit check references updated. Find command scoped to `prds/` + `prd-*` pattern. |
+| **`com-slide-deck` path** | Output moved to `docs/communication/slides/{slug}/`. Internal structure renamed: `output/slides/` → `src/`, `output/slide-deck/` → `dist/`. `com-` prefix added to metamodel prefix→folder table and canonical paths tree. `skill-creation-sync.md` updated. |
 
 ---
 
@@ -46,7 +60,20 @@ Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-
 | **`ops-post-mortem`** | Blameless post-mortem for operational incidents. `ops-bug-rca` is code-level; post-mortem is broader org-wide incident review with timeline, contributing factors, action items. |
 | **`business-stakeholder-map`** | RACI / stakeholder influence-interest grid. Internal actors vs. customers. Links to processes (actors) and value streams (stage owners). |
 | **`dev-changelog`** | CHANGELOG.md management per Keep a Changelog. Bridges commit history → user-facing release notes. |
-| **`dev-tech-debt`** | Log tech debt items as they are discovered — during code review, refactoring, or implementation. Each entry captures location (file + line), category (design debt / test debt / documentation debt / dependency debt), severity, discovery context, and estimated remediation effort. Output: `TECH_DEBT.md` at repo root. Companion to `ops-bug-rca` (bugs) and `arch-adr` (architectural decisions) — tech debt sits between the two. |
+| **`dev-tech-debt`** | Log, prioritise, and track both technical debt and documentation debt as they are discovered — during code review, refactoring, implementation, or doc audits. Each entry captures: location (file + line or doc path), category (design / test / documentation / dependency / architecture debt), severity (critical / major / minor), discovery context, estimated remediation effort, and owner. Modes: `log` (add a new debt item), `triage` (prioritise backlog by severity × effort), `close` (mark resolved with resolution note), `report` (summary table by category + severity). Output: `TECH_DEBT.md` at repo root. Companion to `ops-bug-rca` (bugs) and `arch-adr` (architectural decisions) — tech and docs debt sits between the two. |
+
+---
+
+---
+
+## Structural decisions pending
+
+Convention gaps that need a decision before more artefacts accumulate. Not new skills — metamodel + skill updates only.
+
+| Item | Question | Options |
+|---|---|---|
+| **PRD naming with epic reference** | `prd-NNNN-{feature}.md` does not encode which epic it belongs to. Hard to tell `prd-0003-checkout.md` belongs to `E-02` without opening the file. | (A) Encode epic in filename: `prd-0003-e02-checkout.md` · (B) Subfolder per epic inside `prds/`: `prds/e02/prd-0003-checkout.md` · (C) Keep flat — epic is in §0 traceability, audit enforces the link |
+| **Exec-plan folder organisation + PRD links** | `docs/exec-plans/active/{NNNN}_{slug}/` uses its own sequential NNNN, unrelated to the PRD's NNNN. No enforced naming relationship between a plan and its PRD. Hard to find which plan belongs to which PRD. | (A) Match NNNN to PRD: `exec-plans/active/prd-0003-checkout/` · (B) Reference PRD in folder name: `exec-plans/active/0001-prd0003-checkout/` · (C) Nest plan inside PRD folder: `product-specs/prds/prd-0003-checkout/plan/` |
 
 ---
 
