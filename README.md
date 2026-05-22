@@ -265,8 +265,13 @@ erDiagram
 # Clone once
 git clone git@github.com:VictorHueni/homemade-claude-kit.git ~/projects/homemade-claude-kit
 
-# Symlink everything globally (~/.claude/skills/ + ~/.claude/commands/ + ~/.claude/rules/)
+# Symlink skills directly into ~/.claude/skills/, ~/.codex/skills/,
+# and ~/.agents/skills/.
+# Commands and rules stay under ~/.claude because they are Claude-specific.
 ./install.sh
+
+# Print per-item changes when debugging installer behavior.
+./install.sh --verbose
 ```
 
 ## Update
