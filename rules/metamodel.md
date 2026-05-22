@@ -24,7 +24,7 @@ what order, and where to put it**.
 |---|---|---|---|---|
 | 0 | **Product Vision** (why — the north star) | `business-vision` | `docs/VISION.md` | *(singleton — no ID; referenced by path)* |
 | 1 | **Personas** (who) | `business-persona` | `docs/business/01a-personas.md` | `P-NN` |
-| 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/03a-capability-map.md` | `C1`, `C1.1`, `C1.1.1` (L2 rare) |
+| 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/03a-capability-map.md` | `C-N.M` (e.g. `C1`, `C1.1`, `C1.1.1` at L2 rare) |
 | 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/bounded-contexts.md` + `docs/domain/context-map.md` | `BC-NN` |
 | 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/glossary.md` | `BC-NN.GT-NN` |
 | 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/04a-value-streams.md` + `docs/business/04a-vpc-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
@@ -43,7 +43,8 @@ what order, and where to put it**.
 - `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
 - `spec-idea` — captures pre-PRD ideas → `docs/ideas/{slug}.md`
 - `spec-peer-review` — reviews PRDs / plans
-- `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/01b-competitive-landscape/`; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
+- `arch-research` — Architecture Research notes that inform ADR decisions → `docs/architecture/research/{NNNN}-{slug}.md`; mints `Research-NNNN` in-doc ID (4-digit zero-padded, same convention as `ADR-NNNN`); lifecycle: Draft → Active → Frozen (once feeding ADRs land) → Superseded
+- `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/01b-competitive-landscape/`; mints `CO-NN` per Tier-1 competitor profile; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
 - `ops-runbook`, `ops-bug-rca` — operational artefacts (post-ship)
 - `util-docs-audit` — general doc staleness scan (file-level freshness, dead prose)
 - `util-metamodel-audit` — deep metamodel compliance audit: 16 checks covering stack progress, folder placement, internal + external links, ID integrity + cross-references, dependency enforcement, _TODO_ density, mandatory sections, confidence distribution, expiry + staleness, orphaned files, research sync, ADR chains, FBS + epic delivery progress → report at `var/reports/metamodel-audit/`; report-only with proposed fix per finding; run monthly (active dev) or quarterly (maintenance)
@@ -481,7 +482,7 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | ID format | Meaning | Owned by |
 |---|---|---|
 | `P-NN` | Persona | `business-persona` |
-| `C1`, `C1.1`, `C1.1.1` | Capability (L0 / L1 / L2) | `business-capability-map` |
+| `C-N.M` (e.g. `C1`, `C1.1`, `C1.1.1`) | Capability (L0 / L1 / L2) | `business-capability-map` |
 | `VS-N` | Value stream | `business-value-stream` |
 | `VS-N.M` | Value-stream stage | `business-value-stream` |
 | `OBJ-NN` | Business Objective | `business-objective` |
@@ -499,6 +500,8 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `Plan-NNNN` | Implementation plan | `spec-implementation-plan` |
 | `Inc-N` (within a plan) | Plan increment | `spec-implementation-plan` |
 | `ADR-NNNN` | Architecture decision | `arch-adr` |
+| `Research-NNNN` | Architecture research note | `arch-research` |
+| `CO-NN` | Competitor profile (Tier-1) | `business-competitive-landscape` |
 | Block ID in BMC (e.g., `CS-1`, `VP-1`) | Canvas block | `business-model-canvas` |
 
 **BC-NN namespace rule:** All tactical DDD IDs are scoped to their bounded context. `BC-01.AGG-03` and `BC-02.AGG-03` are different aggregates. Cross-references must always include the BC prefix — bare `AGG-03` is ambiguous and invalid.
