@@ -36,7 +36,7 @@ what order, and where to put it**.
 | 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/07b-models/{bc-slug}.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
 | 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
-| 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prd-[NNNN]-[feature].md` | `PRD-NNNN` |
+| 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` | `PRD-NNNN` |
 | 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
 
 **Supporting skills** (not in the main build order, used as needed):
@@ -425,7 +425,7 @@ moving on.
 **Skill:** `spec-prd`
 **Prerequisites:** Step 8 (one PRD per E-NN epic — scope pre-defined); Step 9 (PRDs reference `QA-XXNN` in acceptance criteria); relevant ADRs (PRDs do not re-open decided architectural choices).
 **Process:**
-- One PRD per epic: `docs/product-specs/prd-[NNNN]-[feature].md`
+- One PRD per epic: `docs/product-specs/prds/prd-NNNN-{feature}.md`
 - Each PRD: §0 Architecture Traceability (E-NN, P-NN, C-N.M, QA-XXNN, FBS scope) · problem · goals · non-goals · user stories (persona-grounded, P-NN) · acceptance criteria · success metrics
 **Output verification:** ≥1 PRD per active epic (E-NN); each PRD references its E-NN, FBS IDs, and QA IDs; FBS functionality status promoted ⬜ → 🔄; Delivery Roadmap PRD link filled.
 
@@ -535,7 +535,8 @@ docs/
 │   ├── 07a-fbs.md                                        ← spec-functional-breakdown-structure (C-N.M.FXX)
 │   ├── 08a-delivery-roadmap.md                           ← spec-delivery-roadmap (E-NN)
 │   ├── 09a-quality-attributes.md                         ← spec-quality-attributes (QA-XXNN)
-│   └── prd-{NNNN}-{feature}.md (one per PRD)            ← spec-prd (PRD-NNNN) — already numbered
+│   └── prds/                                            ← all PRDs in dedicated subfolder
+│       └── prd-NNNN-{feature}.md (one per PRD)          ← spec-prd (PRD-NNNN)
 ├── exec-plans/                                          ← `spec-` skills (implementation)
 │   └── active/
 │       └── {NNNN}_{slug}/  (one folder per plan with increments inside)

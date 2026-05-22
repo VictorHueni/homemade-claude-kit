@@ -309,12 +309,12 @@ Remaining questions or areas needing clarification. Include:
 Determine the next `PRD-NNNN` ID — 4-digit zero-padded, monotonically increasing:
 
 ```bash
-find docs/product-specs/ -name "[0-9]*.md" | sort | tail -1
-# take the NNNN prefix from the result and add 1; first PRD is 0001
+find docs/product-specs/prds/ -name "prd-*.md" | sort | tail -1
+# take the NNNN from the result and add 1; first PRD is 0001
 ```
 
 The same NNNN is used in:
-- The filename: `docs/product-specs/[NNNN]_prd_[feature-name].md`
+- The filename: `docs/product-specs/prds/prd-NNNN-{feature}.md`
 - The frontmatter title: `PRD-NNNN — Feature Name`
 - The `**PRD-ID:** PRD-NNNN` field in §0 Architecture Traceability
 
@@ -339,9 +339,9 @@ access, make the edits directly and commit the FBS alongside the PRD.
 ## Output
 
 - **Format:** Markdown (`.md`)
-- **Location:** `docs/product-specs/`
-- **Filename:** `[NNNN]_prd_[feature-name].md` (e.g., `0001_prd_semester-schedule-generation.md`)
-- **ID format:** `PRD-NNNN` — 4-digit zero-padded integer. Determine by running `find docs/product-specs/ -name "[0-9]*.md" | sort` and taking max NNNN + 1. First PRD is `PRD-0001`.
+- **Location:** `docs/product-specs/prds/`
+- **Filename:** `prd-NNNN-{feature}.md` (e.g., `prd-0001-semester-schedule-generation.md`)
+- **ID format:** `PRD-NNNN` — 4-digit zero-padded integer. Determine by running `find docs/product-specs/prds/ -name "prd-*.md" | sort` and taking max NNNN + 1. First PRD is `PRD-0001`.
 - Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 30d`. Full schema: `rules/artefact-frontmatter.md`.
 
 ---
@@ -360,5 +360,5 @@ Before saving the PRD:
 - [ ] FBS refs listed per user story where applicable
 - [ ] Non-goals reference FBS IDs for explicitly deferred functionalities
 - [ ] Success metrics anchored to persona context and value-stream pain index
-- [ ] Saved to `docs/product-specs/[NNNN]_prd_[feature-name].md`
+- [ ] Saved to `docs/product-specs/prds/prd-NNNN-{feature}.md`
 - [ ] FBS promotion instructions provided (⬜ → 🔄 for committed functionalities)
