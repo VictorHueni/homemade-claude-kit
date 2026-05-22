@@ -16,7 +16,7 @@ Read the plan and its workspace, then verify each item. Report PASS / FAIL / WAR
 ### Workspace structure
 1. Workspace dir exists at `docs/exec-plans/active/NNNN_feature-name/`
 2. Exec plan file matches `*_exec_*.md` inside the workspace (not at the parent level)
-3. Optional PRD file matches `*_prd_*.md` inside the workspace
+3. Optional PRD file matches `prd-*.md` inside the workspace
 4. `progress.txt` exists in the workspace
 
 ### Plan header

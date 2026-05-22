@@ -36,11 +36,11 @@ what order, and where to put it**.
 | 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/07b-models/{bc-slug}.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
 | 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
-| 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/[NNNN]_prd_[feature].md` | `PRD-NNNN` |
+| 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prd-[NNNN]-[feature].md` | `PRD-NNNN` |
 | 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
 
 **Supporting skills** (not in the main build order, used as needed):
-- `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
+- `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
 - `spec-idea` — captures pre-PRD ideas → `docs/ideas/{slug}.md`
 - `spec-peer-review` — reviews PRDs / plans
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/01b-competitive-landscape/`; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
@@ -424,7 +424,7 @@ moving on.
 **Skill:** `spec-prd`
 **Prerequisites:** Step 8 (one PRD per E-NN epic — scope pre-defined); Step 9 (PRDs reference `QA-XXNN` in acceptance criteria); relevant ADRs (PRDs do not re-open decided architectural choices).
 **Process:**
-- One PRD per epic: `docs/product-specs/[NNNN]_prd_[feature].md`
+- One PRD per epic: `docs/product-specs/prd-[NNNN]-[feature].md`
 - Each PRD: §0 Architecture Traceability (E-NN, P-NN, C-N.M, QA-XXNN, FBS scope) · problem · goals · non-goals · user stories (persona-grounded, P-NN) · acceptance criteria · success metrics
 **Output verification:** ≥1 PRD per active epic (E-NN); each PRD references its E-NN, FBS IDs, and QA IDs; FBS functionality status promoted ⬜ → 🔄; Delivery Roadmap PRD link filled.
 
@@ -532,7 +532,7 @@ docs/
 │   ├── 07a-fbs.md                                        ← spec-functional-breakdown-structure (C-N.M.FXX)
 │   ├── 08a-delivery-roadmap.md                           ← spec-delivery-roadmap (E-NN)
 │   ├── 09a-quality-attributes.md                         ← spec-quality-attributes (QA-XXNN)
-│   └── {NNNN}_prd_{feature}.md (one per PRD)            ← spec-prd (PRD-NNNN) — already numbered
+│   └── prd-{NNNN}-{feature}.md (one per PRD)            ← spec-prd (PRD-NNNN) — already numbered
 ├── exec-plans/                                          ← `spec-` skills (implementation)
 │   └── active/
 │       └── {NNNN}_{slug}/  (one folder per plan with increments inside)

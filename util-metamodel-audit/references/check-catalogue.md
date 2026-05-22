@@ -22,7 +22,7 @@ find docs/business/06a-models -name "*.md" 2>/dev/null | head -1
 find docs/product-specs -maxdepth 1 -name "07a-fbs.md" 2>/dev/null
 find docs/product-specs -maxdepth 1 -name "08a-delivery-roadmap.md" 2>/dev/null  # Step 8 (was 08a-delivery-roadmap.md — bug fixed)
 find docs/product-specs -maxdepth 1 -name "09a-quality-attributes.md" 2>/dev/null
-find docs/product-specs -maxdepth 1 -name "*_prd_*.md" 2>/dev/null | head -1
+find docs/product-specs -maxdepth 1 -name "prd-*.md" 2>/dev/null | head -1
 find docs/exec-plans/active -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1
 find docs/domain -maxdepth 1 -name "02b-bounded-contexts.md" 2>/dev/null            # Step 2b
 find docs/domain -maxdepth 1 -name "02c-glossary.md" 2>/dev/null                  # Step 2c
@@ -59,7 +59,7 @@ Then compare each path against the canonical map:
 - `07a-fbs.md` → must be at `docs/product-specs/07a-fbs.md` (flat file)
 - `08a-delivery-roadmap.md` → must be at `docs/product-specs/08a-delivery-roadmap.md` (flat file)
 - `09a-quality-attributes.md` → must be at `docs/product-specs/09a-quality-attributes.md` (flat file)
-- `*_prd_*.md` → must be under `docs/product-specs/`
+- `prd-*.md` → must be under `docs/product-specs/`
 - `*.md` under `docs/architecture/decisions/` → ADRs, correct
 
 **Severity:** Warning
@@ -144,7 +144,7 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `E-NN` | `\bE-[0-9]{2}\b` | `docs/product-specs/08a-delivery-roadmap.md` |
 | `QA-[A-Z]{2}[0-9]{2}` | `\bQA-[A-Z]{2}[0-9]{2}\b` | `docs/product-specs/09a-quality-attributes.md` |
 | `ADR-NNNN` | `\bADR-[0-9]{4}\b` | `docs/architecture/decisions/` |
-| `PRD-NNNN` | `\bPRD-[0-9]{4}\b` | `docs/product-specs/*_prd_*.md` |
+| `PRD-NNNN` | `\bPRD-[0-9]{4}\b` | `docs/product-specs/prd-*.md` |
 
 **Detection (example for P-NN):**
 ```bash
@@ -203,14 +203,14 @@ grep -roh '\bQA-[^A-Z ]' docs/ --include="*.md"
 | `docs/product-specs/07a-fbs.md` | `docs/business/03a-capability-map.md` (FBS inherits L0+L1) |
 | `docs/product-specs/08a-delivery-roadmap.md` | `docs/product-specs/07a-fbs.md` (epics group FBS functionalities) |
 | `docs/product-specs/09a-quality-attributes.md` | `docs/product-specs/07a-fbs.md` (QA reads FBS differentiators) |
-| Any `*_prd_*.md` | `docs/product-specs/08a-delivery-roadmap.md` (PRDs map to E-NN epics) |
-| Any `*_prd_*.md` | `docs/product-specs/09a-quality-attributes.md` (PRDs reference QA-XXNN) |
-| Any `exec-plans/active/*/` plan | Corresponding `*_prd_*.md` |
+| Any `prd-*.md` | `docs/product-specs/08a-delivery-roadmap.md` (PRDs map to E-NN epics) |
+| Any `prd-*.md` | `docs/product-specs/09a-quality-attributes.md` (PRDs reference QA-XXNN) |
+| Any `exec-plans/active/*/` plan | Corresponding `prd-*.md` |
 | `docs/domain/02c-glossary.md` exists | `docs/domain/02b-bounded-contexts.md` must also exist (glossary is scoped to BCs) |
 | `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/02b-bounded-contexts.md` must exist (domain model is namespaced by BC) |
 | `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/02c-glossary.md` must exist (entity names must match glossary terms) |
 | `docs/business/04b-objectives.md` exists | `docs/business/04a-value-streams.md` must also exist (objectives consume pain index from VS) |
-| Any `*_prd_*.md` | If `docs/business/04b-objectives.md` exists, the PRD should reference ≥1 `OBJ-NN` in §0 |
+| Any `prd-*.md` | If `docs/business/04b-objectives.md` exists, the PRD should reference ≥1 `OBJ-NN` in §0 |
 
 **Detection (example):**
 ```bash
@@ -277,7 +277,7 @@ done | sort -rn
 | `07a-fbs.md` | At least one `### C` capability heading with a functionality table | `grep -q '### C[0-9]'` |
 | `08a-delivery-roadmap.md` | Epic table with `E-NN` IDs | `grep -q 'E-[0-9][0-9]'` |
 | `09a-quality-attributes.md` | ISO characteristic headings (`Performance Efficiency`, `Security`, `Reliability`, etc.) | `grep -q 'Performance Efficiency\|Security\|Reliability'` |
-| `*_prd_*.md` | `§0 Architecture Traceability` or traceability block, `## Acceptance criteria` | `grep -q 'Traceability\|Acceptance'` |
+| `prd-*.md` | `§0 Architecture Traceability` or traceability block, `## Acceptance criteria` | `grep -q 'Traceability\|Acceptance'` |
 | `04b-objectives.md` | At least one `OBJ-NN` heading, `## Changelog`, `## Objective × Epic` section | `grep -q 'OBJ-[0-9][0-9]\|Changelog'` |
 | `VISION.md` | `## The Elevator Pitch`, `## What We Are NOT`, `## North Star Metric`, `## Changelog` | `grep -q 'Elevator Pitch\|North Star'` |
 | `bounded-contexts.md` | `## Subdomain catalogue`, at least one `BC-NN` entry | `grep -q 'BC-[0-9][0-9]'` |
@@ -490,11 +490,11 @@ fi
 **Detection — epic ↔ PRD linkage:**
 ```bash
 epic_count=$(grep -c '\bE-[0-9]\{2\}\b' docs/product-specs/08a-delivery-roadmap.md 2>/dev/null || echo 0)
-prd_count=$(find docs/product-specs -maxdepth 1 -name "*_prd_*.md" 2>/dev/null | wc -l)
+prd_count=$(find docs/product-specs -maxdepth 1 -name "prd-*.md" 2>/dev/null | wc -l)
 echo "Epics: $epic_count | PRDs: $prd_count"
 # Find epics with no corresponding PRD link
 grep -oh '\bE-[0-9]\{2\}\b' docs/product-specs/08a-delivery-roadmap.md 2>/dev/null | sort -u | while read epic; do
-  grep -rl "$epic" docs/product-specs --include="*_prd_*.md" 2>/dev/null | head -1 || \
+  grep -rl "$epic" docs/product-specs --include="prd-*.md" 2>/dev/null | head -1 || \
     echo "NO PRD for $epic"
 done
 ```

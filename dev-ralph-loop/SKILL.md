@@ -166,6 +166,6 @@ If the agent or script crashes mid-iteration:
 
 `ralph.sh` supports three PRD modes:
 
-- `auto` (default) — if the workspace contains `*_prd_*.md`, the agent reads and updates it; otherwise the loop runs plan-only.
+- `auto` (default) — if the workspace contains `prd-*.md`, the agent reads and updates it; otherwise the loop runs plan-only.
 - `--with-prd` — require a PRD in the workspace and fail fast if it is missing.
 - `--without-prd` — ignore any PRD file and run using only the execution plan and progress log.

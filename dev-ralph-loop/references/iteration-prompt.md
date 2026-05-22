@@ -20,7 +20,7 @@ Read `skills/dev-ralph-loop/SKILL.md` — specifically the **Iteration Protocol*
 Read these files in the workspace directory:
 
 1. The execution plan (`*_exec_*.md`) — find the next `**Status:** pending` increment.
-2. If `PRD Mode` is `with-prd`, read the PRD (`*_prd_*.md`) and use it to understand acceptance criteria.
+2. If `PRD Mode` is `with-prd`, read the PRD (`prd-*.md`) and use it to understand acceptance criteria.
 3. `progress.txt` — understand what has been done so far.
 
 ### Step 3: Execute one increment

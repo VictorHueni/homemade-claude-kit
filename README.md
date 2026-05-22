@@ -241,11 +241,11 @@ erDiagram
 | `spec-` | `spec-functional-breakdown-structure` | `docs/product-specs/07a-fbs.md` | `C-N.M.FXX` |
 | `spec-` | `spec-delivery-roadmap` | `docs/product-specs/delivery-roadmap.md` | `E-NN` |
 | `spec-` | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-XXNN` |
-| `spec-` | `spec-prd` | `docs/product-specs/{NNNN}_prd_{feature}.md` | `PRD-NNNN` |
+| `spec-` | `spec-prd` | `docs/product-specs/prd-{NNNN}-{feature}.md` | `PRD-NNNN` |
 | `spec-` | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN` |
 | `spec-` | `spec-idea` | `docs/ideas/{slug}.md` | — |
 | `spec-` | `spec-peer-review` | review report | — |
-| `arch-` | `arch-adr` | `docs/architecture/decisions/{NNNN}-{slug}.md` | `ADR-NNNN` |
+| `arch-` | `arch-adr` | `docs/architecture/decisions/adr-{NNNN}-{slug}.md` | `ADR-NNNN` |
 | `ops-` | `ops-runbook` | `docs/ops/runbooks/{slug}.md` | — |
 | `ops-` | `ops-bug-rca` | `docs/ops/rcas/{date}-{slug}.md` | — |
 | `dev-` | `dev-git-commit` | git commit | — |
