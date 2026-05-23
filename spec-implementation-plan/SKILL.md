@@ -1,7 +1,10 @@
 ---
 name: spec-implementation-plan
-description: Create a small-step, testable implementation roadmap from a PRD or feature request. Use when asked to "create an implementation plan", "write a roadmap", or "plan this feature" following the project's atomic increment standard.
+description: "Create a small-step, testable implementation roadmap from a PRD or feature request. Use when asked to create an implementation plan, write a roadmap, or plan this feature following the project's atomic increment standard."
 version: "1.0.0"
+status: active
+last_reviewed: 2026-05-22
+review_interval: 180d
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"

@@ -1,7 +1,10 @@
 ---
 name: arch-research
-description: Create, refresh, and freeze Architecture Research notes that inform ADR decisions — regulatory landscape, certification options, infrastructure norms, vendor evaluations, security/compliance baselines. Question-driven format with verified sources + confidence ratings + explicit ADR linkage. Use when asked to research a regulatory question, document a compliance baseline, capture a vendor evaluation, or build the evidence base before an ADR. Triggers on: architecture research, regulatory research, compliance research, certification research, infrastructure research, vendor evaluation, research note for ADR, decision-support research, evidence base, research doc.
+description: "Create, refresh, and freeze Architecture Research notes that inform ADR decisions — regulatory landscape, certification options, infrastructure norms, vendor evaluations, security/compliance baselines. Question-driven format with verified sources + confidence ratings + explicit ADR linkage. Use when asked to research a regulatory question, document a compliance baseline, capture a vendor evaluation, or build the evidence base before an ADR. Triggers on: architecture research, regulatory research, compliance research, certification research, infrastructure research, vendor evaluation, research note for ADR, decision-support research, evidence base, research doc."
 version: "1.0.0"
+status: active
+last_reviewed: 2026-05-22
+review_interval: 180d
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"

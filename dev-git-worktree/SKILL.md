@@ -1,7 +1,10 @@
 ---
 name: dev-git-worktree
-description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
+description: "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification"
 version: "1.0.0"
+status: active
+last_reviewed: 2026-05-22
+review_interval: 180d
 ---
 
 # Using Git Worktrees
