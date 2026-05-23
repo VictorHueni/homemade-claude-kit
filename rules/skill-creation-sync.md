@@ -130,12 +130,33 @@ Match existing skills like `spec-prd`:
 name: skill-name-kebab
 description: "One sentence + 'Triggers on: phrase1, phrase2, phrase3.' Claude uses this to decide when to activate."
 version: "1.0.0"
+status: active          # draft | active | deprecated | superseded
+last_reviewed: YYYY-MM-DD
+review_interval: 180d
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"
 metadata:
   category: "specification"   # or "infrastructure", "review", etc.
   complexity: "medium"
+---
+```
+
+## Output artefact frontmatter (mandatory for all doc-producing skills)
+
+Every markdown file a skill writes under `docs/` must open with the standard
+five-field frontmatter block. The canonical schema, field rules, default
+`review_interval` values per artefact type, and audit enforcement details live in
+`rules/artefact-frontmatter.md`. Reference that file in every new skill's output
+or checklist section — do not restate the schema inline.
+
+```yaml
+---
+title: <instance title — not the artefact type name>
+status: draft
+owner: <git config user.name>
+last_reviewed: YYYY-MM-DD
+review_interval: Nd   # see artefact-frontmatter.md for defaults per type
 ---
 ```
 

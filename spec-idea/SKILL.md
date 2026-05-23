@@ -164,7 +164,7 @@ When the user asks to see ideas for a domain, read and display the INDEX.md for 
 
 Before saving:
 
-- [ ] Frontmatter is complete (title, domain, status, owner, last_reviewed, review_interval)
+- [ ] Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
 - [ ] Problem section explains user impact
 - [ ] Ideas or Decision section is present (not both)
 - [ ] References section has at least one link

@@ -318,5 +318,6 @@ Before declaring the work done:
 - [ ] §Post-workshop actions table (when × action × owner).
 - [ ] §Facilitation tips section pulled from Kaner / Liberating Structures.
 - [ ] Diamond stage balance check: ≥1 convergent exercise per session (workshops without convergence don't decide).
+- [ ] Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
 - [ ] No project-specific terms baked in (kit version).
 - [ ] Closing report delivered.

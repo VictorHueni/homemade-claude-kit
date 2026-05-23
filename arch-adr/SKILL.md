@@ -2,6 +2,11 @@
 name: arch-adr
 description: Create, review, update, and supersede Architecture Decision Records (ADRs) using MADR 4.x conventions. Handles full ADR lifecycle including project bootstrap (init), new ADR creation with auto-numbering, supersession as an atomic two-file operation, and quality review. Use when asked to document an architecture/technical decision, initialise the ADR directory, supersede an older ADR, or improve ADR quality.
 version: "1.1.0"
+status: active          # draft | active | deprecated | superseded
+last_reviewed: 2026-05-22
+review_interval: 180d
+supersedes: ~           # path to superseded skill version, if applicable
+superseded_by: ~        # path to superseding skill, if this one is retired
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"
@@ -192,6 +197,7 @@ When asked to review an ADR:
 - Keep the narrative factual and concise.
 - Prefer complete ADR drafts over outlines unless the user asks for an outline.
 - If inputs are incomplete and user wants speed, draft with explicit `[ASSUMPTION]` markers and list required confirmations at the end.
+- All ADR files use the five-field frontmatter block defined in `rules/artefact-frontmatter.md`. The MADR templates already include it — do not omit or reorder fields.
 
 ## References
 

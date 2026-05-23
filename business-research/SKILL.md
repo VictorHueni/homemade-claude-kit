@@ -304,5 +304,6 @@ Before declaring the work done:
 - [ ] §What to do after has file-targeted next steps.
 - [ ] Synthesis (mode 3) names every artefact update needed by § reference.
 - [ ] Confidence ratings present.
+- [ ] Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
 - [ ] No project-specific terms baked in (kit version).
 - [ ] Closing report delivered.

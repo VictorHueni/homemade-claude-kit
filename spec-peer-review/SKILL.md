@@ -70,6 +70,8 @@ Use all lenses, then emphasize the highest-risk areas:
 
 ## Output Format
 
+Open every generated report with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 30d`. Full schema: `rules/artefact-frontmatter.md`.
+
 Produce findings first, sorted by severity descending. Include:
 
 1. `Severity`
