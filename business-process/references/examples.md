@@ -61,7 +61,7 @@ flowchart TD
 
 ### Real-world reference
 
-`docs/business/05a-processes/swiss-kostengutsprache-process.md` in the swiss-aos-drug-reimbursement-model project is the operator-grade implementation of this pattern.
+`docs/business/05a-processes/proc-NN-swiss-kostengutsprache.md` in the swiss-aos-drug-reimbursement-model project is the operator-grade implementation of this pattern.
 
 ---
 

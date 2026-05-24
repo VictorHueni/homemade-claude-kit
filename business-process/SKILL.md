@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **BPMN-ready business process documents**: descriptive walkthroughs of how a workflow actually happens today, structured so that an analyst could reach for the doc and produce a BPMN diagram without further interviews.
 
-The artifact produced by this skill is **a markdown document** in the project's processes folder (typically `docs/<domain>/processes/` — see project conventions). It is NOT a BPMN file, NOT a slide, NOT a strategic argument — it is **the descriptive source-of-truth** that strategic analyses, models, and product specs cite.
+The artifact produced by this skill is **a markdown document** in the project's processes folder (typically `docs/business/05a-processes/` — see project conventions). It is NOT a BPMN file, NOT a slide, NOT a strategic argument — it is **the descriptive source-of-truth** that strategic analyses, models, and product specs cite.
 
 This skill is **domain-agnostic**. The template patterns work for any industry; the references use abstract placeholders. When activated inside a project, the skill picks up the project's own actor naming, system inventory, and KPI conventions.
 
@@ -92,7 +92,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 
 | Needed | What you ask if missing |
 |---|---|
-| **Process slug** (kebab-case, used in filename and references) | "What should we call the file? (e.g., `customer-onboarding-process`, `incident-response-process`)" |
+| **Process slug** (kebab-case, used in filename and references) | "What should we call the file? (e.g., `customer-onboarding`, `incident-response`)" |
 | **Display name** (the H1 title) | "And the human-readable display name?" |
 | **One-line purpose** | "One sentence — what does this process do, and for whom?" |
 | **Scope** | "What's the start point and the end point?" |
