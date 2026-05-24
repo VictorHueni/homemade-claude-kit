@@ -102,8 +102,8 @@ Files that predate the domain layer but contain content that belongs in `docs/do
 
 | File | Current path | Suggested destination | Confidence | Skill to invoke |
 |---|---|---|---|---|
-| `{file}` | `{current}` | `docs/domain/glossary/glossary.md` | {H/M/L} | Run `domain-glossary` Mode 2 (seed from existing content) |
-| `{file}` | `{current}` | `docs/domain/{bc-slug}/domain-model.md` | {H/M/L} | Run `domain-bounded-context` first, then `domain-model` Mode 2 |
+| `{file}` | `{current}` | `docs/domain/glossary.md` | {H/M/L} | Run `domain-glossary` Mode 2 (seed from existing content) |
+| `{file}` | `{current}` | `docs/domain/07b-models/{bc-slug}.md` | {H/M/L} | Run `domain-bounded-context` first, then `domain-model` Mode 2 |
 
 ---
 
