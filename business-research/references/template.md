@@ -11,7 +11,7 @@ open questions in upstream artefacts:
 4. **{{Hypothesis 4}}** *(optional)* — _TODO_
 
 This single interview can flip rows {{N}}, {{M}} of the
-[validation tracker](../../pitch-readiness-plan.md) from
+[validation tracker]({{path-to-validation-tracker}}) from
 {{from}} to {{to}}.
 
 > **Methodology:** built using the canonical synthesis of [BABOK §10.25
@@ -241,7 +241,7 @@ Within 1 hour after the interview, fill this in. **Don't rely on memory beyond 2
 2. **Update the calculator/model defaults** — adjust the input ___, re-export, commit with `feat({{scope}}): re-anchor {{input}} to {{N}} per interview {{date}}`.
 3. **Update upstream artefacts** as enumerated in the synthesis (persona § / BMC block / model § / landscape claim).
 4. **Promote confidence ratings** on validated claims; demote those refuted.
-5. **Update the project's `docs/business/research/README.md`** index with this interview's link + headline finding.
+5. **Update the project's `docs/business/discovery/interviews/README.md`** index with this interview's link + headline finding.
 
 This single interview moves the [validation tracker]({{path}}) on {{N}} rows: {{rows-affected}}.
 
