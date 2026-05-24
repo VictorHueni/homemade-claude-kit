@@ -192,7 +192,7 @@ A vision document is good when any reader — including an agent with no prior c
 | **Elevator pitch target** | Personas (`P-NN`) from `docs/business/01a-personas.md` |
 | **Problem statement** | Value stream pain index (`VS-N.M` High/Critical stages) from `docs/business/04a-value-streams.md` |
 | **North Star Metric** | Business Objectives (`OBJ-NN`, `KR-NN.M`) from `docs/business/04b-objectives.md` — OKRs are the measurable steps toward the North Star |
-| **§Linked Artefacts** | BMC Value Propositions (`VP-NN`) from `docs/business/` — VP blocks are the commercial expression of the vision per segment |
+| **§Linked Artefacts** | BMC Value Propositions (`VP-NN`) from `docs/business/02a-bmc.md` — VP blocks are the commercial expression of the vision per segment |
 
 ---
 
