@@ -12,11 +12,11 @@ This document catalogues the bounded contexts for {{product}}: the named islands
 - See `context-map.md` for integration patterns between these contexts.
 
 **Companion documents:**
-- Capability map: [link to capability-map.md if exists]
+- Capability map: [../../business/03a-capability-map.md](../../business/03a-capability-map.md)
 - Context map: [context-map.md](./context-map.md)
-- Domain glossary: [link to glossary.md if exists]
-- Personas: [link to personas.md if exists]
-- Value streams: [link to value-streams.md if exists]
+- Domain glossary: [glossary.md](./glossary.md)
+- Personas: [../../business/01a-personas.md](../../business/01a-personas.md)
+- Value streams: [../../business/04a-value-streams.md](../../business/04a-value-streams.md)
 
 ---
 
@@ -48,7 +48,7 @@ This document catalogues the bounded contexts for {{product}}: the named islands
 - _(Each capability appears in exactly one BC. No shared ownership.)_
 
 **Ubiquitous language scope:**
-- *[Term]* means [precise definition within this context] → see [02c-glossary.md#bc-01](02c-glossary.md#bc-01)
+- *[Term]* means [precise definition within this context] → see [glossary.md#bc-01](glossary.md#bc-01)
 - _(List the 2–5 most important terms whose definition is specific to this context. Cross-context homonyms are especially important to call out.)_
 
 **Canonical data owned:**

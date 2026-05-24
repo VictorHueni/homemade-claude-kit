@@ -531,8 +531,8 @@ docs/
 │   ├── 04b-objectives.md                                ← business-objective (OBJ-NN, KR-NN.M)
 │   ├── 05a-processes/                                   ← multi-file; keep subfolder
 │   │   └── proc-NN-{slug}.md (one per process)
-│   └── models/                                          ← multi-file; keep subfolder
-│       └── {slug}.md (TAM/SAM/SOM, savings, ROI per model)
+│   └── 06a-models/                                      ← multi-file; keep subfolder
+│       └── qm-NN-{topic}.md (TAM/SAM/SOM, savings, ROI per model)
 ├── product-specs/                                       ← `spec-` skills (product delivery)
 │   ├── 07a-fbs.md                                        ← spec-functional-breakdown-structure (C-N.M.FXX)
 │   ├── 08a-delivery-roadmap.md                           ← spec-delivery-roadmap (E-NN)
@@ -549,7 +549,7 @@ docs/
 │   ├── bounded-contexts.md                              ← domain-bounded-context (BC-NN)
 │   ├── context-map.md                                   ← domain-bounded-context (context map)
 │   ├── glossary.md                                      ← domain-glossary (BC-NN.GT-NN)
-│   └── models/                                          ← consolidated domain models
+│   └── 07b-models/                                      ← domain model files per BC
 │       └── {bc-slug}.md                                 ← domain-model (one per BC)
 ├── ops/                                                 ← `ops-` skills
 │   ├── runbooks/
