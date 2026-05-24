@@ -394,10 +394,10 @@ moving on.
 **Skill:** `domain-model`
 **Prerequisites:** Step 2b (Bounded contexts provide BC-NN namespace); Step 2c (Glossary terms — entity names MUST match GT-NN); Step 7 (FBS — functionalities reveal candidate entities and aggregates); Step 3 (Value Stream stages — stage transitions reveal domain events).
 **Process:**
-- One `domain-model.md` per bounded context: `docs/domain/07b-models/{bc-slug}.md`
+- One file per bounded context: `docs/domain/07b-models/{bc-slug}.md`
 - Mode `fill` → per aggregate: root, invariants, lifecycle states, command→event pairs; per entity: identity, attributes, behaviour methods; per value object: attributes, equality rule, validation invariants; per domain event: trigger, payload, consumers, business significance
 - Mode `verify` → check for anemic model (entities must have behaviour); check aggregate sizing (≤5 members); check event naming (past tense + business-meaningful)
-**Output verification:** one `domain-model.md` per BC-NN; every aggregate has a named root + ≥2 documented invariants; all entity names match GT-NN glossary terms; all domain events are past tense + carry business significance; Mermaid class diagram present.
+**Output verification:** one `{bc-slug}.md` per BC-NN in `docs/domain/07b-models/`; every aggregate has a named root + ≥2 documented invariants; all entity names match GT-NN glossary terms; all domain events are past tense + carry business significance; Mermaid class diagram present.
 
 ### Step 8 — Delivery Roadmap (Plan by Feature + Walking Skeleton + Phase Goals)
 
