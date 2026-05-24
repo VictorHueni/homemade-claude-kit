@@ -307,7 +307,7 @@ After running any mode, summarise in 4–6 lines:
 Before declaring the work done:
 
 - [ ] Folder exists or was created.
-- [ ] `objectives.md` exists with all OBJ-NN blocks scaffolded (scaffold mode).
+- [ ] `04b-objectives.md` exists with all OBJ-NN blocks scaffolded (scaffold mode).
 - [ ] Methodology pointer in header links to kit's canonical bibliography.
 - [ ] Each filled OBJ-NN has: title, BSC perspective, timeframe, owner, "why it matters", "linked from".
 - [ ] Every KR is an outcome (metric change), not an output (feature delivery) — outcome discipline test passed.
