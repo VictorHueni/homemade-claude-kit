@@ -10,7 +10,7 @@ deterministic dependency order. Building them in that order minimises
 rework: each model's outputs are the inputs the next model needs.
 
 This file pairs with the **naming convention** documented in `SKILL.md` —
-the slug self-documents what the model is for (`1a-customer-roi-model.md`
+the slug self-documents what the model is for (`qm-1a-customer-roi-model.md`
 tells the reader "phase 1, first model, customer ROI" without opening the
 file).
 
@@ -74,12 +74,12 @@ per-seat / per-account pricing model.
 
 | Slug | What it computes | Depends on |
 |---|---|---|
-| `1a-customer-roi-model.md` | Per-customer (or per-account) CHF value: time saved + revenue uplift + risk avoided, by customer-size tier | — (anchor) |
-| `1b-pricing-headroom-model.md` | Proposed price tier ÷ ROI from 1a = value-capture ratio; payback months; sensitivity to tier price | 1a |
-| `2a-tam-sam-som-model.md` | Total / Serviceable / Obtainable market in customer count and ARR | 1b (per-customer ARR is the multiplier) |
-| `2b-revenue-projection-model.md` | N-year ARR curve: new logos × tier mix × adoption × churn | 1b, 2a |
-| `3a-unit-economics-model.md` | CAC, gross margin, payback, LTV/CAC by tier | 1b, 2b, **gated on architecture / cost-base decision** |
-| `3b-onboarding-cost-model.md` *(optional)* | Time-to-live and onboarding labour per tier; bottleneck identification | 1a, 3a |
+| `qm-1a-customer-roi-model.md` | Per-customer (or per-account) CHF value: time saved + revenue uplift + risk avoided, by customer-size tier | — (anchor) |
+| `qm-1b-pricing-headroom-model.md` | Proposed price tier ÷ ROI from 1a = value-capture ratio; payback months; sensitivity to tier price | 1a |
+| `qm-2a-tam-sam-som-model.md` | Total / Serviceable / Obtainable market in customer count and ARR | 1b (per-customer ARR is the multiplier) |
+| `qm-2b-revenue-projection-model.md` | N-year ARR curve: new logos × tier mix × adoption × churn | 1b, 2a |
+| `qm-3a-unit-economics-model.md` | CAC, gross margin, payback, LTV/CAC by tier | 1b, 2b, **gated on architecture / cost-base decision** |
+| `qm-3b-onboarding-cost-model.md` *(optional)* | Time-to-live and onboarding labour per tier; bottleneck identification | 1a, 3a |
 
 ### DAG
 
@@ -147,12 +147,12 @@ unbilled services, leaked revenue, fraud loss.
 
 | Slug | What it computes | Depends on |
 |---|---|---|
-| `1a-baseline-leak-model.md` | The volume / CHF of the gap in the current state (volumes × unit value × leak rate) | — (anchor; process-derived) |
-| `1b-recovery-rate-model.md` | Recoverable fraction of the baseline leak, segmented by mechanism | 1a |
-| `2a-customer-savings-model.md` | Per-customer CHF restitution = leak share × recovery rate | 1a, 1b |
-| `2b-tam-savings-model.md` | Total addressable savings = customer count × per-customer savings | 2a |
-| `3a-value-capture-model.md` | Vendor share of recovered savings (success fee %, fixed-fee headroom) | 2a |
-| `3b-unit-economics-model.md` *(optional)* | CAC, gross margin, payback under the recovery revenue model | 3a |
+| `qm-1a-baseline-leak-model.md` | The volume / CHF of the gap in the current state (volumes × unit value × leak rate) | — (anchor; process-derived) |
+| `qm-1b-recovery-rate-model.md` | Recoverable fraction of the baseline leak, segmented by mechanism | 1a |
+| `qm-2a-customer-savings-model.md` | Per-customer CHF restitution = leak share × recovery rate | 1a, 1b |
+| `qm-2b-tam-savings-model.md` | Total addressable savings = customer count × per-customer savings | 2a |
+| `qm-3a-value-capture-model.md` | Vendor share of recovered savings (success fee %, fixed-fee headroom) | 2a |
+| `qm-3b-unit-economics-model.md` *(optional)* | CAC, gross margin, payback under the recovery revenue model | 3a |
 
 ### DAG
 
@@ -204,11 +204,11 @@ as a take-rate on transactions between supply and demand sides.
 
 | Slug | What it computes | Depends on |
 |---|---|---|
-| `1a-gmv-per-transaction-model.md` | Average transaction value × frequency by segment | — |
-| `1b-take-rate-headroom-model.md` | Sustainable take-rate vs competitor benchmarks; price elasticity by side | 1a |
-| `2a-tam-gmv-model.md` | Total addressable GMV (TAM in transaction volume, not customer count) | 1a |
-| `2b-liquidity-projection-model.md` | Supply/demand balance over time; matched fraction by cohort | 1a, 2a |
-| `3a-unit-economics-model.md` | Per-side CAC, payback by cohort, cross-side subsidy economics | 1b, 2b |
+| `qm-1a-gmv-per-transaction-model.md` | Average transaction value × frequency by segment | — |
+| `qm-1b-take-rate-headroom-model.md` | Sustainable take-rate vs competitor benchmarks; price elasticity by side | 1a |
+| `qm-2a-tam-gmv-model.md` | Total addressable GMV (TAM in transaction volume, not customer count) | 1a |
+| `qm-2b-liquidity-projection-model.md` | Supply/demand balance over time; matched fraction by cohort | 1a, 2a |
+| `qm-3a-unit-economics-model.md` | Per-side CAC, payback by cohort, cross-side subsidy economics | 1b, 2b |
 
 ### Notes
 
@@ -235,12 +235,12 @@ landed cost, channel margin, and warranty obligations.
 
 | Slug | What it computes | Depends on |
 |---|---|---|
-| `1a-bom-cogs-model.md` | Bill of materials, landed cost per unit, scale curve | — |
-| `1b-pricing-headroom-model.md` | MSRP vs perceived value vs BoM; gross margin per unit | 1a |
-| `2a-tam-units-model.md` | Addressable unit volume by segment / geography | — |
-| `2b-revenue-projection-model.md` | Units × ASP × channel mix over time | 1b, 2a |
-| `3a-channel-economics-model.md` | Distributor / retailer margin; direct-vs-channel break-even | 1b, 2b |
-| `3b-warranty-cost-model.md` *(optional)* | Service / warranty reserves; failure-rate sensitivity | 1a, 2b |
+| `qm-1a-bom-cogs-model.md` | Bill of materials, landed cost per unit, scale curve | — |
+| `qm-1b-pricing-headroom-model.md` | MSRP vs perceived value vs BoM; gross margin per unit | 1a |
+| `qm-2a-tam-units-model.md` | Addressable unit volume by segment / geography | — |
+| `qm-2b-revenue-projection-model.md` | Units × ASP × channel mix over time | 1b, 2a |
+| `qm-3a-channel-economics-model.md` | Distributor / retailer margin; direct-vs-channel break-even | 1b, 2b |
+| `qm-3b-warranty-cost-model.md` *(optional)* | Service / warranty reserves; failure-rate sensitivity | 1a, 2b |
 
 ### Notes
 
@@ -286,7 +286,7 @@ user one question:
 The canonical sets are starting points, not contracts. Deviate when:
 
 - **The project's strategic question is competitor-specific, not
-  market-specific** — replace `2a-tam-sam-som-model.md` with a
+  market-specific** — replace `qm-2a-tam-sam-som-model.md` with a
   competitor-displacement model anchored to the `business-competitive-landscape`
   output.
 - **The market is enumerable by name** (under ~200 accounts) — replace
