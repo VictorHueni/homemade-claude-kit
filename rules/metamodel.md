@@ -37,11 +37,11 @@ what order, and where to put it**.
 | 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` | `PRD-NNNN` |
-| 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
+| 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_exec_{slug}.md` | `Plan-NNNN`, `Inc-N` |
 
 **Supporting skills** (not in the main build order, used as needed):
-- `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
-- `spec-idea` — captures pre-PRD ideas → `docs/ideas/{slug}.md`
+- `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
+- `spec-idea` — captures pre-PRD ideas → `docs/ideas/{domain}/{slug}.md` with `INDEX.md` per domain folder
 - `spec-peer-review` — reviews PRDs / plans
 - `arch-research` — Architecture Research notes that inform ADR decisions → `docs/architecture/research/{NNNN}-{slug}.md`; mints `Research-NNNN` in-doc ID (4-digit zero-padded, same convention as `ADR-NNNN`); lifecycle: Draft → Active → Frozen (once feeding ADRs land) → Superseded
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/01b-competitive-landscape/`; mints `CO-NN` per Tier-1 competitor profile; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
@@ -436,7 +436,7 @@ moving on.
 **Skill:** `spec-implementation-plan`
 **Prerequisites:** Step 10 (PRDs).
 **Process:**
-- One plan per PRD: `docs/exec-plans/active/{NNNN}_{slug}/`
+- One plan per PRD: `docs/exec-plans/active/{NNNN}_exec_{slug}.md`
 - Each plan: numbered increments (Inc-1, Inc-2, …), each small + testable + reversible.
 **Output verification:** each in-flight PRD has a corresponding plan; plan increments are atomic + testable.
 
@@ -541,7 +541,7 @@ docs/
 │       └── prd-NNNN-{feature}.md (one per PRD)          ← spec-prd (PRD-NNNN)
 ├── exec-plans/                                          ← `spec-` skills (implementation)
 │   └── active/
-│       └── {NNNN}_{slug}/  (one folder per plan with increments inside)
+│       └── {NNNN}_exec_{slug}.md  (one file per plan)
 ├── architecture/                                        ← `arch-` skills
 │   └── decisions/                                       ← arch-adr writes here
 │       └── {NNNN}-{slug}.md
@@ -565,6 +565,9 @@ docs/
 │           ├── dist/                                    ← built HTML + prototypes/
 │           └── config.yaml
 └── ideas/                                               ← `spec-idea` (pre-PRD)
+    └── {domain}/                                        ← one subfolder per domain (frontend/backend/infra/etc.)
+        ├── INDEX.md
+        └── {slug}.md
     └── {slug}.md
 ```
 

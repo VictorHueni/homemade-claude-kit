@@ -32,7 +32,7 @@
 ## {BC-01 Name}
 
 > **Subdomain type:** Core | Supporting | Generic
-> **BC reference:** [BC-01 {Name}](02b-bounded-contexts.md#bc-01)
+> **BC reference:** [BC-01 {Name}](bounded-contexts.md#bc-01)
 > **Owner team:** _TODO_
 
 ---
@@ -87,7 +87,7 @@
 ## {BC-02 Name}
 
 > **Subdomain type:** Core | Supporting | Generic
-> **BC reference:** [BC-02 {Name}](02b-bounded-contexts.md#bc-02)
+> **BC reference:** [BC-02 {Name}](bounded-contexts.md#bc-02)
 > **Owner team:** _TODO_
 
 ---
