@@ -1,7 +1,7 @@
 # Personas — Methodology References
 
 This document records the canonical frameworks used to design and maintain the
-[Personas](personas.md). The persona artifact is a synthesis of seven sources
+[Personas](01a-personas.md). The persona artifact is a synthesis of seven sources
 rather than a single school — each framework contributes a specific lens.
 
 ---

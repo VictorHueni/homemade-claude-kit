@@ -51,7 +51,7 @@ The skill operates in one of three modes. Detect which mode the user wants from 
 **When:** the project has no `personas/` folder yet, or has one but is missing the canonical template + methodology references.
 
 **Output:** ONE file in the project's chosen personas folder:
-- `personas.md` — hub document with introduction, kit-link methodology pointer, template, backlog scaffold, "no personas yet" placeholder.
+- `01a-personas.md` — hub document with introduction, kit-link methodology pointer, template, backlog scaffold, "no personas yet" placeholder.
 
 Source from `references/template.md`. Substitute `{{product}}`, `{{domain}}`, `{{org_type_examples}}` placeholders from the project context.
 
@@ -63,7 +63,7 @@ Source from `references/template.md`. Substitute `{{product}}`, `{{domain}}`, `{
 
 **When:** the scaffold exists but the backlog tables (Tier 1 / 2 / 3 / Negative) are empty or missing.
 
-**Output:** populated backlog tables inserted into the existing `personas.md` between the template block and the "## Personas" heading.
+**Output:** populated backlog tables inserted into the existing `01a-personas.md` between the template block and the "## Personas" heading.
 
 **Process:**
 1. **Read project context** — PRD(s), product roadmap, functional breakdown structure (FBS), product-sense doc, README, business analysis docs. The persona backlog must derive from this, not from generic assumptions.
@@ -157,7 +157,7 @@ Ask 2–4 questions max, in a single message, with lettered options where possib
 
 - Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 180d`. Full schema: `rules/artefact-frontmatter.md`.
 
-The skill produces ONE markdown file at `{personas folder}/personas.md` with this fixed structure (full template in `references/template.md`):
+The skill produces ONE markdown file at `{personas folder}/01a-personas.md` with this fixed structure (full template in `references/template.md`):
 
 ```
 <!-- doc-version: 1.0 | created: YYYY-MM-DD -->
@@ -321,7 +321,7 @@ find docs -type d -name "personas" 2>/dev/null
 
 If a folder exists at a non-default location (e.g., `docs/product-specs/personas/`, `docs/<domain>/personas/`), use it — don't move existing work without an explicit user request. If multiple candidates exist, ask. If none exists, default to `docs/business/` and confirm with the user.
 
-**Never overwrite an existing `personas.md`.** If it exists, switch modes:
+**Never overwrite an existing `01a-personas.md`.** If it exists, switch modes:
 - Scaffold mode → skip (report what's already there).
 - Backlog mode → append/update backlog tables only, preserve existing personas.
 - Fill-one mode → append a new H3 sub-section under "## Personas".
@@ -332,7 +332,7 @@ If a folder exists at a non-default location (e.g., `docs/product-specs/personas
 
 Three files in `references/` carry the canonical content. Read them when needed:
 
-- **`references/template.md`** — the canonical `personas.md` skeleton. Copy this to `{personas folder}/personas.md` and fill placeholders.
+- **`references/template.md`** — the canonical `01a-personas.md` skeleton. Copy this to `{personas folder}/01a-personas.md` and fill placeholders.
 - **`references/methodology-references.md`** — the canonical bibliography (BABOK §10.43, Cooper, Pruitt & Adlin, Lene Nielsen, NNG, Lean UX, JTBD). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
 - **`references/persona-types-and-quality.md`** — Cooper's six persona types with decision rules, NNG quality-check anti-patterns, proto-persona discipline. Internal Claude guidance; never copied into the project.
 
@@ -357,8 +357,8 @@ Keep it short. The user will read the file directly; your job is to point them a
 Before declaring the work done:
 
 - [ ] Folder existed or was created (with user confirmation if new path).
-- [ ] `personas.md` exists in the personas folder (scaffold mode).
-- [ ] Methodology pointer in `personas.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
+- [ ] `01a-personas.md` exists in the personas folder (scaffold mode).
+- [ ] Methodology pointer in `01a-personas.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
 - [ ] Backlog tables populated with Cooper persona types + tiers + negative section (backlog mode).
 - [ ] Persona body filled with all required fields per the template (fill-one mode).
 - [ ] Every snapshot field present passes the NNG design-decision-relevance test.
