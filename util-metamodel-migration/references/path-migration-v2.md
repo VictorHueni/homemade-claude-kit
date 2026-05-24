@@ -17,7 +17,7 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | Primary singleton (business / spec) | `docs/{layer}/NNa-{slug}.md` | `docs/business/01a-personas.md` · `docs/product-specs/07a-fbs.md` |
 | Fractional / sub-step artefact (business) | `docs/business/NNb-{slug}.md` | `docs/business/04b-objectives.md` |
 | BMC / VS companion VPC | `docs/business/NNa-vpc-{segment}.md` | `docs/business/02a-vpc-enterprise.md` |
-| Domain singleton (NO step prefix on file) | `docs/domain/{slug}.md` | `docs/domain/bounded-contexts.md` · `docs/domain/glossary.md` |
+| Domain singleton (NO step prefix on file) | `docs/domain/{slug}.md` | `docs/domain/02b-bounded-contexts.md` · `docs/domain/02c-glossary.md` |
 | Domain model (per BC, step prefix on folder) | `docs/domain/07b-models/{bc-slug}.md` | `docs/domain/07b-models/scheduling.md` |
 | Multi-file artefact folder (step-scoped) | `docs/business/NNa-{slug}/` | `docs/business/06a-models/{slug}.md` |
 | Multi-file artefact (slug, no step prefix) | unchanged | `docs/business/05a-processes/proc-NN-{slug}.md` |
@@ -27,7 +27,7 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 - Step numbers zero-pad to 2 digits **plus a letter** to identify ordering: `01a`, `02a`, `03a`, `04a`, `07a`, `08a`, `09a` (primary singleton at each step).
 - The `a` letter is **explicit, not implicit** — `01a-personas.md` (primary), `01b-…` (secondary at the same step), `01c-…` (tertiary), etc. This avoids visual ambiguity where bare `01-` would silently mean "step 1 primary" alongside other `01b-` siblings.
 - **Fractional / sub-step artefacts** in the business layer use letter increments: `04b` (between Step 4 and Step 5).
-- **Domain singleton files have NO step prefix** — `docs/domain/bounded-contexts.md`, `docs/domain/context-map.md`, `docs/domain/glossary.md`. The `docs/domain/` folder scope is the discriminator; step numbering applies to the business and spec layers only.
+- **Domain singleton files have NO step prefix** — `docs/domain/02b-bounded-contexts.md`, `docs/domain/02b-context-map.md`, `docs/domain/02c-glossary.md`. The `docs/domain/` folder scope is the discriminator; step numbering applies to the business and spec layers only.
 - **Domain model subfolder** (`docs/domain/07b-models/`) uses the step prefix on the FOLDER, not on the files inside — `{bc-slug}.md` is the scoping discriminator.
 - **Multi-file artefact folders** use the step-letter prefix on the FOLDER (e.g. `06a-models/`), and the files inside follow the originating skill's own naming (`qm-NN-{topic}.md` for quantitative models — no step collision because the parent folder scopes them).
 - `docs/VISION.md` stays at root regardless of numbering — agent context visibility takes priority over filesystem ordering.
@@ -43,9 +43,9 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | 2 | Business Model Canvas | `docs/business/business-model-canvas/business-model-canvas.md` | `docs/business/02a-bmc.md` | singleton |
 | 2 | Lean Canvas (variant) | `docs/business/business-model-canvas/lean-canvas.md` | `docs/business/02a-lean-canvas.md` | singleton |
 | 2 | BMC Value Proposition Canvas | `docs/business/business-model-canvas/value-proposition-canvas-{segment}.md` | `docs/business/02a-vpc-{segment}.md` | multi-slug |
-| 2b | Bounded Contexts | `docs/domain/bounded-contexts/bounded-contexts.md` | `docs/domain/bounded-contexts.md` | singleton |
-| 2b | Context Map | `docs/domain/bounded-contexts/context-map.md` | `docs/domain/context-map.md` | singleton |
-| 2c | Domain Glossary | `docs/domain/glossary/glossary.md` | `docs/domain/glossary.md` | singleton |
+| 2b | Bounded Contexts | `docs/domain/bounded-contexts/bounded-contexts.md` | `docs/domain/02b-bounded-contexts.md` | singleton |
+| 2b | Context Map | `docs/domain/bounded-contexts/context-map.md` | `docs/domain/02b-context-map.md` | singleton |
+| 2c | Domain Glossary | `docs/domain/glossary/glossary.md` | `docs/domain/02c-glossary.md` | singleton |
 | 3 | Capability Map | `docs/business/capability-map/capability-map.md` | `docs/business/03a-capability-map.md` | singleton |
 | 4 | Value Streams | `docs/business/value-streams/value-streams.md` | `docs/business/04a-value-streams.md` | singleton |
 | 4 | VS Value Proposition Canvas | `docs/business/value-streams/value-proposition-canvas-{segment}.md` | `docs/business/04a-vpc-{segment}.md` | multi-slug |
@@ -59,7 +59,7 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | 9 | Quality Attributes | `docs/product-specs/quality-attributes/quality-attributes.md` | `docs/product-specs/09a-quality-attributes.md` | singleton |
 | 10 | PRDs | `docs/product-specs/{NNNN}_prd_{feature}.md` | `docs/product-specs/prds/prd-{NNNN}-{feature}.md` | pattern-b-rename |
 | 11 | Implementation Plans | `docs/exec-plans/active/{NNNN}_{slug}/` | `docs/exec-plans/active/{NNNN}_exec_{slug}.md` | pattern-b-rename |
-| — | ADRs | `docs/architecture/decisions/adr-{NNNN}-{slug}.md` | `docs/architecture/decisions/{NNNN}-{slug}.md` | pattern-b-rename |
+| — | ADRs | `docs/architecture/decisions/{NNNN}-{slug}.md` | `docs/architecture/decisions/adr-{NNNN}-{slug}.md` | pattern-b-rename |
 | — | Ops Runbooks | `docs/ops/runbooks/{slug}.md` | `docs/ops/runbooks/{slug}.md` | no-change |
 | — | Ops RCAs | `docs/ops/rcas/{YYYY-MM-DD}-{slug}.md` | `docs/ops/rcas/{YYYY-MM-DD}-{slug}.md` | no-change |
 | — | Ideas | `docs/ideas/{slug}.md` | `docs/ideas/{domain}/{slug}.md` + `INDEX.md` | pattern-b-rename |
@@ -95,9 +95,9 @@ Depth change examples:
 - `docs/business/personas/personas.md` (depth 3) → `docs/business/01a-personas.md` (depth 2)
   - A link from `docs/product-specs/07a-fbs.md` was `../business/personas/personas.md`
   - After move: `../business/01a-personas.md` (loses one `../`)
-- `docs/domain/glossary/glossary.md` (depth 3) → `docs/domain/glossary.md` (depth 2)
+- `docs/domain/glossary/glossary.md` (depth 3) → `docs/domain/02c-glossary.md` (depth 2)
   - A link from `docs/domain/07b-models/scheduling.md` was `../glossary/glossary.md`
-  - After move: `../glossary.md`
+  - After move: `../02c-glossary.md`
 
 ### Domain model consolidation (special case)
 

@@ -42,7 +42,7 @@ This skill enforces the **rich model**. Every entity must have documented behavi
 Create an empty `{bc-slug}.md` for a bounded context. Seed section headings and the aggregate catalogue table. Do NOT invent aggregates — leave all aggregate sections as `_TODO_` placeholders.
 
 Steps:
-1. Resolve the BC slug from the bounded-contexts.md (`docs/domain/bounded-contexts.md`).
+1. Resolve the BC slug from the bounded-contexts.md (`docs/domain/02b-bounded-contexts.md`).
 2. Create `docs/domain/07b-models/{bc-slug}.md` from the template in `references/template.md`.
 3. Report: file path created, reminder to run Mode 2 (Fill) to populate.
 
@@ -76,8 +76,8 @@ Populate a scaffolded `docs/domain/07b-models/{bc-slug}.md` with real domain mod
 
 #### Fill process (after Step 0)
 
-1. Read `docs/domain/bounded-contexts.md` for BC-NN scope + capabilities owned.
-2. Read `docs/domain/glossary.md` for the canonical term names — entity names MUST match GT-NN terms exactly.
+1. Read `docs/domain/02b-bounded-contexts.md` for BC-NN scope + capabilities owned.
+2. Read `docs/domain/02c-glossary.md` for the canonical term names — entity names MUST match GT-NN terms exactly.
 3. Read `docs/product-specs/07a-fbs.md` for functionalities the BC implements — each functional group is an aggregate candidate.
 4. Identify aggregates: apply Vernon's rules (see `references/discipline.md`). Prefer small. Start with one entity per aggregate.
 5. For each aggregate: name the root, document invariants (≥2), list member entities and VOs, document the lifecycle state machine, and map commands to domain events.
@@ -160,7 +160,7 @@ Sourced from Evans (2003), Vernon IDDD (2013), and Fowler (2003).
 
 Default output path: `docs/domain/07b-models/{bc-slug}.md`
 
-- `{bc-slug}` = kebab-case BC name from bounded-contexts.md (e.g. `claims-processing`, `policy-management`)
+- `{bc-slug}` = kebab-case BC name from `docs/domain/02b-bounded-contexts.md` (e.g. `claims-processing`, `policy-management`)
 - One file per bounded context
 - If the bounded context folder does not yet exist, create it
 

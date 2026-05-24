@@ -9,12 +9,12 @@ This document catalogues the bounded contexts for {{product}}: the named islands
 **Scope discipline:**
 - A bounded context is where the domain model is consistent — where words have one precise meaning and one team is responsible for that meaning.
 - Subdomain types: **Core** (competitive advantage; build and protect) · **Supporting** (enables Core; build or buy) · **Generic** (commodity; buy SaaS/OSS).
-- See `context-map.md` for integration patterns between these contexts.
+- See `02b-context-map.md` for integration patterns between these contexts.
 
 **Companion documents:**
 - Capability map: [../../business/03a-capability-map.md](../../business/03a-capability-map.md)
-- Context map: [context-map.md](./context-map.md)
-- Domain glossary: [glossary.md](./glossary.md)
+- Context map: [02b-context-map.md](./02b-context-map.md)
+- Domain glossary: [02c-glossary.md](./02c-glossary.md)
 - Personas: [../../business/01a-personas.md](../../business/01a-personas.md)
 - Value streams: [../../business/04a-value-streams.md](../../business/04a-value-streams.md)
 
@@ -48,7 +48,7 @@ This document catalogues the bounded contexts for {{product}}: the named islands
 - _(Each capability appears in exactly one BC. No shared ownership.)_
 
 **Ubiquitous language scope:**
-- *[Term]* means [precise definition within this context] → see [glossary.md#bc-01](glossary.md#bc-01)
+- *[Term]* means [precise definition within this context] → see [02c-glossary.md#bc-01](02c-glossary.md#bc-01)
 - _(List the 2–5 most important terms whose definition is specific to this context. Cross-context homonyms are especially important to call out.)_
 
 **Canonical data owned:**
@@ -109,7 +109,7 @@ This document catalogues the bounded contexts for {{product}}: the named islands
 
 # {{product}} — Context Map
 
-This document maps the integration patterns between the bounded contexts defined in `bounded-contexts.md`. Every relationship names an Evans pattern — no anonymous "they call each other."
+This document maps the integration patterns between the bounded contexts defined in `02b-bounded-contexts.md`. Every relationship names an Evans pattern — no anonymous "they call each other."
 
 > **Methodology:** [Evans DDD (2003) Chapter 14 — eight integration patterns + Vernon DDD Distilled (2016) Chapter 4](https://github.com/VictorHueni/homemade-claude-kit/tree/main/domain-bounded-context/references/methodology-references.md).
 

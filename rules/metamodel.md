@@ -25,8 +25,8 @@ what order, and where to put it**.
 | 0 | **Product Vision** (why — the north star) | `business-vision` | `docs/VISION.md` | *(singleton — no ID; referenced by path)* |
 | 1 | **Personas** (who) | `business-persona` | `docs/business/01a-personas.md` | `P-NN` |
 | 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/03a-capability-map.md` | `C-N.M` (e.g. `C1`, `C1.1`, `C1.1.1` at L2 rare) |
-| 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/bounded-contexts.md` + `docs/domain/context-map.md` | `BC-NN` |
-| 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/glossary.md` | `BC-NN.GT-NN` |
+| 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/02b-bounded-contexts.md` + `docs/domain/02b-context-map.md` | `BC-NN` |
+| 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/02c-glossary.md` | `BC-NN.GT-NN` |
 | 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/04a-value-streams.md` + `docs/business/04a-vpc-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
 | 4.5 | **Business Objectives** (why — strategic intent) | `business-objective` | `docs/business/04b-objectives.md` | `OBJ-NN`, `KR-NN.M` |
 | 4 | **Business Processes** (operational how) | `business-process` | `docs/business/05a-processes/proc-NN-{slug}.md` (one file per process) | per-process slug |
@@ -40,7 +40,7 @@ what order, and where to put it**.
 | 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_exec_{slug}.md` | `Plan-NNNN`, `Inc-N` |
 
 **Supporting skills** (not in the main build order, used as needed):
-- `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
+- `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
 - `spec-idea` — captures pre-PRD ideas → `docs/ideas/{domain}/{slug}.md` with `INDEX.md` per domain folder
 - `spec-peer-review` — reviews PRDs / plans
 - `arch-research` — Architecture Research notes that inform ADR decisions → `docs/architecture/research/{NNNN}-{slug}.md`; mints `Research-NNNN` in-doc ID (4-digit zero-padded, same convention as `ADR-NNNN`); lifecycle: Draft → Active → Frozen (once feeding ADRs land) → Superseded
@@ -325,7 +325,7 @@ moving on.
 - Mode `discover` → read capability map + value streams; group capabilities by domain cohesion; identify boundary signals (where same word means different things; where data ownership changes; where team handoff happens); name bounded contexts
 - Classify each BC: Core (competitive differentiator) / Supporting (enables Core) / Generic (commodity — buy or outsource)
 - Mode `fill` → per-BC definition sections + context map with integration patterns (ACL, Shared Kernel, Customer-Supplier, Open Host Service, Published Language, Conformist)
-**Output verification:** `bounded-contexts.md` + `context-map.md` exist; every capability `C-N.M` assigned to exactly one `BC-NN`; each BC has subdomain type + rationale; context map names integration patterns (not just "they communicate"); 1–3 Core subdomains.
+**Output verification:** `02b-bounded-contexts.md` + `02b-context-map.md` exist; every capability `C-N.M` assigned to exactly one `BC-NN`; each BC has subdomain type + rationale; context map names integration patterns (not just "they communicate"); 1–3 Core subdomains.
 
 ### Step 2c — Domain Glossary (ubiquitous language)
 
@@ -544,11 +544,11 @@ docs/
 │       └── {NNNN}_exec_{slug}.md  (one file per plan)
 ├── architecture/                                        ← `arch-` skills
 │   └── decisions/                                       ← arch-adr writes here
-│       └── {NNNN}-{slug}.md
-├── domain/                                              ← `domain-` skills (DDD artefacts — no step prefix; named by type)
-│   ├── bounded-contexts.md                              ← domain-bounded-context (BC-NN)
-│   ├── context-map.md                                   ← domain-bounded-context (context map)
-│   ├── glossary.md                                      ← domain-glossary (BC-NN.GT-NN)
+│       └── adr-{NNNN}-{slug}.md
+├── domain/                                              ← `domain-` skills (DDD artefacts — numbered by step)
+│   ├── 02b-bounded-contexts.md                          ← domain-bounded-context (BC-NN)
+│   ├── 02b-context-map.md                               ← domain-bounded-context (context map)
+│   ├── 02c-glossary.md                                  ← domain-glossary (BC-NN.GT-NN)
 │   └── 07b-models/                                      ← domain model files per BC
 │       └── {bc-slug}.md                                 ← domain-model (one per BC)
 ├── ops/                                                 ← `ops-` skills

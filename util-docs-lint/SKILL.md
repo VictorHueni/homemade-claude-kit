@@ -59,7 +59,7 @@ Create `.github/workflows/` if it does not exist.
 
 ### Step 3 — write glossary sync script (optional)
 
-If the project has or plans to have a domain glossary (`docs/domain/glossary.md`),
+If the project has or plans to have a domain glossary (`docs/domain/02c-glossary.md`),
 also copy the sync script:
 
 ```
@@ -68,7 +68,7 @@ also copy the sync script:
 ```
 
 The workflow already calls this script conditionally — it only runs if both
-`scripts/sync_glossary_rules.py` and `docs/domain/glossary.md` exist. Safe to
+`scripts/sync_glossary_rules.py` and `docs/domain/02c-glossary.md` exist. Safe to
 include even before a glossary exists.
 
 ### Step 4 — add .gitignore entries
@@ -111,7 +111,7 @@ Tell the user:
 
 ## Mode: add-glossary
 
-Run after `docs/domain/glossary.md` exists and has `**Deprecated aliases:**`
+Run after `docs/domain/02c-glossary.md` exists and has `**Deprecated aliases:**`
 entries.
 
 1. Confirm `scripts/sync_glossary_rules.py` is present (copy from skill if not)
