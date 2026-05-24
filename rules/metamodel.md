@@ -291,7 +291,7 @@ moving on.
 - Mode `scaffold` → create `docs/business/01a-personas.md`
 - Mode `backlog` → identify Tier-1 / Tier-2 / Tier-3 personas with Cooper persona types
 - Mode `fill-one` → write 1–3 Tier-1 personas as proto-personas (Lean UX) or research-grounded (BABOK §10.43)
-**Output verification:** `personas.md` exists; ≥1 Tier-1 persona filled; `P-01` through `P-NN` assigned.
+**Output verification:** `01a-personas.md` exists; ≥1 Tier-1 persona filled; `P-01` through `P-NN` assigned.
 
 ### Step 2 — Business Model Canvas / Lean Canvas (commercial wrapper)
 
@@ -522,13 +522,13 @@ docs/
 ├── business/                                            ← Business Architecture artefacts (numbered = build order)
 │   ├── 01a-personas.md                                   ← business-persona (P-NN)
 │   ├── 02a-bmc.md  (or 02a-lean-canvas.md)               ← business-model-canvas (Step 2)
-│   ├── 02-vpc-{segment}.md  (optional per CS)           ← BMC VPC companions
+│   ├── 02a-vpc-{segment}.md  (optional per CS)          ← BMC VPC companions
 │   ├── 03a-capability-map.md                             ← business-capability-map (C-N.M)
 │   ├── 04a-value-streams.md                              ← business-value-stream (VS-N.M)
 │   ├── 04-vpc-{segment}.md  (optional per VS)           ← VS VPC companions
 │   ├── 04b-objectives.md                                ← business-objective (OBJ-NN, KR-NN.M)
-│   ├── processes/                                       ← multi-file; keep subfolder
-│   │   └── {slug}-process.md (one per process)
+│   ├── 05a-processes/                                   ← multi-file; keep subfolder
+│   │   └── proc-NN-{slug}.md (one per process)
 │   └── models/                                          ← multi-file; keep subfolder
 │       └── {slug}.md (TAM/SAM/SOM, savings, ROI per model)
 ├── product-specs/                                       ← `spec-` skills (product delivery)
