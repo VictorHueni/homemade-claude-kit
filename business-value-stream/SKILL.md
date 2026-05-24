@@ -66,7 +66,7 @@ A value stream is good when a reader can answer, without ambiguity:
 
 ### Mode 1 — Scaffold
 
-**When:** the project has no `value-streams/` folder, or has one but is missing the canonical template + methodology.
+**When:** `docs/business/04a-value-streams.md` does not yet exist, or exists but is missing the canonical template + methodology.
 
 **Output:** ONE file in `docs/business/` (or project-chosen folder):
 - `04a-value-streams.md` — hub doc with intro, kit-link methodology pointer, catalogue table scaffold, template block, "no streams yet" placeholder.
@@ -194,7 +194,7 @@ Intro paragraph:
   - EA vs Lean VSM stance (this skill is EA)
   - Triangulation: persona (who) → value stream (how value flows) → capability (what abilities) → process (operational how)
   - Methodology pointer (2-line blockquote linking to the skill's canonical bibliography in the kit)
-  - Companion docs (../01a-personas.md, ../03a-capability-map.md, ../05a-processes/ folder)
+  - Companion docs (01a-personas.md, 03a-capability-map.md, 05a-processes/ folder)
 
 §Value Stream Template (the blueprint, copied for each new stream)
 

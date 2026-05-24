@@ -28,8 +28,8 @@ Processes (how it operationally happens)
 
 **Companion documents:**
 - Personas: [link to 01a-personas.md if exists]
-- Business Capability Map: [link to ../03a-capability-map.md if exists]
-- Business Processes: [link to docs/business/05a-processes/ if exists]
+- Business Capability Map: [link to 03a-capability-map.md if exists]
+- Business Processes: [link to 05a-processes/ if exists]
 
 **Hard rules:**
 - A value stream describes WHAT value flows, never HOW it's operationally delivered (processes own that).
@@ -74,8 +74,8 @@ using business-object framing. Avoid internal-lifecycle naming
 | **Entrance criteria** | [What must be true to enter this stage — 2–4 bullets] |
 | **Exit criteria** | [What must be true to leave — 2–4 bullets; the value item produced is the primary exit] |
 | **Value items produced** | [1–3 incremental value items that accrue toward the value proposition] |
-| **Enabling capabilities** | [C-N.M IDs — soft-link to ../03a-capability-map.md] |
-| **Operationalised by processes** | [process-name.md — soft-link to docs/business/05a-processes/, or `_TODO_`] |
+| **Enabling capabilities** | [C-N.M IDs — soft-link to 03a-capability-map.md] |
+| **Operationalised by processes** | [process-name.md — soft-link to 05a-processes/, or `_TODO_`] |
 | **Pain point index** | **[Low / Medium / High / Critical]** — [one-line rationale: evidence-based, not wishlist] |
 
 #### VS-N.2 · [Stage name]
