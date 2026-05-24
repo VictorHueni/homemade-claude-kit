@@ -17,16 +17,16 @@ find docs -maxdepth 4 \( -name "business-model-canvas.md" -o -name "lean-canvas.
 find docs/business -maxdepth 1 -name "03a-capability-map.md" 2>/dev/null
 find docs/business -maxdepth 1 -name "04a-value-streams.md" 2>/dev/null
 find docs/business -maxdepth 1 -name "04b-objectives.md" 2>/dev/null          # Step 4.5
-find docs/business/processes -name "*-process.md" 2>/dev/null | head -1
-find docs/business/06a-models -name "*.md" 2>/dev/null | head -1
+find docs/business/05a-processes -name "proc-*.md" 2>/dev/null | head -1
+find docs/business/06a-models -name "qm-*.md" 2>/dev/null | head -1
 find docs/product-specs -maxdepth 1 -name "07a-fbs.md" 2>/dev/null
-find docs/product-specs -maxdepth 1 -name "08a-delivery-roadmap.md" 2>/dev/null  # Step 8 (was 08a-delivery-roadmap.md — bug fixed)
+find docs/product-specs -maxdepth 1 -name "08a-delivery-roadmap.md" 2>/dev/null   # Step 8
 find docs/product-specs -maxdepth 1 -name "09a-quality-attributes.md" 2>/dev/null
 find docs/product-specs/prds -name "prd-*.md" 2>/dev/null | head -1
-find docs/exec-plans/active -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1
-find docs/domain -maxdepth 1 -name "02b-bounded-contexts.md" 2>/dev/null            # Step 2b
-find docs/domain -maxdepth 1 -name "02c-glossary.md" 2>/dev/null                  # Step 2c
-find docs/domain -name "domain-model.md" 2>/dev/null | head -1              # Step 7b (per BC)
+find docs/exec-plans/active -maxdepth 1 -name "*_exec_*.md" 2>/dev/null | head -1
+find docs/domain -maxdepth 1 -name "bounded-contexts.md" 2>/dev/null              # Step 2b
+find docs/domain -maxdepth 1 -name "glossary.md" 2>/dev/null                      # Step 2c
+find docs/domain/07b-models -name "*.md" 2>/dev/null | head -1             # Step 7b (per BC)
 ```
 
 **Status assignment:**
@@ -133,8 +133,8 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `VS-N` | `\bVS-[0-9]+\b` | `docs/business/04a-value-streams.md` |
 | `VS-N.M` | `\bVS-[0-9]+\.[0-9]+\b` | `docs/business/04a-value-streams.md` |
 | `C-N.M.FXX` | `\bC-[0-9]+\.[0-9]+\.F[0-9]+\b` | `docs/product-specs/07a-fbs.md` |
-| `BC-NN` | `\bBC-[0-9]{2}\b` | `docs/domain/02b-bounded-contexts.md` |
-| `BC-NN.GT-NN` | `\bBC-[0-9]{2}\.GT-[0-9]{2}\b` | `docs/domain/02c-glossary.md` |
+| `BC-NN` | `\bBC-[0-9]{2}\b` | `docs/domain/bounded-contexts.md` |
+| `BC-NN.GT-NN` | `\bBC-[0-9]{2}\.GT-[0-9]{2}\b` | `docs/domain/glossary.md` |
 | `BC-NN.AGG-NN` | `\bBC-[0-9]{2}\.AGG-[0-9]{2}\b` | `docs/domain/07b-models/{bc-slug}.md` |
 | `BC-NN.ENT-NN` | `\bBC-[0-9]{2}\.ENT-[0-9]{2}\b` | `docs/domain/07b-models/{bc-slug}.md` |
 | `BC-NN.VO-NN` | `\bBC-[0-9]{2}\.VO-[0-9]{2}\b` | `docs/domain/07b-models/{bc-slug}.md` |
@@ -146,7 +146,7 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `ADR-NNNN` | `\bADR-[0-9]{4}\b` | `docs/architecture/decisions/` |
 | `Research-NNNN` | `\bResearch-[0-9]{4}\b` | `docs/architecture/research/` |
 | `CO-NN` | `\bCO-[0-9]{2}\b` | `docs/business/01b-competitive-landscape/` |
-| `PRD-NNNN` | `\bPRD-[0-9]{4}\b` | `docs/product-specs/prd-*.md` |
+| `PRD-NNNN` | `\bPRD-[0-9]{4}\b` | `docs/product-specs/prds/prd-*.md` |
 | `CS-N` | `\bCS-[0-9]+\b` | `docs/business/02a-bmc.md` |
 | `VP-N` | `\bVP-[0-9]+\b` | `docs/business/02a-bmc.md` |
 | `CH-N` | `\bCH-[0-9]+\b` | `docs/business/02a-bmc.md` |
@@ -220,9 +220,9 @@ grep -roh '\bCO-[0-9]\b' docs/ --include="*.md"
 | Any `docs/product-specs/prds/prd-*.md` | `docs/product-specs/08a-delivery-roadmap.md` (PRDs map to E-NN epics) |
 | Any `docs/product-specs/prds/prd-*.md` | `docs/product-specs/09a-quality-attributes.md` (PRDs reference QA-XXNN) |
 | Any `exec-plans/active/*/` plan | Corresponding `docs/product-specs/prds/prd-*.md` |
-| `docs/domain/02c-glossary.md` exists | `docs/domain/02b-bounded-contexts.md` must also exist (glossary is scoped to BCs) |
-| `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/02b-bounded-contexts.md` must exist (domain model is namespaced by BC) |
-| `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/02c-glossary.md` must exist (entity names must match glossary terms) |
+| `docs/domain/glossary.md` exists | `docs/domain/bounded-contexts.md` must also exist (glossary is scoped to BCs) |
+| `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/bounded-contexts.md` must exist (domain model is namespaced by BC) |
+| `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/glossary.md` must exist (entity names must match glossary terms) |
 | `docs/business/04b-objectives.md` exists | `docs/business/04a-value-streams.md` must also exist (objectives consume pain index from VS) |
 | Any `docs/product-specs/prds/prd-*.md` | If `docs/business/04b-objectives.md` exists, the PRD should reference ≥1 `OBJ-NN` in §0 |
 
@@ -232,14 +232,14 @@ grep -roh '\bCO-[0-9]\b' docs/ --include="*.md"
   [ ! -f "docs/business/03a-capability-map.md" ] && \
   echo "WARNING: FBS exists but 03a-capability-map.md missing"
 
-[ -f "docs/domain/02c-glossary.md" ] && \
-  [ ! -f "docs/domain/02b-bounded-contexts.md" ] && \
+[ -f "docs/domain/glossary.md" ] && \
+  [ ! -f "docs/domain/bounded-contexts.md" ] && \
   echo "WARNING: Glossary exists but bounded-contexts.md missing"
 
-find docs/domain/models -name "*.md" 2>/dev/null | while read f; do
-  [ ! -f "docs/domain/02b-bounded-contexts.md" ] && \
+find docs/domain/07b-models -name "*.md" 2>/dev/null | while read f; do
+  [ ! -f "docs/domain/bounded-contexts.md" ] && \
     echo "WARNING: Domain model exists but bounded-contexts.md missing: $f"
-  [ ! -f "docs/domain/02c-glossary.md" ] && \
+  [ ! -f "docs/domain/glossary.md" ] && \
     echo "WARNING: Domain model exists but glossary missing: $f"
 done
 ```
@@ -296,13 +296,13 @@ done | sort -rn
 | `VISION.md` | `## The Elevator Pitch`, `## What We Are NOT`, `## North Star Metric`, `## Changelog` | `grep -q 'Elevator Pitch\|North Star'` |
 | `bounded-contexts.md` | `## Subdomain catalogue`, at least one `BC-NN` entry | `grep -q 'BC-[0-9][0-9]'` |
 | `glossary.md` | At least one BC section, `## Changelog` | `grep -q '## Changelog'` |
-| `domain-model.md` | `## Aggregate catalogue`, `## Domain event catalogue`, Mermaid `classDiagram` | `grep -q 'Aggregate catalogue\|classDiagram'` |
+| `docs/domain/07b-models/{bc-slug}.md` | `## Aggregate catalogue`, `## Domain event catalogue`, Mermaid `classDiagram` | `grep -q 'Aggregate catalogue\|classDiagram'` |
 | `docs/architecture/research/*.md` | `## Questions`, `## Findings`, `## Changelog` | `grep -q '## Questions\|## Findings'` |
 | `docs/business/01b-competitive-landscape/*.md` | `## Porter Five Forces`, `## Competitor Profiles` or `## CO-` heading | `grep -q 'Five Forces\|CO-[0-9]'` |
 
 **Detection (example for process doc):**
 ```bash
-find docs/business/processes -name "*-process.md" 2>/dev/null | while read f; do
+find docs/business/05a-processes -name "proc-*.md" 2>/dev/null | while read f; do
   grep -q 'KPI\|§8' "$f" || echo "MISSING KPIs: $f"
   grep -q '§11\|Open TODOs' "$f" || echo "MISSING TODOs section: $f"
 done
@@ -382,11 +382,11 @@ grep -n 'Next review' docs/business/01a-personas.md 2>/dev/null
 **Detection — glossary changelog discipline:**
 ```bash
 # Glossary exists but has no Changelog section → living-doc discipline missing
-if [ -f "docs/domain/02c-glossary.md" ]; then
-  grep -q '## Changelog' docs/domain/02c-glossary.md || \
+if [ -f "docs/domain/glossary.md" ]; then
+  grep -q '## Changelog' docs/domain/glossary.md || \
     echo "WARNING: glossary.md missing Changelog section"
   # Changelog exists but last entry is > 30 days ago for Core BC (sprint cadence)
-  last_entry=$(grep -m1 '^### [0-9]' docs/domain/02c-glossary.md 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+  last_entry=$(grep -m1 '^### [0-9]' docs/domain/glossary.md 2>/dev/null | grep -oP '[0-9]{4}-[0-9]{2}-[0-9]{2}')
   [ -n "$last_entry" ] && echo "Glossary last changelog entry: $last_entry"
 fi
 ```
@@ -531,8 +531,8 @@ done
 **Detection — domain model completeness:**
 ```bash
 # Domain model completeness
-bc_count=$(grep -c 'BC-[0-9][0-9]' docs/domain/02b-bounded-contexts.md 2>/dev/null || echo 0)
-dm_count=$(find docs/domain -name "domain-model.md" 2>/dev/null | wc -l)
+bc_count=$(grep -c 'BC-[0-9][0-9]' docs/domain/bounded-contexts.md 2>/dev/null || echo 0)
+dm_count=$(find docs/domain/07b-models -name "*.md" 2>/dev/null | wc -l)
 echo "Bounded contexts: $bc_count | Domain models: $dm_count"
 [ "$dm_count" -lt "$bc_count" ] && echo "WARNING: $(($bc_count - $dm_count)) BC(s) missing domain model"
 ```
