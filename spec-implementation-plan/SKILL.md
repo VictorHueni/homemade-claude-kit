@@ -24,13 +24,13 @@ This skill guides you through creating a high-quality, structured implementation
 3. **Draft Increments:** Break the implementation into small, coherent increments. Each increment MUST be a standalone changeset with a test gate.
 4. **Define Delivery Rules:** Include project-wide constraints (e.g., "one increment per commit", "no live API keys").
 5. **Group into Milestones:** Create a table grouping increments into logical, standalone delivery chunks.
-6. **Save the Plan:** Save the completed plan to `docs/exec-plans/active/[NNNN]_exec_[feature-name].md`. The `[NNNN]` MUST match the ID of the corresponding PRD.
+6. **Save the Plan:** Save the completed plan to `docs/exec-plans/active/{NNNN}_exec_{slug}.md`. The `{NNNN}` MUST match the ID of the corresponding PRD.
 
 ## Output
 
 - **Format:** Markdown (`.md`)
 - **Location:** `docs/exec-plans/active/`
-- **Filename:** `[NNNN]_exec_[feature-name].md` (e.g., 0001_exec_onboard-agent.md)
+- **Filename:** `{NNNN}_exec_{slug}.md` (e.g., 0001_exec_onboard-agent.md)
 - Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 30d`. Full schema: `rules/artefact-frontmatter.md`.
 
 ## Implementation Plan Template
