@@ -27,7 +27,7 @@ Processes (how it operationally happens)
 ```
 
 **Companion documents:**
-- Personas: [link to personas.md if exists]
+- Personas: [link to 01a-personas.md if exists]
 - Business Capability Map: [link to ../03a-capability-map.md if exists]
 - Business Processes: [link to docs/business/05a-processes/ if exists]
 
@@ -70,7 +70,7 @@ using business-object framing. Avoid internal-lifecycle naming
 
 | Field | Value |
 |---|---|
-| **Participating stakeholders** | [P-NN, P-MM — persona IDs from personas.md] |
+| **Participating stakeholders** | [P-NN, P-MM — persona IDs from 01a-personas.md] |
 | **Entrance criteria** | [What must be true to enter this stage — 2–4 bullets] |
 | **Exit criteria** | [What must be true to leave — 2–4 bullets; the value item produced is the primary exit] |
 | **Value items produced** | [1–3 incremental value items that accrue toward the value proposition] |

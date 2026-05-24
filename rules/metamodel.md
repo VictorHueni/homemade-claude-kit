@@ -525,7 +525,7 @@ docs/
 │   ├── 02a-vpc-{segment}.md  (optional per CS)          ← BMC VPC companions
 │   ├── 03a-capability-map.md                             ← business-capability-map (C-N.M)
 │   ├── 04a-value-streams.md                              ← business-value-stream (VS-N.M)
-│   ├── 04-vpc-{segment}.md  (optional per VS)           ← VS VPC companions
+│   ├── 04a-vpc-{segment}.md  (optional per VS)           ← VS VPC companions
 │   ├── 04b-objectives.md                                ← business-objective (OBJ-NN, KR-NN.M)
 │   ├── 05a-processes/                                   ← multi-file; keep subfolder
 │   │   └── proc-NN-{slug}.md (one per process)

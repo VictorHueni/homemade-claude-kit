@@ -44,7 +44,7 @@ A value stream is good when a reader can answer, without ambiguity:
 
 | Question | Where it lives |
 |---|---|
-| **Who triggers the stream?** | §Triggering stakeholder (must link to a persona ID from `personas.md`) |
+| **Who triggers the stream?** | §Triggering stakeholder (must link to a persona ID from `01a-personas.md`) |
 | **What value do they receive at the end?** | §Value proposition |
 | **What are the stages from trigger to value?** | §Stages overview (ASCII flow) |
 | **What is produced at each stage?** | Per-stage Value items |
@@ -57,7 +57,7 @@ A value stream is good when a reader can answer, without ambiguity:
 **Hard scope rules:**
 - A value stream describes WHAT value flows, never HOW it's delivered operationally.
 - Stages soft-link to capabilities; they NEVER define capabilities inline.
-- The triggering stakeholder MUST link to a persona ID — if no `personas.md` exists, leave the link as `_TODO_` and surface the gap to the user.
+- The triggering stakeholder MUST link to a persona ID — if no `01a-personas.md` exists, leave the link as `_TODO_` and surface the gap to the user.
 - A value stream has 4–10 stages. Fewer than 4 = it's probably a process; more than 10 = scoping is wrong.
 
 ---
@@ -81,7 +81,7 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}` placehol
 
 **Process:**
 1. **Read project context** — PRDs, personas, BC map, processes, product roadmap. Value streams emerge from triggering-stakeholder + value-proposition pairs.
-2. **Identify candidate streams** — for each Tier-1 persona (from `personas.md`), what value do they receive end-to-end? Each persona-value pair is a candidate stream.
+2. **Identify candidate streams** — for each Tier-1 persona (from `01a-personas.md`), what value do they receive end-to-end? Each persona-value pair is a candidate stream.
 3. **Apply BIZBOK naming rule** — name the stream after the **final value achieved**, using business-object framing. Examples: "Acquire Product", "Onboard Customer", "Settle Claim", "Resolve Incident". **Avoid internal-lifecycle naming** like "hire-to-retire", "order-to-cash" — that's BIZBOK's #1 scoping mistake.
 4. **Apply scoping discipline** — one value stream = one value proposition. If a candidate stream has two distinct value propositions (e.g., "Onboard Customer AND Bill Customer"), split it.
 5. **Sizing check** — a single product scope typically has 3–10 value streams; enterprises have ~20–25 (BIZBOK). If more than ~25 emerge for a product, scope is wrong.
@@ -182,7 +182,7 @@ Ask 2–4 questions max, single message, lettered options where possible. Don't 
 
 - Open every generated file with the standard artefact frontmatter (title, status, owner, last_reviewed, review_interval). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 90d`. Full schema: `rules/artefact-frontmatter.md`.
 
-The skill produces ONE markdown file at `docs/business/04-04a-value-streams.md` with this fixed structure (full template in `references/template.md`):
+The skill produces ONE markdown file at `docs/business/04a-value-streams.md` with this fixed structure (full template in `references/template.md`):
 
 ```
 <!-- doc-version: 1.0 | created: YYYY-MM-DD -->
@@ -194,7 +194,7 @@ Intro paragraph:
   - EA vs Lean VSM stance (this skill is EA)
   - Triangulation: persona (who) → value stream (how value flows) → capability (what abilities) → process (operational how)
   - Methodology pointer (2-line blockquote linking to the skill's canonical bibliography in the kit)
-  - Companion docs (../01a-personas.md, ../03a-capability-map.md, ../processes/ folder)
+  - Companion docs (../01a-personas.md, ../03a-capability-map.md, ../05a-processes/ folder)
 
 §Value Stream Template (the blueprint, copied for each new stream)
 
@@ -301,7 +301,7 @@ If a folder exists at a non-default location, use it — don't move existing wor
 
 Three files in `references/` carry the canonical content:
 
-- **`references/template.md`** — the canonical `04a-value-streams.md` skeleton. Copy to `docs/business/04-04a-value-streams.md` and fill.
+- **`references/template.md`** — the canonical `04a-value-streams.md` skeleton. Copy to `docs/business/04a-value-streams.md` and fill.
 - **`references/methodology-references.md`** — the canonical bibliography (TOGAF, BIZBOK, Ulrich/Kuehn, EA-vs-Lean stance). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line pointer in their header.
 - **`references/value-stream-discipline.md`** — internal Claude guidance: 7 anti-patterns, EA-vs-Lean stance, scope-vs-process boundary, naming rules, quality checks. Never copied into the project.
 
