@@ -9,3 +9,12 @@
 # - Learnings: [any notable observations]
 # - Commit: [hash]
 # - Timestamp: [ISO 8601]
+
+## Iteration 1
+- Increment: 01 — Define the Open Items Contract
+- Status: done
+- Files changed: rules/open-items-governance.md (new), rules/metamodel.md, README.md, docs/exec-plans/active/0001_open-items-governance/0001_exec_open-items-governance.md
+- Test gate: passed
+- Learnings: All 9 required tokens (## Open Items, document-level, Source anchor, Source heading, project-control/open-items, doc-gap, decision-gap, execution-item, tech-debt) consolidated into rules/open-items-governance.md as the single source of truth; rules/metamodel.md and README.md carry summary pointers rather than duplicated schema. Kept the ledger under project-control/ (not docs/) and explicitly distinguished _TODO_ scaffold debt from open-item rows per the plan principles. Milestone M1 set to in-progress until increment 02 lands the scaffolded control plane.
+- Commit: ae9a7d6
+- Timestamp: 2026-05-25T00:00:00Z
