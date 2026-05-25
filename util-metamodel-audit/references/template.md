@@ -205,6 +205,61 @@ Copy this skeleton to `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md` 
 
 ---
 
+## §18 Open items governance
+
+Six sub-checks against `rules/open-items-governance.md`. Sections kept even when empty
+so readers can see the check ran.
+
+### §18a Section compliance
+
+{No findings. / Table below:}
+
+| File | Line | Found heading | Issue | Proposed fix |
+|---|---|---|---|---|
+| `{file}` | {N} | `{found heading}` | Forbidden legacy variant / Non-document-level | Rename to canonical `## Open Items` per §1 |
+
+### §18b Schema compliance
+
+{No findings. / Table below:}
+
+| File | Line | Issue | Proposed fix |
+|---|---|---|---|
+| `{file}` | {N} | Missing / reordered columns | Restore canonical column order: `OI-ID | Type | Summary | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref` |
+
+### §18c Source-location provenance
+
+{No findings. / Table below:}
+
+| File | OI-ID | Anchor | Heading | Proposed fix |
+|---|---|---|---|---|
+| `{file}` | `{OI-NNNN}` | `{anchor or empty}` | `{heading or empty}` | Populate both fields, or use `_central-only_` in heading if no in-artefact origin |
+
+### §18d Tracker sync coverage
+
+{No findings. / Table below:}
+
+| OI-ID | Local artefact | Ledger row? | Proposed fix |
+|---|---|---|---|
+| `{OI-NNNN}` | `{file or —}` | {✅ / ❌} | Run `util-open-items` in `sync` mode for the local artefact, or mark ledger-only row as `_central-only_` |
+
+### §18e Closure drift
+
+{No findings. / Table below:}
+
+| File | OI-ID | Status | Tracker ref | Proposed fix |
+|---|---|---|---|---|
+| `{file}` | `{OI-NNNN}` | `closed` / `dropped` | `_TBD_` | Record evidencing PR / ADR / plan increment / runbook via `util-open-items close` (or `drop`), or reopen the row |
+
+### §18f Stale open items
+
+{No findings. / Table below:}
+
+| File | OI-ID | Status | Due / Review date | Days overdue | Proposed fix |
+|---|---|---|---|---|---|
+| `{file}` | `{OI-NNNN}` | `{open / in-progress / blocked}` | {YYYY-MM-DD} | {N} | Run `util-open-items` in `triage` mode to re-date, escalate, reassign, or close with a `Tracker ref` |
+
+---
+
 ## Audit metadata
 
 | Field | Value |
@@ -212,8 +267,8 @@ Copy this skeleton to `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md` 
 | Generated | {YYYY-MM-DD HH:MM} |
 | Skill version | util-metamodel-audit v1.0.0 |
 | Scope | {full / business / product-specs / custom} |
-| Mode | {full / progress / links / freshness} |
+| Mode | {full / progress / links / freshness / open-items} |
 | Files scanned | {N} |
-| Checks run | {N} / 16 |
+| Checks run | {N} / 18 |
 | Report path | `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md` |
 ```
