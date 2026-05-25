@@ -59,21 +59,51 @@ Ask the user these 3 questions in a single message. Users respond like `1A, 2B, 
 
 Also ask for the **project name** if it is not already clear from context — used in the INDEX.md header.
 
+**Pre-flight check (run before creating anything):**
+
+```bash
+existing=$(find {docs_root} -name "*.md" 2>/dev/null | wc -l)
+echo "Existing markdown files in {docs_root}: $existing"
+```
+
+If `{docs_root}` already contains markdown files, warn the user:
+
+> "`docs/` already has N markdown file(s). Running scaffold will create any missing
+> canonical folders and **overwrite `docs/INDEX.md`** with a fresh status snapshot.
+> Existing artefact files are NOT touched.
+> If the folder structure needs restructuring (files in wrong locations), run
+> `util-metamodel-migration` instead. Continue with scaffold? (Y/N)"
+
+If the user says N, stop and suggest `util-metamodel-migration` Mode 1.
+If the user says Y, proceed.
+
 **Process:**
 1. Read the folder list for the chosen variant from `references/folder-catalogue.md`.
 2. For each folder in the list: `mkdir -p {folder}`.
-3. Place a `.gitkeep` in every leaf folder that has no content yet, so the tree is git-trackable.
-4. Detect the current status of each canonical artefact path (bash — same logic as
+3. Place a `.gitkeep` in every empty leaf folder so the tree is git-trackable.
+4. **For greenfield and brownfield variants:** create the `project-control/open-items/`
+   control plane — see §Project-control scaffold below.
+5. **`.gitignore` check:**
+   ```bash
+   grep -q 'var/reports' .gitignore 2>/dev/null \
+     || echo "SUGGEST: 'var/reports/' is not in .gitignore — generated reports should not be committed."
+   ```
+   Record the result; surface it in the closing report.
+6. Detect the current status of each canonical artefact path (bash — same logic as
    `util-metamodel-audit` Check 1) and generate `docs/INDEX.md` from
    `references/index-template.md`.
-5. If the user chose to wire CLAUDE.md (Step 0 option 3A): apply the stack pointer update
-   (see CLAUDE.md update rules below).
+7. If the user chose to wire CLAUDE.md (Step 0 option 3A): apply the stack pointer update
+   (see §CLAUDE.md update rules below).
 
 **Output verification:**
 - All variant-appropriate folders exist (`find {docs_root} -type d | sort`).
 - `docs/INDEX.md` exists and contains a row for every canonical artefact step.
+- For greenfield/brownfield: `project-control/open-items/open-items.md` and
+  `project-control/open-items/README.md` exist.
 - If wired: `CLAUDE.md` contains a reference to `docs/INDEX.md`.
-- No artefact content files were created — only folders, `.gitkeep` files, and `docs/INDEX.md`.
+- No artefact content files created — only folders, `.gitkeep` files, `docs/INDEX.md`,
+  and the `project-control/open-items/` control-plane stubs.
+- If `var/reports/` is absent from `.gitignore`, this was surfaced in the closing report.
 
 ---
 
@@ -102,8 +132,9 @@ example).
 **Process:**
 1. Detect docs root (check for existing `docs/INDEX.md` or default to `docs/`).
 2. Re-run the status detection bash commands from `references/index-template.md §Detection`.
-3. Overwrite `docs/INDEX.md` with the refreshed status snapshot.
-4. Report: N steps now ✅ / N steps 🔄 / N steps ⬜.
+3. Update the `last_reviewed` field in the frontmatter to today's date before writing.
+4. Overwrite `docs/INDEX.md` with the refreshed status snapshot.
+5. Report: N steps now ✅ / N steps 🔄 / N steps ⬜.
 
 Does NOT create folders or touch CLAUDE.md.
 
@@ -132,8 +163,98 @@ done
 - Use `mkdir -p` — safe to run on existing trees; never fails if folder already exists.
 - Never delete or overwrite existing files.
 - Report how many folders were created vs already existed.
-- `var/` and `project-control/` are out-of-scope for this skill — those are created by
-  `util-metamodel-audit` and `util-open-items` respectively when first needed.
+- `var/reports/` directories are created by this skill (audit + migration report targets).
+- `project-control/open-items/` is created by this skill for greenfield and brownfield
+  variants (see §Project-control scaffold). For strategy-only and single-feature it is
+  omitted — those variants rarely produce artefact-level open items at scale.
+
+---
+
+## Project-control scaffold
+
+**Scope:** greenfield and brownfield variants only (Mode 1, step 4).
+
+Creates the minimal `project-control/open-items/` control plane so `util-open-items`
+can run `sync` immediately after the first artefact is authored. Without this structure,
+the first sync fails with a missing-path error.
+
+**Files created:**
+
+```bash
+mkdir -p project-control/open-items/archive
+touch project-control/open-items/archive/.gitkeep
+```
+
+Then write two stub files:
+
+**`project-control/open-items/open-items.md`** — empty ledger with canonical schema,
+sourced from `util-open-items/references/template.md §1` (canonical ledger table skeleton):
+
+```markdown
+# Open Items — Living Ledger
+
+This is the consolidated, repo-wide ledger of unresolved work synced from every
+artefact's local `## Open Items` section. It is the operational system of record
+described in §5 of `rules/open-items-governance.md`.
+
+The ledger is **not** a product artefact — no frontmatter, no review cadence.
+See `README.md` for purpose, lifecycle, and operator guidance.
+
+---
+
+## How rows arrive here
+
+1. A skill emits an open item into the source artefact's `## Open Items` section.
+2. `util-open-items sync` reads the local section, deduplicates, assigns `OI-NNNN`,
+   and writes the row here — extended with `Source artefact` (relative repo path).
+
+---
+
+## Live items
+
+| OI-ID | Type | Summary | Source artefact | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref |
+| :---- | :--- | :------ | :-------------- | :------------ | :------------- | :-------------- | :------- | :----- | :---- | :---------------- | :---------- |
+
+_None at present._ The ledger initialises empty; the first sync from any artefact
+will populate it.
+
+---
+
+## Status snapshot
+
+_No snapshot yet — the ledger has not received its first sync._
+
+---
+
+## See also
+
+- `README.md` — operator guidance for this folder.
+- `rules/open-items-governance.md` — canonical schema, taxonomy, lifecycle.
+- `util-open-items/SKILL.md` — ledger CRUD operating manual.
+```
+
+**`project-control/open-items/README.md`** — operator orientation. Copy the content of
+the existing `project-control/open-items/README.md` in the kit as-is — it is
+project-agnostic and applies verbatim to any project scaffolded with this skill.
+
+**Safety rules:**
+- If `project-control/open-items/open-items.md` already exists (non-empty repo): skip
+  creation entirely and report "control plane already present".
+- Never overwrite an existing non-empty ledger.
+
+---
+
+## `.gitignore` check
+
+Run at the end of Mode 1 (step 5). If `var/reports/` is not in `.gitignore`:
+
+1. Surface in the closing report: "⚠️ `var/reports/` is not in `.gitignore`. Generated
+   audit and migration reports should not be committed. Add to `.gitignore`:"
+   ```
+   var/reports/
+   ```
+2. Do NOT automatically modify `.gitignore` — the user may have a reason for tracking
+   reports (e.g. in a shared team context). Surface it as a suggestion, not an auto-fix.
 
 ---
 
@@ -247,13 +368,19 @@ Mirrors the wire-mode pattern from `business-vision`.
 
 ## Closing report to the user
 
-After any mode, summarise in 3–5 lines:
+After any mode, summarise in 5–7 lines:
 
 1. **Mode run** + **variant** + **docs root**.
 2. **Folders created** (N new) / **already existed** (N skipped).
-3. **INDEX.md** — written / refreshed / skipped; current status breakdown (✅ N / 🔄 N / ⬜ N).
-4. **CLAUDE.md** — updated / created / skipped / already wired.
-5. **Next step** — which skill to invoke to begin documentation work (based on variant and INDEX.md status).
+3. **Project-control plane** — created / already present / skipped (strategy-only or single-feature).
+4. **INDEX.md** — written / refreshed / skipped; current status breakdown (✅ N / 🔄 N / ⬜ N).
+5. **CLAUDE.md** — updated / created / skipped / already wired.
+6. **`.gitignore`** — `var/reports/` present ✅ or missing ⚠️ (suggest the one-liner to add).
+7. **Next step** — variant-specific first skill to invoke:
+   - Greenfield → `business-vision` Mode 1 (scaffold) then Mode 2 (fill) then Mode 3 (wire)
+   - Brownfield → `business-capability-map` Mode 1 (scaffold) then Mode 2 (structure)
+   - Strategy-only → `business-vision` Mode 1+2 or `business-model-canvas` Mode 1
+   - Single-feature → `spec-idea` (if feature not yet committed) or `spec-prd` Mode 1
 
 ---
 
@@ -261,6 +388,7 @@ After any mode, summarise in 3–5 lines:
 
 - **`references/folder-catalogue.md`** — complete folder list per variant with `mkdir -p` commands.
 - **`references/index-template.md`** — INDEX.md skeleton and per-step status detection bash commands.
+- **`references/methodology-references.md`** — rationale for variant model, `.gitkeep` discipline, project-control scope, and `.gitignore` policy.
 
 ---
 
@@ -269,12 +397,15 @@ After any mode, summarise in 3–5 lines:
 Before declaring the work done:
 
 - [ ] Step 0 answered (Mode 1) or mode detected from context.
+- [ ] Pre-flight check run: docs root inspected for existing markdown files; user confirmed before proceeding if content was found.
 - [ ] Variant confirmed — folder list selected from `references/folder-catalogue.md`.
 - [ ] All variant-appropriate folders created (`mkdir -p`).
 - [ ] `.gitkeep` placed in every empty leaf folder.
-- [ ] `docs/INDEX.md` written (Modes 1 + 3) or skipped with acknowledgement (Mode 2).
+- [ ] Project-control plane created (greenfield/brownfield) or skipped with acknowledgement (strategy-only/single-feature/already exists).
+- [ ] `.gitignore` checked; result surfaced in closing report.
+- [ ] `docs/INDEX.md` written (Modes 1 + 3) with `last_reviewed` set to today, or skipped with acknowledgement (Mode 2).
 - [ ] `docs/INDEX.md` contains a row for every canonical step (not only those for the chosen variant).
 - [ ] `docs/INDEX.md` frontmatter present (5 fields per `rules/artefact-frontmatter.md`).
 - [ ] CLAUDE.md updated / created (Mode 1 with option 3A) or skipped with acknowledgement.
-- [ ] No artefact content files created — folders + `.gitkeep` + INDEX.md only.
-- [ ] Closing report delivered with next-step recommendation.
+- [ ] No artefact content files created — folders + `.gitkeep` + INDEX.md + control-plane stubs only.
+- [ ] Closing report delivered with variant-specific next-step recommendation.
