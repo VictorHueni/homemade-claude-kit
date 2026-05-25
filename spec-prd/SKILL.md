@@ -361,6 +361,38 @@ access, make the edits directly and commit the FBS alongside the PRD.
 
 ---
 
+## Step 5: Sync Open Items to the central ledger
+
+After the PRD is saved, chain to the `util-open-items` skill to sync rows from
+§9 `## Open Items` into the central living ledger at
+`project-control/open-items/open-items.md`.
+
+- **Local first, ledger second.** §9 is the PRD's authoring surface; the
+  ledger at `project-control/open-items/` is the consolidated read-out across
+  the repo. Always populate §9 first — each row carries `Source anchor` +
+  `Source heading` pointing back to the originating PRD section (e.g.
+  `#us-003` + "US-003 Partner authentication" for items surfaced from a user
+  story; `#open-items` + `_central-only_` for PRD-wide items) — then invoke
+  sync.
+- **Sync preserves provenance.** `util-open-items` carries `Source anchor`
+  and `Source heading` forward unchanged so each ledger row navigates back
+  into the originating PRD section, surviving heading edits and anchor
+  renames (per `rules/open-items-governance.md` §4 + §5).
+- **Sync mints canonical IDs.** Local PRD-scoped `OI-NNN` IDs are reassigned
+  to ledger-canonical `OI-NNNN` on first sync; the PRD §9 row is updated in
+  place with the ledger ID.
+- **Skip when empty.** If §9 reads `_None at present._`, do not invoke the
+  sync — there is nothing to consolidate. The PRD §8 Open Questions narrative
+  is discussion-only and never syncs.
+- **Re-sync on edits.** Any subsequent edit to §9 (status changes, owners
+  added, rows closed with a Tracker ref) should re-invoke sync so the ledger
+  stays in step with the PRD.
+
+Invoke as: "Sync open items for `docs/product-specs/prds/prd-NNNN-{feature}.md`
+via the util-open-items skill in sync mode."
+
+---
+
 ## Output
 
 - **Format:** Markdown (`.md`)

@@ -290,6 +290,20 @@ Three files in `references/` carry the canonical content. Read them when needed:
 
 ---
 
+## Sync Open Items to the central ledger
+
+After the research note is created or updated, chain to the `util-open-items` skill to sync rows from the document-level `## Open Items` section into the central living ledger at `project-control/open-items/open-items.md`.
+
+- **Local first, ledger second.** The research note's own `## Open Items` table is the authoring surface; the ledger at `project-control/open-items/` is the consolidated read-out across the repo. Always populate the local section first (with per-Q `Source anchor = #qN` + `Source heading = "Qn — restated question"`), then invoke sync.
+- **Sync preserves provenance.** `util-open-items` carries `Source anchor` and `Source heading` forward unchanged so each ledger row navigates back into the originating question of this research note, surviving heading edits and anchor renames (per `rules/open-items-governance.md` §4 + §5).
+- **Sync mints canonical IDs.** Local placeholder `OI-NNN` IDs are reassigned to ledger-canonical `OI-NNNN` on first sync; subsequent updates retain the ledger ID.
+- **Skip when empty.** If §Open Items reads `_None at present._`, do not invoke the sync — there is nothing to consolidate.
+- **Mode coverage.** Run sync after Mode 2 Fill (new gaps surface), Mode 3 Refresh (some rows may resolve or new doc-gaps appear when sources rot), and Mode 4 Freeze (terminal-state rows reach `closed`). Mode 1 Scaffold has no open items yet, so sync is skipped.
+
+Invoke as: "Sync open items for `docs/architecture/research/{NNNN}-{slug}.md` via the util-open-items skill in sync mode."
+
+---
+
 ## Closing report to the user
 
 After running any mode, summarise in 5–7 lines:
