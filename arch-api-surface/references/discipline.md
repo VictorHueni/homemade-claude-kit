@@ -210,7 +210,7 @@ Every endpoint that returns an array of items — no exceptions — must return 
 - Adding a new optional field to a response body
 - Adding a new optional request query parameter
 - Adding a new endpoint (new path + method combination)
-- Adding a new IFX-NN entry
+- Adding a new CTR-NN entry
 - Adding a new error `code` to the catalogue
 - Adding a new event type (new CloudEvents `type` string)
 - Adding optional fields to an event payload `data`
@@ -274,7 +274,7 @@ Events are immutable contracts. To change a published event schema:
 
 ## Security surface checklist
 
-For every IFX-NN entry, verify and document:
+For every CTR-NN entry, verify and document:
 
 - [ ] **Authentication mechanism** named: Bearer JWT / API key / mTLS / OAuth 2.0 client credentials / none
 - [ ] **For JWT**: issuer URL, JWKS endpoint, and required claims documented
@@ -290,19 +290,19 @@ For every IFX-NN entry, verify and document:
 
 ## Quality checks
 
-Run these before closing any mode. Report failures as a table with: check name, IFX-NN, severity (critical / major / minor), proposed fix.
+Run these before closing any mode. Report failures as a table with: check name, CTR-NN, severity (critical / major / minor), proposed fix.
 
 | Check | How to verify |
 |---|---|
-| Every IFX-NN maps to a domain concept | Cross-reference IFX-NN list against BC-NN.AGG/ENT/EVT; flag any with no domain model backing |
+| Every CTR-NN maps to a domain concept | Cross-reference CTR-NN list against BC-NN.AGG/ENT/EVT; flag any with no domain model backing |
 | No verb in REST paths (except /actions/) | Scan path segments for: get, create, update, delete, list, fetch, remove, search |
 | Pagination envelope on all collection endpoints | Every GET endpoint returning an array has the `data` + `pagination` wrapper |
 | Error contract is a single unified schema | Only one error format in §3; no per-endpoint custom error shapes |
 | Versioning policy present with breaking change definition | §4 non-empty; breaking vs non-breaking distinction present |
-| Security surface non-empty; auth stated per IFX-NN | §5 non-empty; auth column filled for every IFX-NN entry in the operations table |
-| All async events map to BC-NN.EVT-NN | Cross-reference IFX-NN async list against domain model events |
+| Security surface non-empty; auth stated per CTR-NN | §5 non-empty; auth column filled for every CTR-NN entry in the operations table |
+| All async events map to BC-NN.EVT-NN | Cross-reference CTR-NN async list against domain model events |
 | Event names are past tense and business-meaningful | Manual check: does the name state what happened? Is it past tense? |
 | CloudEvents envelope fields present per event | `specversion`, `id`, `source`, `type`, `time`, `datacontenttype`, `data` |
 | No implementation details in contract | Scan for: column, table, schema, controller, model, orm, database, repo, entity (ORM sense) |
-| IFX-NN IDs are monotonic, zero-padded, no gaps | List all; verify consecutive; flag any skip |
+| CTR-NN IDs are monotonic, zero-padded, no gaps | List all; verify consecutive; flag any skip |
 | All collection responses use cursor pagination | No `?page=N&per_page=M` offset pagination unless explicitly documented as intentional |

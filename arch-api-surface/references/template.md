@@ -41,13 +41,13 @@ review_interval: 180d
 
 ### Resource catalogue
 
-| IFX-NN | Resource name | Base path | Domain concept | Status |
+| CTR-NN | Resource name | Base path | Domain concept | Status |
 |---|---|---|---|---|
-| {{BC-NN}}.IFX-01 | _TODO_ | `/v1/_TODO_` | [AGG-NN _TODO_](../../domain/07b-models/{{bc-slug}}.md#agg-01) | draft |
+| {{BC-NN}}.CTR-01 | _TODO_ | `/v1/_TODO_` | [AGG-NN _TODO_](../../domain/07b-models/{{bc-slug}}.md#agg-01) | draft |
 
 ---
 
-### {{BC-NN}}.IFX-01 · [Resource name]
+### {{BC-NN}}.CTR-01 · [Resource name]
 
 **Domain concept:** [{{BC-NN}}.AGG-NN · Aggregate name](../../domain/07b-models/{{bc-slug}}.md#agg-01)
 **Base path:** `/v1/{resource-plural}`
@@ -123,7 +123,7 @@ All errors use the §3 Error contract format.
 
 *Use `POST /v1/{resource-plural}/{id}/actions/{verb}` for domain commands that do not map cleanly to a standard method.*
 
-| IFX-NN | Path | Domain command | Description | Auth |
+| CTR-NN | Path | Domain command | Description | Auth |
 |---|---|---|---|---|
 | _TODO_ | `POST /v1/_TODO_/{id}/actions/_TODO_` | _TODO_ | _TODO_ | _TODO_ |
 
@@ -137,13 +137,13 @@ All errors use the §3 Error contract format.
 
 Events this BC publishes when its internal state changes. Consumers subscribe; this BC has no knowledge of specific consumer identities.
 
-| IFX-NN | Domain event | CloudEvents `type` | Channel / Topic | Schema version | Known consumers |
+| CTR-NN | Domain event | CloudEvents `type` | Channel / Topic | Schema version | Known consumers |
 |---|---|---|---|---|---|
-| {{BC-NN}}.IFX-XX | [{{BC-NN}}.EVT-NN _TODO_](../../domain/07b-models/{{bc-slug}}.md#evt-01) | `com.{org}.{{bc-slug}}._TODO_` | `_TODO_` | v1 | _TODO_ |
+| {{BC-NN}}.CTR-XX | [{{BC-NN}}.EVT-NN _TODO_](../../domain/07b-models/{{bc-slug}}.md#evt-01) | `com.{org}.{{bc-slug}}._TODO_` | `_TODO_` | v1 | _TODO_ |
 
 ---
 
-#### {{BC-NN}}.IFX-XX · [EventName]
+#### {{BC-NN}}.CTR-XX · [EventName]
 
 **Domain event:** [{{BC-NN}}.EVT-NN · EventName](../../domain/07b-models/{{bc-slug}}.md#evt-01)
 **CloudEvents `type`:** `com.{org}.{{bc-slug}}.EventName`
@@ -182,7 +182,7 @@ Events this BC publishes when its internal state changes. Consumers subscribe; t
 
 Messages or events this BC subscribes to from external producers.
 
-| IFX-NN | Source BC or system | CloudEvents `type` | Channel / Topic | Handler description |
+| CTR-NN | Source BC or system | CloudEvents `type` | Channel / Topic | Handler description |
 |---|---|---|---|---|
 | _TODO_ | _TODO_ | _TODO_ | `_TODO_` | _TODO_ |
 
@@ -273,7 +273,7 @@ All synchronous API errors use **RFC 7807 Problem Details** (`Content-Type: appl
 **Token issuer / JWKS endpoint:** _TODO_
 **Rate limit:** _TODO_ requests per minute per token
 
-| IFX-NN | Operation | Auth required | Scope / Role |
+| CTR-NN | Operation | Auth required | Scope / Role |
 |---|---|---|---|
 | _TODO_ | `_TODO_ /v1/_TODO_` | yes / no | _TODO_ |
 
