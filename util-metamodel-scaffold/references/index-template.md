@@ -142,7 +142,7 @@ Status key: ✅ Done · 🔄 In progress (scaffold exists, needs filling) · ⬜
 | 8 | Delivery Roadmap | `spec-delivery-roadmap` | {S8} | [`docs/product-specs/08a-delivery-roadmap.md`](product-specs/08a-delivery-roadmap.md) | {age} |
 | 9 | Quality Attributes | `spec-quality-attributes` | {S9} | [`docs/product-specs/09a-quality-attributes.md`](product-specs/09a-quality-attributes.md) | {age} |
 | 10 | PRDs | `spec-prd` | {S10} | [`docs/product-specs/prds/`](product-specs/prds/) | {age} |
-| 11 | Implementation Plans | `spec-implementation-plan` | {S11} | [`docs/exec-plans/active/`](../exec-plans/active/) | {age} |
+| 11 | Implementation Plans | `spec-implementation-plan` | {S11} | [`docs/exec-plans/active/`](exec-plans/active/) | {age} |
 
 **Summary:** ✅ {N_done} / 🔄 {N_progress} / ⬜ {N_not_started} of 16 artefact steps
 
@@ -194,5 +194,4 @@ Status key: ✅ Done · 🔄 In progress (scaffold exists, needs filling) · ⬜
 | `QA-XXNN` | Quality Attribute | `09a-quality-attributes.md` |
 | `PRD-NNNN` | PRD | `prds/prd-NNNN-{slug}.md` |
 | `ADR-NNNN` | Architecture Decision | `architecture/decisions/adr-NNNN-{slug}.md` |
-```
 ```
