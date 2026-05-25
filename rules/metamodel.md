@@ -581,6 +581,37 @@ docs/
 
 ---
 
+## Open Items governance (cross-cutting)
+
+Every artefact in the stack can carry unresolved work — research questions, missing
+decisions, follow-up items, deferred refactors. The canonical contract for capturing,
+classifying, syncing, and auditing that work lives in
+[`rules/open-items-governance.md`](./open-items-governance.md). It is mandatory for any
+skill whose output may emit unresolved work.
+
+Summary of the contract (full details in the dedicated rule):
+
+- **Single section:** each artefact exposes one **document-level** `## Open Items` section.
+  No nested `### Open Items` subsections, no legacy variants (`Open / TODO`, `Open
+  questions remaining`, `§Open Issues`).
+- **Item taxonomy:** every row is one of `doc-gap`, `decision-gap`, `execution-item`,
+  `tech-debt`. Inline `_TODO_` scaffold placeholders are explicitly **not** open items.
+- **Provenance:** rows that originate in a sub-section of the artefact carry both a
+  `Source anchor` (short fragment identifier like `#q3`) and a `Source heading` (the full
+  human-readable heading text). The pair survives anchor renames and heading edits.
+- **Central control plane:** the consolidated living ledger is
+  `project-control/open-items/` — deliberately outside `docs/` because it is an
+  operational system of record, not a product artefact. Product backlog (PRDs, FBS, epics)
+  remains separate.
+- **Tooling boundaries:** `util-docs-audit` stays generic. `util-open-items` performs
+  ledger CRUD. `util-metamodel-audit` is report-only and verifies governance drift.
+
+When a new skill produces or governs unresolved work, conform to §8 of
+`rules/open-items-governance.md` (Skill conformance checklist) — canonical heading, schema,
+provenance, sync chaining.
+
+---
+
 ## How Claude should use this rule
 
 When the user invokes documentation work on a project:
