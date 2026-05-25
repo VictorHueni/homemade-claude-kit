@@ -24,7 +24,7 @@ Principles:
 6. Normalize schema and lifecycle rules across artefacts without exceptions in section placement.
 
 **Overall Status:** in-progress
-**Current Increment:** 01 — Define the Open Items Contract
+**Current Increment:** 03 — Normalize Existing Artefact Templates With Real Open-Item Sections
 
 ## Increment Plan
 
@@ -57,7 +57,7 @@ Exit criteria:
 
 ### Increment 02: Scaffold the Central Control Plane
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -286,7 +286,7 @@ Exit criteria:
 
 | Milestone | Increments | Status | Coherent Outcome | Standalone Test Gate | Exit Criteria | Commit Guidance |
 | :------------- | :------------ | :------ | :--------------- | :--------------------- | :----------------- | :-------------- |
-| M1: Contract and Control Plane | 01-02 | in-progress | Canonical open-items rules exist and a central ledger is scaffolded | `rg -n "Open Items|project-control/open-items" rules/open-items-governance.md rules/metamodel.md project-control/open-items/README.md project-control/open-items/open-items.md` | Governance contract and live ledger both exist | `docs(governance): define open-items contract and control plane` |
+| M1: Contract and Control Plane | 01-02 | done | Canonical open-items rules exist and a central ledger is scaffolded | `rg -n "Open Items|project-control/open-items" rules/open-items-governance.md rules/metamodel.md project-control/open-items/README.md project-control/open-items/open-items.md` | Governance contract and live ledger both exist | `docs(governance): define open-items contract and control plane` |
 | M2: Artefact Normalization | 03-04 | pending | Existing templates and discipline docs use one unresolved-work vocabulary and one canonical document-level schema | `rg -n "^## Open Items" arch-research business-process business-research business-workshop business-model-canvas business-capability-map business-value-stream spec-functional-breakdown-structure spec-prd` | No stale `Open Issues` wording remains in targeted artefacts, normalized sections preserve tracker provenance, and `business-process` no longer scaffolds placeholder-only rows | `docs(skills): normalize open-items sections across artefacts` |
 | M3: Ledger Automation | 05-06 | pending | Dedicated maintenance skill exists and relevant artefact skills chain to it | `rg -n "util-open-items|Sync Open Items|project-control/open-items/open-items.md" util-open-items arch-research business-process business-research business-workshop spec-prd spec-implementation-plan ops-runbook` | Central sync behavior is documented and reusable | `feat(skills): add open-items tracker and chaining flow` |
 | M4: Audit and Pilot | 07-08 | pending | Stack audit covers governance drift and docs audit boundaries stay clean | `rg -n "tracker sync|schema compliance|closure drift|util-open-items|not a stack-governance tracker" util-metamodel-audit util-docs-audit` | Governance can be audited end-to-end without blurring tool responsibilities | `feat(audit): add open-items governance checks and rollout guardrails` |
