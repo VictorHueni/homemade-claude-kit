@@ -12,7 +12,7 @@ metadata:
 
 # Stack Audit
 
-You are an expert at auditing strategic-architecture documentation stacks — systematically checking that the 11-step artefact stack (personas → implementation plans) is complete, internally consistent, and free of broken links, stale content, or dependency violations.
+You are an expert at auditing strategic-architecture documentation stacks — systematically checking that the 17-artefact stack (personas → implementation plans, including interface contracts) is complete, internally consistent, and free of broken links, stale content, or dependency violations.
 
 The artifact produced by this skill is **a markdown report** at `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md`. It is NOT a design artefact, NOT a code review, NOT a living document — it is a **point-in-time health snapshot** of the documentation stack, with one finding per row and a proposed fix per finding.
 
@@ -42,6 +42,7 @@ A report is good when a reader can answer, without ambiguity:
 | **Which research synthesis updates were never applied upstream?** | §14 Research sync findings |
 | **Which ADR supersession chains are broken?** | §15 ADR chain findings |
 | **What is the FBS + epic delivery status?** | §16 Delivery progress table |
+| **Which artefacts have missing or invalid frontmatter?** | §17 Frontmatter validity findings |
 | **Is open-items governance healthy across artefacts and the central ledger?** | §18 Open items governance — section + schema compliance, source-location provenance, tracker sync coverage, closure drift, stale items |
 
 ---
@@ -84,7 +85,7 @@ Ask the user the following 4 questions in a single message with lettered options
 If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
 
 **Process:**
-1. Run the bash detection patterns for each of the 16 check categories (see `references/check-catalogue.md`).
+1. Run the bash detection patterns for each of the 18 check categories (see `references/check-catalogue.md`).
 2. Collect all findings; tag each with severity (Error / Warning / Info).
 3. Build executive summary counts.
 4. Fill the report template (see `references/template.md`).
@@ -95,7 +96,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** quick "where are we in the build order?" check. No link, dependency, or freshness analysis.
 
 **Process:**
-1. For each of the 14 steps (including 2b, 2c, 7b), check whether the canonical output path exists.
+1. For each of the 15 steps (including 2b, 2c, 7b, 7c), check whether the canonical output path exists.
 2. For each existing file, retrieve last-modified date: `git log -1 --format="%ci" -- {file}`.
 3. Output a single table: `Step # | Artefact | Status | Path | Last modified | Age (days)`.
 4. Print to terminal. Save to file only if explicitly requested.
@@ -191,6 +192,7 @@ H1: Stack Audit — {project} — {YYYY-MM-DD}
 §14 Research sync           Synthesis file | Upstream artefact | Last modified | Proposed fix
 §15 ADR chains              ADR | Supersedes | Back-link present? | Proposed fix
 §16 Delivery progress       FBS: ✅ N / 🔄 N / ⬜ N | Epics with PRD: N / N total
+§17 Frontmatter validity    File | Missing / invalid field | Proposed fix
 §18 Open items governance   six sub-tables: 18a section compliance · 18b schema compliance · 18c source-location provenance · 18d tracker sync coverage · 18e closure drift · 18f stale open items
 
 Audit metadata
