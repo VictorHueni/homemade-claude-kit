@@ -60,6 +60,22 @@ what order, and where to put it**.
 ## Dependency graph (DAG)
 
 ```
+   ┌──────────────────────────────────────────────────────────────┐
+   │  DISCOVERY LAYER (pre-formal evidence · cross-cutting)       │
+   │                                                              │
+   │   discovery-idea       discovery-research    discovery-      │
+   │   (capture · refine    (1:1 interviews +     workshop        │
+   │    · graduate)          synthesis)           (group facil.)  │
+   │   Output: IDEA-NNNN    Output: interview/    Output: workshop│
+   │   graduates_to →       synthesis docs        + synthesis docs│
+   │                                                              │
+   │   Routing (see "Discovery routing" below the DAG):           │
+   │   • discovery-idea graduates_to → any downstream node        │
+   │   • discovery-research validates Assumed claims in any node  │
+   │   • discovery-workshop aligns stakeholders before any node   │
+   └────────────────────────────┬─────────────────────────────────┘
+                                │ feeds + validates
+                                ▼
    ┌──────────────────────────────────────────────────┐
    │  business-vision (Step 0)                        │
    │  (why — the north star)                          │
@@ -164,6 +180,33 @@ what order, and where to put it**.
    └──────────────────────┘
 ```
 
+### Discovery routing — where the discovery layer feeds the DAG
+
+The three `discovery-*` skills are cross-cutting and not drawn as individual arrows above to keep the main DAG readable. Their routing is enumerated here.
+
+**`discovery-idea` graduation targets** (set per idea via `graduates_to:`):
+
+| Idea graduates to | Becomes | Pre-flight check |
+|---|---|---|
+| `business-persona` | `P-NN` | `01a-personas.md` exists |
+| `business-objective` | `OBJ-NN` (+ `KR-NN.M`) | `04b-objectives.md` exists (scaffold if not) |
+| `business-model-canvas` | new BMC block entry (`VP-NN`, `CS-NN`, …) | canvas file exists |
+| `business-process` | new `proc-NN-{slug}.md` | parent `VS-N.M` stage exists |
+| `arch-research` | `Research-NNNN` | no prerequisite |
+| `arch-adr` | `ADR-NNNN` | architectural choice still open |
+| `spec-functional-breakdown-structure` | new `C-N.M.FXX` row | parent capability `C-N.M` exists |
+| `spec-prd` | `PRD-NNNN` | an `E-NN` epic exists in the delivery roadmap |
+
+**`discovery-research` validation targets** (any artefact carrying `Assumed` confidence rows):
+
+- `business-persona` (Tier-1 proto-personas) · `business-model-canvas` blocks · `business-value-stream` pain indices · `business-quantitative-model` inputs · `business-objective` Key Result baselines
+
+**`discovery-workshop` alignment targets** (any artefact requiring group consensus before lock-in):
+
+- `business-vision` (north-star alignment) · `business-model-canvas` (BMC/Lean co-creation) · `business-value-stream` (journey mapping) · `business-capability-map` (L0 axis agreement) · `business-objective` (OKR setting) · `domain-bounded-context` (Event Storming → BC boundaries)
+
+The discovery layer never **mints** the downstream artefact itself — it produces evidence (interview synth, workshop output) or a graduation pointer (ideation), which the downstream skill consumes during its Mode 2 fill pass.
+
 ### Entity-relationship view
 
 The ER diagram shows which ID each artefact **mints** (PK) and which upstream IDs it **consumes** (FK) as cross-references — treating the documentation system as a data model.
@@ -231,6 +274,11 @@ erDiagram
         string Plan_NNNN PK
         string PRD_NNNN FK
     }
+    IDEA {
+        string IDEA_NNNN PK
+        string graduates_to FK
+        string target_id FK
+    }
 
     PERSONA ||--o{ VALUE_STREAM : "triggers"
     PERSONA ||--o{ BMC : "Customer Segments"
@@ -257,6 +305,13 @@ erDiagram
     EPIC ||--|| PRD : "one PRD per epic"
     QUALITY_ATTRIBUTES ||--o{ PRD : "QA-XXNN in acceptance criteria"
     PRD ||--|| IMPLEMENTATION_PLAN : "one plan per PRD"
+    IDEA }o--o| PERSONA : "graduates_to"
+    IDEA }o--o| OBJECTIVE : "graduates_to"
+    IDEA }o--o| BMC : "graduates_to (new block entry)"
+    IDEA }o--o| BUSINESS_PROCESS : "graduates_to"
+    IDEA }o--o| ADR : "graduates_to"
+    IDEA }o--o| FBS : "graduates_to (new C-N.M.FXX row)"
+    IDEA }o--o| PRD : "graduates_to"
 ```
 
 **Hard rules of the graph:**
@@ -264,6 +319,7 @@ erDiagram
 - **No cycles.** B never feeds back into A.
 - The capability map (BC Map) is the **hub** — most other artefacts soft-link to it by `C-N.M` ID.
 - ADRs are **not in the linear chain** but must precede Step 9 (Quality Attributes) and Step 10 (PRDs) when their decisions affect those artefacts.
+- `IDEA` is **upstream of everything** and **mints no downstream FK on the target** — the relationship is one-way: an idea graduates into a target artefact and stores the target's ID in `IDEA.target_id`. The target does **not** carry an `IDEA_NNNN` FK column; it back-references the originating idea by ID in its body text (e.g., PRD §0 traceability block), not as a structural foreign key. The cardinality is `}o--o|` (each idea graduates to 0..1 target; each target may originate from 0..1 ideas).
 
 ---
 
