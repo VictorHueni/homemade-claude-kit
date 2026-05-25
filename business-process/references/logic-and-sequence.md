@@ -84,11 +84,11 @@ Adapt to process type per the SKILL.md "Common KPI patterns" guidance.
 
 **Source-quality stars:** use the same ★★★★★ → ★ scale from the business-quantitative-model skill for consistency across the docs lifecycle.
 
-### §11 — Open TODOs
+### §11 — Open Items
 
-**Why:** consolidates the inline `_TODO_` markers from across the doc into one trackable place. Each TODO has a resolution path (what specific action resolves it) and a priority (🔴 blocking, 🟡 important, 🟢 nice-to-have).
+**Why:** the document-level canonical Open Items section per [`rules/open-items-governance.md`](../../rules/open-items-governance.md) §1. Captures only **actionable unresolved work** for the process: `doc-gap` / `decision-gap` / `execution-item` / `tech-debt`. Each row uses the canonical schema (OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref).
 
-**Discipline:** when you finish the scaffold, every `_TODO_` in the body should have a corresponding row in §11. If a TODO isn't in §11, it'll be forgotten.
+**Discipline:** inline `_TODO_` markers in the body are scaffold debt, NOT open items. Do not mirror them into §11. Empty is acceptable — `_None at present._` is the correct initial state when no actionable unresolved work exists yet. Skills MAY append a `§` column AFTER `Tracker ref` for intra-doc navigation; canonical columns must not be reordered or removed.
 
 ### Changelog
 
@@ -108,7 +108,7 @@ Follow this order when populating a new process doc. The order matters — each 
 6. **§6 Activities** — write the step-by-step walkthrough per actor. This will likely surface gaps that send you back to §3, §4, §5 to update.
 7. **§0 Master flow** — write the master Mermaid diagram LAST among the descriptive sections. The master diagram should reflect the §6 detail; if you draw it first, you'll constrain §6 to fit your premature picture.
 8. **§7 Decision points + §8 KPIs + §9 Pain points** — these layer over §6. §7 names the rules behind the decisions in §6 sequence diagrams. §8 names what to measure to know §6 is healthy. §9 names what hurts.
-9. **§10 Sources + §11 TODOs + Changelog** — close the doc with provenance. §10 is the source ladder; §11 consolidates inline `_TODO_` markers; Changelog records that this is v1.
+9. **§10 Sources + §11 Open Items + Changelog** — close the doc with provenance. §10 is the source ladder; §11 captures actionable unresolved work per the canonical Open Items schema (NOT a dumping ground for inline `_TODO_` placeholders — those are scaffold debt and stay inline); Changelog records that this is v1.
 
 **One common pitfall:** writing §6 before §3+§4+§5. You'll end up with vague activity descriptions ("the system sends the form to the insurer") because you haven't precisely defined "the system", "the form", or "the insurer". Define your nouns first.
 

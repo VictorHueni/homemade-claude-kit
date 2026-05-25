@@ -287,4 +287,6 @@ Non-negotiable:
 
 If the user pushes to violate any of these, push back once with the source
 (TOGAF / Cutter). If they insist, ship the doc with the violation flagged
-in the §Open Issues / Changelog so a future reviewer sees the compromise.
+in the §Open Items / Changelog so a future reviewer sees the compromise.
+(`Open Items` follows the canonical schema in
+[`rules/open-items-governance.md`](../../rules/open-items-governance.md).)

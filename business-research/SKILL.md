@@ -1,6 +1,6 @@
 ---
 name: business-research
-description: "Create hypothesis-anchored interview scripts + research synthesis docs for validating BIZBOK Business Architecture artefacts (personas, value streams, BMC blocks, competitive landscape claims). Synthesises BABOK §10.25 Interviews + Steve Portigal *Interviewing Users* + Erika Hall *Just Enough Research* + NN/g semi-structured guidance + Tomer Sharon assumption-testing. Use when the user asks to plan an interview, write an interview script, plan customer-discovery research, validate persona assumptions, synthesise interview findings, plan a research wave, or unblock open hypotheses in upstream artefacts. Triggers on: interview script, customer interview, user research, research plan, validate persona, synthesize interview findings, customer discovery, primary research, semi-structured interview, research wave. Domain-agnostic. Companion to design skills (business-persona, business-model-canvas, business-competitive-landscape) — produces the reality-check artefacts those skills assume but don't scaffold. NOT a workshop facilitator (use business-workshop for group sessions)."
+description: "Create hypothesis-anchored interview scripts, research plans, and synthesis docs that validate upstream business-architecture artefacts such as personas, value streams, BMC blocks, and competitive claims. Use when the user asks to plan an interview, write an interview script, run customer-discovery research, validate persona assumptions, synthesize findings, plan a research wave, or unblock open hypotheses in existing docs. Triggers on: interview script, customer interview, user research, research plan, validate persona, synthesize interview findings, customer discovery, primary research, semi-structured interview, research wave. Domain-agnostic. Not for group facilitation; use `business-workshop` for workshops."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -121,7 +121,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
      - BMC blocks: which blocks promote from `Assumed` to `Tested` (or get demoted)
      - Model assumptions: which inputs recalibrate (e.g., recovery rate 50% → 65%)
      - Competitive landscape: which competitor claims gain evidence
-   - **Open questions remaining** — what wasn't answered; what next research wave is needed
+   - **Open Items** (document-level canonical section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4) — actionable unresolved work surfaced by the wave: what wasn't answered (next-wave research), decisions deferred, follow-up execution items. Each row carries `Source anchor` + `Source heading` pointing into the synthesis (e.g. Per-hypothesis verdict, Theme cluster N). Empty is acceptable — `_None at present._` is correct if nothing actionable remains. Do NOT scaffold placeholder rows. Schema: OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref.
    - **Confidence summary** — count of claims now Validated vs Tested vs still Assumed
 
 ### Mode 4 — Research plan (optional)
@@ -274,6 +274,20 @@ Three files in `references/`:
 - **`references/template.md`** — interview-script + synthesis + research-plan templates
 - **`references/methodology-references.md`** — canonical bibliography (BABOK §10.25, Portigal, Hall, NN/g, Sharon). **Kit-only.**
 - **`references/interview-techniques.md`** — discipline patterns + sample-size + consent + failure modes. Internal Claude guidance.
+
+---
+
+## Sync Open Items to the central ledger
+
+After a synthesis or research-plan file is created or updated, chain to the `util-open-items` skill to sync rows from the document-level `## Open Items` section into the central living ledger at `project-control/open-items/open-items.md`.
+
+- **Local first, ledger second.** The synthesis or plan's own `## Open Items` table is the authoring surface; the ledger at `project-control/open-items/` is the consolidated read-out across the repo. Always populate the local section first (rows carry `Source anchor` + `Source heading` pointing back into the originating sub-section of the synthesis — Per-hypothesis verdict, Theme cluster, Per-artefact updates needed, etc.), then invoke sync.
+- **Sync preserves provenance.** `util-open-items` carries `Source anchor` and `Source heading` forward unchanged so each ledger row navigates back into the originating synthesis section, surviving heading edits and anchor renames (per `rules/open-items-governance.md` §4 + §5).
+- **Sync mints canonical IDs.** Local placeholder `OI-NNN` IDs are reassigned to ledger-canonical `OI-NNNN` on first sync.
+- **Skip when empty.** If §Open Items reads `_None at present._`, do not invoke the sync — there is nothing to consolidate.
+- **Mode coverage.** Run sync after Mode 3 Synthesise (the primary mode that surfaces unresolved next-wave research, deferred decisions, and execution items) and Mode 4 Research plan (when planning surfaces hypotheses that require ADRs or process work to close). Mode 1 Scaffold and Mode 2 Create interview script do not author open items, so sync is skipped.
+
+Invoke as: "Sync open items for `docs/business/research/{file}.md` via the util-open-items skill in sync mode."
 
 ---
 

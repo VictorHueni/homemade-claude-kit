@@ -218,6 +218,12 @@ Intro paragraph:
     - Soft-links (personas / value streams / processes / FBS row)
     §§§ L2 if applicable
 
+§Open Items
+  - Document-level canonical section per rules/open-items-governance.md §1
+  - Schema: OI-ID | Type | Summary | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref
+  - Source anchor = capability ID (e.g. `#c1`, `#c12`); Source heading = full capability heading
+  - Initial state is `_None at present._` — do NOT scaffold placeholder rows just to fill the section
+
 Changelog
 ```
 

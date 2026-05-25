@@ -142,6 +142,19 @@ metadata:
 ---
 ```
 
+Codex agent loaders enforce a hard limit on the frontmatter `description`
+field: **1024 characters maximum**. If the description exceeds that limit, the
+skill may be skipped as invalid. Keep the description trigger-focused: what the
+skill does, when to use it, and a short `Triggers on:` phrase list. Move
+methodology detail, examples, and edge-case scope notes into the body or
+`references/` files instead of frontmatter.
+
+Validate before committing:
+
+```bash
+ruby -e 'require "yaml"; d = YAML.load_file("SKILL.md")["description"]; puts d.length; abort("description too long") if d.length > 1024'
+```
+
 ## Output artefact frontmatter (mandatory for all doc-producing skills)
 
 Every markdown file a skill writes under `docs/` must open with the standard

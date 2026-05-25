@@ -165,7 +165,7 @@ If you can't fill a section, that itself is a finding. Common patterns:
 | §4 Data Stores — can't name systems | The process is mostly informal / paper-based | Name the absence ("no canonical system; data lives in mailboxes + paper files") — that IS the finding |
 | §5 Data Objects — too many to enumerate | You're conflating the process's data model with its instance traffic | Enumerate object *types*, not instances |
 | §6 Activities — vague step descriptions | You skipped the §3+§4+§5 grounding | Go back to those sections; precisify the nouns first |
-| §7 Decision rules — no provenance | The rules are tribal knowledge | Add explicit `_TODO_` rows in §11 — the gap IS the finding |
-| §8 KPIs — current values all `_TODO_` | The process isn't being measured | Seed the KPI list anyway; the gap surfaces as §11 TODOs |
+| §7 Decision rules — no provenance | The rules are tribal knowledge | Add a `doc-gap` row in §11 §Open Items naming the missing source + resolution path — the gap IS the finding |
+| §8 KPIs — current values all `_TODO_` | The process isn't being measured | Seed the KPI list anyway; inline `_TODO_` placeholders are scaffold debt (audited by `util-metamodel-audit` Check 8), not §11 §Open Items rows — only add an §Open Items row when extracting the measurement is an actionable execution-item with a known resolution path |
 
-The doc is **complete-enough-to-ship** when every section has either substantive content or an explicit `_TODO_` with a resolution path in §11. A `_TODO_` with no resolution path is incomplete; a structural gap is incomplete; a clearly-marked unknown with a path forward is complete.
+The doc is **complete-enough-to-ship** when every section has either substantive content or an explicit inline `_TODO_` placeholder. Actionable unresolved work is captured in §11 §Open Items per the canonical schema (see [`rules/open-items-governance.md`](../../rules/open-items-governance.md)); a structural gap is incomplete; a clearly-marked unknown with a path forward is complete.

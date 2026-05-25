@@ -1,6 +1,6 @@
 ---
 name: business-workshop
-description: "Plan single-session or multi-session workshops that reality-check BIZBOK Business Architecture artefacts (personas, BMC, value streams, capability map, competitive landscape) via group facilitation. Synthesises Sam Kaner *Facilitator's Guide to Participatory Decision-Making* (Diamond of Participation) + Lipmanowicz & McCandless *Liberating Structures* (33 microstructures) + Strategyzer workshop kits + Jake Knapp *Sprint* (Design Sprint) + Priya Parker *The Art of Gathering* + IAF facilitator competencies. Use when the user asks to plan a workshop, design a workshop series, facilitate stakeholder alignment, run a BMC workshop, design a Design Sprint, plan a discovery workshop, synthesise workshop outputs. Triggers on: workshop, facilitation, workshop series, workshop guide, design sprint, alignment workshop, BMC workshop, discovery workshop, Liberating Structures, facilitator's guide. Domain-agnostic. Companion to design skills + business-research — produces the group reality-check artefacts. NOT a 1:1 interview tool (use business-research for individual interviews)."
+description: "Plan single-session or multi-session workshops that reality-check business-architecture artefacts such as personas, BMCs, value streams, capability maps, and competitive analyses through structured group facilitation. Use when the user asks to plan a workshop, design a workshop series, align stakeholders, run a BMC workshop, design a Design Sprint, plan a discovery workshop, or synthesize workshop outputs. Triggers on: workshop, facilitation, workshop series, workshop guide, design sprint, alignment workshop, BMC workshop, discovery workshop, Liberating Structures, facilitator's guide. Domain-agnostic. Not for 1:1 interviews; use `business-research` for individual research sessions."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -137,6 +137,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
    - **Follow-up commitments** (with owners + dates)
    - **Updates to upstream artefacts** (BMC blocks promoted, personas refined, value-stream stages added, etc.)
    - **What went well / what to change** for next workshop
+   - **Open Items** (document-level canonical section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4) — actionable unresolved work surfaced during the workshop: questions the room could not close, decisions deferred, follow-ups for the next wave. Each row carries `Source anchor` + `Source heading` pointing into the synthesis (Decisions made, Follow-up commitments, etc.). Empty is acceptable — `_None at present._` is correct if nothing actionable remains. Do NOT scaffold placeholder rows. Schema: OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref.
    - **Cross-link to series file** if applicable
 
 ---
@@ -286,6 +287,20 @@ Three files in `references/`:
 - **`references/template.md`** — workshop guide (single + series) + synthesis templates
 - **`references/methodology-references.md`** — canonical bibliography (Kaner, Liberating Structures, Strategyzer, Knapp, Parker, IAF). **Kit-only.**
 - **`references/liberating-structures.md`** — catalog of the 33 microstructures with when-to-use guidance. Internal Claude guidance for picking exercises.
+
+---
+
+## Sync Open Items to the central ledger
+
+After a workshop synthesis file is created or updated, chain to the `util-open-items` skill to sync rows from the document-level `## Open Items` section into the central living ledger at `project-control/open-items/open-items.md`.
+
+- **Local first, ledger second.** The synthesis's own `## Open Items` table is the authoring surface; the ledger at `project-control/open-items/` is the consolidated read-out across the repo. Always populate the local section first (rows carry `Source anchor` + `Source heading` pointing back into the originating sub-section of the synthesis — Decisions made, Follow-up commitments, Updates to upstream artefacts, etc.), then invoke sync.
+- **Sync preserves provenance.** `util-open-items` carries `Source anchor` and `Source heading` forward unchanged so each ledger row navigates back into the originating synthesis section, surviving heading edits and anchor renames (per `rules/open-items-governance.md` §4 + §5).
+- **Sync mints canonical IDs.** Local placeholder `OI-NNN` IDs are reassigned to ledger-canonical `OI-NNNN` on first sync.
+- **Skip when empty.** If §Open Items reads `_None at present._`, do not invoke the sync — there is nothing to consolidate.
+- **Mode coverage.** Run sync after Mode 4 Workshop synthesis (the only mode that authors open items). Mode 1 Scaffold, Mode 2 Plan a single workshop, and Mode 3 Plan a workshop series do not author actionable open items, so sync is skipped — open items emerge from what the room could not close, which is a post-session observation.
+
+Invoke as: "Sync open items for `docs/business/workshops/workshop-synthesis-{slug}-{date}.md` via the util-open-items skill in sync mode."
 
 ---
 
