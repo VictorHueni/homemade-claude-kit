@@ -1,0 +1,11 @@
+# Ralph Progress Log
+
+# Append one `## Iteration N` block per completed or blocked increment.
+# Expected format:
+# - Increment: XX — [Title]
+# - Status: done | blocked
+# - Files changed: [list]
+# - Test gate: passed | failed (retry M)
+# - Learnings: [any notable observations]
+# - Commit: [hash]
+# - Timestamp: [ISO 8601]
