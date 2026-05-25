@@ -5,26 +5,24 @@ design decisions.
 
 ---
 
-## Why variant-aware scaffolding?
+## Why always scaffold the full tree?
 
-Documentation structures that assume greenfield conditions in a brownfield context create
-immediate noise: empty personas folders, competitive landscape directories, and quantitative
-model targets that will never be populated cause the audit to flag every missing artefact
-as ⬜ Not started — including ones that are intentionally out of scope for the project type.
+An early design considered variant-aware scaffolding (greenfield / brownfield /
+strategy-only / single-feature), where each variant would create a different subset of
+folders. The variant model was dropped for two reasons:
 
-The four variants (Greenfield · Brownfield · Strategy-only · Single-feature) reflect the
-first-order distinctions in Scaled Agile (SAFe 6.0, §PI Planning · §Large Solution) between:
-- A product being built from scratch with full strategic documentation
-- An existing system being extended at the capability level
-- A strategy or investor engagement with no delivery commitment
-- A single feature or experiment with no full architecture work
+1. **Empty folders are free.** Git ignores empty directories until a file lands in them.
+   `util-metamodel-audit` checks for *files*, not *folders* — an empty
+   `docs/ops/runbooks/` on a single-feature project produces no audit findings and no
+   noise. The cost of having extra empty directories is exactly zero.
 
-Conway's Law (1968) adds a structural argument: the documentation shape should match the
-team's actual mandate. A single-feature team saddled with greenfield docs will abandon them;
-a greenfield team without the full structure will improvise their own — usually inconsistently.
+2. **Variant selection adds complexity with no payoff.** A four-way configuration
+   question, a promotion mechanism for growing projects, and four parallel folder lists
+   to maintain — all to avoid a handful of empty directories that nobody sees.
 
-**Source:** Conway, M.E. (1968). How do committees invent? *Datamation, 14*(4), 28–31.
-SAFe 6.0 Framework, Scaled Agile Inc. (2023).
+The simpler rule: one universal structure, every project, every time. Teams fill what
+they need and ignore the rest. This is the same principle as `git init` — it does not
+ask whether the project is small or large.
 
 ---
 
@@ -92,9 +90,7 @@ a stale INDEX.md misleading an agent into skipping a completed step is high.
 
 | Source | What it informs |
 |---|---|
-| Conway, M.E. (1968). *Datamation, 14*(4) | Variant model rationale |
-| SAFe 6.0 Framework, Scaled Agile Inc. (2023) | Greenfield / brownfield / single-feature distinctions |
-| Git documentation — gitignore(5) | `.gitkeep` convention |
+| Git documentation — gitignore(5) | `.gitkeep` convention and universal-tree rationale |
 | `util-open-items/SKILL.md` | Project-control scope boundary |
 | `rules/open-items-governance.md` | Control-plane initialisation requirements |
 | `util-metamodel-audit/references/methodology-references.md` | Report-only / suggest-only discipline |

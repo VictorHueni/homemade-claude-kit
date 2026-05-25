@@ -113,7 +113,6 @@ review_interval: 30d
 
 # Documentation Stack — {Project Name}
 
-> **Variant:** {Greenfield | Brownfield | Strategy-only | Single-feature} ·
 > **Scaffolded:** {YYYY-MM-DD} · **Last refreshed:** {YYYY-MM-DD}
 >
 > Run `util-metamodel-scaffold` Mode 3 to refresh status.

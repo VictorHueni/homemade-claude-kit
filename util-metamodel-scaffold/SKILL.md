@@ -1,6 +1,6 @@
 ---
 name: util-metamodel-scaffold
-description: "Initialise the canonical docs/ folder tree for a new project, generate a live INDEX.md navigation hub in docs/, and wire a stack pointer into CLAUDE.md. Variant-aware: greenfield (full tree), brownfield (start at capability map), strategy-only (business layer only), or single-feature (product-specs + exec-plans only). Triggers on: scaffold the docs, initialise the project, set up the docs folder, create the documentation structure, create the folder structure, init metamodel, build the doc tree, scaffold docs, start the documentation."
+description: "Initialise the canonical docs/ folder tree for a new project, generate a live INDEX.md navigation hub in docs/, and wire a stack pointer into CLAUDE.md. Always creates the full canonical tree — every folder costs nothing empty and the audit checks files, not folders. Triggers on: scaffold the docs, initialise the project, set up the docs folder, create the documentation structure, create the folder structure, init metamodel, build the doc tree, scaffold docs, start the documentation."
 version: "1.0.0"
 status: active
 last_reviewed: 2026-05-25
@@ -25,6 +25,10 @@ INDEX.md snapshot, and tells the agent where to look. It does NOT create artefac
 — that is the job of the `business-*`, `domain-*`, `spec-*`, `arch-*`, `ops-*`, and
 `com-*` skills.
 
+**Always the full tree.** Empty folders cost nothing — git ignores them until a file
+lands, and `util-metamodel-audit` checks for files, not folders. There is no variant
+selection: every project gets the same structure, and only fills what it needs.
+
 **Complement to `util-metamodel-migration`:** migration restructures an existing docs/
 folder that predates the metamodel. Scaffold initialises a fresh structure. Run scaffold
 on new projects; run migration on existing ones.
@@ -39,25 +43,20 @@ on new projects; run migration on existing ones.
 
 **Step 0 — Clarifying questions (ask BEFORE running)**
 
-Ask the user these 3 questions in a single message. Users respond like `1A, 2B, 3A`:
+Ask the user these 2 questions in a single message. Users respond like `1A, 2A`:
 
 ```text
-1. Project variant?
-   A. Greenfield — full canonical tree (default)
-   B. Brownfield — existing system adding capability (skip personas + BMC layers)
-   C. Strategy-only — investor / executive engagement (business layer + comms)
-   D. Single-feature — no full architecture work (product-specs + exec-plans only)
-
-2. Docs root?
+1. Docs root?
    A. docs/ (default)
    B. Other — please specify
 
-3. Wire the stack pointer into CLAUDE.md after scaffold?
+2. Wire the stack pointer into CLAUDE.md after scaffold?
    A. Yes — update CLAUDE.md (or create it if absent)
    B. No — scaffold only; I will update CLAUDE.md manually
 ```
 
-Also ask for the **project name** if it is not already clear from context — used in the INDEX.md header.
+Also ask for the **project name** if it is not already clear from context — used in the
+INDEX.md header.
 
 **Pre-flight check (run before creating anything):**
 
@@ -78,11 +77,10 @@ If the user says N, stop and suggest `util-metamodel-migration` Mode 1.
 If the user says Y, proceed.
 
 **Process:**
-1. Read the folder list for the chosen variant from `references/folder-catalogue.md`.
+1. Read the full folder list from `references/folder-catalogue.md`.
 2. For each folder in the list: `mkdir -p {folder}`.
 3. Place a `.gitkeep` in every empty leaf folder so the tree is git-trackable.
-4. **For greenfield and brownfield variants:** create the `project-control/open-items/`
-   control plane — see §Project-control scaffold below.
+4. Create the `project-control/open-items/` control plane — see §Project-control scaffold.
 5. **`.gitignore` check:**
    ```bash
    grep -q 'var/reports' .gitignore 2>/dev/null \
@@ -92,14 +90,14 @@ If the user says Y, proceed.
 6. Detect the current status of each canonical artefact path (bash — same logic as
    `util-metamodel-audit` Check 1) and generate `docs/INDEX.md` from
    `references/index-template.md`.
-7. If the user chose to wire CLAUDE.md (Step 0 option 3A): apply the stack pointer update
+7. If the user chose to wire CLAUDE.md (Step 0 option 2A): apply the stack pointer update
    (see §CLAUDE.md update rules below).
 
 **Output verification:**
-- All variant-appropriate folders exist (`find {docs_root} -type d | sort`).
+- All canonical folders exist (`find {docs_root} -type d | sort`).
 - `docs/INDEX.md` exists and contains a row for every canonical artefact step.
-- For greenfield/brownfield: `project-control/open-items/open-items.md` and
-  `project-control/open-items/README.md` exist.
+- `project-control/open-items/open-items.md` and `project-control/open-items/README.md`
+  exist (or were already present and skipped).
 - If wired: `CLAUDE.md` contains a reference to `docs/INDEX.md`.
 - No artefact content files created — only folders, `.gitkeep` files, `docs/INDEX.md`,
   and the `project-control/open-items/` control-plane stubs.
@@ -112,12 +110,13 @@ If the user says Y, proceed.
 **When:** the user wants the directory structure but will manage INDEX.md and CLAUDE.md
 separately, or a hub doc already exists.
 
-No Step 0 questions needed beyond variant + docs root.
+No Step 0 questions needed beyond docs root.
 
 **Process:**
-1. Read folder list from `references/folder-catalogue.md` for the chosen variant.
+1. Read folder list from `references/folder-catalogue.md`.
 2. `mkdir -p` each folder; place `.gitkeep` in empty leaf folders.
-3. Report: folders created / folders already existed.
+3. Create the `project-control/open-items/` control plane if absent.
+4. Report: folders created / folders already existed.
 
 No INDEX.md generated. No CLAUDE.md update.
 
@@ -142,14 +141,14 @@ Does NOT create folders or touch CLAUDE.md.
 
 ## Folder creation — bash pattern
 
-For each folder in the variant list (from `references/folder-catalogue.md`):
+From `references/folder-catalogue.md`:
 
 ```bash
-# Create all variant folders in one pass
+# Create the full canonical tree in one pass
 mkdir -p \
   docs/business/05a-processes \
-  docs/domain/07b-models \
-  ...   # (full list from folder-catalogue.md for the chosen variant)
+  docs/business/06a-models \
+  ...   # (see full list in folder-catalogue.md)
 
 # Place .gitkeep in leaf folders that have no content yet
 find docs -mindepth 1 -type d | while read d; do
@@ -163,16 +162,12 @@ done
 - Use `mkdir -p` — safe to run on existing trees; never fails if folder already exists.
 - Never delete or overwrite existing files.
 - Report how many folders were created vs already existed.
-- `var/reports/` directories are created by this skill (audit + migration report targets).
-- `project-control/open-items/` is created by this skill for greenfield and brownfield
-  variants (see §Project-control scaffold). For strategy-only and single-feature it is
-  omitted — those variants rarely produce artefact-level open items at scale.
 
 ---
 
 ## Project-control scaffold
 
-**Scope:** greenfield and brownfield variants only (Mode 1, step 4).
+**Scope:** Mode 1 and Mode 2 (always).
 
 Creates the minimal `project-control/open-items/` control plane so `util-open-items`
 can run `sync` immediately after the first artefact is authored. Without this structure,
@@ -238,9 +233,9 @@ the existing `project-control/open-items/README.md` in the kit as-is — it is
 project-agnostic and applies verbatim to any project scaffolded with this skill.
 
 **Safety rules:**
-- If `project-control/open-items/open-items.md` already exists (non-empty repo): skip
-  creation entirely and report "control plane already present".
-- Never overwrite an existing non-empty ledger.
+- If `project-control/open-items/open-items.md` already exists: skip creation entirely
+  and report "control plane already present".
+- Never overwrite an existing ledger.
 
 ---
 
@@ -254,7 +249,7 @@ Run at the end of Mode 1 (step 5). If `var/reports/` is not in `.gitignore`:
    var/reports/
    ```
 2. Do NOT automatically modify `.gitignore` — the user may have a reason for tracking
-   reports (e.g. in a shared team context). Surface it as a suggestion, not an auto-fix.
+   reports. Surface it as a suggestion, not an auto-fix.
 
 ---
 
@@ -268,8 +263,7 @@ Full template and detection commands in `references/index-template.md`.
 **Status detection per step:**
 
 ```bash
-# Detect status for each canonical path.
-# ✅ Done    — file/folder found AND < 50% lines are _TODO_
+# ✅ Done        — file/folder found AND < 50% lines are _TODO_
 # 🔄 In progress — file/folder found AND ≥ 50% lines are _TODO_
 # ⬜ Not started — no file/folder found
 
@@ -291,7 +285,7 @@ check_status() {
 **INDEX.md frontmatter:** the file lives under `docs/` so it must carry the 5-field
 frontmatter schema from `rules/artefact-frontmatter.md`. Use:
 - `status: active` — it is always current (it's a generated snapshot, not a draft)
-- `review_interval: 30d` — refresh frequently (mode 3 re-generates it in seconds)
+- `review_interval: 30d` — refresh frequently (Mode 3 re-generates it in seconds)
 
 ---
 
@@ -317,7 +311,7 @@ Mirrors the wire-mode pattern from `business-vision`.
 
    - **Index:** [`docs/INDEX.md`](docs/INDEX.md) — live artefact status table; run
      `util-metamodel-scaffold` Mode 3 to refresh.
-   - **Build order:** `rules/metamodel.md` (11 steps; variant: {variant})
+   - **Build order:** `rules/metamodel.md` — 11 steps, start at Step 0 (`business-vision`)
    - **Audit:** run `util-metamodel-audit` for full health checks
    - **Scaffolded:** {YYYY-MM-DD}
 
@@ -337,7 +331,7 @@ Mirrors the wire-mode pattern from `business-vision`.
 
    - **Index:** [`docs/INDEX.md`](docs/INDEX.md) — live artefact status table; run
      `util-metamodel-scaffold` Mode 3 to refresh.
-   - **Build order:** `rules/metamodel.md` (11 steps; variant: {variant})
+   - **Build order:** `rules/metamodel.md` — 11 steps, start at Step 0 (`business-vision`)
    - **Audit:** run `util-metamodel-audit` for full health checks
    - **Scaffolded:** {YYYY-MM-DD}
 
@@ -361,34 +355,32 @@ Mirrors the wire-mode pattern from `business-vision`.
 | Run cadence | Once per project (Mode 1/2); Mode 3 as needed |
 | Time to run Mode 1 | < 10 seconds (mkdir + status detection) |
 | INDEX.md refresh cadence | After completing each stack step, or before a sprint review |
-| Folders created (greenfield) | ~20 directories |
-| Folders created (strategy-only) | ~6 directories |
+| Folders created | ~21 directories |
 
 ---
 
 ## Closing report to the user
 
-After any mode, summarise in 5–7 lines:
+After any mode, summarise in 5–6 lines:
 
-1. **Mode run** + **variant** + **docs root**.
+1. **Mode run** + **docs root**.
 2. **Folders created** (N new) / **already existed** (N skipped).
-3. **Project-control plane** — created / already present / skipped (strategy-only or single-feature).
+3. **Project-control plane** — created / already present / skipped (Mode 3).
 4. **INDEX.md** — written / refreshed / skipped; current status breakdown (✅ N / 🔄 N / ⬜ N).
 5. **CLAUDE.md** — updated / created / skipped / already wired.
 6. **`.gitignore`** — `var/reports/` present ✅ or missing ⚠️ (suggest the one-liner to add).
-7. **Next step** — variant-specific first skill to invoke:
-   - Greenfield → `business-vision` Mode 1 (scaffold) then Mode 2 (fill) then Mode 3 (wire)
-   - Brownfield → `business-capability-map` Mode 1 (scaffold) then Mode 2 (structure)
-   - Strategy-only → `business-vision` Mode 1+2 or `business-model-canvas` Mode 1
-   - Single-feature → `spec-idea` (if feature not yet committed) or `spec-prd` Mode 1
+
+**Next step:** always `business-vision` Mode 1 (scaffold) → Mode 2 (fill) → Mode 3 (wire)
+unless the user has a specific entry point in mind (e.g. jumping straight to `spec-prd`
+for a single-feature engagement, or `business-capability-map` for an existing system).
 
 ---
 
 ## Reference materials
 
-- **`references/folder-catalogue.md`** — complete folder list per variant with `mkdir -p` commands.
+- **`references/folder-catalogue.md`** — complete folder list with `mkdir -p` commands.
 - **`references/index-template.md`** — INDEX.md skeleton and per-step status detection bash commands.
-- **`references/methodology-references.md`** — rationale for variant model, `.gitkeep` discipline, project-control scope, and `.gitignore` policy.
+- **`references/methodology-references.md`** — rationale for the single universal tree, `.gitkeep` discipline, project-control scope, and `.gitignore` policy.
 
 ---
 
@@ -398,14 +390,13 @@ Before declaring the work done:
 
 - [ ] Step 0 answered (Mode 1) or mode detected from context.
 - [ ] Pre-flight check run: docs root inspected for existing markdown files; user confirmed before proceeding if content was found.
-- [ ] Variant confirmed — folder list selected from `references/folder-catalogue.md`.
-- [ ] All variant-appropriate folders created (`mkdir -p`).
+- [ ] All canonical folders created (`mkdir -p`).
 - [ ] `.gitkeep` placed in every empty leaf folder.
-- [ ] Project-control plane created (greenfield/brownfield) or skipped with acknowledgement (strategy-only/single-feature/already exists).
+- [ ] Project-control plane created or already present — acknowledged in closing report.
 - [ ] `.gitignore` checked; result surfaced in closing report.
 - [ ] `docs/INDEX.md` written (Modes 1 + 3) with `last_reviewed` set to today, or skipped with acknowledgement (Mode 2).
-- [ ] `docs/INDEX.md` contains a row for every canonical step (not only those for the chosen variant).
+- [ ] `docs/INDEX.md` contains a row for every canonical step.
 - [ ] `docs/INDEX.md` frontmatter present (5 fields per `rules/artefact-frontmatter.md`).
-- [ ] CLAUDE.md updated / created (Mode 1 with option 3A) or skipped with acknowledgement.
+- [ ] CLAUDE.md updated / created (Mode 1 with option 2A) or skipped with acknowledgement.
 - [ ] No artefact content files created — folders + `.gitkeep` + INDEX.md + control-plane stubs only.
-- [ ] Closing report delivered with variant-specific next-step recommendation.
+- [ ] Closing report delivered with next-step recommendation.
