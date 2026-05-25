@@ -81,13 +81,15 @@ Runs checks §1 + §2 + §3 only. No Step 0 needed — scans `docs/` by default.
 
 **When:** fast gap map — what canonical metamodel paths don't exist yet? No file analysis.
 
-Outputs a single checklist: 14 metamodel steps, each marked ✅ (exists) / ⬜ (missing), with the canonical path and the skill to run to create it. No proposed fixes — purely informational.
+Outputs a single checklist: 16 metamodel steps (Step 0 Vision + 1, 2, 2b, 2c, 3, 4, 4.5, 5, 6, 7, 7b, 8, 9, 10, 11), each marked ✅ (exists) / ⬜ (missing), with the canonical path and the skill to run to create it. Discovery layer paths (`docs/discovery/{ideation,interviews,workshops}/`) are listed below the stack checklist as cross-cutting supporting artefacts. No proposed fixes — purely informational.
 
 ### Mode 4 — Schema migration (v1 paths → v2 numbered flat structure)
 
 **When:** a project was built with the v1 canonical paths (nested subfolders like `docs/business/personas/personas.md`) and needs to migrate to the v2 numbered flat structure (e.g. `docs/business/01a-personas.md`) defined in `references/path-migration-v2.md`.
 
 **Key difference from Modes 1–3:** those modes detect and guess — they scan unknown repos and infer canonical placement using 3-tier confidence scoring. Mode 4 is deterministic — the before/after mapping is fully known from `path-migration-v2.md`, no detection needed.
+
+**Mode 4 scope** covers three v1 → v2 transition patterns: `singleton` (most BIZBOK artefacts), `multi-slug` (domain models per BC), and `pattern-c-discovery-promote` (the discovery family was promoted from `docs/business/discovery/` + `docs/ideas/` to a single top-level `docs/discovery/{ideation,interviews,workshops}/` — see §Discovery promotion in `references/path-migration-v2.md` for the full bash block, including IDEA-NNNN renumbering of legacy ideas).
 
 **Step 0 — Clarifying questions (ask BEFORE scanning)**
 
@@ -116,11 +118,18 @@ Outputs a single checklist: 14 metamodel steps, each marked ✅ (exists) / ⬜ (
 3. **For domain model consolidation (`type = multi-slug`, domain models)**:
    - `find docs/domain -mindepth 2 -name "domain-model.md"` → each found file at `docs/domain/{bc-slug}/domain-model.md` → moves to `docs/domain/07b-models/{bc-slug}.md`
    - After all moves: check if any non-domain-model files remain in `docs/domain/{bc-slug}/` folders; if the folder is empty, emit `rm -rf`; if not empty, warn and skip folder deletion
-4. **Relative path recomputation rule:** NEVER string-substitute `../` chains. When folder depth changes (e.g. depth 3 → depth 2), every inbound link's `../` count must be recomputed from scratch using `os.path.relpath()`. String substitution produces wrong paths.
-5. **VISION.md special case:** `docs/VISION.md` stays at root — no move, no link rewriting. BUT check if any CLAUDE.md pointer uses a wrong path (e.g. `vision/VISION.md`) and fix it.
-6. **Assemble the migration script** in atomic blocks: each file migration is one block (`mkdir` + `git mv` + all `sed` repairs for that file). If inbound links = 0, the block is just `git mv`.
-7. **Save to** `var/reports/metamodel-migration/schema-v2-migration-{date}.sh` (Mode 4 output, not the same as Mode 1 markdown report).
-8. **Summary:** N files to move · N links to repair · N sed commands · N warnings (non-empty bc-slug folders, CLAUDE.md issues).
+4. **For discovery promotion (`type = pattern-c-discovery-promote`)** — the three v1 → v2 transitions defined in `references/path-migration-v2.md §Discovery promotion`:
+   - `docs/business/discovery/interviews/` → `docs/discovery/interviews/`
+   - `docs/business/discovery/workshops/` → `docs/discovery/workshops/`
+   - `docs/ideas/{slug}.md` (or `docs/ideas/{domain}/{slug}.md`) → `docs/discovery/ideation/IDEA-{NNNN}-{slug}.md`
+   - The ideas migration mints a sequential `IDEA-NNNN` ID per file as it moves; the original domain subfolder (if any) becomes a `domain:` frontmatter tag, not a folder.
+   - After move, emit a frontmatter backfill block: add `idea_id:`, `lifecycle: captured`, `graduates_to: _TBD_`, and `domain:` (mapped from the v1 subfolder name where present — `frontend`/`backend`/`infra` → `architecture`; `design`/`dx` → `dx`; others → `product` by default).
+   - Full bash block is in `references/path-migration-v2.md §Discovery promotion` — read that section before emitting the migration script.
+5. **Relative path recomputation rule:** NEVER string-substitute `../` chains. When folder depth changes (e.g. depth 3 → depth 2), every inbound link's `../` count must be recomputed from scratch using `os.path.relpath()`. String substitution produces wrong paths.
+6. **VISION.md special case:** `docs/VISION.md` stays at root — no move, no link rewriting. BUT check if any CLAUDE.md pointer uses a wrong path (e.g. `vision/VISION.md`) and fix it.
+7. **Assemble the migration script** in atomic blocks: each file migration is one block (`mkdir` + `git mv` + all `sed` repairs for that file). If inbound links = 0, the block is just `git mv`.
+8. **Save to** `var/reports/metamodel-migration/schema-v2-migration-{date}.sh` (Mode 4 output, not the same as Mode 1 markdown report).
+9. **Summary:** N files to move · N links to repair · N sed commands · N warnings (non-empty bc-slug folders, CLAUDE.md issues) · N ideas re-numbered with `IDEA-NNNN` prefix (Mode 4 discovery-promote step).
 
 **If `--apply` (explicit opt-in only):** execute the script, then run `util-metamodel-audit` Mode 1 to verify zero misplacements. Never apply automatically — always dry-run first.
 
@@ -281,6 +290,9 @@ Never write the report inside `docs/` — migration reports are not artefacts in
 | `domain-bounded-context` | §4 DDD candidates → run this skill after moving glossary/info-model content to docs/domain/ |
 | `domain-glossary` | §4 DDD candidates — glossary migration target |
 | `domain-model` | §4 DDD candidates — information/domain model migration target |
+| `discovery-idea` | Mode 4 `pattern-c-discovery-promote` — after moving ideas to `docs/discovery/ideation/`, run `discovery-idea` Mode 5 (maintain) to fill the backfilled `lifecycle:` / `graduates_to:` / `domain:` frontmatter fields and update the new flat `INDEX.md`. |
+| `discovery-research` | Mode 4 `pattern-c-discovery-promote` — interview / synthesis / plan files are moved from `docs/business/discovery/interviews/` to `docs/discovery/interviews/` (path-only, no content rewrite). |
+| `discovery-workshop` | Mode 4 `pattern-c-discovery-promote` — workshop / synthesis files moved from `docs/business/discovery/workshops/` to `docs/discovery/workshops/`. |
 | `rules/metamodel.md` | The canonical source for all detection rules in references/detection-signals.md |
 
 ---

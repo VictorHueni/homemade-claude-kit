@@ -12,7 +12,7 @@ metadata:
 
 # Stack Audit
 
-You are an expert at auditing strategic-architecture documentation stacks — systematically checking that the 11-step artefact stack (personas → implementation plans) is complete, internally consistent, and free of broken links, stale content, or dependency violations.
+You are an expert at auditing strategic-architecture documentation stacks — systematically checking that the 16-step artefact stack (Vision → Implementation plans, including sub-steps 2b, 2c, 4.5, 7b) is complete, internally consistent, and free of broken links, stale content, or dependency violations. The discovery layer (`docs/discovery/{ideation,interviews,workshops}/`) is cross-cutting and audited alongside the stack — its artefacts are not numbered steps but participate in every check (frontmatter validity, Open Items governance, ID cross-references for `IDEA-NNNN`, etc.).
 
 The artifact produced by this skill is **a markdown report** at `var/reports/metamodel-audit/stack-audit-{YYYY-MM-DD}.md`. It is NOT a design artefact, NOT a code review, NOT a living document — it is a **point-in-time health snapshot** of the documentation stack, with one finding per row and a proposed fix per finding.
 
@@ -26,7 +26,7 @@ A report is good when a reader can answer, without ambiguity:
 
 | Question | Where it lives |
 |---|---|
-| **What fraction of the 11-step stack is complete?** | §1 Stack progress table (✅/🔄/⬜ per step) |
+| **What fraction of the 16-step stack is complete?** | §1 Stack progress table (✅/🔄/⬜ per step; includes Step 0 Vision + sub-steps 2b, 2c, 4.5, 7b) |
 | **Which files are in the wrong folder?** | §2 Folder placement findings |
 | **Which internal links are broken?** | §3 Internal link findings |
 | **Which external links are dead or unverified?** | §4 External link findings |
@@ -60,10 +60,11 @@ Ask the user the following 4 questions in a single message with lettered options
 
 ```text
 1. Audit scope?
-   A. Full docs/ tree — all 16 check categories (default)
+   A. Full docs/ tree — all 18 check categories (default)
    B. Business architecture layer only (docs/business/)
    C. Product specs layer only (docs/product-specs/, docs/exec-plans/)
-   D. Single file or folder — please name it
+   D. Discovery layer only (docs/discovery/ — ideation, interviews, workshops)
+   E. Single file or folder — please name it
 
 2. External link checking?
    A. Skip external links (faster — no network calls)
@@ -84,7 +85,7 @@ Ask the user the following 4 questions in a single message with lettered options
 If the user gives "Other" or pushes back, ask one follow-up to clarify, then proceed.
 
 **Process:**
-1. Run the bash detection patterns for each of the 16 check categories (see `references/check-catalogue.md`).
+1. Run the bash detection patterns for each of the 18 check categories (see `references/check-catalogue.md`).
 2. Collect all findings; tag each with severity (Error / Warning / Info).
 3. Build executive summary counts.
 4. Fill the report template (see `references/template.md`).
@@ -95,7 +96,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** quick "where are we in the build order?" check. No link, dependency, or freshness analysis.
 
 **Process:**
-1. For each of the 14 steps (including 2b, 2c, 7b), check whether the canonical output path exists.
+1. For each of the 16 steps (Step 0 Vision + 1, 2, 2b, 2c, 3, 4, 4.5, 5, 6, 7, 7b, 8, 9, 10, 11), check whether the canonical output path exists.
 2. For each existing file, retrieve last-modified date: `git log -1 --format="%ci" -- {file}`.
 3. Output a single table: `Step # | Artefact | Status | Path | Last modified | Age (days)`.
 4. Print to terminal. Save to file only if explicitly requested.
@@ -172,7 +173,7 @@ Full template in `references/template.md`. Top-level structure:
 H1: Stack Audit — {project} — {YYYY-MM-DD}
 
 § Executive summary
-  X/14 steps complete · N errors · N warnings · N info
+  X/16 steps complete · N errors · N warnings · N info
   Top 3 most urgent findings
 
 §1  Stack progress          Step # | Artefact | Status | Path | Last modified | Age (days)
@@ -245,8 +246,8 @@ If the project uses a different reports root (`reports/`, `docs/reports/`), use 
 ## Reference materials
 
 Three files in `references/`:
-- **`references/template.md`** — full markdown report template with all 16 section skeletons.
-- **`references/check-catalogue.md`** — for each of the 17 checks: bash detection pattern, interpretation rules, severity assignment, proposed fix template.
+- **`references/template.md`** — full markdown report template with all 18 section skeletons.
+- **`references/check-catalogue.md`** — for each of the 18 checks: bash detection pattern, interpretation rules, severity assignment, proposed fix template. Includes the `IDEA-NNNN` ID pattern (Check 5) and `docs/discovery/ideation/IDEA-*.md` mandatory-section rules (Check 9) introduced with the `discovery-` skill family.
 - **`references/methodology-references.md`** — rationale for each check category (link rot research, BABOK traceability discipline, Lean UX hypothesis expiry, SCIP staleness cadence).
 
 ---
@@ -258,7 +259,7 @@ After running any mode, summarise in 4–6 lines:
 1. **Mode run** + **scope** + **files scanned**.
 2. **Error / Warning / Info counts** — headline numbers only.
 3. **Top 3 most urgent findings** (Errors first; Warnings if no Errors).
-4. **Stack progress** — X/14 steps complete; which step is next.
+4. **Stack progress** — X/16 steps complete; which step is next.
 5. **Report saved at** path (if output = file).
 
 ---

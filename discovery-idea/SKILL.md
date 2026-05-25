@@ -284,6 +284,95 @@ Triggers: monthly cadence; user runs the maintenance pass; `util-metamodel-audit
 
 ---
 
+## Relationships of the IDEA artefact
+
+An `IDEA-NNNN` is a hub with five kinds of edges. Understanding which edge applies prevents the skill from over-reaching into downstream territory.
+
+### 1. Inbound — where ideas come FROM
+
+Source signals that *generate* ideas. Not modeled as foreign keys (the source is "human + evidence", not another artefact's ID) but the originating signal is recorded in `## Context` and `## References`.
+
+- `discovery-research` interview synthesis surfaces a hunch → captured as `IDEA-NNNN`
+- `discovery-workshop` output produces several candidate directions → each captured
+- `util-metamodel-audit` flags a gap requiring ideation (e.g. an `Assumed` claim with no evidence) → captured
+- An open item of type `decision-gap` in any artefact may spawn a new idea
+- External signals: customer messages, competitive moves, individual hunches
+
+### 2. Outbound — graduation (the only edge type modeled in the ER)
+
+Eight possible targets, set per idea via the `graduates_to:` frontmatter field. Each idea graduates to **exactly one** target (or is abandoned). The target mints its own ID; the idea stores it in `target_id` after graduation.
+
+| `graduates_to:` | Mints | Typical trigger |
+|---|---|---|
+| `business-persona` | `P-NN` | Research reveals a new persona type |
+| `business-objective` | `OBJ-NN` + `KR-NN.M` | Strategic priority candidate |
+| `business-model-canvas` | New BMC block entry (`VP-NN`, `CS-NN`, …) | New value proposition or segment |
+| `business-process` | New `proc-NN-{slug}.md` | Operational improvement to a VS stage |
+| `arch-research` | `Research-NNNN` | Architectural question needs evidence first |
+| `arch-adr` | `ADR-NNNN` | A decided architectural choice |
+| `spec-functional-breakdown-structure` | New `C-N.M.FXX` row | New functionality on an existing capability |
+| `spec-prd` | `PRD-NNNN` | Feature-scoped build commitment |
+
+### 3. Body-text citations INTO the idea (no FK column — markdown soft-links)
+
+Cited inside `## Context`, `## Direction`, and `## References` to ground claims. These IDs appear as plain markdown links, not as structural foreign keys:
+
+- `P-NN` — User Value claims naming a real persona
+- `VS-N.M` — pain-index context
+- `C-N.M` — parent capability for FBS-graduation ideas
+- `BC-NN` — for architecture / domain ideas
+- `Research-NNNN`, `ADR-NNNN` — existing evidence base
+- `OI-NNNN` — when the idea originates from an open item
+- Other `IDEA-NNNN` — sibling explorations or supersession chains
+
+### 4. Body-text back-references FROM the target (after graduation)
+
+The graduated artefact cites `IDEA-NNNN` in its body — **not** as a structural FK column on the target entity (per the ER hard rule). The back-reference appears in:
+
+- `spec-prd` → §0 Architecture Traceability
+- `arch-adr` → §Context
+- `business-objective` → "why it matters" sentence
+- `business-persona` → persona description origin note
+
+The graduating skill is responsible for writing this back-link during its own scaffold/fill mode.
+
+### 5. Open-Items routing (cross-cutting dispatch layer)
+
+The idea's local `## Open Items` section acts as a dispatcher:
+
+| `Type` | Routes to | Resolution path text |
+|---|---|---|
+| `execution-item` (validation) | `discovery-research` | "Run `discovery-research` Mode 2 with hypothesis: `<Must-be-true statement>`" |
+| `execution-item` (alignment) | `discovery-workshop` | "Run `discovery-workshop` Mode 1 with focus question: `<Decision question>`" |
+| `decision-gap` | stays local | "Refine pass — pick between variations A/B/C" |
+| `doc-gap` | blocks graduation | "Fill `<missing section>` before graduating to `<target skill>`" |
+
+After `util-open-items` sync, the row gets a canonical `OI-NNNN` in `project-control/open-items/`.
+
+### 6. Lifecycle: supersession
+
+Standard artefact frontmatter applies (per `rules/artefact-frontmatter.md`):
+
+- `status: superseded` + `superseded_by: <path>` when a refined variant replaces an earlier idea
+- `lifecycle: abandoned` is **orthogonal** to `status` — used when the idea is dropped without a replacement, not when it's replaced by another
+
+### What ideas do NOT graduate to
+
+Worth knowing because it tells you when the skill is being misused. These artefacts are derived or structural — they emerge from upstream architecture, not from individual ideas:
+
+| Artefact | Why not a graduation target |
+|---|---|
+| `business-vision` | Project-level singleton; emerges from founding intent |
+| `business-capability-map` | Derived from vision + BMC; the L0 axis is a structural choice |
+| `business-value-stream` | Falls out of personas × value propositions |
+| `business-quantitative-model` | Commissioned modelling; one model serves many decisions |
+| `domain-bounded-context` · `domain-glossary` · `domain-model` | Emerge from Event Storming + capability cohesion |
+| `spec-delivery-roadmap` · `spec-quality-attributes` · `spec-implementation-plan` | Downstream of FBS / PRDs; mechanical groupings, not creative bets |
+
+**Diagnostic:** if an "idea" wants to graduate to one of these, the underlying artefact is probably missing or stale. Don't graduate — invoke the missing skill directly. Example: an idea like "we need to track our value flows" doesn't graduate to anything; it means `business-value-stream` Mode 1 (scaffold) should run.
+
+---
+
 ## How this skill interacts with siblings
 
 | Skill | Relationship |

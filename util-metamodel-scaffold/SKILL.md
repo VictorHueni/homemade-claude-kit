@@ -22,8 +22,8 @@ new project — before any artefact-producing skill is invoked.
 The canonical folder tree and artefact paths are defined in `rules/metamodel.md`. This
 skill operationalises that definition: it creates the directories, documents them in an
 INDEX.md snapshot, and tells the agent where to look. It does NOT create artefact content
-— that is the job of the `business-*`, `domain-*`, `spec-*`, `arch-*`, `ops-*`, and
-`com-*` skills.
+— that is the job of the `business-*`, `discovery-*`, `domain-*`, `spec-*`, `arch-*`,
+`ops-*`, and `com-*` skills.
 
 **Always the full tree.** Empty folders cost nothing — git ignores them until a file
 lands, and `util-metamodel-audit` checks for files, not folders. There is no variant
@@ -311,7 +311,7 @@ Mirrors the wire-mode pattern from `business-vision`.
 
    - **Index:** [`docs/INDEX.md`](docs/INDEX.md) — live artefact status table; run
      `util-metamodel-scaffold` Mode 3 to refresh.
-   - **Build order:** `rules/metamodel.md` — 11 steps, start at Step 0 (`business-vision`)
+   - **Build order:** `rules/metamodel.md` — 16 steps (Vision → Implementation plans), start at Step 0 (`business-vision`); the `discovery-*` family (idea, research, workshop) is cross-cutting and runs alongside any step.
    - **Audit:** run `util-metamodel-audit` for full health checks
    - **Scaffolded:** {YYYY-MM-DD}
 
@@ -331,7 +331,7 @@ Mirrors the wire-mode pattern from `business-vision`.
 
    - **Index:** [`docs/INDEX.md`](docs/INDEX.md) — live artefact status table; run
      `util-metamodel-scaffold` Mode 3 to refresh.
-   - **Build order:** `rules/metamodel.md` — 11 steps, start at Step 0 (`business-vision`)
+   - **Build order:** `rules/metamodel.md` — 16 steps (Vision → Implementation plans), start at Step 0 (`business-vision`); the `discovery-*` family (idea, research, workshop) is cross-cutting and runs alongside any step.
    - **Audit:** run `util-metamodel-audit` for full health checks
    - **Scaffolded:** {YYYY-MM-DD}
 
@@ -355,7 +355,7 @@ Mirrors the wire-mode pattern from `business-vision`.
 | Run cadence | Once per project (Mode 1/2); Mode 3 as needed |
 | Time to run Mode 1 | < 10 seconds (mkdir + status detection) |
 | INDEX.md refresh cadence | After completing each stack step, or before a sprint review |
-| Folders created | ~21 directories |
+| Folders created | ~22 directories (includes the three `docs/discovery/{ideation,interviews,workshops}/` folders) |
 
 ---
 
