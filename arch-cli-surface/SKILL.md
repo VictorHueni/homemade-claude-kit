@@ -1,6 +1,6 @@
 ---
 name: arch-cli-surface
-description: "Define the external CLI surface contract for a user-facing command-line tool — subcommand tree, per-command flags and arguments, output format contract, exit code catalogue, configuration precedence, and error contract. One artefact per CLI tool. Mints CLI-NN and CLI-NN.CMD-NN IDs. Modes: scaffold, design (contract-first from FBS functionalities), document-existing (reverse-engineer from --help output or source), refresh (detect added/removed commands, emit changelog). Use when asked to design a CLI, document CLI commands, define subcommands and flags, specify exit codes, or formalise the surface of a command-line tool. Triggers on: CLI design, command line, subcommands, flags, CLI surface, shell tool, command interface, exit codes, CLI contract. Output: docs/architecture/interfaces/cli-{slug}.md."
+description: "Define the external CLI surface contract for a user-facing command-line tool — subcommand tree, per-command flags and arguments, output format contract, exit code catalogue, configuration precedence, and error contract. BC-scoped (one CLI per BC/service, ID: BC-NN.CLI-NN) or product-level spanning multiple BCs (ID: CLI-NN). Modes: scaffold, design (contract-first from FBS functionalities), document-existing (reverse-engineer from --help output or source), refresh (detect added/removed commands, emit changelog). Use when asked to design a CLI, document CLI commands, define subcommands and flags, specify exit codes, or formalise the surface of a command-line tool. Triggers on: CLI design, command line, subcommands, flags, CLI surface, shell tool, command interface, exit codes, CLI contract. Output: docs/architecture/interfaces/cli-{slug}.md."
 version: "1.0.0"
 status: draft
 last_reviewed: 2026-05-25
@@ -72,10 +72,18 @@ Detect from the user's prompt. Ask if ambiguous.
 
 **When:** FBS and/or delivery roadmap exist; the user wants to design the CLI surface from product functionalities outward.
 
-#### Step 0 — Clarifying questions (one message; user responds e.g. "1A, 2B, 3A, 4B")
+#### Step 0 — Clarifying questions (one message; user responds e.g. "1A, 2B, 3A, 4A, 5B")
 
 ```
-1. Command taxonomy (how to group subcommands)?
+1. CLI scope?
+   A. BC-scoped: this CLI is a direct surface for one BC/service.
+      ID format: BC-NN.CLI-NN (tool surface), BC-NN.CLI-NN.CMD-NN (commands)
+      — recommended for per-service tooling (orders-cli, deploy-ctl for the deployment BC)
+   B. Product-level: this CLI spans multiple BCs.
+      ID format: CLI-NN (tool surface), CLI-NN.CMD-NN (commands)
+      — use for unified product CLIs; BC-NN column documents which BC each command delegates to
+
+2. Command taxonomy (how to group subcommands)?
    A. Noun-verb: tool <resource> <action>  (e.g. kubectl get pods, heroku apps:create)
       — groups by resource type; scales well as the tool grows
    B. Verb-noun: tool <action> <resource>  (e.g. docker run image, npm install pkg)
@@ -83,17 +91,17 @@ Detect from the user's prompt. Ask if ambiguous.
    C. Flat: no subcommands — tool is a single-purpose utility
       (e.g. jq, grep, curl)
 
-2. Primary audience?
+3. Primary audience?
    A. Developers / power users — accept terse flags; assume Unix familiarity
    B. Operators / devops — prefer explicit long flags; include --dry-run everywhere
    C. Mixed — provide both short and long flags; make --dry-run the default for destructive ops
 
-3. Machine-readable output?
+4. Machine-readable output?
    A. --output json|yaml|table (table is the default human view)
    B. --json flag (shorthand; table by default)
    C. Not required — human-readable output only
 
-4. Configuration?
+5. Configuration?
    A. Config file + env vars + flags (12-Factor; flag overrides env overrides file overrides default)
    B. Env vars + flags only (no config file)
    C. Flags only (stateless; no persistence)
@@ -109,7 +117,10 @@ Detect from the user's prompt. Ask if ambiguous.
 6. **Define the exit code catalogue** using the sysexits.h conventions in `references/discipline.md §Exit code catalogue`. Document every non-zero code the tool emits.
 7. **Design the output contract** per `references/discipline.md §Output contract`. Determine what goes to stdout (structured result data) vs stderr (progress, errors, prompts).
 8. **Define the configuration chain** per the user's choice from Step 0 and `references/discipline.md §Configuration precedence`.
-9. **Assign CLI-NN.CMD-NN IDs** — `CLI-01` for the tool surface; `CLI-01.CMD-01`, `CLI-01.CMD-02`, etc. for commands.
+9. **Assign IDs** — format depends on scope (Step 0 question 1):
+   - **BC-scoped (1A):** `BC-NN.CLI-01` for the tool surface; `BC-NN.CLI-01.CMD-01`, `BC-NN.CLI-01.CMD-02`, etc. for commands.
+   - **Product-level (1B):** `CLI-01` for the tool surface; `CLI-01.CMD-01`, `CLI-01.CMD-02`, etc. for commands. Add a `BC-NN` column per command documenting which BC it delegates to.
+   Zero-pad to two digits. One CMD-NN ID per command.
 10. Write `docs/architecture/interfaces/cli-{slug}.md` using `references/template.md`.
 11. Run quality checks from `references/discipline.md §Quality checks` before delivering.
 

@@ -1,6 +1,6 @@
 ---
 name: arch-api-surface
-description: "Define the external interface contract for a bounded context — REST resources, async events published, and commands consumed. One artefact per BC-NN, placed after the domain model (Step 7c). Derives contracts from BC-NN.AGG-NN, BC-NN.ENT-NN, BC-NN.EVT-NN. Mints BC-NN.IFX-NN IDs. Modes: scaffold, contract-first (design from domain model outward), document-existing (reverse-engineer from code), refresh (detect drift + emit deprecation notices). Use when asked to define an API, design the interface surface, document HTTP endpoints, define event schemas, or formalise the public contract of a service. Triggers on: API design, REST API, interface contract, endpoint design, event schema, async surface, public API, service contract, HTTP API, interface surface, API surface. Output: docs/architecture/interfaces/{bc-slug}.md."
+description: "Define the external interface contract for a bounded context or a product-level API — REST resources, async events published, and commands consumed. BC-scoped (one artefact per BC-NN, ID: BC-NN.IFX-NN) or product-level spanning multiple BCs (ID: IFX-NN). Placed after the domain model (Step 7c). Derives contracts from BC-NN.AGG-NN, BC-NN.ENT-NN, BC-NN.EVT-NN. Modes: scaffold, contract-first (design from domain model outward), document-existing (reverse-engineer from code), refresh (detect drift + emit deprecation notices). Use when asked to define an API, design the interface surface, document HTTP endpoints, define event schemas, or formalise the public contract of a service. Triggers on: API design, REST API, interface contract, endpoint design, event schema, async surface, public API, service contract, HTTP API, interface surface, API surface. Output: docs/architecture/interfaces/{bc-slug}.md (BC-scoped) or docs/architecture/interfaces/{slug}.md (product-level)."
 version: "1.0.0"
 status: draft
 last_reviewed: 2026-05-25
@@ -69,26 +69,33 @@ Detect from the user's prompt. Ask if ambiguous.
 
 **When:** the domain model exists; the user wants to design the external surface from domain concepts outward before writing code.
 
-#### Step 0 — Clarifying questions (one message; user responds e.g. "1A, 2C, 3A, 4C")
+#### Step 0 — Clarifying questions (one message; user responds e.g. "1A, 2A, 3C, 4A, 5C")
 
 ```
-1. Which bounded context?
+1. API scope?
+   A. BC-scoped: this API is the direct external surface of one bounded context.
+      ID format: BC-NN.IFX-NN — recommended for microservices and per-service APIs
+   B. Product-level: this API spans or aggregates multiple BCs (BFF, API gateway, GraphQL schema).
+      ID format: IFX-NN — BC-NN column in each resource entry documents which BC it delegates to
+
+2. Which bounded context(s)?
    A. [Specific BC-NN — confirm from docs/domain/02b-bounded-contexts.md]
    B. All bounded contexts — one pass per BC
+   C. Not applicable — product-level API (answer 1B)
 
-2. Sync surface protocol?
+3. Sync surface protocol?
    A. REST, Richardson Maturity Level 2 (resources + correct HTTP verbs) — recommended default
    B. REST + HATEOAS Level 3 (hypermedia _links drive state transitions)
    C. SDK / library interface (public methods + types; no HTTP)
    D. gRPC (derive service definitions from domain operations)
    E. No sync surface — async events only
 
-3. Async surface?
+4. Async surface?
    A. Publish domain events only (BC-NN.EVT-NN → external consumers)
    B. Publish events + consume commands from external producers
    C. No async surface — synchronous only
 
-4. Versioning strategy?
+5. Versioning strategy?
    A. URL path versioning (/v1/, /v2/) — explicit, easy to route and test
    B. Accept header versioning (Accept: application/vnd.api+json;version=2) — clean URLs, harder to test in browser
    C. Additive-only — no explicit version until a breaking change forces a major version bump
@@ -123,7 +130,10 @@ Detect from the user's prompt. Ask if ambiguous.
 
 7. **Draft the security surface** — auth mechanism, scopes or roles per operation, rate limits.
 
-8. **Assign IFX-NN IDs** — monotonically increasing within the BC, zero-padded to two digits. `BC-02.IFX-01`, `BC-02.IFX-02`, etc. One ID per discrete surface element (one per resource, one per event type, one per command subscription).
+8. **Assign IFX-NN IDs** — format depends on scope (Step 0 question 1):
+   - **BC-scoped (1A):** `BC-NN.IFX-01`, `BC-NN.IFX-02`, … — monotonically increasing within the BC. Each ID is owned by one BC.
+   - **Product-level (1B):** `IFX-01`, `IFX-02`, … — monotonically increasing across the product. Add a `Delegates to` field per resource entry naming the `BC-NN` that owns the underlying domain model.
+   Zero-pad to two digits. One ID per discrete surface element (one per resource, one per event type, one per command subscription).
 
 9. Write `docs/architecture/interfaces/{bc-slug}.md` using `references/template.md`.
 
