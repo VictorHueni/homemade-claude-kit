@@ -1,6 +1,6 @@
-# CLI Surface — Methodology References
+# CLI Contract — Methodology References
 
-Canonical bibliography for the `arch-cli-surface` skill. Lives only in the kit — never copied to projects. Project docs link here via the methodology pointer in their header.
+Canonical bibliography for the `arch-cli-contract` skill. Lives only in the kit — never copied to projects. Project docs link here via the methodology pointer in their header.
 
 ---
 

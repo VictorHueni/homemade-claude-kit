@@ -1,6 +1,6 @@
-# CLI Surface — Discipline Guide
+# CLI Contract — Discipline Guide
 
-Internal Claude guidance for the `arch-cli-surface` skill. Not copied to projects.
+Internal Claude guidance for the `arch-cli-contract` skill. Not copied to projects.
 
 ---
 

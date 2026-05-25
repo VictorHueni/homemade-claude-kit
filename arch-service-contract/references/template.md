@@ -8,7 +8,7 @@ review_interval: 180d
 
 # {{BC-NN}} {{bc-name}} — Interface Contract
 
-> **Methodology:** built using REST architectural constraints (Fielding 2000), HTTP semantics (RFC 9110), structured error format (RFC 7807 Problem Details), event envelope (CloudEvents 1.0.3), and Hyrum's Law stability principles. Full bibliography: [methodology-references.md](https://github.com/VictorHueni/homemade-claude-kit/tree/main/arch-api-surface/references/methodology-references.md).
+> **Methodology:** built using REST architectural constraints (Fielding 2000), HTTP semantics (RFC 9110), structured error format (RFC 7807 Problem Details), event envelope (CloudEvents 1.0.3), and Hyrum's Law stability principles. Full bibliography: [methodology-references.md](https://github.com/VictorHueni/homemade-claude-kit/tree/main/arch-service-contract/references/methodology-references.md).
 
 **Scope:** the external surface of `{{BC-NN}} {{bc-name}}`. This document defines what external consumers can depend on. Internal implementation is not part of this contract. Any observable behaviour not documented here is not guaranteed.
 

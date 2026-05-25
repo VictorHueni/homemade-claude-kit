@@ -1,14 +1,14 @@
 ---
-title: "{Tool name} — CLI Surface Contract"
+title: "{Tool name} — CLI Contract"
 status: draft
 owner: _TODO_
 last_reviewed: {{today}}
 review_interval: 180d
 ---
 
-# {Tool name} — CLI Surface Contract
+# {Tool name} — CLI Contract
 
-> **Methodology:** built on POSIX Utility Conventions (Section 12), GNU Coding Standards (Chapter 4), ESR *Art of Unix Programming* (2003), CLI Guidelines (clig.dev, 2021), 12-Factor Config, and sysexits.h exit code conventions. Full bibliography: [methodology-references.md](https://github.com/VictorHueni/homemade-claude-kit/tree/main/arch-cli-surface/references/methodology-references.md).
+> **Methodology:** built on POSIX Utility Conventions (Section 12), GNU Coding Standards (Chapter 4), ESR *Art of Unix Programming* (2003), CLI Guidelines (clig.dev, 2021), 12-Factor Config, and sysexits.h exit code conventions. Full bibliography: [methodology-references.md](https://github.com/VictorHueni/homemade-claude-kit/tree/main/arch-cli-contract/references/methodology-references.md).
 
 **Tool name:** `{toolname}`
 **Scope:** the external CLI surface of `{Tool name}`. This document defines what operators and scripts can depend on. Internal implementation details are not part of this contract.

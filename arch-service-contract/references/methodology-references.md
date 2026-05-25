@@ -1,6 +1,6 @@
-# API Surface — Methodology References
+# Service Contract — Methodology References
 
-Canonical bibliography for the `arch-api-surface` skill. Lives only in the kit — never copied to projects. Project docs link here via the methodology pointer in their header.
+Canonical bibliography for the `arch-service-contract` skill. Lives only in the kit — never copied to projects. Project docs link here via the methodology pointer in their header.
 
 ---
 

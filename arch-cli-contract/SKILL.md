@@ -1,5 +1,5 @@
 ---
-name: arch-cli-surface
+name: arch-cli-contract
 description: "Define the external CLI surface contract for a user-facing command-line tool — subcommand tree, per-command flags and arguments, output format contract, exit code catalogue, configuration precedence, and error contract. BC-scoped (one CLI per BC/service, ID: BC-NN.CLI-NN) or product-level spanning multiple BCs (ID: CLI-NN). Modes: scaffold, design (contract-first from FBS functionalities), document-existing (reverse-engineer from --help output or source), refresh (detect added/removed commands, emit changelog). Use when asked to design a CLI, document CLI commands, define subcommands and flags, specify exit codes, or formalise the surface of a command-line tool. Triggers on: CLI design, command line, subcommands, flags, CLI surface, shell tool, command interface, exit codes, CLI contract. Output: docs/architecture/interfaces/cli-{slug}.md."
 version: "1.0.0"
 status: draft
@@ -15,7 +15,7 @@ metadata:
   complexity: "medium"
 ---
 
-# CLI Surface Contract Builder
+# CLI Contract Builder
 
 You are an expert at producing **stable, scriptable CLI surface contracts** — the artefacts that answer: *"what can operators and scripts depend on when invoking this tool?"*
 
@@ -230,7 +230,7 @@ find docs/architecture -name "cli-*.md" 2>/dev/null
 | **spec-quality-attributes (`QA-XXNN`)** | `QA-PE` entries → response time SLA per command; `QA-US` entries → help text quality standards |
 | **arch-adr (`ADR-NNNN`)** | CLI design decisions → ADRs (taxonomy choice noun-verb vs verb-noun; config file format; output format strategy) |
 | **spec-prd (`PRD-NNNN`)** | PRDs for CLI-facing features reference `CLI-NN.CMD-NN` IDs in acceptance criteria |
-| **arch-api-surface (`BC-NN.IFX-NN`)** | CLI commands often wrap API surface calls; each command can reference the IFX-NN it delegates to |
+| **arch-service-contract (`BC-NN.CTR-NN`)** | CLI commands often wrap service contract calls; each command can reference the CTR-NN it delegates to |
 
 ---
 

@@ -1,6 +1,6 @@
-# API Surface — Discipline Guide
+# Service Contract — Discipline Guide
 
-Internal Claude guidance for the `arch-api-surface` skill. Not copied to projects.
+Internal Claude guidance for the `arch-service-contract` skill. Not copied to projects.
 
 ---
 
