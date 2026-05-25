@@ -34,6 +34,7 @@ what order, and where to put it**.
 | 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/06a-models/qm-NN-{topic}.md` | per-model slug |
 | 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/07a-fbs.md` | `C-N.M.FXX` (capability + functionality counter) |
 | 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/07b-models/{bc-slug}.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
+| 7c | **Interface Contract** (external API surface — sync REST/gRPC/SDK + async events) | `arch-service-contract` | `docs/architecture/interfaces/{bc-slug}.md` (BC-scoped) or `docs/architecture/interfaces/{slug}.md` (product-level) | `BC-NN.CTR-NN` (BC-scoped) · `CTR-NN` (product-level) |
 | 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` | `PRD-NNNN` |
@@ -41,6 +42,7 @@ what order, and where to put it**.
 
 **Supporting skills** (not in the main build order, used as needed):
 - `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
+- `arch-cli-contract` — CLI surface contract for a user-facing command-line tool → `docs/architecture/interfaces/cli-{slug}.md` (one per tool). ID format is scope-dependent: **BC-scoped** (one CLI per BC/service) mints `BC-NN.CLI-NN` + `BC-NN.CLI-NN.CMD-NN`; **product-level** (one CLI spanning multiple BCs) mints `CLI-NN` + `CLI-NN.CMD-NN`. Invoke when the product exposes a CLI; run after Step 7 (FBS) and Step 8 (Delivery Roadmap) so subcommands can be mapped to `C-N.M.FXX` functionalities and `E-NN` phases. Covers: subcommand tree, flag conventions, exit code catalogue, output format contract (stdout/stderr separation), configuration precedence, error contract.
 - `spec-idea` — captures pre-PRD ideas → `docs/ideas/{domain}/{slug}.md` with `INDEX.md` per domain folder
 - `spec-peer-review` — reviews PRDs / plans
 - `arch-research` — Architecture Research notes that inform ADR decisions → `docs/architecture/research/{NNNN}-{slug}.md`; mints `Research-NNNN` in-doc ID (4-digit zero-padded, same convention as `ADR-NNNN`); lifecycle: Draft → Active → Frozen (once feeding ADRs land) → Superseded
@@ -109,14 +111,14 @@ what order, and where to put it**.
               │   └──────────────────────────────────────────┘
               │
               ▼
-   ┌──────────────────────┐
-   │ spec-functional-     │
-   │   breakdown-structure│
-   │ (what product does)  │
-   │ Output: C-N.M.FXX    │
-   │ Inherits L0+L1 from  │
-   │   capability map     │
-   └──────────┬───────────┘
+   ┌──────────────────────┐   ┌──────────────────────────────────┐
+   │ arch-service-contract     │   │ spec-functional-                 │
+   │ (Step 7c)            │   │   breakdown-structure            │
+   │ External interface   │   │ (what product does)              │
+   │   contract per BC    │   │ Output: C-N.M.FXX                │
+   │ Output: BC-NN.CTR-NN │   │ Inherits L0+L1 from              │
+   │ Reads: AGG/ENT/EVT   │   │   capability map                 │
+   └──────────────────────┘   └──────────┬───────────────────────┘
               │
               ▼
    ┌──────────────────────┐
@@ -231,6 +233,21 @@ erDiagram
         string Plan_NNNN PK
         string PRD_NNNN FK
     }
+    INTERFACE_CONTRACT {
+        string BC_NN_CTR_NN PK
+        string BC_NN FK
+        string BC_NN_AGG_NN FK
+        string BC_NN_EVT_NN FK
+        string ADR_NNNN FK
+    }
+    CLI_SURFACE {
+        string CLI_NN PK
+    }
+    CLI_COMMAND {
+        string CLI_NN_CMD_NN PK
+        string CLI_NN FK
+        string C_NM_FXX FK
+    }
 
     PERSONA ||--o{ VALUE_STREAM : "triggers"
     PERSONA ||--o{ BMC : "Customer Segments"
@@ -257,6 +274,12 @@ erDiagram
     EPIC ||--|| PRD : "one PRD per epic"
     QUALITY_ATTRIBUTES ||--o{ PRD : "QA-XXNN in acceptance criteria"
     PRD ||--|| IMPLEMENTATION_PLAN : "one plan per PRD"
+    INTERFACE_CONTRACT }o--o{ ADR : "versioning and auth decisions"
+    INTERFACE_CONTRACT }o--o{ QUALITY_ATTRIBUTES : "SLA per CTR-NN"
+    INTERFACE_CONTRACT }o--o{ PRD : "acceptance criteria reference CTR-NN"
+    CLI_SURFACE ||--o{ CLI_COMMAND : "contains"
+    CLI_COMMAND }o--o{ FBS : "maps to C-N.M.FXX"
+    CLI_COMMAND }o--o{ EPIC : "scoped by delivery phase"
 ```
 
 **Hard rules of the graph:**
@@ -400,6 +423,19 @@ moving on.
 - Mode `verify` → check for anemic model (entities must have behaviour); check aggregate sizing (≤5 members); check event naming (past tense + business-meaningful)
 **Output verification:** one `{bc-slug}.md` per BC-NN in `docs/domain/07b-models/`; every aggregate has a named root + ≥2 documented invariants; all entity names match GT-NN glossary terms; all domain events are past tense + carry business significance; Mermaid class diagram present.
 
+### Step 7c — Interface Contract (external API + async surface per BC)
+
+**Skill:** `arch-service-contract`
+**Prerequisites:** Step 7b (Domain Model — aggregates, entities, value objects, domain events are the raw material for the contract); Step 2c (Glossary — resource and event names must match GT-NN terms); relevant ADRs for versioning strategy, auth mechanism, and event-bus choice.
+**Process:**
+- Mode `scaffold` → create `docs/architecture/interfaces/{bc-slug}.md` with `_TODO_` placeholders; one file per BC
+- Mode `contract-first` → read domain model (AGG-NN, ENT-NN, EVT-NN); map aggregates to REST resources; map domain events to async events; define error contract (RFC 7807), versioning policy, and security surface; assign `BC-NN.CTR-NN` IDs
+- Mode `document-existing` → reverse-engineer from route files or OpenAPI specs; emit drift report (surface elements with no domain model backing)
+- Mode `refresh` → detect additions, removals, renames vs. current domain model; classify breaking vs non-breaking changes; append changelog
+**Output verification:** `docs/architecture/interfaces/{bc-slug}.md` exists; every CTR-NN entry maps to a `BC-NN.AGG-NN`, `BC-NN.ENT-NN`, or `BC-NN.EVT-NN`; no verb in REST paths (exception: `/actions/{verb}`); pagination envelope on all collection endpoints; RFC 7807 error contract present; versioning and security surfaces present; CTR-NN IDs monotonically assigned.
+
+---
+
 ### Step 8 — Delivery Roadmap (Plan by Feature + Walking Skeleton + Phase Goals)
 
 **Skill:** `spec-delivery-roadmap`
@@ -497,6 +533,11 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `BC-NN.ENT-NN` | Entity (scoped to bounded context) | `domain-model` |
 | `BC-NN.VO-NN` | Value Object (scoped to bounded context) | `domain-model` |
 | `BC-NN.EVT-NN` | Domain Event (scoped to bounded context) | `domain-model` |
+| `BC-NN.CTR-NN` | Interface Contract element, **BC-scoped** — API is the direct surface of one BC (microservices, per-service APIs) | `arch-service-contract` |
+| `CTR-NN` | Interface Contract element, **product-level** — API spans multiple BCs (BFF, gateway, GraphQL schema); `Delegates to` field records the BC-NN per resource | `arch-service-contract` |
+| `BC-NN.CLI-NN` | CLI tool surface, **BC-scoped** — one CLI per BC/service | `arch-cli-contract` |
+| `CLI-NN` | CLI tool surface, **product-level** — one CLI spanning multiple BCs; BC-NN column per command records the BC it delegates to | `arch-cli-contract` |
+| `BC-NN.CLI-NN.CMD-NN` or `CLI-NN.CMD-NN` | CLI command — scoped to match the parent CLI tool's ID format | `arch-cli-contract` |
 | `E-NN` | Epic + walking skeleton + phase plan (delivery roadmap) | `spec-delivery-roadmap` |
 | `QA-XXNN` | Quality attribute (characteristic prefix + counter, e.g. `QA-PE01`, `QA-SE03`) | `spec-quality-attributes` |
 | `PRD-NNNN` | PRD ID | `spec-prd` |
@@ -544,8 +585,12 @@ docs/
 │   └── active/
 │       └── {NNNN}_exec_{slug}.md  (one file per plan)
 ├── architecture/                                        ← `arch-` skills
-│   └── decisions/                                       ← arch-adr writes here
-│       └── adr-{NNNN}-{slug}.md
+│   ├── decisions/                                       ← arch-adr writes here
+│   │   └── adr-{NNNN}-{slug}.md
+│   └── interfaces/                                      ← arch-service-contract + arch-cli-contract
+│       ├── {bc-slug}.md  (BC-scoped API, one per BC)    ← arch-service-contract (BC-NN.CTR-NN)
+│       ├── {slug}.md  (product-level API, spans BCs)    ← arch-service-contract (CTR-NN)
+│       └── cli-{slug}.md  (one per CLI tool)            ← arch-cli-contract (BC-NN.CLI-NN or CLI-NN)
 ├── domain/                                              ← `domain-` skills (DDD artefacts — numbered by step)
 │   ├── 02b-bounded-contexts.md                          ← domain-bounded-context (BC-NN)
 │   ├── 02b-context-map.md                               ← domain-bounded-context (context map)
@@ -654,6 +699,9 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 | New artefact step, new canonical path | `util-metamodel-scaffold/references/index-template.md` → §Detection bash block + §Template stack-progress table (add detection command + row) |
 
 Failing to update these files after a metamodel change will cause the audit and migration skills to silently miss the new artefact — the most dangerous kind of drift.
+
+**Already-updated coupling (arch-service-contract Step 7c + arch-cli-contract supporting skill, 2026-05-25):**
+`rules/metamodel.md` artefact table (row 7c) + build order §7c + DAG + canonical paths tree + ID conventions table (`BC-NN.CTR-NN`, `CLI-NN`, `CLI-NN.CMD-NN`) + supporting skills (`arch-cli-contract` bullet) + this coupling table · `util-metamodel-audit/SKILL.md` (step count 14→15, check count 16→18, §17 frontmatter row added to report-structure and "what a good audit means" tables) · `util-metamodel-audit/references/check-catalogue.md` (Checks 1, 2, 5, 6, 7, 9: Step 7c detection patterns + CTR-NN/CLI-NN/CMD-NN ID patterns + interface contract dependency rules + mandatory section rules) · `util-metamodel-migration/references/detection-signals.md` (filename patterns, folder patterns §Tier 2, content signals §Tier 3 for service contract + CLI contract artefacts)
 
 **Already-updated coupling (business-vision, Step 0, 2026-05-21):**
 `rules/metamodel.md` artefact table (row 0) + build order §0 + DAG + ER diagram + canonical paths + prefix exception note + this table · `README.md` flowchart (S0 node + edges) + ER diagram + skill index · `util-metamodel-audit/references/check-catalogue.md` Checks 1, 2 · `util-metamodel-migration/references/detection-signals.md` §Filename + §Content signals · `business-persona/SKILL.md` · `business-model-canvas/SKILL.md` · `business-objective/SKILL.md` · `spec-delivery-roadmap/SKILL.md` · `spec-prd/SKILL.md`

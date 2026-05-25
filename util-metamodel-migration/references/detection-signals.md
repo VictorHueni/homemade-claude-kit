@@ -32,6 +32,8 @@ A file whose name matches one of these patterns is likely the artefact type list
 | `*quant-model*.md` or `*tam-*.md` or `*savings-model*.md` | Quantitative model | `business-quantitative-model` | `docs/business/06a-models/qm-NN-{topic}.md` |
 | `VISION.md` or `*vision*.md` or `*north-star*.md` | Product vision | `business-vision` | `docs/VISION.md` (singleton at docs root) |
 | `*objectives*.md` or `*okr*.md` or `*key-results*.md` | Business objectives | `business-objective` | `docs/business/04b-objectives.md` |
+| `*interface-contract*.md` or `*service-contract*.md` or `*api-contract*.md` or `*api-surface*.md` (outside `docs/architecture/interfaces/`) | Service contract | `arch-service-contract` | `docs/architecture/interfaces/{bc-slug}.md` |
+| `*cli-contract*.md` or `*cli-surface*.md` (outside `docs/architecture/interfaces/`) | CLI contract | `arch-cli-contract` | `docs/architecture/interfaces/cli-{slug}.md` |
 
 **ADR naming redundancy rule:** if a file is already in `docs/architecture/decisions/` and its name contains `-adr-` (e.g. `0003-adr-clean-architecture.md`), flag as Tier 1 naming issue. Proposed fix: `git mv 0003-adr-clean-architecture.md 0003-clean-architecture.md`. The `-adr-` prefix is redundant since the folder already signals the type.
 
@@ -54,6 +56,7 @@ A folder whose name matches one of these patterns, AND is not already at the can
 | `value-streams/` or `journeys/` or `customer-journeys/` | `business-value-stream` | `docs/business/04a-value-streams.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "value-stream*" -o -type d -iname "journey*"` |
 | `processes/` or `workflows/` | `business-process` | `docs/business/05a-processes/` | `find docs -type d -iname "process*" -o -type d -iname "workflow*" \| grep -v "docs/business/05a-processes"` |
 | `decisions/` or `adrs/` or `adr/` | `arch-adr` | `docs/architecture/decisions/` | `find docs -type d -iname "decision*" -o -type d -iname "adr*" \| grep -v "docs/architecture/decisions"` |
+| `interfaces/` or `api-surface/` or `api-contracts/` or `service-contracts/` (not at `docs/architecture/interfaces/`) | Interface / CLI contracts | `docs/architecture/interfaces/` | `find docs -type d \( -iname "interface*" -o -iname "api-surface*" -o -iname "api-contract*" -o -iname "service-contract*" \) \| grep -v "docs/architecture/interfaces"` |
 | `glossary/` or `ubiquitous-language/` or `vocabulary/` | `domain-glossary` | `docs/domain/02c-glossary.md` (flat — no subfolder in v2) | `find docs/domain -type d -iname "glossar*" -o -type d -iname "ubiquitous*"` |
 | `models/` containing `*model*.md` files | `business-quantitative-model` or `domain-model` | `docs/business/06a-models/` or `docs/domain/` | Confirm with Tier 1 + Tier 3 |
 | `ideas/` or `proposals/` | `spec-idea` | `docs/ideas/` | `find docs -type d -iname "idea*" -o -type d -iname "proposal*" \| grep -v "docs/ideas"` |
@@ -84,6 +87,8 @@ Read only `head -50 {file}`. Check for these high-signal headings. A content sig
 | `## The Elevator Pitch` or `## North Star Metric` heading | `business-vision` |
 | `OBJ-[0-9][0-9]` pattern or `KR-[0-9][0-9]\.[0-9]` pattern | `business-objective` |
 | `## Objective.*Epic traceability` | `business-objective` |
+| `## §0 Traceability` with `BC-NN.CTR-NN` or `CTR-NN` pattern | `arch-service-contract` (service / interface contract) |
+| `## §2 Command catalogue` or `## §7 Error contract` with `CMD-NN` pattern | `arch-cli-contract` (CLI contract) |
 
 ---
 

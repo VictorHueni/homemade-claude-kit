@@ -27,6 +27,8 @@ find docs/exec-plans/active -maxdepth 1 -name "*_exec_*.md" 2>/dev/null | head -
 find docs/domain -maxdepth 1 -name "02b-bounded-contexts.md" 2>/dev/null           # Step 2b
 find docs/domain -maxdepth 1 -name "02c-glossary.md" 2>/dev/null                  # Step 2c
 find docs/domain/07b-models -name "*.md" 2>/dev/null | head -1             # Step 7b (per BC)
+find docs/architecture/interfaces -name "*.md" ! -name "cli-*.md" 2>/dev/null | head -1  # Step 7c (service contract, per BC)
+find docs/architecture/interfaces -name "cli-*.md" 2>/dev/null | head -1                  # CLI contract (supporting skill, per tool)
 ```
 
 **Status assignment:**
@@ -61,6 +63,9 @@ Then compare each path against the canonical map:
 - `09a-quality-attributes.md` → must be at `docs/product-specs/09a-quality-attributes.md` (flat file)
 - `prd-*.md` → must be under `docs/product-specs/prds/`
 - `*.md` under `docs/architecture/decisions/` → ADRs, correct
+- `{bc-slug}.md` (no `cli-` prefix) under `docs/architecture/interfaces/` → service contract (`arch-service-contract`), correct
+- `cli-{slug}.md` under `docs/architecture/interfaces/` → CLI contract (`arch-cli-contract`), correct
+- `*.md` under `docs/architecture/` but NOT in `decisions/`, `interfaces/`, or `research/` → likely misplaced architecture file
 
 **Severity:** Warning
 
@@ -155,6 +160,11 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `KA-N` | `\bKA-[0-9]+\b` | `docs/business/02a-bmc.md` |
 | `KP-N` | `\bKP-[0-9]+\b` | `docs/business/02a-bmc.md` |
 | `CT-N` | `\bCT-[0-9]+\b` | `docs/business/02a-bmc.md` |
+| `BC-NN.CTR-NN` | `\bBC-[0-9]{2}\.CTR-[0-9]{2}\b` | `docs/architecture/interfaces/{bc-slug}.md` |
+| `CTR-NN` | `\bCTR-[0-9]{2}\b` | `docs/architecture/interfaces/{slug}.md` (product-level) |
+| `BC-NN.CLI-NN` | `\bBC-[0-9]{2}\.CLI-[0-9]{2}\b` | `docs/architecture/interfaces/cli-{slug}.md` |
+| `CLI-NN` | `\bCLI-[0-9]{2}\b` | `docs/architecture/interfaces/cli-{slug}.md` (product-level) |
+| `CLI-NN.CMD-NN` | `\bCLI-[0-9]{2}\.CMD-[0-9]{2}\b` | `docs/architecture/interfaces/cli-{slug}.md` |
 
 **Detection (example for P-NN):**
 ```bash
@@ -197,6 +207,15 @@ grep -roh '\bResearch-[0-9]\{1,3\}\b' docs/ --include="*.md"
 grep -roh '\bCO-[0-9]\b' docs/ --include="*.md"
 ```
 
+```bash
+# CTR IDs with single digit (CTR-1 instead of CTR-01)
+grep -roh '\bCTR-[0-9]\b' docs/ --include="*.md"
+# CLI IDs with single digit (CLI-1 instead of CLI-01)
+grep -roh '\bCLI-[0-9]\b' docs/ --include="*.md"
+# CMD IDs with single digit (CMD-1 instead of CMD-01)
+grep -roh '\bCMD-[0-9]\b' docs/ --include="*.md"
+```
+
 **Severity:** Error
 
 **Proposed fix template:**
@@ -225,6 +244,8 @@ grep -roh '\bCO-[0-9]\b' docs/ --include="*.md"
 | `docs/domain/07b-models/{bc-slug}.md` exists | `docs/domain/02c-glossary.md` must exist (entity names must match glossary terms) |
 | `docs/business/04b-objectives.md` exists | `docs/business/04a-value-streams.md` must also exist (objectives consume pain index from VS) |
 | Any `docs/product-specs/prds/prd-*.md` | If `docs/business/04b-objectives.md` exists, the PRD should reference ≥1 `OBJ-NN` in §0 |
+| `docs/architecture/interfaces/{bc-slug}.md` exists (not `cli-*.md`) | `docs/domain/07b-models/{bc-slug}.md` must also exist — service contract derives from domain model (AGG/ENT/EVT) |
+| `docs/architecture/interfaces/{bc-slug}.md` exists (not `cli-*.md`) | `docs/domain/02b-bounded-contexts.md` must also exist — BC-NN namespace for CTR-NN IDs |
 
 **Detection (example):**
 ```bash
@@ -241,6 +262,14 @@ find docs/domain/07b-models -name "*.md" 2>/dev/null | while read f; do
     echo "WARNING: Domain model exists but 02b-bounded-contexts.md missing: $f"
   [ ! -f "docs/domain/02c-glossary.md" ] && \
     echo "WARNING: Domain model exists but glossary missing: $f"
+done
+
+find docs/architecture/interfaces -name "*.md" ! -name "cli-*.md" 2>/dev/null | while read f; do
+  slug=$(basename "$f" .md)
+  [ ! -f "docs/domain/07b-models/${slug}.md" ] && \
+    echo "WARNING: Service contract exists for '${slug}' but no domain model at docs/domain/07b-models/${slug}.md"
+  [ ! -f "docs/domain/02b-bounded-contexts.md" ] && \
+    echo "WARNING: Service contract exists but 02b-bounded-contexts.md missing"
 done
 ```
 
@@ -299,11 +328,31 @@ done | sort -rn
 | `docs/domain/07b-models/{bc-slug}.md` | `## Aggregate catalogue`, `## Domain event catalogue`, Mermaid `classDiagram` | `grep -q 'Aggregate catalogue\|classDiagram'` |
 | `docs/architecture/research/*.md` | `## Questions`, `## Findings`, `## Changelog` | `grep -q '## Questions\|## Findings'` |
 | `docs/business/01b-competitive-landscape/*.md` | `## Porter Five Forces`, `## Competitor Profiles` or `## CO-` heading | `grep -q 'Five Forces\|CO-[0-9]'` |
+| `docs/architecture/interfaces/*.md` (not `cli-*.md`) | `## §0 Traceability`, `## §3 Error contract`, `## §4 Versioning & deprecation policy`, `## §5 Security surface`, `## Open Items`, `## Changelog` | `grep -q '§0 Traceability\|§3 Error contract'` |
+| `docs/architecture/interfaces/cli-*.md` | `## §0 Traceability`, `## §2 Command catalogue`, `## §5 Output contract`, `## §7 Error contract`, `## Open Items`, `## Changelog` | `grep -q 'Command catalogue\|§7 Error contract'` |
 
 **Detection (example for process doc):**
 ```bash
 find docs/business/05a-processes -name "proc-*.md" 2>/dev/null | while read f; do
   grep -q 'KPI\|§8' "$f" || echo "MISSING KPIs: $f"
+  grep -q '^## Open Items' "$f" || echo "MISSING canonical Open Items section: $f"
+done
+
+# Service contracts
+find docs/architecture/interfaces -name "*.md" ! -name "cli-*.md" 2>/dev/null | while read f; do
+  grep -q '§0 Traceability' "$f" || echo "MISSING §0 Traceability: $f"
+  grep -q '§3 Error contract' "$f" || echo "MISSING §3 Error contract: $f"
+  grep -q '§4 Versioning' "$f" || echo "MISSING §4 Versioning: $f"
+  grep -q '§5 Security' "$f" || echo "MISSING §5 Security surface: $f"
+  grep -q '^## Open Items' "$f" || echo "MISSING canonical Open Items section: $f"
+done
+
+# CLI contracts
+find docs/architecture/interfaces -name "cli-*.md" 2>/dev/null | while read f; do
+  grep -q '§0 Traceability' "$f" || echo "MISSING §0 Traceability: $f"
+  grep -q 'Command catalogue' "$f" || echo "MISSING §2 Command catalogue: $f"
+  grep -q '§5 Output contract' "$f" || echo "MISSING §5 Output contract: $f"
+  grep -q '§7 Error contract' "$f" || echo "MISSING §7 Error contract: $f"
   grep -q '^## Open Items' "$f" || echo "MISSING canonical Open Items section: $f"
 done
 ```
