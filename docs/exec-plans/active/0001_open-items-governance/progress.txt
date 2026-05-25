@@ -18,3 +18,12 @@
 - Learnings: All 9 required tokens (## Open Items, document-level, Source anchor, Source heading, project-control/open-items, doc-gap, decision-gap, execution-item, tech-debt) consolidated into rules/open-items-governance.md as the single source of truth; rules/metamodel.md and README.md carry summary pointers rather than duplicated schema. Kept the ledger under project-control/ (not docs/) and explicitly distinguished _TODO_ scaffold debt from open-item rows per the plan principles. Milestone M1 set to in-progress until increment 02 lands the scaffolded control plane.
 - Commit: ae9a7d6
 - Timestamp: 2026-05-25T00:00:00Z
+
+## Iteration 2
+- Increment: 02 — Scaffold the Central Control Plane
+- Status: done
+- Files changed: project-control/open-items/README.md (new), project-control/open-items/open-items.md (new), project-control/open-items/archive/.gitkeep (new), docs/exec-plans/active/0001_open-items-governance/0001_exec_open-items-governance.md
+- Test gate: passed
+- Learnings: Ledger initialised empty per §2 of the governance rule (no placeholder rows) and placed under project-control/, not docs/, so util-metamodel-audit treats it as control-plane data rather than a product artefact. README documents the local-first authoring rule (artefact `## Open Items` is the source; the ledger is the consolidated read-out) and clarifies that governance-only items use `_central-only_` in Source heading. Archive folder seeded with .gitkeep so the time-bucketed snapshot path exists before util-open-items arrives in increment 05. Milestone M1 closed.
+- Commit: 6fabdd4
+- Timestamp: 2026-05-25T00:00:00Z
