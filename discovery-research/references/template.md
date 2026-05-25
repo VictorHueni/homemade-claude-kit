@@ -17,9 +17,9 @@ This single interview can flip rows {{N}}, {{M}} of the
 > **Methodology:** built using the canonical synthesis of [BABOK §10.25
 > Interviews + Steve Portigal *Interviewing Users* (2022) + Erika Hall
 > *Just Enough Research* + NN/g semi-structured guidance + Tomer Sharon
-> assumption-testing](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-research/references/methodology-references.md).
-> Full bibliography lives with the [business-research
-> skill](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-research).
+> assumption-testing](https://github.com/VictorHueni/homemade-claude-kit/tree/main/discovery-research/references/methodology-references.md).
+> Full bibliography lives with the [discovery-research
+> skill](https://github.com/VictorHueni/homemade-claude-kit/tree/main/discovery-research).
 
 **Frontmatter:**
 - **Target persona:** [P-NN link or "TBD — interview will help build one"]
@@ -249,7 +249,7 @@ Columns: OI-ID | Type | Summary | Source anchor | Source heading | Resolution pa
 2. **Update the calculator/model defaults** — adjust the input ___, re-export, commit with `feat({{scope}}): re-anchor {{input}} to {{N}} per interview {{date}}`.
 3. **Update upstream artefacts** as enumerated in the synthesis (persona § / BMC block / model § / landscape claim).
 4. **Promote confidence ratings** on validated claims; demote those refuted.
-5. **Update the project's `docs/business/discovery/interviews/README.md`** index with this interview's link + headline finding.
+5. **Update the project's `docs/discovery/interviews/README.md`** index with this interview's link + headline finding.
 
 This single interview moves the [validation tracker]({{path}}) on {{N}} rows: {{rows-affected}}.
 
@@ -269,7 +269,7 @@ from upstream artefacts:
 2. **{{Hypothesis 2}}** — _TODO_
 3. **{{Hypothesis 3}}** *(optional)*
 
-> **Methodology:** [business-research kit-link methodology pointer](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-research/references/methodology-references.md)
+> **Methodology:** [discovery-research kit-link methodology pointer](https://github.com/VictorHueni/homemade-claude-kit/tree/main/discovery-research/references/methodology-references.md)
 
 ---
 
@@ -397,7 +397,7 @@ from upstream artefacts:
 1. **{{Hypothesis 1}}** — currently `Assumed`; this wave aims for `Tested`
 2. **{{Hypothesis 2}}** — _TODO_
 
-> **Methodology:** [business-research kit-link methodology pointer](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-research/references/methodology-references.md)
+> **Methodology:** [discovery-research kit-link methodology pointer](https://github.com/VictorHueni/homemade-claude-kit/tree/main/discovery-research/references/methodology-references.md)
 
 ---
 

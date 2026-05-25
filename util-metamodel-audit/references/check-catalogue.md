@@ -62,6 +62,9 @@ Then compare each path against the canonical map:
 - `08a-delivery-roadmap.md` → must be at `docs/product-specs/08a-delivery-roadmap.md` (flat file)
 - `09a-quality-attributes.md` → must be at `docs/product-specs/09a-quality-attributes.md` (flat file)
 - `prd-*.md` → must be under `docs/product-specs/prds/`
+- `IDEA-*.md` → must be under `docs/discovery/ideation/` (filename matches `IDEA-NNNN-{slug}.md`)
+- `interview-*.md`, `research-synthesis-*.md`, `research-plan-*.md` → must be under `docs/discovery/interviews/`
+- `workshop-*.md`, `workshop-synthesis-*.md` → must be under `docs/discovery/workshops/`
 - `*.md` under `docs/architecture/decisions/` → ADRs, correct
 - `{bc-slug}.md` (no `cli-` prefix) under `docs/architecture/interfaces/` → service contract (`arch-service-contract`), correct
 - `cli-{slug}.md` under `docs/architecture/interfaces/` → CLI contract (`arch-cli-contract`), correct
@@ -150,6 +153,7 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `QA-[A-Z]{2}[0-9]{2}` | `\bQA-[A-Z]{2}[0-9]{2}\b` | `docs/product-specs/09a-quality-attributes.md` |
 | `ADR-NNNN` | `\bADR-[0-9]{4}\b` | `docs/architecture/decisions/` |
 | `Research-NNNN` | `\bResearch-[0-9]{4}\b` | `docs/architecture/research/` |
+| `IDEA-NNNN` | `\bIDEA-[0-9]{4}\b` | `docs/discovery/ideation/` (filename prefix `IDEA-NNNN-{slug}.md`) |
 | `CO-NN` | `\bCO-[0-9]{2}\b` | `docs/business/01b-competitive-landscape/` |
 | `PRD-NNNN` | `\bPRD-[0-9]{4}\b` | `docs/product-specs/prds/prd-*.md` |
 | `CS-N` | `\bCS-[0-9]+\b` | `docs/business/02a-bmc.md` |
@@ -330,6 +334,7 @@ done | sort -rn
 | `docs/business/01b-competitive-landscape/*.md` | `## Porter Five Forces`, `## Competitor Profiles` or `## CO-` heading | `grep -q 'Five Forces\|CO-[0-9]'` |
 | `docs/architecture/interfaces/*.md` (not `cli-*.md`) | `## §0 Traceability`, `## §3 Error contract`, `## §4 Versioning & deprecation policy`, `## §5 Security surface`, `## Open Items`, `## Changelog` | `grep -q '§0 Traceability\|§3 Error contract'` |
 | `docs/architecture/interfaces/cli-*.md` | `## §0 Traceability`, `## §2 Command catalogue`, `## §5 Output contract`, `## §7 Error contract`, `## Open Items`, `## Changelog` | `grep -q 'Command catalogue\|§7 Error contract'` |
+| `docs/discovery/ideation/IDEA-*.md` | `## Problem statement`, `## Not doing`, `## Open Items`, `## Changelog`; frontmatter must include `idea_id`, `domain`, `lifecycle`, `graduates_to` | `grep -q '## Problem statement\|## Not doing'` and `grep -q '^idea_id:\|^lifecycle:\|^graduates_to:'` |
 
 **Detection (example for process doc):**
 ```bash
@@ -400,7 +405,7 @@ done
 
 **Severity:** Warning (100% Assumed + >90 days); Info (distribution report only)
 
-**Proposed fix template:** "Run `business-research` Mode 2 (interview script) targeting the Assumed bullets in `{file}` to gather evidence and promote to Tested/Validated."
+**Proposed fix template:** "Run `discovery-research` Mode 2 (interview script) targeting the Assumed bullets in `{file}` to gather evidence and promote to Tested/Validated."
 
 ---
 
@@ -448,7 +453,7 @@ fi
 - Glossary changelog last entry >30 days ago → Info (may need sprint review)
 
 **Proposed fix template:**
-- Expired persona: "Run `business-research` Mode 2 to validate `{persona}` and update `Next review` date, or mark as retired."
+- Expired persona: "Run `discovery-research` Mode 2 to validate `{persona}` and update `Next review` date, or mark as retired."
 - Stale competitive claim: "Run `business-competitive-landscape` Mode 5 (refresh) for `{competitor}` claim in `{file}`."
 - Missing glossary changelog: "Run `domain-glossary` Mode 4 (Maintain) — add `## Changelog` section and log all terms added/retired to date."
 - Stale glossary changelog: "Run `domain-glossary` Mode 4 (Maintain, trigger 1D — scheduled sprint review) for the Core BC."

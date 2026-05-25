@@ -37,7 +37,8 @@ Skill folder name + `name:` frontmatter field must follow this exact pattern:
 | Category | Maps to output folder | Examples |
 |---|---|---|
 | `business-` | `docs/business/` | `business-persona`, `business-capability-map`, `business-value-stream`, `business-process`, `business-model-canvas`, `business-quantitative-model` |
-| `spec-` | `docs/product-specs/`, `docs/exec-plans/`, `docs/ideas/` (pre-PRD specs all live in the `spec-` family) | `spec-prd`, `spec-functional-breakdown-structure`, `spec-implementation-plan`, `spec-peer-review`, `spec-idea` |
+| `discovery-` | `docs/discovery/` (pre-formal evidence layer — ideation, interviews, workshops; cross-cutting, feeds every downstream artefact) | `discovery-idea` (→ `docs/discovery/ideation/`), `discovery-research` (→ `docs/discovery/interviews/`), `discovery-workshop` (→ `docs/discovery/workshops/`) |
+| `spec-` | `docs/product-specs/`, `docs/exec-plans/` | `spec-prd`, `spec-functional-breakdown-structure`, `spec-implementation-plan`, `spec-peer-review` |
 | `arch-` | `docs/architecture/` (subfolders per artefact type) | `arch-adr` (writes to `docs/architecture/decisions/`) |
 | `domain-` | `docs/domain/` | DDD artefacts — bounded contexts, glossary, domain model; the shared language between business and tech | `domain-bounded-context`, `domain-glossary`, `domain-model` |
 | `ops-` | `docs/ops/` (subfolders per artefact type) | `ops-runbook` (→ `docs/ops/runbooks/`), `ops-bug-rca` (→ `docs/ops/rcas/`) |

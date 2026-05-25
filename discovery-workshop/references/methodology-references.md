@@ -117,13 +117,13 @@ canvas-specific facilitation guides:
   VP prompts about value-not-features; KR prompts about Differentiator
   vs Commodity).
 - **Post-workshop validation list** — flag which bullets are most
-  uncertain; these become the input to `business-research` interview
+  uncertain; these become the input to `discovery-research` interview
   scripts.
 
 ### Discipline encoded in the skill
 
 - BMC / VPC workshops in the skill produce explicit "post-workshop
-  validation backlog" — feeds `business-research` mode 2.
+  validation backlog" — feeds `discovery-research` mode 2.
 - One-sticky-per-bullet discipline (avoid sticky-note clusters
   representing multi-paragraph ideas).
 - Confidence ratings (Assumed / Tested / Validated) carried into the
@@ -161,7 +161,7 @@ Schuster, 2016). Originally developed at Google Ventures.
   5-session series with the canonical Monday-Friday cadence.
 - Decider-role pattern surfaced in §Facilitation tips when stakes are
   high.
-- Friday's user testing leverages `business-research` mode 2 interview
+- Friday's user testing leverages `discovery-research` mode 2 interview
   scripts.
 
 ---

@@ -62,7 +62,9 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | — | ADRs | `docs/architecture/decisions/{NNNN}-{slug}.md` | `docs/architecture/decisions/adr-{NNNN}-{slug}.md` | pattern-b-rename |
 | — | Ops Runbooks | `docs/ops/runbooks/{slug}.md` | `docs/ops/runbooks/{slug}.md` | no-change |
 | — | Ops RCAs | `docs/ops/rcas/{YYYY-MM-DD}-{slug}.md` | `docs/ops/rcas/{YYYY-MM-DD}-{slug}.md` | no-change |
-| — | Ideas | `docs/ideas/{slug}.md` | `docs/ideas/{domain}/{slug}.md` + `INDEX.md` | pattern-b-rename |
+| — | Ideas | `docs/ideas/{slug}.md` or `docs/ideas/{domain}/{slug}.md` | `docs/discovery/ideation/IDEA-{NNNN}-{slug}.md` + flat `INDEX.md` (domain becomes a frontmatter tag, not a subfolder) | pattern-c-discovery-promote |
+| — | Discovery Research | `docs/business/discovery/interviews/` | `docs/discovery/interviews/` | pattern-c-discovery-promote |
+| — | Discovery Workshops | `docs/business/discovery/workshops/` | `docs/discovery/workshops/` | pattern-c-discovery-promote |
 
 ---
 
@@ -114,6 +116,66 @@ done
 
 Also check for other files in the `docs/domain/{bc-slug}/` folders before deleting them.
 If any non-domain-model files are present, report as a warning and skip folder deletion.
+
+### Discovery promotion (special case — `pattern-c-discovery-promote`)
+
+The v1 layout placed two discovery artefacts under `docs/business/discovery/` and pre-PRD
+ideas under `docs/ideas/`. The v2 layout promotes all three to a single top-level
+`docs/discovery/` so the cross-cutting discovery family is co-located:
+
+| v1 source | v2 destination |
+| :-- | :-- |
+| `docs/business/discovery/interviews/` | `docs/discovery/interviews/` |
+| `docs/business/discovery/workshops/` | `docs/discovery/workshops/` |
+| `docs/ideas/{slug}.md` or `docs/ideas/{domain}/{slug}.md` | `docs/discovery/ideation/IDEA-{NNNN}-{slug}.md` |
+
+Detection + move:
+```bash
+# Move discovery artefacts up one level
+[ -d docs/business/discovery ] && git mv docs/business/discovery docs/discovery
+
+# Move flat ideas
+if [ -d docs/ideas ]; then
+  mkdir -p docs/discovery/ideation
+  # Assign sequential IDEA-NNNN IDs as files are moved
+  idx=1
+  find docs/ideas -name "*.md" -type f | while read f; do
+    slug=$(basename "$f" .md)
+    # Strip any pre-existing IDEA-NNNN prefix to avoid double-prefixing
+    slug=$(echo "$slug" | sed -E 's/^IDEA-[0-9]{4}-//')
+    printf -v id "IDEA-%04d" $idx
+    git mv "$f" "docs/discovery/ideation/${id}-${slug}.md"
+    idx=$((idx + 1))
+  done
+  # Remove any leftover empty domain subfolders
+  find docs/ideas -mindepth 1 -type d -empty -delete 2>/dev/null
+  rmdir docs/ideas 2>/dev/null
+fi
+
+# Frontmatter backfill required after move:
+#   - Add idea_id: IDEA-NNNN matching the filename prefix
+#   - Add lifecycle: captured (or refining if §Ideas section exists; ready if §Decision exists)
+#   - Add graduates_to: _TBD_ for operator to fill on next refine pass
+#   - Add domain: <product|business|architecture|process|dx|ops> from the v1 subfolder name
+#     (frontend/backend/infra → architecture; design/dx → dx; others → product by default)
+```
+
+Link rewrites (sed pass after move):
+```bash
+# In every docs/**/*.md, rewrite stale references:
+sed -i -E \
+  -e 's|docs/business/discovery/interviews|docs/discovery/interviews|g' \
+  -e 's|docs/business/discovery/workshops|docs/discovery/workshops|g' \
+  -e 's|docs/ideas/|docs/discovery/ideation/|g' \
+  $(find docs -name '*.md')
+```
+
+Skill rename (one-shot — only affects projects that hardcoded the old skill names in
+CLAUDE.md or in custom slash commands; the kit's own skill folders have already been
+renamed):
+- `business-research` → `discovery-research`
+- `business-workshop` → `discovery-workshop`
+- `spec-idea` → `discovery-idea`
 
 ### VISION.md — no action needed
 

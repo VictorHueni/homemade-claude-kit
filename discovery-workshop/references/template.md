@@ -12,9 +12,9 @@
 > Guide to Participatory Decision-Making* (Diamond of Participation) + Lipmanowicz
 > & McCandless *Liberating Structures* + Strategyzer workshop kits + Jake Knapp
 > *Sprint* + Priya Parker *The Art of
-> Gathering*](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-workshop/references/methodology-references.md).
-> Full bibliography lives with the [business-workshop
-> skill](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-workshop).
+> Gathering*](https://github.com/VictorHueni/homemade-claude-kit/tree/main/discovery-workshop/references/methodology-references.md).
+> Full bibliography lives with the [discovery-workshop
+> skill](https://github.com/VictorHueni/homemade-claude-kit/tree/main/discovery-workshop).
 
 **Frontmatter:**
 - **Date:** _TODO_
@@ -183,7 +183,7 @@ Send to all participants:
 >
 > **Timeline:** {{N}} half-day sessions over {{2-3}} weeks.
 
-> **Methodology:** [business-workshop kit-link methodology pointer](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-workshop/references/methodology-references.md)
+> **Methodology:** [discovery-workshop kit-link methodology pointer](https://github.com/VictorHueni/homemade-claude-kit/tree/main/discovery-workshop/references/methodology-references.md)
 
 ---
 
@@ -215,7 +215,7 @@ Send to all participants:
 
 1. **{{Foundational doc}}** — read before W1
 2. **{{Market snapshot, 1 page}}** — _TODO_
-3. **{{Interview assignment}}** *(optional)* — each participant conducts N customer interviews before W1 using [interview script]({{path}}) from `business-research`
+3. **{{Interview assignment}}** *(optional)* — each participant conducts N customer interviews before W1 using [interview script]({{path}}) from `discovery-research`
 
 ---
 
@@ -268,7 +268,7 @@ Each session has its own file following the single-workshop template above:
 
 Synthesis of outputs from the workshop held on {{YYYY-MM-DD}}.
 
-> **Methodology:** [business-workshop kit-link methodology pointer](https://github.com/VictorHueni/homemade-claude-kit/tree/main/business-workshop/references/methodology-references.md)
+> **Methodology:** [discovery-workshop kit-link methodology pointer](https://github.com/VictorHueni/homemade-claude-kit/tree/main/discovery-workshop/references/methodology-references.md)
 
 ---
 

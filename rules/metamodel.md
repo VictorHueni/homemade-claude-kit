@@ -43,12 +43,12 @@ what order, and where to put it**.
 **Supporting skills** (not in the main build order, used as needed):
 - `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
 - `arch-cli-contract` — CLI surface contract for a user-facing command-line tool → `docs/architecture/interfaces/cli-{slug}.md` (one per tool). ID format is scope-dependent: **BC-scoped** (one CLI per BC/service) mints `BC-NN.CLI-NN` + `BC-NN.CLI-NN.CMD-NN`; **product-level** (one CLI spanning multiple BCs) mints `CLI-NN` + `CLI-NN.CMD-NN`. Invoke when the product exposes a CLI; run after Step 7 (FBS) and Step 8 (Delivery Roadmap) so subcommands can be mapped to `C-N.M.FXX` functionalities and `E-NN` phases. Covers: subcommand tree, flag conventions, exit code catalogue, output format contract (stdout/stderr separation), configuration precedence, error contract.
-- `spec-idea` — captures pre-PRD ideas → `docs/ideas/{domain}/{slug}.md` with `INDEX.md` per domain folder
+- `discovery-idea` — captures, refines, and graduates pre-formal ideas → `docs/discovery/ideation/IDEA-{NNNN}-{slug}.md` with a single `INDEX.md` at folder root; mints `IDEA-NNNN` (4-digit zero-padded); each idea carries a `graduates_to:` pointer naming the downstream skill that owns the matured artefact (`spec-prd`, `arch-adr`, `business-persona`, `business-objective`, `business-model-canvas`, `arch-research`, `business-process`, or `spec-functional-breakdown-structure`); pre-Step-0 cross-cutting node — the skill itself never writes downstream artefacts, only invokes the right one at graduation
 - `spec-peer-review` — reviews PRDs / plans
 - `arch-research` — Architecture Research notes that inform ADR decisions → `docs/architecture/research/{NNNN}-{slug}.md`; mints `Research-NNNN` in-doc ID (4-digit zero-padded, same convention as `ADR-NNNN`); lifecycle: Draft → Active → Frozen (once feeding ADRs land) → Superseded
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/01b-competitive-landscape/`; mints `CO-NN` per Tier-1 competitor profile; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
-- `business-research` — hypothesis-anchored interview scripts + research synthesis + research plans → `docs/business/discovery/interviews/`; run alongside any step where upstream artefacts carry `Assumed` claims; especially valuable after Step 1 (Personas), Step 5 (BMC), and Step 6 (Quantitative Models); synthesis feeds confidence ratings (`Assumed → Tested → Validated`) back into those artefacts; companion to `business-workshop` (individual reality-check vs. group reality-check)
-- `business-workshop` — workshop facilitation guides + series plans + synthesis → `docs/business/discovery/workshops/`; run when stakeholder alignment or group reality-checking is needed; especially valuable before Step 3 (Value Streams) and Step 5 (BMC) to build shared understanding; companion to `business-research` (group reality-check vs. individual reality-check); both share the `docs/business/discovery/` parent folder
+- `discovery-research` — hypothesis-anchored interview scripts + research synthesis + research plans → `docs/discovery/interviews/`; run alongside any step where upstream artefacts carry `Assumed` claims; especially valuable after Step 1 (Personas), Step 5 (BMC), and Step 6 (Quantitative Models); synthesis feeds confidence ratings (`Assumed → Tested → Validated`) back into those artefacts; companion to `discovery-workshop` (individual reality-check vs. group reality-check) and `discovery-idea` (validates Must-be-true assumptions raised during idea refinement)
+- `discovery-workshop` — workshop facilitation guides + series plans + synthesis → `docs/discovery/workshops/`; run when stakeholder alignment or group reality-checking is needed; especially valuable before Step 3 (Value Streams) and Step 5 (BMC) to build shared understanding; companion to `discovery-research` (group reality-check vs. individual reality-check); the three `discovery-*` skills share the `docs/discovery/` parent folder
 - `ops-runbook`, `ops-bug-rca` — operational artefacts (post-ship)
 - `util-metamodel-scaffold` — one-time initialisation: creates the canonical `docs/` folder tree (variant-aware: greenfield / brownfield / strategy-only / single-feature), generates `docs/INDEX.md` (live navigation hub with ✅/🔄/⬜ status per step), and wires a stack pointer into `CLAUDE.md`; run once per new project before any artefact-producing skill; re-run Mode 3 to refresh `docs/INDEX.md` after completing stack steps
 - `util-docs-audit` — general doc staleness scan (file-level freshness, dead prose)
@@ -62,6 +62,22 @@ what order, and where to put it**.
 ## Dependency graph (DAG)
 
 ```
+   ┌──────────────────────────────────────────────────────────────┐
+   │  DISCOVERY LAYER (pre-formal evidence · cross-cutting)       │
+   │                                                              │
+   │   discovery-idea       discovery-research    discovery-      │
+   │   (capture · refine    (1:1 interviews +     workshop        │
+   │    · graduate)          synthesis)           (group facil.)  │
+   │   Output: IDEA-NNNN    Output: interview/    Output: workshop│
+   │   graduates_to →       synthesis docs        + synthesis docs│
+   │                                                              │
+   │   Routing (see "Discovery routing" below the DAG):           │
+   │   • discovery-idea graduates_to → any downstream node        │
+   │   • discovery-research validates Assumed claims in any node  │
+   │   • discovery-workshop aligns stakeholders before any node   │
+   └────────────────────────────┬─────────────────────────────────┘
+                                │ feeds + validates
+                                ▼
    ┌──────────────────────────────────────────────────┐
    │  business-vision (Step 0)                        │
    │  (why — the north star)                          │
@@ -166,6 +182,33 @@ what order, and where to put it**.
    └──────────────────────┘
 ```
 
+### Discovery routing — where the discovery layer feeds the DAG
+
+The three `discovery-*` skills are cross-cutting and not drawn as individual arrows above to keep the main DAG readable. Their routing is enumerated here.
+
+**`discovery-idea` graduation targets** (set per idea via `graduates_to:`):
+
+| Idea graduates to | Becomes | Pre-flight check |
+|---|---|---|
+| `business-persona` | `P-NN` | `01a-personas.md` exists |
+| `business-objective` | `OBJ-NN` (+ `KR-NN.M`) | `04b-objectives.md` exists (scaffold if not) |
+| `business-model-canvas` | new BMC block entry (`VP-NN`, `CS-NN`, …) | canvas file exists |
+| `business-process` | new `proc-NN-{slug}.md` | parent `VS-N.M` stage exists |
+| `arch-research` | `Research-NNNN` | no prerequisite |
+| `arch-adr` | `ADR-NNNN` | architectural choice still open |
+| `spec-functional-breakdown-structure` | new `C-N.M.FXX` row | parent capability `C-N.M` exists |
+| `spec-prd` | `PRD-NNNN` | an `E-NN` epic exists in the delivery roadmap |
+
+**`discovery-research` validation targets** (any artefact carrying `Assumed` confidence rows):
+
+- `business-persona` (Tier-1 proto-personas) · `business-model-canvas` blocks · `business-value-stream` pain indices · `business-quantitative-model` inputs · `business-objective` Key Result baselines
+
+**`discovery-workshop` alignment targets** (any artefact requiring group consensus before lock-in):
+
+- `business-vision` (north-star alignment) · `business-model-canvas` (BMC/Lean co-creation) · `business-value-stream` (journey mapping) · `business-capability-map` (L0 axis agreement) · `business-objective` (OKR setting) · `domain-bounded-context` (Event Storming → BC boundaries)
+
+The discovery layer never **mints** the downstream artefact itself — it produces evidence (interview synth, workshop output) or a graduation pointer (ideation), which the downstream skill consumes during its Mode 2 fill pass.
+
 ### Entity-relationship view
 
 The ER diagram shows which ID each artefact **mints** (PK) and which upstream IDs it **consumes** (FK) as cross-references — treating the documentation system as a data model.
@@ -233,6 +276,7 @@ erDiagram
         string Plan_NNNN PK
         string PRD_NNNN FK
     }
+<<<<<<< HEAD
     INTERFACE_CONTRACT {
         string BC_NN_CTR_NN PK
         string BC_NN FK
@@ -247,6 +291,12 @@ erDiagram
         string CLI_NN_CMD_NN PK
         string CLI_NN FK
         string C_NM_FXX FK
+=======
+    IDEA {
+        string IDEA_NNNN PK
+        string graduates_to FK
+        string target_id FK
+>>>>>>> origin/claude/metamodel-rules-ideas-skills-MwmUc
     }
 
     PERSONA ||--o{ VALUE_STREAM : "triggers"
@@ -274,12 +324,22 @@ erDiagram
     EPIC ||--|| PRD : "one PRD per epic"
     QUALITY_ATTRIBUTES ||--o{ PRD : "QA-XXNN in acceptance criteria"
     PRD ||--|| IMPLEMENTATION_PLAN : "one plan per PRD"
+<<<<<<< HEAD
     INTERFACE_CONTRACT }o--o{ ADR : "versioning and auth decisions"
     INTERFACE_CONTRACT }o--o{ QUALITY_ATTRIBUTES : "SLA per CTR-NN"
     INTERFACE_CONTRACT }o--o{ PRD : "acceptance criteria reference CTR-NN"
     CLI_SURFACE ||--o{ CLI_COMMAND : "contains"
     CLI_COMMAND }o--o{ FBS : "maps to C-N.M.FXX"
     CLI_COMMAND }o--o{ EPIC : "scoped by delivery phase"
+=======
+    IDEA }o--o| PERSONA : "graduates_to"
+    IDEA }o--o| OBJECTIVE : "graduates_to"
+    IDEA }o--o| BMC : "graduates_to (new block entry)"
+    IDEA }o--o| BUSINESS_PROCESS : "graduates_to"
+    IDEA }o--o| ADR : "graduates_to"
+    IDEA }o--o| FBS : "graduates_to (new C-N.M.FXX row)"
+    IDEA }o--o| PRD : "graduates_to"
+>>>>>>> origin/claude/metamodel-rules-ideas-skills-MwmUc
 ```
 
 **Hard rules of the graph:**
@@ -287,6 +347,7 @@ erDiagram
 - **No cycles.** B never feeds back into A.
 - The capability map (BC Map) is the **hub** — most other artefacts soft-link to it by `C-N.M` ID.
 - ADRs are **not in the linear chain** but must precede Step 9 (Quality Attributes) and Step 10 (PRDs) when their decisions affect those artefacts.
+- `IDEA` is **upstream of everything** and **mints no downstream FK on the target** — the relationship is one-way: an idea graduates into a target artefact and stores the target's ID in `IDEA.target_id`. The target does **not** carry an `IDEA_NNNN` FK column; it back-references the originating idea by ID in its body text (e.g., PRD §0 traceability block), not as a structural foreign key. The cardinality is `}o--o|` (each idea graduates to 0..1 target; each target may originate from 0..1 ideas).
 
 ---
 
@@ -483,7 +544,7 @@ Not numbered in the linear build order but sequencing matters:
 - `arch-adr` → invoke as soon as an architectural choice must be made; ADRs governing security, flexibility, or maintainability must precede Step 9 (Quality Attributes); all ADRs must precede Step 10 (PRDs) that depend on their decisions
 - `ops-runbook` → operational procedures captured post-ship
 - `ops-bug-rca` → root cause analyses post-incident
-- `spec-idea` → pre-PRD idea capture (becomes a PRD when committed)
+- `discovery-idea` → pre-formal idea capture, refinement, and graduation (an idea graduates to whichever downstream skill matches its matured form — `spec-prd`, `arch-adr`, `business-persona`, `business-objective`, etc.)
 - `spec-peer-review` → PRD / plan review before implementation
 - `util-docs-audit` → periodic health check (quarterly)
 
@@ -505,7 +566,7 @@ Skip Steps 1–8 entirely. Go straight to:
 - Step 10 (`spec-prd`) for the feature — manually define the E-NN scope inline in §0.
 - Step 11 (`spec-implementation-plan`) for the plan.
 
-Optionally: `spec-idea` first if the feature is still hypothetical. Write relevant ADRs before the PRD if architecture decisions are open. Write domain model for the feature's aggregate (Step 7b) if the aggregate isn't already modelled.
+Optionally: `discovery-idea` first if the feature is still hypothetical — refine it through the divergent/convergent loop, then graduate to `spec-prd`. Write relevant ADRs before the PRD if architecture decisions are open. Write domain model for the feature's aggregate (Step 7b) if the aggregate isn't already modelled.
 
 ### Strategy / investor / executive engagement only
 
@@ -545,6 +606,7 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `Inc-N` (within a plan) | Plan increment | `spec-implementation-plan` |
 | `ADR-NNNN` | Architecture decision | `arch-adr` |
 | `Research-NNNN` | Architecture research note | `arch-research` |
+| `IDEA-NNNN` | Pre-formal idea (capture · refine · graduate) | `discovery-idea` |
 | `CO-NN` | Competitor profile (Tier-1) | `business-competitive-landscape` |
 | Block ID in BMC (e.g., `CS-1`, `VP-1`) | Canvas block | `business-model-canvas` |
 
@@ -610,11 +672,14 @@ docs/
 │           ├── src/                                     ← slide partials (source of truth)
 │           ├── dist/                                    ← built HTML + prototypes/
 │           └── config.yaml
-└── ideas/                                               ← `spec-idea` (pre-PRD)
-    └── {domain}/                                        ← one subfolder per domain (frontend/backend/infra/etc.)
-        ├── INDEX.md
-        └── {slug}.md
-    └── {slug}.md
+└── discovery/                                           ← `discovery-` skills (pre-formal evidence layer; cross-cutting; feeds every downstream artefact)
+    ├── ideation/                                       ← discovery-idea (IDEA-NNNN)
+    │   ├── INDEX.md
+    │   └── IDEA-NNNN-{slug}.md (one per idea)
+    ├── interviews/                                     ← discovery-research
+    │   └── interview-{persona-id-or-slug}-{topic}.md · research-synthesis-{date}-{topic}.md · research-plan-{topic}.md
+    └── workshops/                                      ← discovery-workshop
+        └── workshop-{slug}-{date}.md · workshop-synthesis-{slug}-{date}.md
 ```
 
 **Prefix → folder mapping (memorise this):**
@@ -622,7 +687,8 @@ docs/
 | Prefix | Folder | Note |
 |---|---|---|
 | `business-` | `docs/business/` | All BIZBOK Business Architecture artefacts. **Exception:** `business-vision` outputs to `docs/VISION.md` (project root level) for agent-context visibility — the only `business-` skill whose output is not under `docs/business/`. |
-| `spec-` | `docs/product-specs/`, `docs/exec-plans/`, `docs/ideas/` | Product specs, plans, pre-PRD ideas |
+| `discovery-` | `docs/discovery/` | Pre-formal evidence layer — ideation, 1:1 research, group workshops. Cross-cutting; feeds every downstream artefact. Subfolders per artefact (`ideation/`, `interviews/`, `workshops/`). |
+| `spec-` | `docs/product-specs/`, `docs/exec-plans/` | Product specs and execution plans |
 | `arch-` | `docs/architecture/` | Subfolders per artefact (e.g., `decisions/` for ADRs) |
 | `domain-` | `docs/domain/` | DDD artefacts — the shared language between business and tech (bounded contexts, glossary, domain model) |
 | `ops-` | `docs/ops/` | Subfolders per artefact (`runbooks/`, `rcas/`) |
@@ -708,3 +774,6 @@ Failing to update these files after a metamodel change will cause the audit and 
 
 **Already-updated coupling (business-objective, Step 4.5, 2026-05-21):**
 `rules/metamodel.md` artefact table + build order §4.5 + DAG + ER diagram + ID conventions + canonical paths + this table · `README.md` flowchart + ER diagram + skill index · `util-metamodel-audit/references/check-catalogue.md` Checks 1, 2, 5, 7, 9 · `util-metamodel-migration/references/detection-signals.md` §Filename + §Folder + §Content signals · `spec-delivery-roadmap/SKILL.md` · `spec-prd/SKILL.md` · `spec-quality-attributes/SKILL.md` · `business-value-stream/SKILL.md` · `business-model-canvas/SKILL.md`
+
+**Already-updated coupling (discovery- prefix promotion + discovery-idea, 2026-05-25):**
+`rules/metamodel.md` supporting-skills list + ID conventions table + canonical paths block + prefix→folder mapping + this table · `rules/skill-creation-sync.md` categories table · `README.md` skill index · `util-metamodel-audit/references/check-catalogue.md` Checks 2, 5, 9 · `util-metamodel-migration/references/detection-signals.md` §Filename + §Folder patterns · `util-metamodel-migration/references/path-migration-v2.md` Ideas + discovery promote rows · `util-metamodel-scaffold/references/folder-catalogue.md` (replaced `docs/ideas` + `docs/business/discovery/*` with `docs/discovery/{ideation,interviews,workshops}/`) · `util-metamodel-scaffold/references/index-template.md` supporting artefacts table · skill renames: `business-research` → `discovery-research`, `business-workshop` → `discovery-workshop`, new `discovery-idea` (replaces `spec-idea`)

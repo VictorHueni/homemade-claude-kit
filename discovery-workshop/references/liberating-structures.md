@@ -155,7 +155,7 @@ spec define the structure. Don't reinvent.
   microstructures.
 
 If the workshop has ≤2 participants, drop Liberating Structures and use
-the `business-research` 1:1 interview skill instead.
+the `discovery-research` 1:1 interview skill instead.
 
 ---
 

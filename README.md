@@ -17,8 +17,9 @@ A personal Claude Code toolkit — composable skills for business architecture, 
 | `business-` | `business-process` | BPMN-ready process docs |
 | `business-` | `business-quantitative-model` | TAM/SAM/SOM · ROI models |
 | `business-` | `business-competitive-landscape` | Five Forces · value curve |
-| `business-` | `business-research` | Interview scripts + synthesis |
-| `business-` | `business-workshop` | Workshop planning + facilitation |
+| `discovery-` | `discovery-idea` | Pre-formal idea capture · refine · graduate — `IDEA-NNNN` |
+| `discovery-` | `discovery-research` | Interview scripts + synthesis |
+| `discovery-` | `discovery-workshop` | Workshop planning + facilitation |
 | `domain-` | `domain-bounded-context` | Bounded context map — `BC-NN` |
 | `domain-` | `domain-glossary` | Ubiquitous language — `GT-NN` |
 | `domain-` | `domain-model` | Entities · aggregates · events |
@@ -27,7 +28,6 @@ A personal Claude Code toolkit — composable skills for business architecture, 
 | `spec-` | `spec-quality-attributes` | NFRs — `QA-XXNN` |
 | `spec-` | `spec-prd` | Product Requirements Document — `PRD-NNNN` |
 | `spec-` | `spec-implementation-plan` | Atomic increment plan |
-| `spec-` | `spec-idea` | Idea capture |
 | `spec-` | `spec-peer-review` | PRD / plan review |
 | `arch-` | `arch-adr` | Architecture Decision Records |
 | `arch-` | `arch-research` | Evidence base for ADRs |
