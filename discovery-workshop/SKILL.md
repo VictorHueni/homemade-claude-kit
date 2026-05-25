@@ -1,6 +1,6 @@
 ---
-name: business-workshop
-description: "Plan single-session or multi-session workshops that reality-check business-architecture artefacts such as personas, BMCs, value streams, capability maps, and competitive analyses through structured group facilitation. Use when the user asks to plan a workshop, design a workshop series, align stakeholders, run a BMC workshop, design a Design Sprint, plan a discovery workshop, or synthesize workshop outputs. Triggers on: workshop, facilitation, workshop series, workshop guide, design sprint, alignment workshop, BMC workshop, discovery workshop, Liberating Structures, facilitator's guide. Domain-agnostic. Not for 1:1 interviews; use `business-research` for individual research sessions."
+name: discovery-workshop
+description: "Plan single-session or multi-session workshops that reality-check business-architecture artefacts such as personas, BMCs, value streams, capability maps, and competitive analyses through structured group facilitation. Use when the user asks to plan a workshop, design a workshop series, align stakeholders, run a BMC workshop, design a Design Sprint, plan a discovery workshop, or synthesize workshop outputs. Triggers on: workshop, facilitation, workshop series, workshop guide, design sprint, alignment workshop, BMC workshop, discovery workshop, Liberating Structures, facilitator's guide. Domain-agnostic. Not for 1:1 interviews; use `discovery-research` for individual research sessions."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **workshop facilitation guides** in the canonical practitioner tradition: Sam Kaner's *Facilitator's Guide to Participatory Decision-Making* (Diamond of Participation), Lipmanowicz & McCandless's *Liberating Structures* (33 microstructures replacing conventional meeting formats), Strategyzer workshop kits (BMC + VPC facilitation), Jake Knapp's *Sprint* (5-day Design Sprint), Priya Parker's *The Art of Gathering* (intentional gathering), and IAF facilitator competencies.
 
-The artifact produced by this skill is **a markdown document** at `docs/business/discovery/workshops/`. It is NOT a 1:1 interview script (use `business-research`), NOT a sales presentation, NOT a project kick-off meeting agenda — it is **the strategic-design group session** that aligns stakeholders + builds shared artefacts + reality-checks design assumptions.
+The artifact produced by this skill is **a markdown document** at `docs/discovery/workshops/`. It is NOT a 1:1 interview script (use `discovery-research`), NOT a sales presentation, NOT a project kick-off meeting agenda — it is **the strategic-design group session** that aligns stakeholders + builds shared artefacts + reality-checks design assumptions.
 
 This skill is **domain-agnostic**. When activated inside a project, it picks up personas, BMC, value streams, capability map, and competitive landscape, and produces workshop guides that target specific design-validation outcomes.
 
@@ -50,7 +50,7 @@ A workshop guide is good when a reader can answer, without ambiguity:
 
 **When:** the project has no workshops/ folder yet.
 
-**Output:** ONE file in `docs/business/discovery/workshops/`:
+**Output:** ONE file in `docs/discovery/workshops/`:
 - `README.md` — hub doc listing open workshop opportunities (which BA artefacts need stakeholder validation? which decisions need group alignment?) + index of past + planned workshops.
 
 Do NOT create workshop guides in scaffold mode.
@@ -96,7 +96,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 
 **Process:**
 1. **Read upstream artefacts** — relevant BA docs, personas, BMC, value streams, models. Identify which open decisions / assumptions the workshop will close.
-2. **Create** `workshop-{slug}-{date}.md` in `docs/business/discovery/workshops/`.
+2. **Create** `workshop-{slug}-{date}.md` in `docs/discovery/workshops/`.
 3. **Fill the template** (see `references/template.md`):
    - **Frontmatter:** objective + duration + group + date + facilitator
    - **Team composition + superpower** mapping (per practitioner-tested pattern)
@@ -129,7 +129,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** a workshop has happened; the user wants to capture outputs.
 
 **Process:**
-1. **Create** `workshop-synthesis-{slug}-{date}.md` in `docs/business/discovery/workshops/`.
+1. **Create** `workshop-synthesis-{slug}-{date}.md` in `docs/discovery/workshops/`.
 2. **Fill the template:**
    - **Attendees + roles** (with absences noted)
    - **Outputs produced** (with photos or Miro/Mural links)
@@ -217,9 +217,9 @@ Ask 2–4 questions max in a single message.
 | Value stream workshop | `docs/business/04a-value-streams.md` — stages confirmed / refined |
 | Capability map workshop | `docs/business/03a-capability-map.md` — L0 axis decided; L1 enumerated |
 | Roadmap workshop | `docs/product-specs/` — MoSCoW prioritisation; MVP scope decided |
-| Discovery workshop | `docs/business/discovery/interviews/` — interview themes synthesised; problem framing aligned |
+| Discovery workshop | `docs/discovery/interviews/` — interview themes synthesised; problem framing aligned |
 
-Workshops are the group-reality-check counterpart to `business-research` (the individual reality-check). Both feed evidence back to the design skills.
+Workshops are the group-reality-check counterpart to `discovery-research` (the individual reality-check). Both feed evidence back to the design skills.
 
 ---
 
@@ -237,7 +237,7 @@ Workshops are the group-reality-check counterpart to `business-research` (the in
 
 6. **Parking lot.** Dedicated wall space for off-topic ideas. Promise to revisit. Prevents derailing.
 
-7. **Strategyzer canvas workshop pattern** — for BMC / VPC: print A1 / A0; fill with sticky notes; one bullet per sticky; cluster within blocks; vote on most uncertain bullets; designate which bullets need post-workshop validation (= input to `business-research` interview scripts).
+7. **Strategyzer canvas workshop pattern** — for BMC / VPC: print A1 / A0; fill with sticky notes; one bullet per sticky; cluster within blocks; vote on most uncertain bullets; designate which bullets need post-workshop validation (= input to `discovery-research` interview scripts).
 
 8. **Design Sprint (Knapp) — 5-day pattern** — for product discovery: Monday map, Tuesday sketch, Wednesday decide, Thursday prototype, Friday test. The skill supports this as a special-case series in mode 3.
 
@@ -263,7 +263,7 @@ Workshops are the group-reality-check counterpart to `business-research` (the in
 
 ## Finding the right folder
 
-Default: `docs/business/discovery/workshops/`. The parent `docs/business/discovery/` is shared with `business-research` (`docs/business/discovery/interviews/`) — both are the reality-check family for the design skills.
+Default: `docs/discovery/workshops/`. The parent `docs/discovery/` is shared with `discovery-research` (`docs/discovery/interviews/`) and `discovery-idea` (`docs/discovery/ideation/`) — the three skills together form the reality-check family for the design skills.
 
 **Check first:**
 

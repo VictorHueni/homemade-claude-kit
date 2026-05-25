@@ -1,6 +1,6 @@
 ---
-name: business-research
-description: "Create hypothesis-anchored interview scripts, research plans, and synthesis docs that validate upstream business-architecture artefacts such as personas, value streams, BMC blocks, and competitive claims. Use when the user asks to plan an interview, write an interview script, run customer-discovery research, validate persona assumptions, synthesize findings, plan a research wave, or unblock open hypotheses in existing docs. Triggers on: interview script, customer interview, user research, research plan, validate persona, synthesize interview findings, customer discovery, primary research, semi-structured interview, research wave. Domain-agnostic. Not for group facilitation; use `business-workshop` for workshops."
+name: discovery-research
+description: "Create hypothesis-anchored interview scripts, research plans, and synthesis docs that validate upstream business-architecture artefacts such as personas, value streams, BMC blocks, and competitive claims. Use when the user asks to plan an interview, write an interview script, run customer-discovery research, validate persona assumptions, synthesize findings, plan a research wave, or unblock open hypotheses in existing docs. Triggers on: interview script, customer interview, user research, research plan, validate persona, synthesize interview findings, customer discovery, primary research, semi-structured interview, research wave. Domain-agnostic. Not for group facilitation; use `discovery-workshop` for workshops."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -14,7 +14,7 @@ metadata:
 
 You are an expert at producing **hypothesis-anchored research artefacts** — interview scripts that surface evidence for upstream BIZBOK design artefacts (personas, value streams, BMC, competitive landscape) + research synthesis docs that capture findings + optional research-plan docs that scope a research wave. Synthesises BABOK §10.25 Interviews + Steve Portigal's *Interviewing Users* (2nd ed., 2022) + Erika Hall's *Just Enough Research* + NN/g semi-structured guidance + Tomer Sharon's assumption-testing framework.
 
-The artifact produced by this skill is **a markdown document** at `docs/business/discovery/interviews/`. It is NOT a survey tool (different methodology), NOT a workshop facilitation guide (use `business-workshop`), NOT a competitive intelligence report (use `business-competitive-landscape`) — it is **the primary-research artefact layer** that closes the reality-check loop for the design skills.
+The artifact produced by this skill is **a markdown document** at `docs/discovery/interviews/`. It is NOT a survey tool (different methodology), NOT a workshop facilitation guide (use `discovery-workshop`), NOT a competitive intelligence report (use `business-competitive-landscape`) — it is **the primary-research artefact layer** that closes the reality-check loop for the design skills.
 
 This skill is **domain-agnostic**. When activated inside a project, it picks up personas, BMC, value streams, models, and competitive landscape, and produces interviews + synthesis that target specific open hypotheses in those artefacts.
 
@@ -48,7 +48,7 @@ A research artefact is good when a reader can answer, without ambiguity:
 
 **When:** the project has no research/ folder yet.
 
-**Output:** ONE file in `docs/business/discovery/interviews/`:
+**Output:** ONE file in `docs/discovery/interviews/`:
 - `README.md` — hub doc listing open research questions across upstream artefacts (which personas need validation? which BMC blocks are still `Assumed`? which competitive claims lack evidence?) + index of interview scripts + index of synthesis docs.
 
 Do NOT create scripts in scaffold mode. The hub doc surfaces the unblockers; scripts target them in mode 2.
@@ -92,7 +92,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 
 **Process:**
 1. **Read upstream artefacts** — persona file (if exists), BMC (if exists), competitive landscape (if exists), models (for hypothesis context). Identify which open questions / `Assumed` claims this interview is designed to unblock.
-2. **Create** `interview-{persona-id-or-slug}-{topic}.md` in `docs/business/discovery/interviews/`.
+2. **Create** `interview-{persona-id-or-slug}-{topic}.md` in `docs/discovery/interviews/`.
 3. **Fill the template** (see `references/template.md`):
    - **Frontmatter:** persona link + hypotheses targeted + expected duration + language
    - **Pre-interview prep (15 min before)** — checklist with Why column
@@ -110,7 +110,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 
 **Process:**
 1. **Pick the scope** — single interview synthesis, or multi-interview wave synthesis.
-2. **Create** `research-synthesis-{date}-{topic}.md` in `docs/business/discovery/interviews/`.
+2. **Create** `research-synthesis-{date}-{topic}.md` in `docs/discovery/interviews/`.
 3. **Fill the template:**
    - **Sample summary** — N interviews, when, who (anonymised role + org type), recruitment channel
    - **Headline findings** (3–5 most surprising or actionable insights)
@@ -129,7 +129,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** the user is planning a research wave (multiple interviews + maybe other methods) and wants to scope it before executing.
 
 **Process:**
-1. **Create** `research-plan-{topic}.md` in `docs/business/discovery/interviews/`.
+1. **Create** `research-plan-{topic}.md` in `docs/discovery/interviews/`.
 2. **Fill the template:**
    - **Hypotheses + assumptions to test** (lifted from upstream `Assumed` claims)
    - **Sampling strategy** — target N participants, criteria, recruitment channel, screener questions
@@ -250,7 +250,7 @@ Consult during generation.
 
 ## Finding the right folder
 
-Default: `docs/business/discovery/interviews/`. The parent `docs/business/discovery/` is shared with `business-workshop` (`docs/business/discovery/workshops/`) — both are the reality-check family for the design skills.
+Default: `docs/discovery/interviews/`. The parent `docs/discovery/` is shared with `discovery-workshop` (`docs/discovery/workshops/`) and `discovery-idea` (`docs/discovery/ideation/`) — the three skills together form the reality-check family for the design skills.
 
 **Check first:**
 

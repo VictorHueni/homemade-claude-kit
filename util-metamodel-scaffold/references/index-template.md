@@ -156,11 +156,11 @@ Status key: ✅ Done · 🔄 In progress (scaffold exists, needs filling) · ⬜
 | Architecture Decision Records | `arch-adr` | `docs/architecture/decisions/adr-NNNN-{slug}.md` |
 | Architecture Research | `arch-research` | `docs/architecture/research/{NNNN}-{slug}.md` |
 | Competitive Landscape | `business-competitive-landscape` | `docs/business/01b-competitive-landscape/` |
-| Business Research | `business-research` | `docs/business/discovery/interviews/` |
-| Business Workshops | `business-workshop` | `docs/business/discovery/workshops/` |
+| Discovery Research | `discovery-research` | `docs/discovery/interviews/` |
+| Discovery Workshops | `discovery-workshop` | `docs/discovery/workshops/` |
 | Ops Runbooks | `ops-runbook` | `docs/ops/runbooks/{slug}.md` |
 | Bug RCAs | `ops-bug-rca` | `docs/ops/rcas/{date}-{slug}.md` |
-| Pre-PRD Ideas | `spec-idea` | `docs/ideas/{domain}/{slug}.md` |
+| Pre-formal Ideas | `discovery-idea` | `docs/discovery/ideation/IDEA-NNNN-{slug}.md` |
 | Slide Decks | `com-slide-deck` | `docs/communication/slides/{slug}/` |
 | PRD / Plan reviews | `spec-peer-review` | — (interactive, no persistent artefact) |
 

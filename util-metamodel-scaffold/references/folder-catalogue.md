@@ -15,8 +15,11 @@ All paths are relative to the project root. `{docs_root}` defaults to `docs/`.
 mkdir -p docs/business/05a-processes
 mkdir -p docs/business/06a-models
 mkdir -p docs/business/01b-competitive-landscape
-mkdir -p docs/business/discovery/interviews
-mkdir -p docs/business/discovery/workshops
+
+# Discovery layer (pre-formal evidence — ideation, 1:1 research, group workshops)
+mkdir -p docs/discovery/ideation
+mkdir -p docs/discovery/interviews
+mkdir -p docs/discovery/workshops
 
 # Domain layer (DDD artefacts)
 mkdir -p docs/domain/07b-models
@@ -38,9 +41,6 @@ mkdir -p docs/ops/rcas
 # Communication layer
 mkdir -p docs/communication/slides
 
-# Pre-PRD ideas
-mkdir -p docs/ideas
-
 # Reports (non-docs — audit + migration output)
 mkdir -p var/reports/metamodel-audit
 mkdir -p var/reports/metamodel-migration
@@ -51,7 +51,7 @@ mkdir -p project-control/open-items/archive
 ```
 
 **Implied parent folders** (created automatically by `mkdir -p` above):
-`docs/` · `docs/business/` · `docs/domain/` · `docs/product-specs/` · `docs/exec-plans/`
+`docs/` · `docs/business/` · `docs/discovery/` · `docs/domain/` · `docs/product-specs/` · `docs/exec-plans/`
 `docs/architecture/` · `docs/ops/` · `docs/communication/` · `var/` · `var/reports/`
 `project-control/` · `project-control/open-items/`
 
@@ -62,4 +62,4 @@ mkdir -p project-control/open-items/archive
 **Leaf folders that get `.gitkeep` until content is added:**
 All `docs/` and `var/` leaf folders when empty at scaffold time.
 
-**Total directories:** ~21
+**Total directories:** ~22

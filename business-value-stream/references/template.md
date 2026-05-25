@@ -142,7 +142,7 @@ For catalogue-wide items, use `#catalogue` and `Catalogue-wide`.
 | OI-ID  | Type           | Summary                                              | Source anchor | Source heading                                | Resolution path                                              | Priority | Status | Owner   | Due / Review date | Tracker ref |
 | :----- | :------------- | :--------------------------------------------------- | :------------ | :-------------------------------------------- | :----------------------------------------------------------- | :------- | :----- | :------ | :---------------- | :---------- |
 | OI-001 | decision-gap   | {{Should VS-1 split into self-serve vs sales-led?}}  | #vs-1         | VS-1 · {{value stream name}}                  | Workshop with product + sales; split or keep merged          | high     | open   | _TBD_   | {{YYYY-MM-DD}}    | _TBD_       |
-| OI-002 | doc-gap        | {{Pain index unsourced for stage VS-2.3}}            | #vs-2-3       | VS-2.3 · {{stage name}}                       | Run business-research wave; replace estimate with evidence   | medium   | open   | _TBD_   | {{YYYY-MM-DD}}    | _TBD_       |
+| OI-002 | doc-gap        | {{Pain index unsourced for stage VS-2.3}}            | #vs-2-3       | VS-2.3 · {{stage name}}                       | Run discovery-research wave; replace estimate with evidence  | medium   | open   | _TBD_   | {{YYYY-MM-DD}}    | _TBD_       |
 
 _Replace the placeholder rows above with real entries, or replace the table with `_None at present._` if no actionable unresolved work exists yet (per §2 of the governance rule, scaffold `_TODO_` cells are not open items)._
 

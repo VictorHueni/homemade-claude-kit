@@ -16,21 +16,21 @@ You manage pre-formal ideas — the upstream layer that feeds **every** downstre
 
 An idea here is **pre-classification**. At capture, it does not yet know whether it will become a `PRD-NNNN`, an `OBJ-NN`, an `ADR-NNNN`, or be abandoned. The skill's job is to (1) capture it cleanly, (2) pressure-test it, and (3) **graduate** it to the right downstream skill when it is ready — never to do the downstream work itself.
 
-This skill does **not** replicate persona design, value-proposition shaping, hypothesis-anchored interview scripting, market sizing, ADR analysis, PRD acceptance criteria, or implementation breakdown. Those are owned by `business-persona`, `business-model-canvas`, `business-research`, `business-quantitative-model`, `arch-adr`, `spec-prd`, and `spec-implementation-plan` respectively. When the idea matures past its capture phase, route to them — do not absorb their work.
+This skill does **not** replicate persona design, value-proposition shaping, hypothesis-anchored interview scripting, market sizing, ADR analysis, PRD acceptance criteria, or implementation breakdown. Those are owned by `business-persona`, `business-model-canvas`, `discovery-research`, `business-quantitative-model`, `arch-adr`, `spec-prd`, and `spec-implementation-plan` respectively. When the idea matures past its capture phase, route to them — do not absorb their work.
 
 ---
 
 ## Position in the metamodel
 
-`discovery-idea` is a **pre-Step-0** cross-cutting node. It sits alongside `business-research` (1:1 interviews) and `business-workshop` (group sessions) under the shared `docs/discovery/` parent — the three skills together form the **discovery family**, the reality-check layer that feeds every downstream artefact.
+`discovery-idea` is a **pre-Step-0** cross-cutting node. It sits alongside `discovery-research` (1:1 interviews) and `discovery-workshop` (group sessions) under the shared `docs/discovery/` parent — the three skills together form the **discovery family**, the reality-check layer that feeds every downstream artefact.
 
 ```
 docs/discovery/
 ├── ideation/      ← discovery-idea  (this skill)
 │   ├── INDEX.md
 │   └── {slug}.md
-├── interviews/    ← business-research
-└── workshops/     ← business-workshop
+├── interviews/    ← discovery-research
+└── workshops/     ← discovery-workshop
 ```
 
 Every idea file declares a `graduates_to:` field naming the downstream skill that will own the matured artefact. Graduation is explicit and the skill drives it — an idea is never silently abandoned in the folder.
@@ -39,9 +39,11 @@ Every idea file declares a `graduates_to:` field naming the downstream skill tha
 
 ## File layout and ID convention
 
-**Output path:** `docs/discovery/ideation/{slug}.md` (flat — no per-domain subfolders; `domain:` is a frontmatter tag).
+**Output path:** `docs/discovery/ideation/IDEA-NNNN-{slug}.md` (flat — no per-domain subfolders; `domain:` is a frontmatter tag; the `IDEA-NNNN-` filename prefix carries the ID so the slug stays free for human-readable kebab-case).
 
-**ID format:** `IDEA-NNNN` (4-digit zero-padded, monotonic per project). Assigned at scaffold time. Used in cross-doc references when the idea is cited from a downstream artefact ("This PRD originated from IDEA-0042").
+**ID format:** `IDEA-NNNN` (4-digit zero-padded, monotonic per project). Assigned at scaffold time. Embedded in both the filename and the frontmatter `idea_id:` field. Used in cross-doc references when the idea is cited from a downstream artefact ("This PRD originated from IDEA-0042").
+
+**Filename rule:** `IDEA-{NNNN}-{slug}.md` — e.g. `IDEA-0042-sms-reorder-for-regulars.md`. The ID prefix guarantees uniqueness without per-domain subfolders; the slug is kebab-case, 3–5 words, human-readable. Same convention as `prd-NNNN-{feature}.md` and `adr-NNNN-{slug}.md` in the kit.
 
 **Index:** one `docs/discovery/ideation/INDEX.md` listing every idea with status, domain, graduates-to target, and one-line summary. Filterable by the `domain:` column.
 
@@ -134,7 +136,7 @@ Three-tier list. The "Must be true" tier sets the validation budget for the next
 - **Might be true (nice to have)** — secondary optimisations; validate after the core.
 
 Each row names the validation method (interview · prototype · data pull · expert review).
-Items that need a structured research wave become Open Items routed to `business-research`.
+Items that need a structured research wave become Open Items routed to `discovery-research`.
 
 ## Recommended direction
 
@@ -178,7 +180,7 @@ Canonical document-level section per `rules/open-items-governance.md` §4. Schem
 
 Use the `Type` taxonomy: `doc-gap` (missing info needed before graduation) · `decision-gap`
 (unresolved choice between variations) · `execution-item` (validation task — invoke
-`business-research` or run a probe) · `tech-debt` (rare — refactor implied by the idea).
+`discovery-research` or run a probe) · `tech-debt` (rare — refactor implied by the idea).
 
 ## Changelog
 
@@ -200,9 +202,9 @@ The skill operates in five modes. Each maps to a lifecycle transition.
 Triggers: `/idea`, `new idea`, `add idea`, `capture idea <text>`.
 
 1. Read the user's one-line idea.
-2. Assign next available `IDEA-NNNN` ID by scanning `docs/discovery/ideation/`.
+2. Assign next available `IDEA-NNNN` ID by scanning `docs/discovery/ideation/` for the highest existing `IDEA-NNNN-*.md` filename prefix and incrementing.
 3. If `domain` is not stated, ask once (lettered options: a=product · b=business · c=architecture · d=process · e=dx · f=ops).
-4. Scaffold the file at `docs/discovery/ideation/{slug}.md` with frontmatter + `## Problem statement` + `## Context` + `## Not doing` + `## Open Items` (empty) + `## Changelog` (one row).
+4. Scaffold the file at `docs/discovery/ideation/IDEA-{NNNN}-{slug}.md` with frontmatter + `## Problem statement` + `## Context` + `## Not doing` + `## Open Items` (empty) + `## Changelog` (one row).
 5. Set `lifecycle: captured`, `graduates_to: _TBD_`, `target_id: _TBD_`, `status: draft`.
 6. Update `docs/discovery/ideation/INDEX.md` (create if missing).
 7. Report the ID and the path. Offer to enter Refine mode immediately.
@@ -286,8 +288,8 @@ Triggers: monthly cadence; user runs the maintenance pass; `util-metamodel-audit
 
 | Skill | Relationship |
 |---|---|
-| `business-research` | Receives `execution-item` Open Items from idea refine. When an assumption needs interview validation, the OI row's `Resolution path` says "Run `business-research` Mode 2 with hypothesis: `<Must-be-true statement>`". Conversely, when `business-research` synthesis surfaces a new hunch, it can create a Mode 1 idea here. |
-| `business-workshop` | Workshop synthesis often produces multiple candidate ideas; each gets a Mode 1 capture call. Conversely, ideation can request a workshop to align stakeholders before graduating — emit an Open Item routing to `business-workshop`. |
+| `discovery-research` | Receives `execution-item` Open Items from idea refine. When an assumption needs interview validation, the OI row's `Resolution path` says "Run `discovery-research` Mode 2 with hypothesis: `<Must-be-true statement>`". Conversely, when `discovery-research` synthesis surfaces a new hunch, it can create a Mode 1 idea here. |
+| `discovery-workshop` | Workshop synthesis often produces multiple candidate ideas; each gets a Mode 1 capture call. Conversely, ideation can request a workshop to align stakeholders before graduating — emit an Open Item routing to `discovery-workshop`. |
 | `spec-prd` | Most common graduation target for `product` domain ideas. PRD §0 must reference the originating `IDEA-NNNN`. |
 | `arch-adr`, `arch-research` | Graduation target for `architecture` domain ideas. ADR's `## Context` references the originating `IDEA-NNNN`. |
 | `business-objective`, `business-model-canvas`, `business-persona` | Graduation targets for `business` domain ideas. |
@@ -329,8 +331,8 @@ Sort: `refining` → `ready` → `captured` → `graduated` → `abandoned` (act
 - **Do not do downstream work.** The skill never writes a PRD body, an ADR analysis, a persona profile, or a domain-event catalogue. It writes the *sketch* and *invokes* the right skill.
 - **`## Not doing` is mandatory.** An idea with no exclusions is not refined.
 - **Sources cited.** Every variation cluster in §Direction with a "User value" claim that names an existing persona must use the `P-NN` ID. Fabricated personas are forbidden — route to `business-persona` first.
-- **Assumption tier discipline.** "Must be true" assumptions become Open Items with `Type: execution-item` and `Resolution path: business-research` (or another evidence skill).
-- **Cross-doc linking.** Use `[IDEA-NNNN — title](../../discovery/ideation/{slug}.md)` from anywhere else in `docs/`.
+- **Assumption tier discipline.** "Must be true" assumptions become Open Items with `Type: execution-item` and `Resolution path: discovery-research` (or another evidence skill).
+- **Cross-doc linking.** Use `[IDEA-NNNN — title](../../discovery/ideation/IDEA-NNNN-{slug}.md)` from anywhere else in `docs/`.
 - **Today's date format:** `YYYY-MM-DD`.
 
 ---
@@ -338,7 +340,7 @@ Sort: `refining` → `ready` → `captured` → `graduated` → `abandoned` (act
 ## Checklist before saving
 
 - [ ] Frontmatter complete per `rules/artefact-frontmatter.md` + idea-specific fields (`idea_id`, `domain`, `lifecycle`, `graduates_to`, `target_id`)
-- [ ] `IDEA-NNNN` is the next available ID, 4-digit zero-padded
+- [ ] `IDEA-NNNN` is the next available ID, 4-digit zero-padded; filename matches `IDEA-NNNN-{slug}.md`
 - [ ] `## Problem statement` is HMW-framed and names a specific user/stakeholder
 - [ ] If `lifecycle ≥ ready`: §Variations, §Direction, §Assumption audit, §Recommended direction, §Not doing are all non-empty
 - [ ] If `lifecycle = ready`: `graduates_to` is set (not `_TBD_`) and matches the recommended direction

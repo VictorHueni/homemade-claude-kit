@@ -32,6 +32,9 @@ A file whose name matches one of these patterns is likely the artefact type list
 | `*quant-model*.md` or `*tam-*.md` or `*savings-model*.md` | Quantitative model | `business-quantitative-model` | `docs/business/06a-models/qm-NN-{topic}.md` |
 | `VISION.md` or `*vision*.md` or `*north-star*.md` | Product vision | `business-vision` | `docs/VISION.md` (singleton at docs root) |
 | `*objectives*.md` or `*okr*.md` or `*key-results*.md` | Business objectives | `business-objective` | `docs/business/04b-objectives.md` |
+| `IDEA-[0-9][0-9][0-9][0-9]-*.md` or `*idea*.md` outside canonical | Discovery idea | `discovery-idea` | `docs/discovery/ideation/IDEA-NNNN-{slug}.md` |
+| `interview-*.md` or `research-synthesis-*.md` or `research-plan-*.md` outside canonical | Discovery research | `discovery-research` | `docs/discovery/interviews/` |
+| `workshop-*.md` or `workshop-synthesis-*.md` outside canonical | Discovery workshop | `discovery-workshop` | `docs/discovery/workshops/` |
 
 **ADR naming redundancy rule:** if a file is already in `docs/architecture/decisions/` and its name contains `-adr-` (e.g. `0003-adr-clean-architecture.md`), flag as Tier 1 naming issue. Proposed fix: `git mv 0003-adr-clean-architecture.md 0003-clean-architecture.md`. The `-adr-` prefix is redundant since the folder already signals the type.
 
@@ -47,7 +50,8 @@ A folder whose name matches one of these patterns, AND is not already at the can
 |---|---|---|---|
 | `runbooks/` or `runbook/` | `ops-runbook` | `docs/ops/runbooks/` | `find docs -type d -iname "runbook*" \| grep -v "docs/ops/runbooks"` |
 | `bugs/` or `bug-reports/` or `rcas/` or `incidents/` | `ops-bug-rca` | `docs/ops/rcas/` | `find docs -type d -iname "bug*" -o -type d -iname "rca*" -o -type d -iname "incident*" \| grep -v "docs/ops"` |
-| `workshop*/` or `workshops/` | `business-workshop` | `docs/business/discovery/workshops/` | `find docs -type d -iname "workshop*" \| grep -v "docs/business/discovery/workshops"` |
+| `workshop*/` or `workshops/` | `discovery-workshop` | `docs/discovery/workshops/` | `find docs -type d -iname "workshop*" \| grep -v "docs/discovery/workshops"` |
+| `interview*/` or `interviews/` | `discovery-research` | `docs/discovery/interviews/` | `find docs -type d -iname "interview*" \| grep -v "docs/discovery/interviews"` |
 | `objectives/` or `okr/` or `okrs/` | `business-objective` | `docs/business/04b-objectives.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "objective*" -o -type d -iname "okr*"` |
 | `personas/` or `persona/` | `business-persona` | `docs/business/01a-personas.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "persona*"` |
 | `capabilities/` or `capability-map/` | `business-capability-map` | `docs/business/03a-capability-map.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "capabilit*"` |
@@ -56,7 +60,8 @@ A folder whose name matches one of these patterns, AND is not already at the can
 | `decisions/` or `adrs/` or `adr/` | `arch-adr` | `docs/architecture/decisions/` | `find docs -type d -iname "decision*" -o -type d -iname "adr*" \| grep -v "docs/architecture/decisions"` |
 | `glossary/` or `ubiquitous-language/` or `vocabulary/` | `domain-glossary` | `docs/domain/02c-glossary.md` (flat — no subfolder in v2) | `find docs/domain -type d -iname "glossar*" -o -type d -iname "ubiquitous*"` |
 | `models/` containing `*model*.md` files | `business-quantitative-model` or `domain-model` | `docs/business/06a-models/` or `docs/domain/` | Confirm with Tier 1 + Tier 3 |
-| `ideas/` or `proposals/` | `spec-idea` | `docs/ideas/` | `find docs -type d -iname "idea*" -o -type d -iname "proposal*" \| grep -v "docs/ideas"` |
+| `ideas/` or `proposals/` or `ideation/` | `discovery-idea` | `docs/discovery/ideation/` | `find docs -type d \( -iname "idea*" -o -iname "proposal*" -o -iname "ideation*" \) \| grep -v "docs/discovery/ideation"` |
+| `business/discovery/` (legacy — discovery promoted to top-level) | `discovery-*` family | `docs/discovery/` | `find docs/business -type d -iname "discovery"` |
 
 ---
 
