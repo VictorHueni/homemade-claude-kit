@@ -18,7 +18,7 @@ what order, and where to put it**.
 
 ---
 
-## The 16 artefacts and their skills
+## The 18 artefacts and their skills
 
 | # | Layer | Skill | Output file | Primary IDs |
 |---|---|---|---|---|
@@ -36,19 +36,19 @@ what order, and where to put it**.
 | 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/07b-models/{bc-slug}.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
 | 7c | **Interface Contract** (external API surface — sync REST/gRPC/SDK + async events) | `arch-service-contract` | `docs/architecture/interfaces/{bc-slug}.md` (BC-scoped) or `docs/architecture/interfaces/{slug}.md` (product-level) | `BC-NN.CTR-NN` (BC-scoped) · `CTR-NN` (product-level) |
 | 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
+| 8.5 | **CLI Surface Contract** (CLI command tree · flag contract · exit codes · output format — only when the product exposes a user-facing CLI) | `arch-cli-contract` | `docs/architecture/interfaces/cli-{slug}.md` (one per CLI tool) | `BC-NN.CLI-NN` / `CLI-NN` · `BC-NN.CLI-NN.CMD-NN` / `CLI-NN.CMD-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` | `PRD-NNNN` |
 | 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_exec_{slug}.md` | `Plan-NNNN`, `Inc-N` |
 
 **Supporting skills** (not in the main build order, used as needed):
 - `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
-- `arch-cli-contract` — CLI surface contract for a user-facing command-line tool → `docs/architecture/interfaces/cli-{slug}.md` (one per tool). ID format is scope-dependent: **BC-scoped** (one CLI per BC/service) mints `BC-NN.CLI-NN` + `BC-NN.CLI-NN.CMD-NN`; **product-level** (one CLI spanning multiple BCs) mints `CLI-NN` + `CLI-NN.CMD-NN`. Invoke when the product exposes a CLI; run after Step 7 (FBS) and Step 8 (Delivery Roadmap) so subcommands can be mapped to `C-N.M.FXX` functionalities and `E-NN` phases. Covers: subcommand tree, flag conventions, exit code catalogue, output format contract (stdout/stderr separation), configuration precedence, error contract.
 - `discovery-idea` — captures, refines, and graduates pre-formal ideas → `docs/discovery/ideation/IDEA-{NNNN}-{slug}.md` with a single `INDEX.md` at folder root; mints `IDEA-NNNN` (4-digit zero-padded); each idea carries a `graduates_to:` pointer naming the downstream skill that owns the matured artefact (`spec-prd`, `arch-adr`, `business-persona`, `business-objective`, `business-model-canvas`, `arch-research`, `business-process`, or `spec-functional-breakdown-structure`); pre-Step-0 cross-cutting node — the skill itself never writes downstream artefacts, only invokes the right one at graduation
 - `spec-peer-review` — reviews PRDs / plans
 - `arch-research` — Architecture Research notes that inform ADR decisions → `docs/architecture/research/{NNNN}-{slug}.md`; mints `Research-NNNN` in-doc ID (4-digit zero-padded, same convention as `ADR-NNNN`); lifecycle: Draft → Active → Frozen (once feeding ADRs land) → Superseded
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/01b-competitive-landscape/`; mints `CO-NN` per Tier-1 competitor profile; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
-- `discovery-research` — hypothesis-anchored interview scripts + research synthesis + research plans → `docs/discovery/interviews/`; run alongside any step where upstream artefacts carry `Assumed` claims; especially valuable after Step 1 (Personas), Step 5 (BMC), and Step 6 (Quantitative Models); synthesis feeds confidence ratings (`Assumed → Tested → Validated`) back into those artefacts; companion to `discovery-workshop` (individual reality-check vs. group reality-check) and `discovery-idea` (validates Must-be-true assumptions raised during idea refinement)
-- `discovery-workshop` — workshop facilitation guides + series plans + synthesis → `docs/discovery/workshops/`; run when stakeholder alignment or group reality-checking is needed; especially valuable before Step 3 (Value Streams) and Step 5 (BMC) to build shared understanding; companion to `discovery-research` (group reality-check vs. individual reality-check); the three `discovery-*` skills share the `docs/discovery/` parent folder
+- `discovery-research` — hypothesis-anchored interview scripts + research synthesis + research plans → `docs/discovery/interviews/`; run alongside any step where upstream artefacts carry `Assumed` claims; especially valuable after Step 1 (Personas), Step 2 (BMC), and Step 6 (Quantitative Models); synthesis feeds confidence ratings (`Assumed → Tested → Validated`) back into those artefacts; companion to `discovery-workshop` (individual reality-check vs. group reality-check) and `discovery-idea` (validates Must-be-true assumptions raised during idea refinement)
+- `discovery-workshop` — workshop facilitation guides + series plans + synthesis → `docs/discovery/workshops/`; run when stakeholder alignment or group reality-checking is needed; especially valuable before Step 2 (BMC) and Step 4 (Value Streams) to build shared understanding; companion to `discovery-research` (group reality-check vs. individual reality-check); the three `discovery-*` skills share the `docs/discovery/` parent folder
 - `ops-runbook`, `ops-bug-rca` — operational artefacts (post-ship)
 - `util-metamodel-scaffold` — one-time initialisation: creates the canonical `docs/` folder tree (variant-aware: greenfield / brownfield / strategy-only / single-feature), generates `docs/INDEX.md` (live navigation hub with ✅/🔄/⬜ status per step), and wires a stack pointer into `CLAUDE.md`; run once per new project before any artefact-producing skill; re-run Mode 3 to refresh `docs/INDEX.md` after completing stack steps
 - `util-docs-audit` — general doc staleness scan (file-level freshness, dead prose)
@@ -145,15 +145,15 @@ what order, and where to put it**.
    │   stage + capability │
    │ Orders by pain index │
    └──────────┬───────────┘
-              │         ┌─────────────────────┐
-              │         │ arch-adr            │
-              │         │ (architecture       │
-              │         │  decisions)         │
-              │         │ Output: ADR-NNNN    │
-              │         │ Precedes Steps 9+10 │
-              │         └──────────┬──────────┘
-              │                    │
-              ▼                    ▼
+              │  ┌──────────────────────┐  ┌─────────────────────┐
+              │  │ arch-cli-contract    │  │ arch-adr            │
+              │  │ (Step 8.5 — opt.)    │  │ (architecture       │
+              │  │ CLI surface contract │  │  decisions)         │
+              │  │ Output: CLI-NN.CMD-NN│  │ Output: ADR-NNNN    │
+              │  │ Reads: FBS + E-NN    │  │ Precedes Steps 9+10 │
+              │  └──────────┬───────────┘  └──────────┬──────────┘
+              │             │                         │
+              ▼             ▼                         ▼
    ┌──────────────────────────────────────────┐
    │ spec-quality-attributes                  │
    │ (how well the system performs — NFRs)    │
@@ -276,7 +276,6 @@ erDiagram
         string Plan_NNNN PK
         string PRD_NNNN FK
     }
-<<<<<<< HEAD
     INTERFACE_CONTRACT {
         string BC_NN_CTR_NN PK
         string BC_NN FK
@@ -286,17 +285,18 @@ erDiagram
     }
     CLI_SURFACE {
         string CLI_NN PK
+        string BC_NN FK
     }
     CLI_COMMAND {
         string CLI_NN_CMD_NN PK
         string CLI_NN FK
         string C_NM_FXX FK
-=======
+        string BC_NN_CTR_NN FK
+    }
     IDEA {
         string IDEA_NNNN PK
         string graduates_to FK
         string target_id FK
->>>>>>> origin/claude/metamodel-rules-ideas-skills-MwmUc
     }
 
     PERSONA ||--o{ VALUE_STREAM : "triggers"
@@ -324,14 +324,17 @@ erDiagram
     EPIC ||--|| PRD : "one PRD per epic"
     QUALITY_ATTRIBUTES ||--o{ PRD : "QA-XXNN in acceptance criteria"
     PRD ||--|| IMPLEMENTATION_PLAN : "one plan per PRD"
-<<<<<<< HEAD
     INTERFACE_CONTRACT }o--o{ ADR : "versioning and auth decisions"
     INTERFACE_CONTRACT }o--o{ QUALITY_ATTRIBUTES : "SLA per CTR-NN"
     INTERFACE_CONTRACT }o--o{ PRD : "acceptance criteria reference CTR-NN"
     CLI_SURFACE ||--o{ CLI_COMMAND : "contains"
+    CLI_SURFACE }o--o{ BOUNDED_CONTEXT : "BC scope for BC-scoped CLIs"
+    CLI_SURFACE }o--o{ ADR : "taxonomy and config decisions"
     CLI_COMMAND }o--o{ FBS : "maps to C-N.M.FXX"
     CLI_COMMAND }o--o{ EPIC : "scoped by delivery phase"
-=======
+    CLI_COMMAND }o--o{ QUALITY_ATTRIBUTES : "SLA per command"
+    CLI_COMMAND }o--o{ PRD : "acceptance criteria reference CMD-NN"
+    CLI_COMMAND }o--o{ INTERFACE_CONTRACT : "wraps CTR-NN calls"
     IDEA }o--o| PERSONA : "graduates_to"
     IDEA }o--o| OBJECTIVE : "graduates_to"
     IDEA }o--o| BMC : "graduates_to (new block entry)"
@@ -339,7 +342,6 @@ erDiagram
     IDEA }o--o| ADR : "graduates_to"
     IDEA }o--o| FBS : "graduates_to (new C-N.M.FXX row)"
     IDEA }o--o| PRD : "graduates_to"
->>>>>>> origin/claude/metamodel-rules-ideas-skills-MwmUc
 ```
 
 **Hard rules of the graph:**
@@ -510,6 +512,19 @@ moving on.
 - Produce `docs/product-specs/08a-delivery-roadmap.md`
 - Coverage check: every Phase 1 FBS functionality in exactly one epic
 **Output verification:** `docs/product-specs/08a-delivery-roadmap.md` exists; §Walking Skeleton covers every stage of primary VS; §Phase Plan has one goal per phase expressed as VS streams operational; every epic has a value statement; ★ functionalities each anchor their own epic; sizing within 5–25 FBS rows per epic; E-NN IDs in pain-index order.
+
+### Step 8.5 — CLI Surface Contract (only when the product exposes a CLI)
+
+**Skill:** `arch-cli-contract`
+**Prerequisites:** Step 7 (FBS — `C-N.M.FXX` functionalities map to CLI commands); Step 8 (Delivery Roadmap — `E-NN` phase tags drive `status: planned` vs `status: active` per command). ADRs for command taxonomy, config format, and output format should be written before or alongside this step.
+**Process:**
+- Mode `scaffold` → create `docs/architecture/interfaces/cli-{slug}.md` with `_TODO_` skeleton
+- Mode `design` → read FBS + delivery roadmap; derive command tree by capability cluster; assign `CLI-NN.CMD-NN` IDs; define global flags, exit code catalogue, stdout/stderr contract, configuration precedence
+- Mode `document-existing` → parse `--help` output or source; emit drift report (commands with no FBS backing; FBS functionalities not yet surfaced)
+- Mode `refresh` → detect added/removed commands vs current FBS; classify breaking vs non-breaking; append changelog
+**Output verification:** `docs/architecture/interfaces/cli-{slug}.md` exists; every `CLI-NN.CMD-NN` maps to a `C-N.M.FXX` or `E-NN`; `--help` and `--version` documented; stdout/stderr separation explicit; exit code catalogue present; `--dry-run` on all mutating commands; `--output json` documented; colour policy present.
+
+---
 
 ### Step 9 — Quality Attributes (how well the system performs)
 
@@ -765,6 +780,9 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 | New artefact step, new canonical path | `util-metamodel-scaffold/references/index-template.md` → §Detection bash block + §Template stack-progress table (add detection command + row) |
 
 Failing to update these files after a metamodel change will cause the audit and migration skills to silently miss the new artefact — the most dangerous kind of drift.
+
+**Already-updated coupling (arch-cli-contract promoted to Step 8.5 + ER symmetry fix, 2026-05-26):**
+`rules/metamodel.md` artefact count (16→18) + artefact table (row 8.5 added) + supporting-skills list (arch-cli-contract bullet removed — promoted to step) + DAG (Step 8.5 node alongside arch-adr) + ER diagram (merge conflict resolved: IDEA entity from branch merged; CLI_SURFACE.BC_NN FK added; CLI_COMMAND.BC_NN_CTR_NN FK added; CLI_SURFACE→BOUNDED_CONTEXT, CLI_SURFACE→ADR, CLI_COMMAND→QUALITY_ATTRIBUTES, CLI_COMMAND→PRD, CLI_COMMAND→INTERFACE_CONTRACT relationships added) + build order §8.5 added + this coupling table · `README.md` artefact count (16→18) + flowchart (ARCH subgraph with S7c + S8_5 nodes + all edges) + ER diagram (INTERFACE_CONTRACT entity added; CLI_SURFACE/CLI_COMMAND FKs + relationships updated to match metamodel)
 
 **Already-updated coupling (arch-service-contract Step 7c + arch-cli-contract supporting skill, 2026-05-25):**
 `rules/metamodel.md` artefact table (row 7c) + build order §7c + DAG + canonical paths tree + ID conventions table (`BC-NN.CTR-NN`, `CLI-NN`, `CLI-NN.CMD-NN`) + supporting skills (`arch-cli-contract` bullet) + this coupling table · `util-metamodel-audit/SKILL.md` (step count 14→15, check count 16→18, §17 frontmatter row added to report-structure and "what a good audit means" tables) · `util-metamodel-audit/references/check-catalogue.md` (Checks 1, 2, 5, 6, 7, 9: Step 7c detection patterns + CTR-NN/CLI-NN/CMD-NN ID patterns + interface contract dependency rules + mandatory section rules) · `util-metamodel-migration/references/detection-signals.md` (filename patterns, folder patterns §Tier 2, content signals §Tier 3 for service contract + CLI contract artefacts)
