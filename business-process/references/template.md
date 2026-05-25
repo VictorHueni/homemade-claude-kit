@@ -194,7 +194,7 @@ sequenceDiagram
 
 **Why these KPIs:** {one paragraph explaining what monitoring these together tells the operator — operational health vs. structural drift vs. compliance risk}.
 
-> ⚠️ **If `current value` is `_TODO_`,** flag this as a row in §11 with the resolution path (typically: which system holds the measurement, who can extract it).
+> ⚠️ **`current value` of `_TODO_`** is a scaffold placeholder, not an open item. It is detected separately by `util-metamodel-audit` Check 8. Only add a row to §11 §Open Items when the missing measurement requires actionable follow-up (e.g. a scheduled extract, an interview, a tracker-resolvable decision-gap) — see [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §2.
 
 ---
 
@@ -242,13 +242,25 @@ Operator-grade observations. Don't argue for a product solution here — that's 
 
 ---
 
-## 11. Open TODOs
+## Open Items
 
-All flagged inline above; consolidated here for tracking.
+<!--
+Document-level canonical section per rules/open-items-governance.md §1.
+Only actionable unresolved work (doc-gap | decision-gap | execution-item | tech-debt).
+Inline `_TODO_` placeholders inside the body are NOT open items — they are scaffold
+debt tracked by util-metamodel-audit Check 8. Do not scaffold placeholder-only rows
+to satisfy this section; an empty table with `_None at present._` is correct when
+there is no actionable unresolved work yet.
 
-| § | TODO | Resolution path | Priority |
-|---|---|---|---|
-| {§} | {What's missing or unverified} | {How to resolve — interview, observe, primary-source lookup, internal DB extract} | 🔴 / 🟡 / 🟢 |
+Skills MAY add `§` (section pointer) as an extra column AFTER `Tracker ref` for
+intra-doc navigation; canonical columns below must not be reordered or removed.
+-->
+
+| OI-ID  | Type           | Summary                                       | Source anchor      | Source heading                  | Resolution path                                        | Priority | Status | Owner   | Due / Review date | Tracker ref |
+| :----- | :------------- | :-------------------------------------------- | :----------------- | :------------------------------ | :----------------------------------------------------- | :------- | :----- | :------ | :---------------- | :---------- |
+| OI-001 | doc-gap        | {Sourced KPI baseline still missing}           | #8-kpis            | §8 KPIs — measurable indicators | Extract from {system X}; owner: {role}                  | high     | open   | _TBD_   | {YYYY-MM-DD}      | _TBD_       |
+
+_Replace with real rows, or replace the row with `_None at present._` if there is no actionable unresolved work yet._
 
 ---
 

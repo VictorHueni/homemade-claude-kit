@@ -25,7 +25,7 @@ A research note is good when a reader can answer, without ambiguity:
 | **For each question, what's the answer + how confident?** | Per-Q §Finding + the Findings summary table |
 | **What evidence supports each claim?** | Per-Q §Sources consulted table (URL + Last verified + ★ confidence + quote) |
 | **Which ADRs does this research feed?** | Header `Feeds ADRs:` + per-Q §Implication for ADRs |
-| **What's still unknown?** | Per-Q §Open / TODO + Status field (Draft / Active / Frozen) |
+| **What's still unknown?** | Document-level §Open Items (one consolidated section; rows carry `Source anchor = #qN` + `Source heading`) + Status field (Draft / Active / Frozen) |
 | **When were the sources last verified?** | Header `Last verified:` + per-source `Last verified` column |
 
 ---
@@ -95,13 +95,13 @@ Ask the user the following 4 questions in a single message with lettered options
    - Populate §Sources consulted table (one row per source, with the answers from Q3 + Q4 governing depth + verification).
    - Write §Finding (1–3 paragraphs, falsifiable, honest about uncertainty).
    - Populate §Implication for ADRs (cite by ADR number + section).
-   - Populate §Open / TODO with unresolved gaps.
+   - Consolidate any unresolved gaps for this question into the document-level §Open Items section (one canonical table per file, per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md)). Each row carries `Source anchor = #qN` and `Source heading = "Qn — restated question"`; do NOT add a per-Q open-gap subsection (no `###` heading inside the Q for this purpose).
 3. Fill the §Findings summary table (one row per Q).
 4. Consolidate §Sources section (deduplicated by URL).
 5. Add Changelog entry.
 
 **Do NOT in Fill mode:**
-- Fabricate sources. If you don't have a real verifiable URL for a claim, mark the claim as `_TODO_` and add to §Open / TODO.
+- Fabricate sources. If you don't have a real verifiable URL for a claim, mark the claim inline as `_TODO_` AND add a `doc-gap` row to the document-level §Open Items section with `Source anchor` + `Source heading` pointing back to the affected question. Inline `_TODO_` alone is scaffold debt, not an open item — both surfaces matter.
 - Inflate confidence. Consultancy blogs are ★★ at best (per [`references/discipline.md`](references/discipline.md) confidence rubric); never ★★★★ or ★★★★★.
 - Cite without quote. Every source row needs an exact short quote or specific table/section reference. "See source X" is not citation.
 - Skip per-Q §Implication for ADRs. The whole point is ADR linkage; an unlinked finding is research without a decision.
@@ -128,7 +128,7 @@ Ask the following 2 questions in a single message. Users respond like `1B, 2A`:
 
 **Process:**
 1. For each in-scope question (per Q1 answer):
-   - Re-fetch every source's URL. If 404 / paywalled / moved, mark in §Sources consulted table + flag in §Open.
+   - Re-fetch every source's URL. If 404 / paywalled / moved, mark in §Sources consulted table + add a `doc-gap` row to §Open Items.
    - Check if quoted text still appears in the source (regulations get amended; pages get rewritten).
    - Update confidence ratings where evidence has shifted (e.g. an Assumed industry norm now has a regulator publication backing it → promote ★★★ → ★★★★★).
    - If Finding has materially shifted, rewrite §Finding + §Implication for ADRs.
@@ -183,10 +183,11 @@ Frontmatter block (Status / Date / Author / Last verified / Feeds ADRs / Superse
     §Sources consulted (table: Source · URL · Type · Last verified · Confidence · Quote)
     §Finding (1–3 paragraphs)
     §Implication for ADRs (bullet list per ADR)
-    §Open / TODO (bullet list)
+    (no per-Q open-items subsection — consolidated at document level below)
 §Findings summary (citable table — one row per Q)
 §Decisions Anchored (only populated in Mode 4 Freeze)
 §Consolidated sources (deduplicated by URL, grouped by type)
+§Open Items (document-level canonical table per rules/open-items-governance.md §4; rows carry `Source anchor` + `Source heading` to preserve per-Q provenance)
 §Changelog (dated rows)
 ```
 
@@ -296,7 +297,7 @@ After running any mode, summarise in 5–7 lines:
 1. **Mode executed** + **file created or updated** (path).
 2. **Questions count** + per-Q confidence distribution (e.g. "Q1 ★★★★, Q2 ★★★, Q3 ★★ — Q3 needs deeper sources before ADR cite").
 3. **ADRs fed** by this research (from the header).
-4. **§Open / TODO summary** — what's still unverified.
+4. **§Open Items summary** — what's still unverified (count by Type: doc-gap / decision-gap / execution-item / tech-debt).
 5. **Next action** — typically "fill remaining Q via Mode 2" or "have target ADR cite §findings Q1 + Q2" or "schedule Mode 3 Refresh in 6 months".
 
 Keep it short. The user will open the file directly; your job is to flag where evidence is still thin.
@@ -312,7 +313,8 @@ Before declaring the work done:
 - [ ] HTML version comment present with doc-version + created + last-verified dates.
 - [ ] Header has Status / Date / Author / Last verified / Feeds ADRs (Superseded by may be empty).
 - [ ] §Questions index lists every Q numbered.
-- [ ] Every Q section has all 5 sub-sections (Context / Sources consulted / Finding / Implication for ADRs / Open / TODO).
+- [ ] Every Q section has its 4 sub-sections (Context / Sources consulted / Finding / Implication for ADRs). Per-Q gaps are consolidated into the single document-level §Open Items section — no `###` open-gap subsection per question.
+- [ ] Document-level §Open Items section present with the canonical schema from `rules/open-items-governance.md` §4 (OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref). Each row from a per-Q gap carries `Source anchor = #qN` and `Source heading = "Qn — restated question"`.
 - [ ] §Sources consulted tables have: URL · Type · Last verified · Confidence · Quote (no missing columns).
 - [ ] No confidence inflation (consultancy blogs not rated above ★★).
 - [ ] No citation without quote.

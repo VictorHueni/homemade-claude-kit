@@ -283,7 +283,7 @@ done | sort -rn
 
 | File type | Mandatory sections | Detection pattern |
 |---|---|---|
-| `*-process.md` | `## §8 KPIs` or `## KPIs`, `## §11` or `## Open TODOs`, `## §0 Master flow` | `grep -q 'KPI\|§8'` |
+| `*-process.md` | `## §8 KPIs` or `## KPIs`, `## Open Items` (canonical document-level section per `rules/open-items-governance.md` §1; legacy variants such as the older §11 unresolved-work heading are forbidden), `## §0 Master flow` | `grep -q 'KPI\|§8'` |
 | `docs/business/06a-models/*.md` | `§5.2` or `Implicit assumptions`, `§6` or `Scenario Matrix`, `§7` or `Value capture` | `grep -q '5\.2\|Implicit assumptions'` |
 | `01a-personas.md` | `## Persona Backlog`, `## Personas`, `## Persona Template` | `grep -q 'Persona Backlog'` |
 | `03a-capability-map.md` | `## L0 axis`, `## Global overview`, `## Capability index` | `grep -q 'L0 axis\|Capability index'` |
@@ -304,7 +304,7 @@ done | sort -rn
 ```bash
 find docs/business/processes -name "*-process.md" 2>/dev/null | while read f; do
   grep -q 'KPI\|§8' "$f" || echo "MISSING KPIs: $f"
-  grep -q '§11\|Open TODOs' "$f" || echo "MISSING TODOs section: $f"
+  grep -q '^## Open Items' "$f" || echo "MISSING canonical Open Items section: $f"
 done
 ```
 

@@ -297,10 +297,35 @@ Metrics that take time to develop (weeks to months):
 
 ### 8. Open Questions
 
-Remaining questions or areas needing clarification. Include:
-- Unresolved FBS scope (functionalities considered but not committed)
-- Persona edge cases not yet designed for
-- Dependencies on other PRDs or ADR decisions
+Narrative discussion section — unresolved scope debates, persona edge cases, or PRD-internal trade-offs that need stakeholder input. Free-form prose / bullets are fine here. This section is for **discussion**, not actionable governance work.
+
+**Actionable unresolved work** (doc-gap / decision-gap / execution-item / tech-debt) goes in the document-level §Open Items section below, NOT here.
+
+---
+
+### 9. Open Items
+
+This is the document-level canonical Open Items section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4. The PRD is a first adopter of the contract.
+
+**Schema (fixed column order):**
+
+```markdown
+## Open Items
+
+| OI-ID  | Type           | Summary                       | Source anchor | Source heading                          | Resolution path                                  | Priority | Status      | Owner   | Due / Review date | Tracker ref       |
+| :----- | :------------- | :---------------------------- | :------------ | :-------------------------------------- | :----------------------------------------------- | :------- | :---------- | :------ | :---------------- | :---------------- |
+| OI-001 | decision-gap   | Auth model for partner API    | #us-003       | US-003 Partner authentication           | Open ADR on token strategy                       | high     | open        | _TBD_   | 2026-06-15        | _TBD_             |
+```
+
+**Rules:**
+
+- One row per actionable unresolved item. Inline `_TODO_` placeholders elsewhere in the PRD are scaffold debt, not open items.
+- `Type` is exactly one of `doc-gap` | `decision-gap` | `execution-item` | `tech-debt`.
+- `Source anchor` + `Source heading` together preserve provenance — for example, `#us-003` + `US-003 Partner authentication` when the open item surfaced from a user story. For PRD-wide items use `#open-items` + `_central-only_`.
+- `Tracker ref` is `_TBD_` while the row is `open`; required (PR · ADR · plan increment · audit report link) to move to `closed` or `dropped`.
+- Empty section is acceptable — `_None at present._` is the correct initial state for a brand-new PRD.
+- The skill MAY append additional informational columns AFTER `Tracker ref`; canonical columns must not be reordered or removed.
+- After the PRD ships, `util-open-items` syncs rows to the central ledger at `project-control/open-items/` and replaces the local `OI-NNN` with the canonical `OI-NNNN` ledger ID.
 
 ---
 
@@ -362,3 +387,4 @@ Before saving the PRD:
 - [ ] Success metrics anchored to persona context and value-stream pain index
 - [ ] Saved to `docs/product-specs/prds/prd-NNNN-{feature}.md`
 - [ ] FBS promotion instructions provided (⬜ → 🔄 for committed functionalities)
+- [ ] §Open Items section present with the canonical schema (OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref); empty (`_None at present._`) is acceptable. No placeholder-only rows.

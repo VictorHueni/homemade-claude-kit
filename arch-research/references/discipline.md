@@ -166,7 +166,7 @@ Once a research note is Frozen (Mode 4), its Implications section reflects what 
 
 4. **Citing without re-reading.** Pasting a URL from memory or from a previous research note without re-fetching. URLs change; quotes get rewritten; pages get retired. Always verify on Last verified date.
 
-5. **Letting Active research drift forever.** Active status without progress for >3 months means either the topic isn't important enough to warrant a research note (delete or merge), or the research is blocked on something specific (document the blocker in §Open and re-scope).
+5. **Letting Active research drift forever.** Active status without progress for >3 months means either the topic isn't important enough to warrant a research note (delete or merge), or the research is blocked on something specific (capture the blocker as a `decision-gap` row in §Open Items with `Source heading` naming the affected question, then re-scope).
 
 6. **Frozen research that pretends to be Active.** After feeding ADRs decide, the research is historical. Editing it (other than Refresh → Supersede flow) falsifies the historical record. Resist the urge.
 
@@ -177,7 +177,8 @@ Once a research note is Frozen (Mode 4), its Implications section reflects what 
 Before declaring a Mode 2 Fill complete, verify silently:
 
 - [ ] All N questions in §Questions index have matching H2 sections
-- [ ] Each H2 has exactly 5 sub-sections (Context · Sources consulted · Finding · Implication for ADRs · Open / TODO)
+- [ ] Each H2 has its 4 sub-sections (Context · Sources consulted · Finding · Implication for ADRs). Per-Q gaps are consolidated into the document-level §Open Items section per [`rules/open-items-governance.md`](../../rules/open-items-governance.md) — no `###` open-gap subsection under any Q.
+- [ ] Document-level §Open Items table present with the canonical schema (OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref). Per-Q rows preserve provenance via `Source anchor = #qN` + `Source heading = "Qn — restated question"`.
 - [ ] Every Sources table has the full column set (Source · URL · Type · Last verified · Confidence · Quote)
 - [ ] No source row missing `Last verified` date
 - [ ] No source row missing Quote
