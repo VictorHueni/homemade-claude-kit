@@ -328,3 +328,31 @@ Non-negotiable:
 
 If the user ships with violations, flag them in the Changelog so a
 future reviewer sees the compromise.
+
+---
+
+## Open-items governance stance — Changelog-only for now
+
+The competitive landscape is **deliberately not part of the formal `Open Items` rollout**
+in the current governance increment. Unresolved work (claims awaiting verification,
+deferred per-competitor profiles, missing strategic-group ratings) is captured in the
+existing `## Changelog` section together with the date, evidence source, and reviewer.
+
+Rationale:
+
+- Competitive intel evolves continuously and most "open" items are *evidence-freshness*
+  questions, not the four governance categories (`doc-gap` / `decision-gap` /
+  `execution-item` / `tech-debt`) defined in
+  [`rules/open-items-governance.md`](../../rules/open-items-governance.md) §2.
+- The artefact already enforces `Source:` + `Last verified:` on every claim, which acts
+  as a per-claim freshness ledger that the central `project-control/open-items/`
+  ledger would only duplicate.
+- The per-competitor profile, value curve, and Five Forces sections are themselves
+  rebuilt on every refresh wave, so the `Changelog` captures the meaningful change set.
+
+When governance items of the four canonical types *do* arise (for example, a deferred
+ADR on whether to enter a substitute-product category), they belong in the BMC or the
+relevant ADR's `## Open Items` section, **not** in this artefact. This stance is
+re-evaluated after one rollout cycle; if competitive intel accumulates governance items
+that do not fit the existing artefacts, this rule is revisited and a document-level
+`## Open Items` section is added then.

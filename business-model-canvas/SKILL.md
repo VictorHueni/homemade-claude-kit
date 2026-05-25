@@ -272,6 +272,12 @@ Intro paragraph:
 §Value Proposition deep-dives
   - List of VPC companion files (one per segment, if created)
 
+§Open Items
+  - Document-level canonical section per rules/open-items-governance.md §1
+  - Schema: OI-ID | Type | Summary | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref
+  - Source anchor = canvas block ID (e.g. `#cs-1`, `#vp-2`); Source heading = full block name
+  - Initial state is `_None at present._` — do NOT scaffold placeholder rows just to fill the section
+
 Changelog
 ```
 

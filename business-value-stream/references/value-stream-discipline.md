@@ -281,5 +281,6 @@ Non-negotiable:
 - No Lean VSM and no customer-journey content in this artefact.
 
 If the user violates these despite pushback, ship with the violation
-flagged in the §Changelog or §Open Issues so a future reviewer sees the
-compromise.
+flagged in the §Changelog or §Open Items so a future reviewer sees the
+compromise. (`Open Items` follows the canonical schema in
+[`rules/open-items-governance.md`](../../rules/open-items-governance.md).)
