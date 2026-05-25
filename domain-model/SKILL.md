@@ -39,23 +39,23 @@ This skill enforces the **rich model**. Every entity must have documented behavi
 
 ### Mode 1 — Scaffold
 
-Create an empty `domain-model.md` for a bounded context. Seed section headings and the aggregate catalogue table. Do NOT invent aggregates — leave all aggregate sections as `_TODO_` placeholders.
+Create an empty `{bc-slug}.md` for a bounded context. Seed section headings and the aggregate catalogue table. Do NOT invent aggregates — leave all aggregate sections as `_TODO_` placeholders.
 
 Steps:
-1. Resolve the BC slug from the bounded-contexts.md (`docs/domain/bounded-contexts.md`).
+1. Resolve the BC slug from the bounded-contexts.md (`docs/domain/02b-bounded-contexts.md`).
 2. Create `docs/domain/07b-models/{bc-slug}.md` from the template in `references/template.md`.
 3. Report: file path created, reminder to run Mode 2 (Fill) to populate.
 
 ### Mode 2 — Fill
 
-Populate a scaffolded `domain-model.md` with real domain model content.
+Populate a scaffolded `docs/domain/07b-models/{bc-slug}.md` with real domain model content.
 
 #### Step 0 — Context questions (ask verbatim; user responds with letter codes, e.g. "1A, 2B, 3C, 4A")
 
 ```
 1. Which bounded context to model?
    A. [name a specific BC-NN — e.g. BC-01 Claims Processing]
-   B. All bounded contexts — one domain-model.md per BC in one pass
+   B. All bounded contexts — one {bc-slug}.md per BC in one pass
 
 2. Discovery basis for aggregates?
    A. Event Storming output — domain events → aggregate clusters → roots
@@ -76,8 +76,8 @@ Populate a scaffolded `domain-model.md` with real domain model content.
 
 #### Fill process (after Step 0)
 
-1. Read `docs/domain/bounded-contexts.md` for BC-NN scope + capabilities owned.
-2. Read `docs/domain/glossary.md` for the canonical term names — entity names MUST match GT-NN terms exactly.
+1. Read `docs/domain/02b-bounded-contexts.md` for BC-NN scope + capabilities owned.
+2. Read `docs/domain/02c-glossary.md` for the canonical term names — entity names MUST match GT-NN terms exactly.
 3. Read `docs/product-specs/07a-fbs.md` for functionalities the BC implements — each functional group is an aggregate candidate.
 4. Identify aggregates: apply Vernon's rules (see `references/discipline.md`). Prefer small. Start with one entity per aggregate.
 5. For each aggregate: name the root, document invariants (≥2), list member entities and VOs, document the lifecycle state machine, and map commands to domain events.
@@ -89,7 +89,7 @@ Populate a scaffolded `domain-model.md` with real domain model content.
 
 ### Mode 3 — Verify
 
-Run discipline checks on an existing `domain-model.md`. Report findings as a table.
+Run discipline checks on an existing `docs/domain/07b-models/{bc-slug}.md`. Report findings as a table.
 
 | Check | Method |
 |---|---|
@@ -160,17 +160,17 @@ Sourced from Evans (2003), Vernon IDDD (2013), and Fowler (2003).
 
 Default output path: `docs/domain/07b-models/{bc-slug}.md`
 
-- `{bc-slug}` = kebab-case BC name from bounded-contexts.md (e.g. `claims-processing`, `policy-management`)
+- `{bc-slug}` = kebab-case BC name from `docs/domain/02b-bounded-contexts.md` (e.g. `claims-processing`, `policy-management`)
 - One file per bounded context
 - If the bounded context folder does not yet exist, create it
 
 Discover existing models:
 ```bash
-find docs/domain -name "domain-model.md" 2>/dev/null
+find docs/domain/07b-models -name "*.md" 2>/dev/null
 ```
 
 Overwrite rules:
-- **Scaffold**: skip if `domain-model.md` already exists; warn and offer Mode 2 instead
+- **Scaffold**: skip if `docs/domain/07b-models/{bc-slug}.md` already exists; warn and offer Mode 2 instead
 - **Fill**: update specific aggregate/entity/VO/event sections; do not erase sections that are already filled
 - **Verify**: report-only; never edit the file
 - **Refactor**: targeted edits only; always append a changelog entry
@@ -194,7 +194,7 @@ Overwrite rules:
 
 ## Reference materials
 
-- `references/template.md` — canonical `domain-model.md` skeleton
+- `references/template.md` — canonical `{bc-slug}.md` skeleton (output at `docs/domain/07b-models/{bc-slug}.md`)
 - `references/methodology-references.md` — Evans, Vernon, Fowler, Brandolini bibliography with specific chapters and rules
 - `references/discipline.md` — aggregate design rules, invariant writing guide, event naming guide, anemic model detection patterns
 

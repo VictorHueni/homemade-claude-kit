@@ -30,7 +30,7 @@ soft-links to value-stream stages.
 - Business Capability Map: [link to ../../business/03a-capability-map.md if exists]
 - Personas: [link to ../../business/01a-personas.md if exists]
 - Value Streams: [link to ../../business/04a-value-streams.md if exists]
-- Business Processes: [link to ../../business/processes/ if exists]
+- Business Processes: [link to ../../business/05a-processes/ if exists]
 - PRDs: [link to ../ if exists]
 
 ---

@@ -372,12 +372,12 @@ The digit order is not arbitrary. You cannot defend market sizing until you know
 
 | Slug | What it computes |
 |---|---|
-| `1a-customer-roi-model.md` | Per-customer / per-account value the product delivers |
-| `1b-pricing-headroom-model.md` | Tier price ÷ ROI = value-capture ratio + payback |
-| `2a-tam-sam-som-model.md` | Addressable market in customer count + ARR |
-| `2b-revenue-projection-model.md` | N-year ARR / GMV / unit-sales curve |
-| `3a-unit-economics-model.md` | CAC, gross margin, payback, LTV/CAC |
-| `3b-onboarding-cost-model.md` | Time-to-live + onboarding labour per customer |
+| `qm-1a-customer-roi-model.md` | Per-customer / per-account value the product delivers |
+| `qm-1b-pricing-headroom-model.md` | Tier price ÷ ROI = value-capture ratio + payback |
+| `qm-2a-tam-sam-som-model.md` | Addressable market in customer count + ARR |
+| `qm-2b-revenue-projection-model.md` | N-year ARR / GMV / unit-sales curve |
+| `qm-3a-unit-economics-model.md` | CAC, gross margin, payback, LTV/CAC |
+| `qm-3b-onboarding-cost-model.md` | Time-to-live + onboarding labour per customer |
 
 ### Picking the right slug for a new model
 
@@ -393,8 +393,8 @@ The H1 is the slug, transformed:
 - Title Case the remainder
 - Add "Model" suffix
 
-`1a-customer-roi-model.md` → `# Customer ROI Model`
-`2a-tam-sam-som-model.md` → `# TAM / SAM / SOM Model`
+`qm-1a-customer-roi-model.md` → `# Customer ROI Model`
+`qm-2a-tam-sam-som-model.md` → `# TAM / SAM / SOM Model`
 
 ### Don't overwrite existing model files
 

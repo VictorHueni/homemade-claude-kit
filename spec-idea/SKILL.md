@@ -129,7 +129,7 @@ abandoned
 1. If the user does not specify a domain, ask which domain (with lettered options).
 2. Discuss the problem and potential solutions with the user.
 3. Generate the idea file following the format above.
-4. Save to `docs/ideas/[domain]/[slug].md`.
+4. Save to `docs/ideas/{domain}/{slug}.md`.
 5. Create the domain folder and INDEX.md if they don't exist.
 6. Add the idea to INDEX.md.
 

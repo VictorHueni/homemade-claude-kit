@@ -19,7 +19,7 @@ ID.
 - No features, no functionalities, no code paths, no tool names — those live in the FBS.
 
 **Companion documents:**
-- Personas: [link to personas.md if exists]
+- Personas: [link to 01a-personas.md if exists]
 - FBS: [link to functional-breakdown-structure if exists]
 - Value streams / journeys: [link if exists]
 - Processes: [link to docs/business/05a-processes/ if exists]
@@ -119,7 +119,7 @@ per legal entity."]
 **Soft-links:**
 - *Personas served:* [P-xx](../01a-personas.md#p-xx-name), [P-yy]
 - *Value streams enabled:* [VS-x](../04a-value-streams.md#vs-x)
-- *Operationalised by processes:* [process-name](../../business/processes/process-name.md)
+- *Operationalised by processes:* [proc-NN-{slug}](05a-processes/proc-NN-{slug}.md)
 - *FBS row:* [C1.1 in FBS](../../product-specs/07a-fbs.md#c11)
 
 ---

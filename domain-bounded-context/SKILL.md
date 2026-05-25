@@ -15,8 +15,8 @@ metadata:
 You are an expert at producing **strategic DDD Bounded Context Maps** — the artefacts that answer one question: *"where does the domain model change meaning, and what are the explicit relationships between those islands of meaning?"*
 
 The artifacts produced by this skill are **two markdown documents** in the project's domain folder (default `docs/domain/`):
-- `bounded-contexts.md` — the catalogue of bounded contexts, their subdomain type, owned capabilities, and team ownership.
-- `context-map.md` — the integration pattern map showing how bounded contexts relate to each other.
+- `02b-bounded-contexts.md` — the catalogue of bounded contexts, their subdomain type, owned capabilities, and team ownership.
+- `02b-context-map.md` — the integration pattern map showing how bounded contexts relate to each other.
 
 This is NOT an org chart, NOT a microservices deployment diagram, NOT a data flow diagram. It is the **strategic model of where the domain model changes meaning**, expressed as named bounded contexts with explicit integration patterns between them.
 
@@ -50,8 +50,8 @@ The skill operates in one of four modes. Detect from the user's prompt; ask if a
 **When:** the project has no `docs/domain/` folder yet, or has the folder but no files.
 
 **Output:** two empty template files:
-- `bounded-contexts.md` — catalogue skeleton with placeholder BC-01 / BC-02 rows.
-- `context-map.md` — Mermaid flowchart skeleton + relationship definition blocks.
+- `02b-bounded-contexts.md` — catalogue skeleton with placeholder BC-01 / BC-02 rows.
+- `02b-context-map.md` — Mermaid flowchart skeleton + relationship definition blocks.
 
 Source from `references/template.md`. Substitute `{{product}}` placeholders. Do NOT invent bounded contexts in scaffold mode — leave the catalogue as a `_TODO_` skeleton.
 
@@ -94,11 +94,11 @@ Ask the user the following 4 questions in a single message with lettered options
 3. **Name the bounded contexts** — noun phrases in the ubiquitous language of that context. Business experts must understand the name without knowing what a microservice is.
 4. **Assign capabilities to BCs** — each capability C-N.M goes to exactly one BC. No unassigned capabilities, no double-assigned capabilities.
 5. **Classify subdomains** — Core / Supporting / Generic per context. See `references/discipline.md` §Subdomain classification guide.
-6. **Produce `bounded-contexts.md`** — catalogue table + per-BC definition sections.
+6. **Produce `02b-bounded-contexts.md`** — catalogue table + per-BC definition sections.
 
 ### Mode 3 — Fill
 
-**When:** bounded-contexts.md has the BC catalogue; the user wants to:
+**When:** 02b-bounded-contexts.md has the BC catalogue; the user wants to:
 - Fill per-BC definition sections in full.
 - Draw the context map with named integration patterns.
 - Map every relationship to one of Evans' eight patterns.
@@ -106,7 +106,7 @@ Ask the user the following 4 questions in a single message with lettered options
 **Process:**
 1. For each BC, fill the canonical definition block (see `references/template.md`): responsibility statement, subdomain type + rationale, capabilities owned, ubiquitous language scope, canonical data owned, integration interfaces, team boundary recommendation.
 2. For each BC-to-BC relationship, pick the integration pattern using the decision tree in `references/discipline.md`. Record: upstream / downstream, pattern name + Evans definition, what crosses the boundary, translation layer description (for ACL), technical implementation hint, coupling risk.
-3. Render the Mermaid flowchart in `context-map.md` with BCs as nodes and integration pattern names as edge labels.
+3. Render the Mermaid flowchart in `02b-context-map.md` with BCs as nodes and integration pattern names as edge labels.
 4. Run the quality checks from `references/discipline.md` §Quality checks.
 
 ### Mode 4 — Refresh
@@ -114,7 +114,7 @@ Ask the user the following 4 questions in a single message with lettered options
 **When:** bounded contexts and context map exist; system has evolved and boundaries need re-evaluation.
 
 **Process:**
-1. **Re-read** bounded-contexts.md and context-map.md against current capability map + codebase (if available).
+1. **Re-read** 02b-bounded-contexts.md and 02b-context-map.md against current capability map + codebase (if available).
 2. **Flag split candidates** — BCs that have grown too large: >7 aggregates (preview), team friction at the boundary, multiple unrelated ubiquitous language clusters under one BC name.
 3. **Flag merge candidates** — BCs that are too small: <2 capabilities, trivial integration (pure delegation), or context map shows it only conforms to one upstream without adding any translation.
 4. **Flag pattern drift** — relationships that were ACL but the translation layer was never built (now de facto Conformist). Rename and document the debt.
@@ -193,7 +193,7 @@ If a folder exists at a non-default location, use it — don't move existing wor
 
 The bounded context map references other artefacts as pointers, not dependencies. It should stand alone even if the capability map or personas don't yet exist — use `_TODO_` placeholders for C-N.M and P-NN links.
 
-When linking, use ID + name + relative path: `[BC-02 Order Fulfilment](bounded-contexts.md#bc-02)` so future renames don't break the link.
+When linking, use ID + name + relative path: `[BC-02 Order Fulfilment](02b-bounded-contexts.md#bc-02)` so future renames don't break the link.
 
 ---
 
@@ -201,7 +201,7 @@ When linking, use ID + name + relative path: `[BC-02 Order Fulfilment](bounded-c
 
 Three files in `references/` carry the canonical content. Read when needed:
 
-- **`references/template.md`** — the canonical `bounded-contexts.md` + `context-map.md` skeletons. Copy to the target folder and fill placeholders.
+- **`references/template.md`** — the canonical `02b-bounded-contexts.md` + `02b-context-map.md` skeletons. Copy to the target folder and fill placeholders.
 - **`references/methodology-references.md`** — the canonical bibliography (Evans, Vernon, Nick Tune, Conway, Team Topologies, Brandolini). **Lives only in the kit** — never copied to projects. Project docs link here via the 2-line methodology pointer in their header.
 - **`references/discipline.md`** — internal Claude guidance: integration pattern decision tree, subdomain classification guide, BC naming test, quality checks. Never copied into the project.
 
@@ -227,14 +227,14 @@ Keep it short. Point the user at the next move.
 Before declaring the work done:
 
 - [ ] Folder identified or created (with user confirmation if new).
-- [ ] `bounded-contexts.md` exists.
-- [ ] `context-map.md` exists.
-- [ ] Methodology pointer in `bounded-contexts.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
+- [ ] `02b-bounded-contexts.md` exists.
+- [ ] `02b-context-map.md` exists.
+- [ ] Methodology pointer in `02b-bounded-contexts.md` header links to the kit's canonical bibliography (NOT a local methodology-references.md).
 - [ ] Every capability C-N.M assigned to exactly one BC — no unassigned, no double-assigned.
 - [ ] Every BC has: subdomain type (Core / Supporting / Generic) + one-sentence rationale.
 - [ ] No BC has a technology name or CRUD operation name.
 - [ ] Core subdomain count: 1–3.
-- [ ] `context-map.md` names the integration pattern for every relationship — no anonymous "they call each other".
+- [ ] `02b-context-map.md` names the integration pattern for every relationship — no anonymous "they call each other".
 - [ ] Every ACL relationship has a translation layer description.
 - [ ] Conway's Law alignment noted (team boundary recommendation per BC).
 - [ ] Mermaid flowchart renders without parse errors (see diagramming-mermaid rule).

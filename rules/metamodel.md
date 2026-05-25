@@ -25,8 +25,8 @@ what order, and where to put it**.
 | 0 | **Product Vision** (why — the north star) | `business-vision` | `docs/VISION.md` | *(singleton — no ID; referenced by path)* |
 | 1 | **Personas** (who) | `business-persona` | `docs/business/01a-personas.md` | `P-NN` |
 | 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/03a-capability-map.md` | `C-N.M` (e.g. `C1`, `C1.1`, `C1.1.1` at L2 rare) |
-| 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/bounded-contexts.md` + `docs/domain/context-map.md` | `BC-NN` |
-| 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/glossary.md` | `BC-NN.GT-NN` |
+| 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/02b-bounded-contexts.md` + `docs/domain/02b-context-map.md` | `BC-NN` |
+| 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/02c-glossary.md` | `BC-NN.GT-NN` |
 | 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/04a-value-streams.md` + `docs/business/04a-vpc-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
 | 4.5 | **Business Objectives** (why — strategic intent) | `business-objective` | `docs/business/04b-objectives.md` | `OBJ-NN`, `KR-NN.M` |
 | 4 | **Business Processes** (operational how) | `business-process` | `docs/business/05a-processes/proc-NN-{slug}.md` (one file per process) | per-process slug |
@@ -37,14 +37,16 @@ what order, and where to put it**.
 | 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` | `PRD-NNNN` |
-| 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_{slug}/` | `Plan-NNNN`, `Inc-N` |
+| 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_exec_{slug}.md` | `Plan-NNNN`, `Inc-N` |
 
 **Supporting skills** (not in the main build order, used as needed):
 - `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
-- `spec-idea` — captures pre-PRD ideas → `docs/ideas/{slug}.md`
+- `spec-idea` — captures pre-PRD ideas → `docs/ideas/{domain}/{slug}.md` with `INDEX.md` per domain folder
 - `spec-peer-review` — reviews PRDs / plans
 - `arch-research` — Architecture Research notes that inform ADR decisions → `docs/architecture/research/{NNNN}-{slug}.md`; mints `Research-NNNN` in-doc ID (4-digit zero-padded, same convention as `ADR-NNNN`); lifecycle: Draft → Active → Frozen (once feeding ADRs land) → Superseded
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/01b-competitive-landscape/`; mints `CO-NN` per Tier-1 competitor profile; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
+- `business-research` — hypothesis-anchored interview scripts + research synthesis + research plans → `docs/business/discovery/interviews/`; run alongside any step where upstream artefacts carry `Assumed` claims; especially valuable after Step 1 (Personas), Step 5 (BMC), and Step 6 (Quantitative Models); synthesis feeds confidence ratings (`Assumed → Tested → Validated`) back into those artefacts; companion to `business-workshop` (individual reality-check vs. group reality-check)
+- `business-workshop` — workshop facilitation guides + series plans + synthesis → `docs/business/discovery/workshops/`; run when stakeholder alignment or group reality-checking is needed; especially valuable before Step 3 (Value Streams) and Step 5 (BMC) to build shared understanding; companion to `business-research` (group reality-check vs. individual reality-check); both share the `docs/business/discovery/` parent folder
 - `ops-runbook`, `ops-bug-rca` — operational artefacts (post-ship)
 - `util-docs-audit` — general doc staleness scan (file-level freshness, dead prose)
 - `util-metamodel-audit` — deep metamodel compliance audit: 16 checks covering stack progress, folder placement, internal + external links, ID integrity + cross-references, dependency enforcement, _TODO_ density, mandatory sections, confidence distribution, expiry + staleness, orphaned files, research sync, ADR chains, FBS + epic delivery progress → report at `var/reports/metamodel-audit/`; report-only with proposed fix per finding; run monthly (active dev) or quarterly (maintenance)
@@ -291,7 +293,7 @@ moving on.
 - Mode `scaffold` → create `docs/business/01a-personas.md`
 - Mode `backlog` → identify Tier-1 / Tier-2 / Tier-3 personas with Cooper persona types
 - Mode `fill-one` → write 1–3 Tier-1 personas as proto-personas (Lean UX) or research-grounded (BABOK §10.43)
-**Output verification:** `personas.md` exists; ≥1 Tier-1 persona filled; `P-01` through `P-NN` assigned.
+**Output verification:** `01a-personas.md` exists; ≥1 Tier-1 persona filled; `P-01` through `P-NN` assigned.
 
 ### Step 2 — Business Model Canvas / Lean Canvas (commercial wrapper)
 
@@ -323,7 +325,7 @@ moving on.
 - Mode `discover` → read capability map + value streams; group capabilities by domain cohesion; identify boundary signals (where same word means different things; where data ownership changes; where team handoff happens); name bounded contexts
 - Classify each BC: Core (competitive differentiator) / Supporting (enables Core) / Generic (commodity — buy or outsource)
 - Mode `fill` → per-BC definition sections + context map with integration patterns (ACL, Shared Kernel, Customer-Supplier, Open Host Service, Published Language, Conformist)
-**Output verification:** `bounded-contexts.md` + `context-map.md` exist; every capability `C-N.M` assigned to exactly one `BC-NN`; each BC has subdomain type + rationale; context map names integration patterns (not just "they communicate"); 1–3 Core subdomains.
+**Output verification:** `02b-bounded-contexts.md` + `02b-context-map.md` exist; every capability `C-N.M` assigned to exactly one `BC-NN`; each BC has subdomain type + rationale; context map names integration patterns (not just "they communicate"); 1–3 Core subdomains.
 
 ### Step 2c — Domain Glossary (ubiquitous language)
 
@@ -392,10 +394,10 @@ moving on.
 **Skill:** `domain-model`
 **Prerequisites:** Step 2b (Bounded contexts provide BC-NN namespace); Step 2c (Glossary terms — entity names MUST match GT-NN); Step 7 (FBS — functionalities reveal candidate entities and aggregates); Step 3 (Value Stream stages — stage transitions reveal domain events).
 **Process:**
-- One `domain-model.md` per bounded context: `docs/domain/07b-models/{bc-slug}.md`
+- One file per bounded context: `docs/domain/07b-models/{bc-slug}.md`
 - Mode `fill` → per aggregate: root, invariants, lifecycle states, command→event pairs; per entity: identity, attributes, behaviour methods; per value object: attributes, equality rule, validation invariants; per domain event: trigger, payload, consumers, business significance
 - Mode `verify` → check for anemic model (entities must have behaviour); check aggregate sizing (≤5 members); check event naming (past tense + business-meaningful)
-**Output verification:** one `domain-model.md` per BC-NN; every aggregate has a named root + ≥2 documented invariants; all entity names match GT-NN glossary terms; all domain events are past tense + carry business significance; Mermaid class diagram present.
+**Output verification:** one `{bc-slug}.md` per BC-NN in `docs/domain/07b-models/`; every aggregate has a named root + ≥2 documented invariants; all entity names match GT-NN glossary terms; all domain events are past tense + carry business significance; Mermaid class diagram present.
 
 ### Step 8 — Delivery Roadmap (Plan by Feature + Walking Skeleton + Phase Goals)
 
@@ -434,7 +436,7 @@ moving on.
 **Skill:** `spec-implementation-plan`
 **Prerequisites:** Step 10 (PRDs).
 **Process:**
-- One plan per PRD: `docs/exec-plans/active/{NNNN}_{slug}/`
+- One plan per PRD: `docs/exec-plans/active/{NNNN}_exec_{slug}.md`
 - Each plan: numbered increments (Inc-1, Inc-2, …), each small + testable + reversible.
 **Output verification:** each in-flight PRD has a corresponding plan; plan increments are atomic + testable.
 
@@ -522,15 +524,15 @@ docs/
 ├── business/                                            ← Business Architecture artefacts (numbered = build order)
 │   ├── 01a-personas.md                                   ← business-persona (P-NN)
 │   ├── 02a-bmc.md  (or 02a-lean-canvas.md)               ← business-model-canvas (Step 2)
-│   ├── 02-vpc-{segment}.md  (optional per CS)           ← BMC VPC companions
+│   ├── 02a-vpc-{segment}.md  (optional per CS)          ← BMC VPC companions
 │   ├── 03a-capability-map.md                             ← business-capability-map (C-N.M)
 │   ├── 04a-value-streams.md                              ← business-value-stream (VS-N.M)
-│   ├── 04-vpc-{segment}.md  (optional per VS)           ← VS VPC companions
+│   ├── 04a-vpc-{segment}.md  (optional per VS)           ← VS VPC companions
 │   ├── 04b-objectives.md                                ← business-objective (OBJ-NN, KR-NN.M)
-│   ├── processes/                                       ← multi-file; keep subfolder
-│   │   └── {slug}-process.md (one per process)
-│   └── models/                                          ← multi-file; keep subfolder
-│       └── {slug}.md (TAM/SAM/SOM, savings, ROI per model)
+│   ├── 05a-processes/                                   ← multi-file; keep subfolder
+│   │   └── proc-NN-{slug}.md (one per process)
+│   └── 06a-models/                                      ← multi-file; keep subfolder
+│       └── qm-NN-{topic}.md (TAM/SAM/SOM, savings, ROI per model)
 ├── product-specs/                                       ← `spec-` skills (product delivery)
 │   ├── 07a-fbs.md                                        ← spec-functional-breakdown-structure (C-N.M.FXX)
 │   ├── 08a-delivery-roadmap.md                           ← spec-delivery-roadmap (E-NN)
@@ -539,15 +541,15 @@ docs/
 │       └── prd-NNNN-{feature}.md (one per PRD)          ← spec-prd (PRD-NNNN)
 ├── exec-plans/                                          ← `spec-` skills (implementation)
 │   └── active/
-│       └── {NNNN}_{slug}/  (one folder per plan with increments inside)
+│       └── {NNNN}_exec_{slug}.md  (one file per plan)
 ├── architecture/                                        ← `arch-` skills
 │   └── decisions/                                       ← arch-adr writes here
-│       └── {NNNN}-{slug}.md
-├── domain/                                              ← `domain-` skills (DDD artefacts — no step prefix; named by type)
-│   ├── bounded-contexts.md                              ← domain-bounded-context (BC-NN)
-│   ├── context-map.md                                   ← domain-bounded-context (context map)
-│   ├── glossary.md                                      ← domain-glossary (BC-NN.GT-NN)
-│   └── models/                                          ← consolidated domain models
+│       └── adr-{NNNN}-{slug}.md
+├── domain/                                              ← `domain-` skills (DDD artefacts — numbered by step)
+│   ├── 02b-bounded-contexts.md                          ← domain-bounded-context (BC-NN)
+│   ├── 02b-context-map.md                               ← domain-bounded-context (context map)
+│   ├── 02c-glossary.md                                  ← domain-glossary (BC-NN.GT-NN)
+│   └── 07b-models/                                      ← domain model files per BC
 │       └── {bc-slug}.md                                 ← domain-model (one per BC)
 ├── ops/                                                 ← `ops-` skills
 │   ├── runbooks/
@@ -563,6 +565,9 @@ docs/
 │           ├── dist/                                    ← built HTML + prototypes/
 │           └── config.yaml
 └── ideas/                                               ← `spec-idea` (pre-PRD)
+    └── {domain}/                                        ← one subfolder per domain (frontend/backend/infra/etc.)
+        ├── INDEX.md
+        └── {slug}.md
     └── {slug}.md
 ```
 

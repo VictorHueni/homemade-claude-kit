@@ -132,7 +132,7 @@ Source from `references/template.md`. Substitute `{{product_or_scope}}`, `{{vari
 
 **Process:**
 1. **Pick the segment** — must be one of the segments listed in the main canvas's Customer Segments block.
-2. **Create** `value-proposition-canvas-{segment-slug}.md` in the same folder.
+2. **Create** `02a-vpc-{segment}.md` in the same folder.
 3. **Fill the two halves:**
    - **Customer Profile** (the segment's perspective):
      - **Customer Jobs** — what they're trying to accomplish (functional, emotional, social jobs)
@@ -235,7 +235,7 @@ Lifted from Strategyzer canon + multiple practitioner sources. Run these checks 
 | **Folder location** | Default `docs/business/`. Ask if alternative. |
 | **Variant** (BMC / Lean Canvas) | Required at scaffold. Suggest based on project type (BMC for established; Lean for startup) but user picks. |
 | **Scope name** | What product / business / venture? Used for `{{product_or_scope}}` substitution. |
-| **Other artefact existence** | Check for `personas.md`, `capability-map.md`, `value-streams.md`, `processes/`. If absent, soft-links will be `_TODO_`. |
+| **Other artefact existence** | Check for `01a-personas.md`, `03a-capability-map.md`, `04a-value-streams.md`, `05a-processes/`. If absent, soft-links will be `_TODO_`. |
 | **Block to fill / refresh** (mode 2 / 4) | Which block(s)? Single, multiple, or "all"? |
 | **Segment for VPC** (mode 3) | Which Customer Segment to drill into? |
 

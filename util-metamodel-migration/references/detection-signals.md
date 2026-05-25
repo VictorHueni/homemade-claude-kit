@@ -12,30 +12,30 @@ A file whose name matches one of these patterns is likely the artefact type list
 
 | Filename pattern (glob) | Likely artefact type | Canonical skill | Canonical path |
 |---|---|---|---|
-| `*_prd_*.md` or `*-prd-*.md` | PRD | `spec-prd` | `docs/product-specs/NNNN_prd_*.md` (flat, not in subdirs) |
-| `[0-9][0-9][0-9][0-9]-*.md` or `[0-9][0-9][0-9][0-9]_*.md` in a decisions-like folder | ADR | `arch-adr` | `docs/architecture/decisions/NNNN-{topic}.md` |
+| `*_prd_*.md` or `*-prd-*.md` | PRD | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` |
+| `[0-9][0-9][0-9][0-9]-*.md` or `[0-9][0-9][0-9][0-9]_*.md` in a decisions-like folder | ADR | `arch-adr` | `docs/architecture/decisions/adr-NNNN-{topic}.md` |
 | `*-adr-*.md` (redundant adr in name) | ADR naming issue | `arch-adr` | Rename: remove `-adr` from filename |
 | `*runbook*.md` | Runbook | `ops-runbook` | `docs/ops/runbooks/{slug}.md` |
 | `*-rca*.md` or `*-incident*.md` or `*-postmortem*.md` | Bug RCA | `ops-bug-rca` | `docs/ops/rcas/{date}-{slug}.md` |
-| `*-process.md` or `*-workflow.md` | Business process | `business-process` | `docs/business/processes/{slug}-process.md` |
+| `*-process.md` or `*-workflow.md` | Business process | `business-process` | `docs/business/05a-processes/proc-NN-{slug}.md` |
 | `*persona*.md` or `*personas*.md` | Personas | `business-persona` | `docs/business/01a-personas.md` |
 | `*capability-map*.md` or `*capabilities*.md` | Capability map | `business-capability-map` | `docs/business/03a-capability-map.md` |
 | `*value-stream*.md` or `*value-streams*.md` | Value streams | `business-value-stream` | `docs/business/04a-value-streams.md` |
 | `*business-model-canvas*.md` or `*lean-canvas*.md` or `*bmc*.md` | BMC / Lean Canvas | `business-model-canvas` | `docs/business/02a-bmc.md or docs/business/02a-lean-canvas.md` |
 | `*glossary*.md` | Domain glossary | `domain-glossary` | `docs/domain/02c-glossary.md` |
-| `*information-model*.md` or `*domain-model*.md` or `*canonical*model*.md` | Domain model | `domain-model` | `docs/domain/models/{bc-slug}.md` |
+| `*information-model*.md` or `*domain-model*.md` or `*canonical*model*.md` | Domain model | `domain-model` | `docs/domain/07b-models/{bc-slug}.md` |
 | `*bounded-context*.md` or `*context-map*.md` | Bounded context | `domain-bounded-context` | `docs/domain/02b-bounded-contexts.md` + `docs/domain/02b-context-map.md` |
 | `FBS.md` or `*functional-breakdown*.md` | FBS | `spec-functional-breakdown-structure` | `docs/product-specs/07a-fbs.md` |
 | `*quality-attributes*.md` or `*nfr*.md` or `*non-functional*.md` | Quality attributes | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` |
 | `*delivery-roadmap*.md` or `*epic-catalogue*.md` or `*epic-catalog*.md` | Delivery roadmap | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` |
-| `*competitive-landscape*.md` or `*competitor*.md` | Competitive landscape | `business-competitive-landscape` | `docs/business/competitive-landscape/` |
-| `*quant-model*.md` or `*tam-*.md` or `*savings-model*.md` | Quantitative model | `business-quantitative-model` | `docs/business/06a-models/{slug}.md` |
+| `*competitive-landscape*.md` or `*competitor*.md` | Competitive landscape | `business-competitive-landscape` | `docs/business/01b-competitive-landscape/` |
+| `*quant-model*.md` or `*tam-*.md` or `*savings-model*.md` | Quantitative model | `business-quantitative-model` | `docs/business/06a-models/qm-NN-{topic}.md` |
 | `VISION.md` or `*vision*.md` or `*north-star*.md` | Product vision | `business-vision` | `docs/VISION.md` (singleton at docs root) |
 | `*objectives*.md` or `*okr*.md` or `*key-results*.md` | Business objectives | `business-objective` | `docs/business/04b-objectives.md` |
 
 **ADR naming redundancy rule:** if a file is already in `docs/architecture/decisions/` and its name contains `-adr-` (e.g. `0003-adr-clean-architecture.md`), flag as Tier 1 naming issue. Proposed fix: `git mv 0003-adr-clean-architecture.md 0003-clean-architecture.md`. The `-adr-` prefix is redundant since the folder already signals the type.
 
-**PRD subdirectory rule:** if `*_prd_*.md` files are found at depth ≥2 under `docs/product-specs/` (i.e., in a subdirectory), flag as misplacement. The canonical location is flat at `docs/product-specs/NNNN_prd_*.md`.
+**PRD location rule:** canonical location is `docs/product-specs/prds/prd-NNNN-{feature}.md`. PRDs found flat under `docs/product-specs/` (not in `prds/` subfolder) should be moved.
 
 ---
 
@@ -47,12 +47,12 @@ A folder whose name matches one of these patterns, AND is not already at the can
 |---|---|---|---|
 | `runbooks/` or `runbook/` | `ops-runbook` | `docs/ops/runbooks/` | `find docs -type d -iname "runbook*" \| grep -v "docs/ops/runbooks"` |
 | `bugs/` or `bug-reports/` or `rcas/` or `incidents/` | `ops-bug-rca` | `docs/ops/rcas/` | `find docs -type d -iname "bug*" -o -type d -iname "rca*" -o -type d -iname "incident*" \| grep -v "docs/ops"` |
-| `workshop*/` or `workshops/` | `business-workshop` | `docs/business/workshops/` | `find docs -type d -iname "workshop*" \| grep -v "docs/business/workshops"` |
+| `workshop*/` or `workshops/` | `business-workshop` | `docs/business/discovery/workshops/` | `find docs -type d -iname "workshop*" \| grep -v "docs/business/discovery/workshops"` |
 | `objectives/` or `okr/` or `okrs/` | `business-objective` | `docs/business/04b-objectives.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "objective*" -o -type d -iname "okr*"` |
 | `personas/` or `persona/` | `business-persona` | `docs/business/01a-personas.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "persona*"` |
 | `capabilities/` or `capability-map/` | `business-capability-map` | `docs/business/03a-capability-map.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "capabilit*"` |
 | `value-streams/` or `journeys/` or `customer-journeys/` | `business-value-stream` | `docs/business/04a-value-streams.md` (flat — no subfolder in v2) | `find docs/business -type d -iname "value-stream*" -o -type d -iname "journey*"` |
-| `processes/` or `workflows/` | `business-process` | `docs/business/processes/` | `find docs -type d -iname "process*" -o -type d -iname "workflow*" \| grep -v "docs/business/processes"` |
+| `processes/` or `workflows/` | `business-process` | `docs/business/05a-processes/` | `find docs -type d -iname "process*" -o -type d -iname "workflow*" \| grep -v "docs/business/05a-processes"` |
 | `decisions/` or `adrs/` or `adr/` | `arch-adr` | `docs/architecture/decisions/` | `find docs -type d -iname "decision*" -o -type d -iname "adr*" \| grep -v "docs/architecture/decisions"` |
 | `glossary/` or `ubiquitous-language/` or `vocabulary/` | `domain-glossary` | `docs/domain/02c-glossary.md` (flat — no subfolder in v2) | `find docs/domain -type d -iname "glossar*" -o -type d -iname "ubiquitous*"` |
 | `models/` containing `*model*.md` files | `business-quantitative-model` or `domain-model` | `docs/business/06a-models/` or `docs/domain/` | Confirm with Tier 1 + Tier 3 |
@@ -111,8 +111,8 @@ Files that predate the domain- skill layer but contain content that belongs in `
 | Signal | Likely destination | Skill to run |
 |---|---|---|
 | File named `*glossary*.md` not at `docs/domain/02c-glossary.md` | `docs/domain/02c-glossary.md` | `domain-glossary` Mode 2 (seed from existing) |
-| File named `*information-model*.md` or `*canonical*model*.md` or `*domain-model*.md` outside `docs/domain/` | `docs/domain/models/{bc-slug}.md` | `domain-model` Mode 2 (fill from existing) |
-| File named `*entity*.md` or `*entities*.md` or `*aggregate*.md` | `docs/domain/models/{bc-slug}.md` | `domain-model` Mode 2 |
+| File named `*information-model*.md` or `*canonical*model*.md` or `*domain-model*.md` outside `docs/domain/` | `docs/domain/07b-models/{bc-slug}.md` | `domain-model` Mode 2 (fill from existing) |
+| File named `*entity*.md` or `*entities*.md` or `*aggregate*.md` | `docs/domain/07b-models/{bc-slug}.md` | `domain-model` Mode 2 |
 | File named `*bounded-context*.md` not at `docs/domain/02b-bounded-contexts.md` | `docs/domain/02b-bounded-contexts.md` | `domain-bounded-context` Mode 3 (fill) |
 | Content signal: `## Ubiquitous Language` or `GT-[0-9]` IDs anywhere | `docs/domain/02c-glossary.md` | `domain-glossary` Mode 3 (enrich) |
 

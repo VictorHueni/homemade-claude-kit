@@ -15,21 +15,21 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | Context | Pattern | Example |
 |---|---|---|
 | Primary singleton (business / spec) | `docs/{layer}/NNa-{slug}.md` | `docs/business/01a-personas.md` · `docs/product-specs/07a-fbs.md` |
-| Fractional / sub-step artefact | `docs/{layer}/NNb-{slug}.md` · `NNc-{slug}.md` ... | `docs/business/04b-objectives.md` · `docs/domain/02c-glossary.md` |
+| Fractional / sub-step artefact (business) | `docs/business/NNb-{slug}.md` | `docs/business/04b-objectives.md` |
 | BMC / VS companion VPC | `docs/business/NNa-vpc-{segment}.md` | `docs/business/02a-vpc-enterprise.md` |
-| Domain singleton (sub-step) | `docs/domain/NNX-{slug}.md` | `docs/domain/02b-bounded-contexts.md` · `docs/domain/02c-glossary.md` |
-| Domain model (per BC) | `docs/domain/models/{bc-slug}.md` | `docs/domain/models/scheduling.md` |
+| Domain singleton (NO step prefix on file) | `docs/domain/{slug}.md` | `docs/domain/02b-bounded-contexts.md` · `docs/domain/02c-glossary.md` |
+| Domain model (per BC, step prefix on folder) | `docs/domain/07b-models/{bc-slug}.md` | `docs/domain/07b-models/scheduling.md` |
 | Multi-file artefact folder (step-scoped) | `docs/business/NNa-{slug}/` | `docs/business/06a-models/{slug}.md` |
-| Multi-file artefact (slug, no step prefix) | unchanged | `docs/business/processes/{slug}-process.md` |
-| Numbered multi-file artefact | unchanged | `docs/product-specs/prd-{NNNN}-{feature}.md` |
+| Multi-file artefact (slug, no step prefix) | unchanged | `docs/business/05a-processes/proc-NN-{slug}.md` |
+| Numbered multi-file artefact | unchanged | `docs/product-specs/prds/prd-{NNNN}-{feature}.md` |
 
 **Rules:**
 - Step numbers zero-pad to 2 digits **plus a letter** to identify ordering: `01a`, `02a`, `03a`, `04a`, `07a`, `08a`, `09a` (primary singleton at each step).
 - The `a` letter is **explicit, not implicit** — `01a-personas.md` (primary), `01b-…` (secondary at the same step), `01c-…` (tertiary), etc. This avoids visual ambiguity where bare `01-` would silently mean "step 1 primary" alongside other `01b-` siblings.
-- **Fractional / sub-step artefacts** use letter increments: `04b` (between Step 4 and Step 5), `02b` / `02c` (Bounded Contexts and Glossary as sub-steps of Step 2's Capability-Map area).
-- **Domain singletons keep the step-letter prefix** (e.g. `02b-bounded-contexts.md`, `02c-glossary.md`). Sub-step letters are the discriminator that distinguishes them from primary singletons at the same parent step.
-- **Multi-file artefact folders** use the step-letter prefix on the FOLDER (e.g. `06a-models/`), and the files inside follow the originating skill's own naming (funnel `1a-`, `1b-`, `2a-` for quantitative models — no step collision because the parent folder scopes them).
-- **Domain model files** (`docs/domain/models/{bc-slug}.md`) skip the step prefix — the `bc-slug` itself is the scoping discriminator; adding `07b-` to every file would be redundant.
+- **Fractional / sub-step artefacts** in the business layer use letter increments: `04b` (between Step 4 and Step 5).
+- **Domain singleton files have NO step prefix** — `docs/domain/02b-bounded-contexts.md`, `docs/domain/02b-context-map.md`, `docs/domain/02c-glossary.md`. The `docs/domain/` folder scope is the discriminator; step numbering applies to the business and spec layers only.
+- **Domain model subfolder** (`docs/domain/07b-models/`) uses the step prefix on the FOLDER, not on the files inside — `{bc-slug}.md` is the scoping discriminator.
+- **Multi-file artefact folders** use the step-letter prefix on the FOLDER (e.g. `06a-models/`), and the files inside follow the originating skill's own naming (`qm-NN-{topic}.md` for quantitative models — no step collision because the parent folder scopes them).
 - `docs/VISION.md` stays at root regardless of numbering — agent context visibility takes priority over filesystem ordering.
 
 ---
@@ -50,19 +50,19 @@ Used by the kit maintainer as the authoritative reference when updating skill fi
 | 4 | Value Streams | `docs/business/value-streams/value-streams.md` | `docs/business/04a-value-streams.md` | singleton |
 | 4 | VS Value Proposition Canvas | `docs/business/value-streams/value-proposition-canvas-{segment}.md` | `docs/business/04a-vpc-{segment}.md` | multi-slug |
 | 4b | Business Objectives | `docs/business/objectives/objectives.md` | `docs/business/04b-objectives.md` | singleton |
-| 5 | Business Processes | `docs/business/processes/{slug}-process.md` | `docs/business/05a-processes/proc-NN-{slug}.md` | singleton-folder (Pattern B inside) |
-| 6 | Quantitative Models | `docs/business/models/{slug}.md` | `docs/business/06a-models/qm-NN-{topic}.md` | singleton-folder (Pattern B inside) |
+| 5 | Business Processes | `docs/business/processes/{slug}-process.md` | `docs/business/05a-processes/proc-NN-{slug}.md` | multi-file folder |
+| 6 | Quantitative Models | `docs/business/models/{slug}.md` | `docs/business/06a-models/qm-NN-{topic}.md` | multi-file folder |
 | 6 (supporting) | Competitive Landscape | `docs/business/competitive-landscape/competitive-landscape.md` | `docs/business/01b-competitive-landscape/cl-NN-{slug}.md` + `CO-NN-{slug}.md` for competitor profiles | singleton-folder (Pattern B inside) |
 | 7 | FBS | `docs/product-specs/functional-breakdown-structure/FBS.md` | `docs/product-specs/07a-fbs.md` | singleton |
-| 7b | Domain Model (per BC) | `docs/domain/{bc-slug}/domain-model.md` | `docs/domain/07b-models/{bc-slug}.md` | singleton-folder (Pattern B inside) |
+| 7b | Domain Model (per BC) | `docs/domain/{bc-slug}/domain-model.md` | `docs/domain/07b-models/{bc-slug}.md` | multi-file folder |
 | 8 | Delivery Roadmap | `docs/product-specs/delivery-roadmap/delivery-roadmap.md` | `docs/product-specs/08a-delivery-roadmap.md` | singleton |
 | 9 | Quality Attributes | `docs/product-specs/quality-attributes/quality-attributes.md` | `docs/product-specs/09a-quality-attributes.md` | singleton |
-| 10 | PRDs | `docs/product-specs/{NNNN}_prd_{feature}.md` | `docs/product-specs/prd-{NNNN}-{feature}.md` | pattern-b-rename |
-| 11 | Implementation Plans | `docs/exec-plans/active/{NNNN}_{slug}/` | `docs/exec-plans/active/{NNNN}_{slug}/` | no-change |
+| 10 | PRDs | `docs/product-specs/{NNNN}_prd_{feature}.md` | `docs/product-specs/prds/prd-{NNNN}-{feature}.md` | pattern-b-rename |
+| 11 | Implementation Plans | `docs/exec-plans/active/{NNNN}_{slug}/` | `docs/exec-plans/active/{NNNN}_exec_{slug}.md` | pattern-b-rename |
 | — | ADRs | `docs/architecture/decisions/{NNNN}-{slug}.md` | `docs/architecture/decisions/adr-{NNNN}-{slug}.md` | pattern-b-rename |
 | — | Ops Runbooks | `docs/ops/runbooks/{slug}.md` | `docs/ops/runbooks/{slug}.md` | no-change |
 | — | Ops RCAs | `docs/ops/rcas/{YYYY-MM-DD}-{slug}.md` | `docs/ops/rcas/{YYYY-MM-DD}-{slug}.md` | no-change |
-| — | Ideas | `docs/ideas/{slug}.md` | `docs/ideas/{slug}.md` | no-change |
+| — | Ideas | `docs/ideas/{slug}.md` | `docs/ideas/{domain}/{slug}.md` + `INDEX.md` | pattern-b-rename |
 
 ---
 
@@ -76,7 +76,7 @@ When matching v1 paths containing variables:
 |---|---|---|
 | `{slug}` | kebab-case file name (e.g. `my-process`) | Pass through unchanged |
 | `{segment}` | customer segment slug | Pass through unchanged |
-| `{bc-slug}` | bounded context slug (e.g. `scheduling`) | In v2 domain models: **becomes the filename** — `docs/domain/my-bc/domain-model.md` → `docs/domain/models/my-bc.md` |
+| `{bc-slug}` | bounded context slug (e.g. `scheduling`) | In v2 domain models: **becomes the filename** — `docs/domain/my-bc/domain-model.md` → `docs/domain/07b-models/my-bc.md` |
 | `{NNNN}` | 4-digit zero-padded number | Pass through unchanged |
 | `{YYYY-MM-DD}` | date string | Pass through unchanged |
 
@@ -96,19 +96,19 @@ Depth change examples:
   - A link from `docs/product-specs/07a-fbs.md` was `../business/personas/personas.md`
   - After move: `../business/01a-personas.md` (loses one `../`)
 - `docs/domain/glossary/glossary.md` (depth 3) → `docs/domain/02c-glossary.md` (depth 2)
-  - A link from `docs/domain/models/scheduling.md` was `../glossary/glossary.md`
+  - A link from `docs/domain/07b-models/scheduling.md` was `../glossary/glossary.md`
   - After move: `../02c-glossary.md`
 
 ### Domain model consolidation (special case)
 
 The v1 pattern `docs/domain/{bc-slug}/domain-model.md` creates one folder per BC.
-The v2 pattern `docs/domain/models/{bc-slug}.md` consolidates into a single folder.
+The v2 pattern `docs/domain/07b-models/{bc-slug}.md` consolidates into a single step-prefixed folder.
 
 Detection:
 ```bash
 find docs/domain -mindepth 2 -name "domain-model.md" | while read f; do
   bc_slug=$(basename $(dirname "$f"))
-  echo "mv: $f -> docs/domain/models/${bc_slug}.md"
+  echo "mv: $f -> docs/domain/07b-models/${bc_slug}.md"
 done
 ```
 

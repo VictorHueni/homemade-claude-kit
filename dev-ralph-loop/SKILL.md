@@ -36,7 +36,7 @@ Before the first iteration, prepare the workspace:
 1. **Create workspace directory**: `docs/exec-plans/active/NNNN_feature-name/`
 2. **Move artifacts into workspace**:
    - Move exec plan from `docs/exec-plans/active/NNNN_exec_feature-name.md` into the workspace
-   - Optional: copy PRD from `docs/product-specs/NNNN_prd_feature-name.md` into the workspace
+   - Optional: copy PRD from `docs/product-specs/prds/prd-NNNN-{feature}.md` into the workspace
 3. **Create progress log**: `docs/exec-plans/active/NNNN_feature-name/progress.txt`
 4. **Create feature branch**: `git checkout -b ralph/NNNN-feature-name`
 
@@ -45,7 +45,7 @@ Workspace structure after setup:
 ```text
 docs/exec-plans/active/NNNN_feature-name/
   NNNN_exec_feature-name.md     # Execution plan (source of truth)
-  NNNN_prd_feature-name.md      # Optional PRD copy for acceptance tracking
+  prd-NNNN-feature-name.md      # Optional PRD copy for acceptance tracking
   progress.txt                  # Iteration log
 ```
 
@@ -132,7 +132,7 @@ The loop is complete when:
 When all increments are done:
 
 1. **Move exec plan**: Move from workspace to `docs/exec-plans/completed/`.
-2. **Move PRD if present**: Copy from workspace back to `docs/product-specs/` (overwrite with updated checkboxes). Set PRD status to `complete`.
+2. **Move PRD if present**: Copy from workspace back to `docs/product-specs/prds/` (overwrite with updated checkboxes). Set PRD status to `complete`.
 3. **Delete progress log**: Remove `progress.txt`.
 4. **Remove workspace**: Delete the empty `NNNN_feature-name/` directory.
 5. **Optional**: Invoke `git-dev-pr` to open a pull request for the feature branch.

@@ -185,7 +185,7 @@ Run all checks before declaring any mode complete.
 
 ### Structural checks
 
-- [ ] **No unassigned capabilities** — every C-N.M from the capability map is assigned to exactly one BC. Run: `grep "C-[0-9]\+\.[0-9]\+" bounded-contexts.md` and verify every capability ID from capability-map.md appears exactly once.
+- [ ] **No unassigned capabilities** — every C-N.M from the capability map is assigned to exactly one BC. Run: `grep "C-[0-9]\+\.[0-9]\+" docs/domain/02b-bounded-contexts.md` and verify every capability ID from capability-map.md appears exactly once.
 - [ ] **No double-assigned capabilities** — a capability cannot appear in two BC definitions. If it appears in both, decide: which context truly owns it? The other gets a soft-link (read) access, not ownership.
 - [ ] **No two BCs claim the same concept with the same meaning** — if both BCs use "Customer" and their definitions are identical, they may need to merge or use a Published Language to align. The whole point of separate contexts is semantic independence.
 

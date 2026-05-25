@@ -55,7 +55,7 @@ status: superseded
 superseded_by: docs/domain/bounded-contexts-v2.md
 
 # the replacement document (only if it was written to replace the above):
-supersedes: docs/domain/bounded-contexts.md
+supersedes: docs/domain/02b-bounded-contexts.md
 ```
 
 ---
@@ -80,11 +80,11 @@ Supersession follows the same conditional field rules as all other artefacts:
 ```yaml
 # old ADR — status switches to superseded, superseded_by is added:
 status: superseded
-superseded_by: docs/architecture/decisions/0003-use-cockroachdb.md
+superseded_by: docs/architecture/decisions/adr-0003-use-cockroachdb.md
 
 # new ADR — created specifically as a replacement, so supersedes is added:
 status: active
-supersedes: docs/architecture/decisions/0002-use-postgresql.md
+supersedes: docs/architecture/decisions/adr-0002-use-postgresql.md
 ```
 
 ---

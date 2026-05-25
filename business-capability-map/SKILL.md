@@ -117,7 +117,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
    - **Boundaries** — 2–3 bullets describing what the capability does NOT cover (anti-overlap discipline; helps the reader understand the edges).
    - **Maturity (optional)** — `Initial / Developing / Defined / Managed / Optimising` (CMM-style). Skip if the project isn't ready to assess.
 3. **Soft-links footer** — populate ONLY links to artefacts that actually exist:
-   - Personas served (link by persona ID from `personas.md`)
+   - Personas served (link by persona ID from `01a-personas.md`)
    - Value streams enabled (link by VS ID if value-stream doc exists)
    - Processes that operationalise it (link to `docs/business/05a-processes/*.md`)
    - FBS row (link to the same capability ID in the FBS if it exists)

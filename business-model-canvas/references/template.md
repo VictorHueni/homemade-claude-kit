@@ -29,9 +29,9 @@ logic.
 - Personas: [link to ../01a-personas.md if exists]
 - Business Capability Map: [link to ../03a-capability-map.md if exists]
 - Value Streams: [link to ../04a-value-streams.md if exists]
-- Business Processes: [link to ../processes/ if exists]
+- Business Processes: [link to ../05a-processes/ if exists]
 - Quantitative models: [link to ../06a-models/ if exists]
-- Value Proposition Canvases: [list of `value-proposition-canvas-{segment}.md` files in this folder]
+- Value Proposition Canvases: [list of `02a-vpc-{segment}.md` files in this folder]
 
 ---
 
@@ -92,7 +92,7 @@ cost-efficient? How are we integrating them with customer routines?*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Value-stream stages VS-N.M](../04a-value-streams.md) (customer-facing stages) · [Processes](../processes/)
+**Soft-links:** [Value-stream stages VS-N.M](../04a-value-streams.md) (customer-facing stages) · [Processes](../05a-processes/)
 
 ---
 
@@ -109,7 +109,7 @@ communities / co-creation?*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Processes](../processes/) (support, account-management processes)
+**Soft-links:** [Processes](../05a-processes/) (support, account-management processes)
 
 ---
 
@@ -193,7 +193,7 @@ value proposition.*
 - _TODO_
 
 **Confidence:** Assumed
-**Soft-links:** [Business processes](../processes/) · [Capabilities](../03a-capability-map.md)
+**Soft-links:** [Business processes](../05a-processes/) · [Capabilities](../03a-capability-map.md)
 
 ---
 
@@ -274,7 +274,7 @@ VPC per Tier-1 segment where understanding the fit deeply matters.*
 
 | Segment | VPC file |
 |---|---|
-| [CS-1 name] | [value-proposition-canvas-cs-1.md](value-proposition-canvas-cs-1.md) (if created) |
+| [CS-1 name] | [02a-vpc-cs-1.md](02a-vpc-cs-1.md) (if created) |
 | [CS-2 name] | _TODO_ — run skill in VPC mode to create |
 
 ---
@@ -307,7 +307,7 @@ If any of these is missing or `_TODO_`, the canvas has a coherence gap.
 
 ---
 
-# VPC Companion Template — value-proposition-canvas-{{segment-slug}}.md
+# VPC Companion Template — 02a-vpc-{{segment-slug}}.md
 
 *Use this template for the optional VPC companion file. One file per
 customer segment where the value-fit deserves drill-down. Drop this
@@ -315,13 +315,13 @@ section when scaffolding the main canvas; it's reproduced separately for
 each VPC file the skill creates.*
 
 ```markdown
-<!-- doc-version: 1.0 | created: YYYY-MM-DD | parent: business-model-canvas.md | segment: CS-N -->
+<!-- doc-version: 1.0 | created: YYYY-MM-DD | parent: 02a-bmc.md | segment: CS-N -->
 
 # VPC — {{segment_name}}
 
 This Value Proposition Canvas drills into the fit between Customer
 Segment [CS-N] and the Value Proposition serving it. See the parent
-[business-model-canvas.md](business-model-canvas.md) for context.
+[02a-bmc.md](../02a-bmc.md) (or `02a-lean-canvas.md`) for context.
 
 **Segment:** [CS-N · short name]
 **Value Proposition:** [VP-N · short name]

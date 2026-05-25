@@ -1,7 +1,7 @@
 # Business Capability Map — Methodology References
 
 This document records the canonical frameworks used to design and maintain the
-[Business Capability Map](capability-map.md). The artefact is a
+[Business Capability Map](03a-capability-map.md). The artefact is a
 synthesis of five sources rather than a single school — each contributes a
 specific lens.
 

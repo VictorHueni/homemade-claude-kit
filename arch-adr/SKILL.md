@@ -31,9 +31,9 @@ Use this skill to produce ADRs that are explicit, auditable, and easy to revisit
 
 2. Auto-number every new ADR.
 
-   - Run `find docs/architecture/decisions/ -name "[0-9]*.md" | sort` to list existing ADRs.
+   - Run `find docs/architecture/decisions/ -name "adr-*.md" | sort` to list existing ADRs.
    - Next number = highest existing NNNN + 1, zero-padded to 4 digits.
-   - Filename: `NNNN-{slug}.md` where slug is the title lowercased with spaces replaced by hyphens.
+   - Filename: `adr-{NNNN}-{slug}.md` where slug is the title lowercased with spaces replaced by hyphens.
    - Never reuse a number, even for superseded ADRs.
 
 3. Apply repository conventions first, then MADR structure.
@@ -71,7 +71,7 @@ Use when the project has no ADR directory yet, or when setting up ADRs for the f
    - If it exists but is empty, proceed to step 3.
    - If it does not exist, create it.
 
-2. Write `docs/architecture/decisions/0001-record-architecture-decisions.md`:
+2. Write `docs/architecture/decisions/adr-0001-record-architecture-decisions.md`:
 
 ```markdown
 ---
@@ -130,12 +130,12 @@ queryable.
 
 **Steps — execute in order:**
 
-1. Run `find docs/architecture/decisions/ -name "[0-9]*.md" | sort` to determine the next number.
+1. Run `find docs/architecture/decisions/ -name "adr-*.md" | sort` to determine the next number.
 2. Run `git config user.name` to get the owner value.
 3. Gather missing inputs: problem context, decision drivers, options, chosen option, consequences.
 4. Draft using the appropriate template from `references/madr-templates.md`. The template already includes the frontmatter block — populate all five fields. Set `status: draft`.
 5. Validate with `references/adr-quality-checklist.md`.
-6. Write the file to `docs/architecture/decisions/NNNN-{slug}.md`.
+6. Write the file to `docs/architecture/decisions/adr-{NNNN}-{slug}.md`.
 7. Report the filename and a one-line summary of the decision outcome.
 
 ---
@@ -148,21 +148,21 @@ A supersession is **always a two-file atomic operation**. Both files must be wri
 
 1. Ask for (or infer from context): the number of the ADR being superseded and the title of the new ADR.
 
-2. Read the existing ADR being superseded (`docs/architecture/decisions/NNNN-{old-slug}.md`) to understand the original decision context.
+2. Read the existing ADR being superseded (`docs/architecture/decisions/adr-{NNNN}-{old-slug}.md`) to understand the original decision context.
 
-3. Determine the next number by running `find docs/architecture/decisions/ -name "[0-9]*.md" | sort`.
+3. Determine the next number by running `find docs/architecture/decisions/ -name "adr-*.md" | sort`.
 
 4. Run `git config user.name` to get the owner value.
 
 5. Draft the new ADR using `references/madr-templates.md`. Populate the frontmatter with:
    - `status: draft`
-   - `supersedes: docs/architecture/decisions/{old-NNNN}-{old-slug}.md`
+   - `supersedes: docs/architecture/decisions/adr-{old-NNNN}-{old-slug}.md`
 
-6. **Write the new ADR** to `docs/architecture/decisions/{new-NNNN}-{new-slug}.md`.
+6. **Write the new ADR** to `docs/architecture/decisions/adr-{new-NNNN}-{new-slug}.md`.
 
 7. **Update the superseded ADR's frontmatter** — two changes only:
    - Change `status:` to `superseded`
-   - Add `superseded_by: docs/architecture/decisions/{new-NNNN}-{new-slug}.md`
+   - Add `superseded_by: docs/architecture/decisions/adr-{new-NNNN}-{new-slug}.md`
 
    If the superseded ADR has no frontmatter block yet, add one before the `#` title line with all five standard fields populated, plus `superseded_by`.
 

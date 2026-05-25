@@ -1,6 +1,6 @@
 ---
 name: domain-glossary
-description: "Create and maintain the Ubiquitous Language glossary — the shared vocabulary between domain experts and developers scoped per bounded context. Each term has a stable GT-NN ID, canonical definition, examples, deprecated aliases, cross-context translations, and code convention note. Synthesises Evans Domain-Driven Design (2003) Chapter 2 + Vernon DDD Distilled (2016) Chapter 2 + Martin Fowler ubiquitous language pattern. Use when asked to define domain vocabulary, create a glossary, document ubiquitous language, deprecate synonyms, manage domain terms, or align terminology between business and engineering. Triggers on: ubiquitous language, domain glossary, domain vocabulary, shared language, term definition, domain terms, DDD glossary, terminology alignment, domain dictionary, term deprecation, glossary management. Output: docs/domain/glossary.md. Scoped to bounded contexts (BC-NN from domain-bounded-context)."
+description: "Create and maintain the Ubiquitous Language glossary — the shared vocabulary between domain experts and developers scoped per bounded context. Each term has a stable GT-NN ID, canonical definition, examples, deprecated aliases, cross-context translations, and code convention note. Synthesises Evans Domain-Driven Design (2003) Chapter 2 + Vernon DDD Distilled (2016) Chapter 2 + Martin Fowler ubiquitous language pattern. Use when asked to define domain vocabulary, create a glossary, document ubiquitous language, deprecate synonyms, manage domain terms, or align terminology between business and engineering. Triggers on: ubiquitous language, domain glossary, domain vocabulary, shared language, term definition, domain terms, DDD glossary, terminology alignment, domain dictionary, term deprecation, glossary management. Output: docs/domain/02c-glossary.md. Scoped to bounded contexts (BC-NN from domain-bounded-context)."
 version: "1.0.0"
 user-invocable: true
 allow_implicit_invocation: true
@@ -12,7 +12,7 @@ metadata:
 
 # Domain Glossary Builder
 
-Expert at producing and maintaining the Ubiquitous Language glossary — the single source of truth for domain vocabulary. Output is `docs/domain/glossary.md`. NOT a technical dictionary, NOT a database schema, NOT a marketing glossary — it is the contractual vocabulary that domain experts and developers BOTH use in every conversation, every document, every line of code, every test name. Evans: "Use the model as the backbone of a language. Commit the team to exercising that language relentlessly in all communication within the team and in the code."
+Expert at producing and maintaining the Ubiquitous Language glossary — the single source of truth for domain vocabulary. Output is `docs/domain/02c-glossary.md`. NOT a technical dictionary, NOT a database schema, NOT a marketing glossary — it is the contractual vocabulary that domain experts and developers BOTH use in every conversation, every document, every line of code, every test name. Evans: "Use the model as the backbone of a language. Commit the team to exercising that language relentlessly in all communication within the team and in the code."
 
 ---
 
@@ -68,9 +68,9 @@ Apply this rule to every term entry in every mode (Seed, Enrich, Maintain). When
 
 ### Mode 1 — Scaffold
 
-Create an empty `glossary.md` with the canonical structure, BC section stubs, and the methodology pointer. Do NOT invent terms — leave all term entries as `_TODO_`. Output: `docs/domain/glossary.md` using `references/template.md` as the skeleton.
+Create an empty `02c-glossary.md` with the canonical structure, BC section stubs, and the methodology pointer. Do NOT invent terms — leave all term entries as `_TODO_`. Output: `docs/domain/02c-glossary.md` using `references/template.md` as the skeleton.
 
-Scaffold is idempotent: if `glossary.md` already exists, report its current state and skip creation.
+Scaffold is idempotent: if `02c-glossary.md` already exists, report its current state and skip creation.
 
 ---
 
@@ -166,7 +166,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 
 **Changelog discipline (mandatory for every Mode 4 run):**
 
-Every maintenance pass must add an entry to the `## Changelog` section at the bottom of `glossary.md`:
+Every maintenance pass must add an entry to the `## Changelog` section at the bottom of `02c-glossary.md`:
 
 ```
 ### YYYY-MM-DD — {trigger summary}
@@ -213,7 +213,7 @@ Bump the `glossary-version` in the HTML comment at the top of the file for any s
 
 ## Finding the right folder
 
-Default output path: `docs/domain/glossary.md`.
+Default output path: `docs/domain/02c-glossary.md`.
 
 Before writing, check for existing glossary artefacts:
 
@@ -223,7 +223,7 @@ find docs -name "*glossary*" -o -name "*ubiquitous*" 2>/dev/null
 ```
 
 Never overwrite existing content without explicit instruction:
-- **Scaffold** → skip if `glossary.md` already exists; report current state instead.
+- **Scaffold** → skip if `02c-glossary.md` already exists; report current state instead.
 - **Seed** → append terms to the correct BC section; never delete existing entries.
 - **Enrich** → update specific term entries in place.
 - **Maintain** → mark terms as Retired or add new entries; never delete.
@@ -249,7 +249,7 @@ Never overwrite existing content without explicit instruction:
 
 This skill loads the following from `references/`:
 
-- `template.md` — canonical `glossary.md` skeleton (Scaffold mode copies this verbatim as a starting point)
+- `template.md` — canonical `02c-glossary.md` skeleton (Scaffold mode copies this verbatim as a starting point)
 - `methodology-references.md` — Evans, Vernon, Fowler, Brandolini, Sapir-Whorf sources
 - `discipline.md` — Claude-internal guidance: definition quality tests, synonym detection patterns, cross-context translation rules, alias deprecation discipline
 
@@ -261,7 +261,7 @@ After every mode, emit a structured closing report:
 
 ```
 Mode executed: [Scaffold | Seed | Enrich | Maintain]
-File: docs/domain/glossary.md
+File: docs/domain/02c-glossary.md
 Terms seeded/enriched/retired: N
 GT-NN IDs assigned: [GT-01 … GT-NN list]
 Alias deprecations: [list term → deprecated alias pairs]
@@ -275,7 +275,7 @@ Next steps: [what Mode to run next, or what artefacts to update]
 ## Checklist (verify before closing)
 
 - [ ] `docs/domain/` folder exists
-- [ ] `glossary.md` exists with the canonical structure from `template.md`
+- [ ] `02c-glossary.md` exists with the canonical structure from `template.md`
 - [ ] Methodology pointer blockquote present at the top of the file
 - [ ] Every BC-NN from the bounded-context map has a glossary section
 - [ ] GT-NN IDs assigned sequentially within each BC section

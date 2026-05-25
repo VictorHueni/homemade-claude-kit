@@ -104,5 +104,5 @@ When running Mode 3 (Align), apply these checks in order:
 > If not, flag: "KR-NN.M target could ground a QA-PE or QA-RE entry — consider running `spec-quality-attributes` Mode 3 (Update)."
 
 **PRD traceability:**
-> When a PRD exists (`docs/product-specs/prd-*.md`), check that `§0 Architecture Traceability` references at least one `OBJ-NN`.
+> When a PRD exists (`docs/product-specs/prds/prd-NNNN-*.md`), check that `§0 Architecture Traceability` references at least one `OBJ-NN`.
 > If not, flag: "PRD-NNNN has no OBJ-NN reference in §0 — the strategic 'why' of this PRD is unstated."

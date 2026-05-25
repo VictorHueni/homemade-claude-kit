@@ -1,7 +1,7 @@
 # Value Streams — Methodology References
 
 This document records the canonical frameworks used to design and maintain
-the [Value Streams](value-streams.md). The artefact is a synthesis of two
+the [Value Streams](04a-value-streams.md). The artefact is a synthesis of two
 primary sources plus practitioner guidance — each contributes a specific
 lens.
 

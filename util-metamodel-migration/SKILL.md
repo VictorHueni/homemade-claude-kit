@@ -85,7 +85,7 @@ Outputs a single checklist: 14 metamodel steps, each marked ✅ (exists) / ⬜ (
 
 ### Mode 4 — Schema migration (v1 paths → v2 numbered flat structure)
 
-**When:** a project was built with the v1 canonical paths (nested subfolders like `docs/business/01a-personas.md`) and needs to migrate to the v2 numbered flat structure (e.g. `docs/business/01a-personas.md`) defined in `references/path-migration-v2.md`.
+**When:** a project was built with the v1 canonical paths (nested subfolders like `docs/business/personas/personas.md`) and needs to migrate to the v2 numbered flat structure (e.g. `docs/business/01a-personas.md`) defined in `references/path-migration-v2.md`.
 
 **Key difference from Modes 1–3:** those modes detect and guess — they scan unknown repos and infer canonical placement using 3-tier confidence scoring. Mode 4 is deterministic — the before/after mapping is fully known from `path-migration-v2.md`, no detection needed.
 
