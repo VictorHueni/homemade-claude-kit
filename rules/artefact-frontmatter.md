@@ -5,7 +5,11 @@ paths:
 
 # Artefact Frontmatter Convention
 
-Every markdown file produced by a kit skill under `docs/` must open with this YAML frontmatter block:
+Every markdown file produced by a kit skill under `docs/` must open with this YAML frontmatter block.
+
+**Exemption — README files.** Any file literally named `README.md` (case-sensitive) at any depth under `docs/` is exempt. READMEs are tool-, folder-, or vendor-level navigation aids whose lifecycle does not match the artefact review cadence (they update only when the surrounding tool changes, not on a quarterly review schedule). Adding artefact frontmatter to a README implies it carries strategic content it does not actually carry, and forces a `review_interval` that produces noisy staleness warnings. Examples that must stay frontmatter-free: a marimo / Jupyter notebook's runtime `analysis/README.md`, a vendored package's `README.md`, a folder-level "what lives here" `README.md`.
+
+`INDEX.md` (the live navigation hub produced by `util-metamodel-scaffold`) is **not** exempt — it is itself a metamodel artefact and must carry frontmatter.
 
 ```yaml
 ---
@@ -100,3 +104,5 @@ The audit skill checks every `docs/**/*.md` for:
 - When `status: superseded` → `superseded_by` must be present and the target path must resolve to an existing file
 - When `supersedes` is present → target path must resolve to an existing file with `status: superseded`
 - ADR-specific: `## Status` section absent from body
+
+**Files named `README.md` are excluded from every check above** per the exemption stated at the top of this rule. If a `README.md` happens to carry frontmatter, the audit ignores it rather than validating it — the file is simply not in scope.

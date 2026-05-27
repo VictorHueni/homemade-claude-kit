@@ -607,47 +607,138 @@ echo "Bounded contexts: $bc_count | Domain models: $dm_count"
 - Valid `status` values: `draft`, `active`, `superseded`, `deprecated`
 
 **Detection:**
+
+> **IMPORTANT — bypass shell wrappers.** Some environments (including Claude
+> Code's interactive shell) wrap `grep`/`find` as bash functions that `exec`
+> into a different binary. When such a wrapper is called from inside a
+> `while read` subshell, the `exec` replaces the entire subshell process — the
+> loop silently aborts at the first `grep` call with no error. This is why a
+> previous version of this check produced empty output on a repo where every
+> file in `docs/` opened with `<!-- doc-version: … -->` HTML comments instead
+> of YAML frontmatter. Always invoke `grep`/`find` via `command grep` /
+> `command find` (or absolute paths) inside `while`/`for` loops.
+
 ```bash
-find docs -name "*.md" | sort | while read f; do
-  # 1. Frontmatter block must be present (file must start with ---)
-  head -1 "$f" | grep -q '^---' || { echo "MISSING FRONTMATTER: $f"; continue; }
+# Exclude transient/non-metamodel paths that often appear inside docs/ in real
+# repos (Python virtualenvs, build caches, notebook session metadata, npm).
+EXCLUDED='( -path */.venv/* -o -path */__pycache__/* -o -path */.pytest_cache/* -o -path */__marimo__/* -o -path */node_modules/* )'
+
+# Use a tally file so the per-file subshell can update counters that survive
+# the `while read` pipe-subshell boundary.
+tally=$(mktemp)
+printf '0 0 0\n' > "$tally"   # scanned missing_frontmatter findings
+
+echo "=== Check 17: Frontmatter validity — starting ==="
+
+# Exempt: files literally named README.md (case-sensitive) at any depth.
+# Per `rules/artefact-frontmatter.md`, READMEs are tool/folder/vendor navigation
+# aids whose lifecycle does not match the artefact review cadence, so they are
+# explicitly out of scope for this check. INDEX.md is NOT exempt (it is a
+# metamodel artefact produced by util-metamodel-scaffold).
+command find docs -name "*.md" ! -name 'README.md' ! \( $EXCLUDED \) 2>/dev/null | sort | while IFS= read -r f; do
+  read scanned missing findings < "$tally"
+  scanned=$((scanned + 1))
+
+  # 1. Frontmatter block must be present — first 3 bytes must be '---'.
+  # Using `head -c 3` is portable and avoids the pitfalls of
+  # `head -1 | grep -q '^---'` (the grep can be a wrapped function — see
+  # the IMPORTANT note above).
+  first3=$(head -c 3 "$f" 2>/dev/null)
+  if [ "$first3" != "---" ]; then
+    echo "MISSING FRONTMATTER: $f"
+    missing=$((missing + 1))
+    findings=$((findings + 1))
+    printf '%d %d %d\n' "$scanned" "$missing" "$findings" > "$tally"
+    continue
+  fi
+
+  # Helper: read a frontmatter field, trim leading/trailing whitespace and
+  # surrounding quotes. Returns empty string when the field is absent.
+  fm() {
+    command grep -m1 "^${1}:" "$f" 2>/dev/null \
+      | sed -E "s/^${1}:[[:space:]]*//; s/[[:space:]]+\$//; s/^[\"']//; s/[\"']\$//"
+  }
 
   # 2. All 5 required fields must exist
   for field in title status owner last_reviewed review_interval; do
-    grep -q "^${field}:" "$f" || echo "MISSING FIELD '${field}': $f"
+    command grep -q "^${field}:" "$f" || {
+      echo "MISSING FIELD '${field}': $f"
+      findings=$((findings + 1))
+    }
   done
 
   # 3. status must be one of the four allowed values
-  status=$(grep "^status:" "$f" | head -1 | sed 's/status: *//')
+  status=$(fm status)
   case "$status" in
     draft|active|superseded|deprecated) ;;
-    *) echo "INVALID STATUS '${status}': $f" ;;
+    *) echo "INVALID STATUS '${status}': $f"; findings=$((findings + 1)) ;;
   esac
 
   # 4. When status: superseded, superseded_by must be present and target must exist
   if [ "$status" = "superseded" ]; then
-    sb=$(grep "^superseded_by:" "$f" 2>/dev/null | sed 's/superseded_by: *//')
-    [ -z "$sb" ] && echo "MISSING superseded_by (status is superseded): $f"
-    [ -n "$sb" ] && [ ! -f "$sb" ] && echo "DEAD superseded_by TARGET '$sb': $f"
+    sb=$(fm superseded_by)
+    if [ -z "$sb" ]; then
+      echo "MISSING superseded_by (status is superseded): $f"
+      findings=$((findings + 1))
+    elif [ ! -f "$sb" ]; then
+      echo "DEAD superseded_by TARGET '$sb': $f"
+      findings=$((findings + 1))
+    fi
   fi
 
   # 5. When supersedes: present, target must exist and have status: superseded
-  sup=$(grep "^supersedes:" "$f" 2>/dev/null | sed 's/supersedes: *//')
+  sup=$(fm supersedes)
   if [ -n "$sup" ]; then
-    [ ! -f "$sup" ] && echo "DEAD supersedes TARGET '$sup': $f"
-    [ -f "$sup" ] && ! grep -q "^status: superseded" "$sup" && \
+    if [ ! -f "$sup" ]; then
+      echo "DEAD supersedes TARGET '$sup': $f"
+      findings=$((findings + 1))
+    elif ! command grep -q "^status:[[:space:]]*[\"']\?superseded[\"']\?" "$sup"; then
       echo "supersedes TARGET NOT SUPERSEDED '$sup': $f"
+      findings=$((findings + 1))
+    fi
   fi
 
-  # 6. owner must not be empty or a placeholder
-  owner=$(grep "^owner:" "$f" | head -1 | sed 's/owner: *//')
-  [ -z "$owner" ] && echo "EMPTY owner: $f"
+  # 6. owner must not be empty when the field exists.
+  owner=$(fm owner)
+  if [ -z "$owner" ] && command grep -q "^owner:" "$f"; then
+    echo "EMPTY owner: $f"
+    findings=$((findings + 1))
+  fi
 
-  # 7. last_reviewed must be a valid YYYY-MM-DD date
-  lr=$(grep "^last_reviewed:" "$f" | head -1 | sed 's/last_reviewed: *//')
-  echo "$lr" | grep -qP '^\d{4}-\d{2}-\d{2}$' || echo "INVALID last_reviewed '${lr}': $f"
+  # 7. last_reviewed must be a valid YYYY-MM-DD date when the field exists.
+  # Skip the regex check when the field is entirely absent (already flagged
+  # in step 2) so we don't emit a confusing "INVALID last_reviewed ''" line
+  # on top of the MISSING FIELD line.
+  lr=$(fm last_reviewed)
+  if [ -n "$lr" ] && ! echo "$lr" | command grep -qP '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+    echo "INVALID last_reviewed '${lr}': $f"
+    findings=$((findings + 1))
+  fi
+
+  printf '%d %d %d\n' "$scanned" "$missing" "$findings" > "$tally"
 done
+
+# Summary — emit even when there are zero findings, so a silent stdout
+# is distinguishable from "the check didn't run".
+read scanned missing findings < "$tally"
+echo "=== Check 17 complete: scanned=${scanned} missing_frontmatter=${missing} total_findings=${findings} ==="
+rm -f "$tally"
 ```
+
+**Two defensive guarantees of this version:**
+
+1. **Always emits a summary line.** Earlier versions produced zero stdout on a
+   clean run, indistinguishable from "the loop never executed". The
+   `=== Check 17 complete: scanned=N … ===` line at the end is mandatory and
+   tells the operator the check actually ran and how many files it touched. If
+   `scanned=0` and the repo has `*.md` files under `docs/`, that itself is a
+   finding (find pattern is wrong, or a wrapper is killing the loop).
+
+2. **Survives wrapped `grep`/`find`.** `command grep` / `command find` bypass
+   any bash function or alias of the same name. This is harmless in plain
+   environments and load-bearing in Claude Code's interactive shell, where
+   `grep` is wrapped as a function that `exec`s into `ugrep`, replacing the
+   subshell process and silently aborting the loop.
 
 **Severity:**
 - Missing frontmatter block → Error
