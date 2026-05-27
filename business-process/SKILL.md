@@ -378,9 +378,9 @@ Three files in `references/` carry the canonical content. Read them when needed:
 
 ## Sync Open Items to the central ledger
 
-After the process file is created or updated, chain to the `util-open-items` skill to sync rows from §11 `## Open Items` into the central living ledger at `project-control/open-items/open-items.md`.
+After the process file is created or updated, chain to the `util-open-items` skill to sync rows from §11 `## Open Items` into the central living ledger at `docs/project-control/open-items/open-items.md`.
 
-- **Local first, ledger second.** The process doc's §11 table is the authoring surface; the ledger at `project-control/open-items/` is the consolidated read-out. Always populate §11 first (rows carry `Source anchor` + `Source heading` pointing into the originating sub-section, e.g. `#7-decisions` + "§7 Decision points + business rules"), then invoke sync.
+- **Local first, ledger second.** The process doc's §11 table is the authoring surface; the ledger at `docs/project-control/open-items/` is the consolidated read-out. Always populate §11 first (rows carry `Source anchor` + `Source heading` pointing into the originating sub-section, e.g. `#7-decisions` + "§7 Decision points + business rules"), then invoke sync.
 - **Sync preserves provenance.** `util-open-items` carries `Source anchor` and `Source heading` forward unchanged so each ledger row navigates back into the originating §-section of this process (per `rules/open-items-governance.md` §4 + §5).
 - **Sync mints canonical IDs.** Local placeholder `OI-NNN` IDs are reassigned to ledger-canonical `OI-NNNN` on first sync.
 - **Skip when empty.** If §11 reads `_None at present._`, do not invoke the sync. Inline `_TODO_` placeholders in §8 KPIs or elsewhere are scaffold debt — they MUST NOT be mirrored to the ledger.

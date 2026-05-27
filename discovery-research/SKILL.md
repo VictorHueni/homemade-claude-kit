@@ -279,9 +279,9 @@ Three files in `references/`:
 
 ## Sync Open Items to the central ledger
 
-After a synthesis or research-plan file is created or updated, chain to the `util-open-items` skill to sync rows from the document-level `## Open Items` section into the central living ledger at `project-control/open-items/open-items.md`.
+After a synthesis or research-plan file is created or updated, chain to the `util-open-items` skill to sync rows from the document-level `## Open Items` section into the central living ledger at `docs/project-control/open-items/open-items.md`.
 
-- **Local first, ledger second.** The synthesis or plan's own `## Open Items` table is the authoring surface; the ledger at `project-control/open-items/` is the consolidated read-out across the repo. Always populate the local section first (rows carry `Source anchor` + `Source heading` pointing back into the originating sub-section of the synthesis — Per-hypothesis verdict, Theme cluster, Per-artefact updates needed, etc.), then invoke sync.
+- **Local first, ledger second.** The synthesis or plan's own `## Open Items` table is the authoring surface; the ledger at `docs/project-control/open-items/` is the consolidated read-out across the repo. Always populate the local section first (rows carry `Source anchor` + `Source heading` pointing back into the originating sub-section of the synthesis — Per-hypothesis verdict, Theme cluster, Per-artefact updates needed, etc.), then invoke sync.
 - **Sync preserves provenance.** `util-open-items` carries `Source anchor` and `Source heading` forward unchanged so each ledger row navigates back into the originating synthesis section, surviving heading edits and anchor renames (per `rules/open-items-governance.md` §4 + §5).
 - **Sync mints canonical IDs.** Local placeholder `OI-NNN` IDs are reassigned to ledger-canonical `OI-NNNN` on first sync.
 - **Skip when empty.** If §Open Items reads `_None at present._`, do not invoke the sync — there is nothing to consolidate.

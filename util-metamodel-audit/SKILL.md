@@ -135,7 +135,7 @@ sync coverage, closure drift, stale open items) only.
 1. Run the six sub-checks of Check 18 — see `references/check-catalogue.md`.
 2. Output findings grouped by sub-check.
 3. Save to `var/reports/metamodel-audit/open-items-governance-{YYYY-MM-DD}.md`.
-4. Never mutate `project-control/open-items/open-items.md` or any artefact's local
+4. Never mutate `docs/project-control/open-items/open-items.md` or any artefact's local
    `## Open Items` section — remediation is always operator-driven through
    `util-open-items` or direct artefact edits.
 
@@ -164,7 +164,7 @@ Full detection patterns and bash commands in `references/check-catalogue.md`. Br
 | 15 | **ADR chains** | One-sided supersession links (ADR-A supersedes ADR-B but ADR-B has no back-link) | Warning |
 | 16 | **Delivery progress** | FBS ✅/🔄/⬜ counts; epic ↔ PRD linkage completeness | Info |
 | 17 | **Frontmatter validity** | Missing frontmatter block, missing required fields, invalid `status`, broken supersession links | Error / Warning |
-| 18 | **Open items governance** | Six sub-checks against `rules/open-items-governance.md`: section compliance (canonical `## Open Items` heading, no legacy variants), schema compliance (canonical column order), source-location provenance (`Source anchor` + `Source heading` populated), tracker sync coverage (canonical `OI-NNNN` IDs aligned between local sections and `project-control/open-items/open-items.md`), closure drift (`closed`/`dropped` rows must carry a non-`_TBD_` `Tracker ref`), stale open items (`open`/`in-progress`/`blocked` rows past `Due / Review date`) | Error / Warning |
+| 18 | **Open items governance** | Six sub-checks against `rules/open-items-governance.md`: section compliance (canonical `## Open Items` heading, no legacy variants), schema compliance (canonical column order), source-location provenance (`Source anchor` + `Source heading` populated), tracker sync coverage (canonical `OI-NNNN` IDs aligned between local sections and `docs/project-control/open-items/open-items.md`), closure drift (`closed`/`dropped` rows must carry a non-`_TBD_` `Tracker ref`), stale open items (`open`/`in-progress`/`blocked` rows past `Due / Review date`) | Error / Warning |
 
 ---
 

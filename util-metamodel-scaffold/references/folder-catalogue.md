@@ -46,18 +46,19 @@ mkdir -p var/reports/metamodel-audit
 mkdir -p var/reports/metamodel-migration
 mkdir -p var/reports/open-items
 
-# Open-items control plane (non-docs — operational system of record)
-mkdir -p project-control/open-items/archive
+# Open-items control plane (under docs/ but in a dedicated project-control/ folder —
+# operational system of record, not a product artefact)
+mkdir -p docs/project-control/open-items/archive
 ```
 
 **Implied parent folders** (created automatically by `mkdir -p` above):
 `docs/` · `docs/business/` · `docs/discovery/` · `docs/domain/` · `docs/product-specs/` · `docs/exec-plans/`
 `docs/architecture/` · `docs/ops/` · `docs/communication/` · `var/` · `var/reports/`
-`project-control/` · `project-control/open-items/`
+`docs/project-control/` · `docs/project-control/open-items/`
 
 **Stub files also created (by SKILL.md §Project-control scaffold):**
-`project-control/open-items/open-items.md` · `project-control/open-items/README.md`
-`project-control/open-items/archive/.gitkeep`
+`docs/project-control/open-items/open-items.md` · `docs/project-control/open-items/README.md`
+`docs/project-control/open-items/archive/.gitkeep`
 
 **Leaf folders that get `.gitkeep` until content is added:**
 All `docs/` and `var/` leaf folders when empty at scaffold time.

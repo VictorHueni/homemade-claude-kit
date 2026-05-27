@@ -762,10 +762,10 @@ rm -f "$tally"
 
 **What:** verifies that every artefact's local `## Open Items` section conforms to
 `rules/open-items-governance.md` and that the central ledger at
-`project-control/open-items/open-items.md` stays in sync with the artefact rows.
+`docs/project-control/open-items/open-items.md` stays in sync with the artefact rows.
 
 This is the only check category in the catalogue that spans both `docs/` and
-`project-control/`. It is **report-only** — findings are surfaced to the operator;
+`docs/project-control/`. It is **report-only** — findings are surfaced to the operator;
 remediation is always done through `util-open-items` (sync, triage, close, archive)
 or direct artefact edits. The audit never mutates the ledger or any source artefact.
 
@@ -871,14 +871,14 @@ Use `_central-only_` in `Source heading` only when the row has no in-artefact or
 ### Sub-check 18d — Tracker sync coverage
 
 **What:** every local row whose `OI-ID` has been promoted to the canonical `OI-NNNN`
-format must have a corresponding row in `project-control/open-items/open-items.md`.
+format must have a corresponding row in `docs/project-control/open-items/open-items.md`.
 Rows still on a pre-sync local ID (e.g. `OI-001`, `OI-002`) are not flagged — they
 indicate the artefact has not been synced yet, which is normal between edits.
 
 **Detection:**
 
 ```bash
-ledger="project-control/open-items/open-items.md"
+ledger="docs/project-control/open-items/open-items.md"
 [ ! -f "$ledger" ] && echo "LEDGER MISSING: $ledger" && exit 0
 
 # Collect every canonical OI-NNNN ID present in the ledger
@@ -916,7 +916,7 @@ done
 **Proposed fix template:**
 
 - Sync drift: "Run `util-open-items` in `sync` mode for `{source artefact}` so the local
-  `{OI-NNNN}` row reaches `project-control/open-items/open-items.md`."
+  `{OI-NNNN}` row reaches `docs/project-control/open-items/open-items.md`."
 - Orphaned ledger row: "Either the source artefact was deleted (close or drop the ledger
   row with `util-open-items` and record the rationale) or the row should be marked
   `_central-only_` in `Source heading` per §5 of `rules/open-items-governance.md`."
@@ -929,7 +929,7 @@ done
 **Detection:**
 
 ```bash
-ledger="project-control/open-items/open-items.md"
+ledger="docs/project-control/open-items/open-items.md"
 
 # Closure drift in artefact-local sections
 find docs -name "*.md" -print0 | while IFS= read -r -d '' f; do
@@ -1031,6 +1031,6 @@ re-date, escalate priority, reassign owner, or close with a `Tracker ref`."
 | 18e Closure drift | Error | `closed` / `dropped` rows without an evidencing `Tracker ref` |
 | 18f Stale open items | Warning | `open` / `in-progress` / `blocked` rows past `Due / Review date` |
 
-All six sub-checks are read-only; none of them write to `project-control/open-items/` or
+All six sub-checks are read-only; none of them write to `docs/project-control/open-items/` or
 to any source artefact. Findings always route to the operator for action through
 `util-open-items`.

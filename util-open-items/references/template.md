@@ -12,7 +12,7 @@ copy-pasteable template, not an independent definition.
 
 ## 1. Canonical ledger table skeleton
 
-The live ledger at `project-control/open-items/open-items.md` uses this header and
+The live ledger at `docs/project-control/open-items/open-items.md` uses this header and
 column order. The ledger extends the local artefact schema with `Source artefact`
 inserted after `Summary`.
 
@@ -28,7 +28,7 @@ per §2 of the governance rule.
 ```
 
 The same 12-column shape is used for every archive file under
-`project-control/open-items/archive/<YYYY-Q[1-4]>.md`.
+`docs/project-control/open-items/archive/<YYYY-Q[1-4]>.md`.
 
 ---
 
@@ -72,7 +72,7 @@ This example walks through one sync invocation end-to-end. The source artefact i
 
 ### Before sync — central ledger
 
-`project-control/open-items/open-items.md`:
+`docs/project-control/open-items/open-items.md`:
 
 ```markdown
 ## Open Items
@@ -139,7 +139,7 @@ util-open-items close OI-0001 --tracker-ref https://github.com/example/repo/pull
 
 ### Close mechanics
 
-1. Locate `OI-0001` in `project-control/open-items/open-items.md` and verify its current
+1. Locate `OI-0001` in `docs/project-control/open-items/open-items.md` and verify its current
    state is `open`, `in-progress`, or `blocked` (it is `open`).
 2. Verify the supplied `--tracker-ref` is non-`_TBD_`.
 3. Update the ledger row:
@@ -172,7 +172,7 @@ util-open-items archive --older-than 30d
 
 1. Scan `open-items.md` for rows with `Status: closed` or `Status: dropped` and
    `Due / Review date` older than today minus 30 days.
-2. Append eligible rows to `project-control/open-items/archive/2026-Q2.md`, creating the
+2. Append eligible rows to `docs/project-control/open-items/archive/2026-Q2.md`, creating the
    file with the canonical 12-column header if it does not exist.
 3. Only after the rows are persisted to the archive file, delete them from
    `open-items.md`.

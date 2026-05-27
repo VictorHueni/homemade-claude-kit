@@ -80,7 +80,7 @@ If the user says Y, proceed.
 1. Read the full folder list from `references/folder-catalogue.md`.
 2. For each folder in the list: `mkdir -p {folder}`.
 3. Place a `.gitkeep` in every empty leaf folder so the tree is git-trackable.
-4. Create the `project-control/open-items/` control plane — see §Project-control scaffold.
+4. Create the `docs/project-control/open-items/` control plane — see §Project-control scaffold.
 5. **`.gitignore` check:**
    ```bash
    grep -q 'var/reports' .gitignore 2>/dev/null \
@@ -96,11 +96,11 @@ If the user says Y, proceed.
 **Output verification:**
 - All canonical folders exist (`find {docs_root} -type d | sort`).
 - `docs/INDEX.md` exists and contains a row for every canonical artefact step.
-- `project-control/open-items/open-items.md` and `project-control/open-items/README.md`
+- `docs/project-control/open-items/open-items.md` and `docs/project-control/open-items/README.md`
   exist (or were already present and skipped).
 - If wired: `CLAUDE.md` contains a reference to `docs/INDEX.md`.
 - No artefact content files created — only folders, `.gitkeep` files, `docs/INDEX.md`,
-  and the `project-control/open-items/` control-plane stubs.
+  and the `docs/project-control/open-items/` control-plane stubs.
 - If `var/reports/` is absent from `.gitignore`, this was surfaced in the closing report.
 
 ---
@@ -115,7 +115,7 @@ No Step 0 questions needed beyond docs root.
 **Process:**
 1. Read folder list from `references/folder-catalogue.md`.
 2. `mkdir -p` each folder; place `.gitkeep` in empty leaf folders.
-3. Create the `project-control/open-items/` control plane if absent.
+3. Create the `docs/project-control/open-items/` control plane if absent.
 4. Report: folders created / folders already existed.
 
 No INDEX.md generated. No CLAUDE.md update.
@@ -169,20 +169,20 @@ done
 
 **Scope:** Mode 1 and Mode 2 (always).
 
-Creates the minimal `project-control/open-items/` control plane so `util-open-items`
+Creates the minimal `docs/project-control/open-items/` control plane so `util-open-items`
 can run `sync` immediately after the first artefact is authored. Without this structure,
 the first sync fails with a missing-path error.
 
 **Files created:**
 
 ```bash
-mkdir -p project-control/open-items/archive
-touch project-control/open-items/archive/.gitkeep
+mkdir -p docs/project-control/open-items/archive
+touch docs/project-control/open-items/archive/.gitkeep
 ```
 
 Then write two stub files:
 
-**`project-control/open-items/open-items.md`** — empty ledger with canonical schema,
+**`docs/project-control/open-items/open-items.md`** — empty ledger with canonical schema,
 sourced from `util-open-items/references/template.md §1` (canonical ledger table skeleton):
 
 ```markdown
@@ -228,12 +228,12 @@ _No snapshot yet — the ledger has not received its first sync._
 - `util-open-items/SKILL.md` — ledger CRUD operating manual.
 ```
 
-**`project-control/open-items/README.md`** — operator orientation. Copy the content of
-the existing `project-control/open-items/README.md` in the kit as-is — it is
+**`docs/project-control/open-items/README.md`** — operator orientation. Copy the content of
+the existing `docs/project-control/open-items/README.md` in the kit as-is — it is
 project-agnostic and applies verbatim to any project scaffolded with this skill.
 
 **Safety rules:**
-- If `project-control/open-items/open-items.md` already exists: skip creation entirely
+- If `docs/project-control/open-items/open-items.md` already exists: skip creation entirely
   and report "control plane already present".
 - Never overwrite an existing ledger.
 
@@ -380,7 +380,7 @@ for a single-feature engagement, or `business-capability-map` for an existing sy
 
 - **`references/folder-catalogue.md`** — complete folder list with `mkdir -p` commands.
 - **`references/index-template.md`** — INDEX.md skeleton and per-step status detection bash commands.
-- **`references/methodology-references.md`** — rationale for the single universal tree, `.gitkeep` discipline, project-control scope, and `.gitignore` policy.
+- **`references/methodology-references.md`** — rationale for the single universal tree, `.gitkeep` discipline, control-plane scope (`docs/project-control/`), and `.gitignore` policy.
 
 ---
 

@@ -115,7 +115,7 @@ explicitly deferred. When the plan carries such work, add a document-level
 
 After the plan is saved or updated, chain to the `util-open-items` skill to
 sync the `## Open Items` rows into the central living ledger at
-`project-control/open-items/open-items.md`.
+`docs/project-control/open-items/open-items.md`.
 
 - **Local first, ledger second.** The plan's own `## Open Items` table is
   the authoring surface; the ledger is the consolidated read-out across the

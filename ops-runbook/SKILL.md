@@ -143,7 +143,7 @@ work, add a document-level `## Open Items` section per
 
 After the runbook is saved, chain to the `util-open-items` skill to sync the
 `## Open Items` rows into the central living ledger at
-`project-control/open-items/open-items.md`.
+`docs/project-control/open-items/open-items.md`.
 
 - **Local first, ledger second.** The runbook's own `## Open Items` table is
   the authoring surface; the ledger is the consolidated read-out across the

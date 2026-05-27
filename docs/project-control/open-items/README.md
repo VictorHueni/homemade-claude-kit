@@ -11,18 +11,22 @@ This README documents how that contract is **operated** at the central plane.
 
 ---
 
-## Why this lives outside `docs/`
+## Why this lives under `docs/project-control/`
 
-The ledger is deliberately placed under `project-control/`, not `docs/`:
+The ledger lives **under `docs/` for unified navigation** (every persistent artefact in
+the repo sits somewhere under `docs/`, so contributors only have to remember one root),
+but in a **dedicated `project-control/` folder** because it is fundamentally different
+from every other artefact in `docs/`:
 
-- `docs/` holds product and architecture artefacts. Each artefact has a stable shape, an
-  owner, and a review cadence governed by frontmatter.
-- `project-control/open-items/` holds an **always-mutating operational log**. It does not
-  carry artefact frontmatter, is not part of the strategic-architecture build order, and is
-  not audited under product-spec rules.
-- Treating the ledger as an artefact would invite audits to flag every legitimate row churn
-  as drift. Treating it as control-plane data keeps governance work visible without
-  polluting the product surface.
+- The rest of `docs/` holds product and architecture artefacts. Each artefact has a
+  stable shape, an owner, and a review cadence governed by frontmatter.
+- `docs/project-control/open-items/` holds an **always-mutating operational log**. It does
+  not carry artefact frontmatter, is not part of the strategic-architecture build order,
+  and is not swept by product-spec audit rules (those checks match by file pattern or by
+  deeper folder like `docs/product-specs/` or `docs/domain/`, never by being-under-`docs/`).
+- Treating the ledger as a product artefact would invite audits to flag every legitimate
+  row churn as drift. Keeping it under `project-control/` keeps governance work visible
+  without polluting the product surface.
 
 The same separation is why the ledger is **not** part of the product backlog. Open items
 include things that may never become commitments (dropped questions, never-shipped tech

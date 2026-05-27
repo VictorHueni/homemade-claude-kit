@@ -38,15 +38,15 @@ the first real file is added to the directory (the presence of any other file ma
 `.gitkeep` redundant — skills that write to a folder do not need to delete it explicitly;
 the directory continues to be tracked via its new content).
 
-This is the same convention used in the kit's own `project-control/open-items/archive/`.
+This is the same convention used in the kit's own `docs/project-control/open-items/archive/`.
 
 ---
 
-## Why scaffold `project-control/open-items/` rather than leaving it to `util-open-items`?
+## Why scaffold `docs/project-control/open-items/` rather than leaving it to `util-open-items`?
 
 `util-open-items` is a **runtime operator** — its `sync` mode reads artefact-local
 `## Open Items` sections and writes rows to the central ledger. It assumes the ledger
-path (`project-control/open-items/open-items.md`) already exists. When it doesn't, `sync`
+path (`docs/project-control/open-items/open-items.md`) already exists. When it doesn't, `sync`
 fails with a file-not-found error before any row is processed.
 
 The scaffold is the correct place to initialise the control plane because:
@@ -56,7 +56,7 @@ The scaffold is the correct place to initialise the control plane because:
 3. `util-open-items` remains the sole authoritative writer of row data; the scaffold only
    creates the structural skeleton.
 
-The strategy-only and single-feature variants omit `project-control/` because those
+The strategy-only and single-feature variants omit `docs/project-control/` because those
 project types rarely produce artefact-level open items at scale. If open items are later
 needed, the user can re-run scaffold Mode 2 with a larger variant (idempotent).
 

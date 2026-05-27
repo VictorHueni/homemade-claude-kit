@@ -347,7 +347,7 @@ The idea's local `## Open Items` section acts as a dispatcher:
 | `decision-gap` | stays local | "Refine pass — pick between variations A/B/C" |
 | `doc-gap` | blocks graduation | "Fill `<missing section>` before graduating to `<target skill>`" |
 
-After `util-open-items` sync, the row gets a canonical `OI-NNNN` in `project-control/open-items/`.
+After `util-open-items` sync, the row gets a canonical `OI-NNNN` in `docs/project-control/open-items/`.
 
 ### 6. Lifecycle: supersession
 
@@ -384,7 +384,7 @@ Worth knowing because it tells you when the skill is being misused. These artefa
 | `business-objective`, `business-model-canvas`, `business-persona` | Graduation targets for `business` domain ideas. |
 | `business-process` | Graduation target for `process` domain ideas. |
 | `spec-functional-breakdown-structure` | Graduation target when an idea is "add this functionality `C-N.M.FXX` to an existing capability". |
-| `util-open-items` | Picks up the local `## Open Items` rows on sync and writes them to `project-control/open-items/open-items.md` with canonical `OI-NNNN` IDs. |
+| `util-open-items` | Picks up the local `## Open Items` rows on sync and writes them to `docs/project-control/open-items/open-items.md` with canonical `OI-NNNN` IDs. |
 | `util-metamodel-audit` | Reports on stale `ready` ideas, missing `graduates_to`, dead `target_id` links, and `## Open Items` schema drift. |
 
 ---

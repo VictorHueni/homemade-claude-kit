@@ -325,7 +325,7 @@ This is the document-level canonical Open Items section per [`rules/open-items-g
 - `Tracker ref` is `_TBD_` while the row is `open`; required (PR · ADR · plan increment · audit report link) to move to `closed` or `dropped`.
 - Empty section is acceptable — `_None at present._` is the correct initial state for a brand-new PRD.
 - The skill MAY append additional informational columns AFTER `Tracker ref`; canonical columns must not be reordered or removed.
-- After the PRD ships, `util-open-items` syncs rows to the central ledger at `project-control/open-items/` and replaces the local `OI-NNN` with the canonical `OI-NNNN` ledger ID.
+- After the PRD ships, `util-open-items` syncs rows to the central ledger at `docs/project-control/open-items/` and replaces the local `OI-NNN` with the canonical `OI-NNNN` ledger ID.
 
 ---
 
@@ -365,10 +365,10 @@ access, make the edits directly and commit the FBS alongside the PRD.
 
 After the PRD is saved, chain to the `util-open-items` skill to sync rows from
 §9 `## Open Items` into the central living ledger at
-`project-control/open-items/open-items.md`.
+`docs/project-control/open-items/open-items.md`.
 
 - **Local first, ledger second.** §9 is the PRD's authoring surface; the
-  ledger at `project-control/open-items/` is the consolidated read-out across
+  ledger at `docs/project-control/open-items/` is the consolidated read-out across
   the repo. Always populate §9 first — each row carries `Source anchor` +
   `Source heading` pointing back to the originating PRD section (e.g.
   `#us-003` + "US-003 Partner authentication" for items surfaced from a user

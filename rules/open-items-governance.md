@@ -136,14 +136,18 @@ or reorder the canonical columns.
 The repo-level living ledger lives under:
 
 ```text
-project-control/open-items/
+docs/project-control/open-items/
 ```
 
-This path is deliberately outside `docs/`. It is **not** a product artefact — it is the
-operational system of record for governance work, much like an ops runbook or an internal
-tracker. Mixing it into `docs/` would invite it to be treated as a static spec and audited
-under product-spec rules; keeping it under `project-control/` signals that it is the live
-ledger and is expected to change continuously.
+This path is **under `docs/` for unified navigation** (every persistent artefact in the
+repo lives somewhere under `docs/`, so contributors only have to remember one root) but
+**named `project-control/` because it is an operational control plane, not a product
+spec**. The folder name is the load-bearing signal: anything under
+`docs/project-control/` is a live, continuously-changing system of record — closer to a
+runbook or an internal tracker than to a PRD, an ADR, or a domain model. Audits and
+linters that operate on product-spec artefacts (PRDs, FBS, ADRs, domain models, etc.)
+either match by file pattern or by deeper folder (`docs/product-specs/`, `docs/domain/`,
+`docs/architecture/`) and therefore do **not** sweep `docs/project-control/`.
 
 Why it is separate from product backlog artefacts (PRDs, delivery roadmap, FBS):
 
@@ -179,7 +183,7 @@ Closed and dropped items remain on the active local section and the central ledg
 review cycle (default: 30 days). After that they are moved to:
 
 ```text
-project-control/open-items/archive/
+docs/project-control/open-items/archive/
 ```
 
 Archive files are time-bucketed snapshots (e.g. `2026-Q2.md`) or per-resolution rollups.
@@ -192,7 +196,7 @@ The live ledger never silently deletes rows — archival is explicit and dated.
 | Tool                          | Responsibility                                                                                              |
 | :---------------------------- | :---------------------------------------------------------------------------------------------------------- |
 | `util-docs-audit`             | Generic file-level rot (stale, outdated, dead). **Not** an open-items governance tracker.                   |
-| `util-open-items`             | Maintains `project-control/open-items/` — sync, triage, close, archive, report. Living ledger CRUD.         |
+| `util-open-items`             | Maintains `docs/project-control/open-items/` — sync, triage, close, archive, report. Living ledger CRUD.         |
 | `util-metamodel-audit`        | Report-only. Verifies `## Open Items` section presence, schema compliance, source-anchor / source-heading provenance, tracker sync coverage, closure drift. Never mutates source artefacts or the ledger. |
 
 `util-metamodel-audit` is the only place that flags governance drift between artefacts and

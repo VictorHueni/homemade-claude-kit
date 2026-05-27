@@ -6,7 +6,7 @@ the source artefact or the ledger silently. Every triage finding is operator-rev
 The lifecycle, schema, and taxonomy live in
 [`rules/open-items-governance.md`](../../rules/open-items-governance.md). This file is the
 day-to-day playbook for keeping the central ledger at
-`project-control/open-items/open-items.md` healthy.
+`docs/project-control/open-items/open-items.md` healthy.
 
 ---
 

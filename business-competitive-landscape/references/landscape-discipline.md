@@ -345,7 +345,7 @@ Rationale:
   `execution-item` / `tech-debt`) defined in
   [`rules/open-items-governance.md`](../../rules/open-items-governance.md) §2.
 - The artefact already enforces `Source:` + `Last verified:` on every claim, which acts
-  as a per-claim freshness ledger that the central `project-control/open-items/`
+  as a per-claim freshness ledger that the central `docs/project-control/open-items/`
   ledger would only duplicate.
 - The per-competitor profile, value curve, and Five Forces sections are themselves
   rebuilt on every refresh wave, so the `Changelog` captures the meaningful change set.

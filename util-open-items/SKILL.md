@@ -1,6 +1,6 @@
 ---
 name: util-open-items
-description: "Maintain the repo-wide living ledger of unresolved governance work at `project-control/open-items/open-items.md`. Use this skill to sync local `## Open Items` sections from artefacts into the central ledger, triage incoming rows, close or drop items with a tracker ref, archive terminal rows at the end of a review cycle, and produce status reports. Triggers on: sync open items, triage open items, close open item, drop open item, archive open items, open-items report, roll up open items, OI-NNNN, central ledger, project-control/open-items."
+description: "Maintain the repo-wide living ledger of unresolved governance work at `docs/project-control/open-items/open-items.md`. Use this skill to sync local `## Open Items` sections from artefacts into the central ledger, triage incoming rows, close or drop items with a tracker ref, archive terminal rows at the end of a review cycle, and produce status reports. Triggers on: sync open items, triage open items, close open item, drop open item, archive open items, open-items report, roll up open items, OI-NNNN, central ledger, docs/project-control/open-items."
 version: "1.0.0"
 status: active
 last_reviewed: 2026-05-25
@@ -16,7 +16,7 @@ metadata:
 # util-open-items — Open Items Ledger Operator
 
 Operate the central control plane for unresolved governance work. This skill is the only
-sanctioned writer of `project-control/open-items/open-items.md`; every other skill emits
+sanctioned writer of `docs/project-control/open-items/open-items.md`; every other skill emits
 open items into its own artefact's document-level `## Open Items` section and then chains
 to this skill to push them into the ledger.
 
@@ -49,7 +49,7 @@ those are scaffold debt, audited by `util-metamodel-audit` Check 8, and are not 
 ## Modes
 
 This skill exposes five operating modes. Each mode reads or writes
-`project-control/open-items/open-items.md` and respects the lifecycle in
+`docs/project-control/open-items/open-items.md` and respects the lifecycle in
 `rules/open-items-governance.md` §3.
 
 ### Mode 1 — `sync`
@@ -145,7 +145,7 @@ Process:
 
 1. Identify rows in `open-items.md` with `Status: closed` or `Status: dropped` whose
    `Due / Review date` is older than 30 days (configurable per invocation).
-2. Move those rows into `project-control/open-items/archive/<YYYY-Q[1-4]>.md`, creating
+2. Move those rows into `docs/project-control/open-items/archive/<YYYY-Q[1-4]>.md`, creating
    the bucket file with the canonical 12-column ledger schema if it does not already
    exist.
 3. Remove the rows from `open-items.md` only after they have been written to the archive
@@ -206,7 +206,7 @@ required because:
 Governance-only items (raised directly at the central plane with no artefact home) carry
 `_central-only_` in `Source heading`, an empty `Source anchor`, and an empty
 `Source artefact`. `util-metamodel-audit` does not flag these as orphans (per the README
-in `project-control/open-items/`).
+in `docs/project-control/open-items/`).
 
 ---
 
@@ -258,7 +258,7 @@ util-open-items sync docs/architecture/research/0003-token-auth.md
 # → reads the document-level ## Open Items section,
 #   mints OI-NNNN for any unmatched rows,
 #   writes those IDs back into the source file,
-#   appends rows to project-control/open-items/open-items.md.
+#   appends rows to docs/project-control/open-items/open-items.md.
 ```
 
 **Close a resolved decision gap:**
@@ -290,8 +290,8 @@ util-open-items report
 
 | Path                                                          | Owner                                  |
 | :------------------------------------------------------------ | :------------------------------------- |
-| `project-control/open-items/open-items.md`                    | This skill (sync / close / drop / archive). |
-| `project-control/open-items/archive/<YYYY-Q[1-4]>.md`         | This skill (archive only).             |
+| `docs/project-control/open-items/open-items.md`                    | This skill (sync / close / drop / archive). |
+| `docs/project-control/open-items/archive/<YYYY-Q[1-4]>.md`         | This skill (archive only).             |
 | `var/reports/open-items/triage-YYYY-MM-DD.md`                 | This skill (triage report).            |
 | `var/reports/open-items/report-YYYY-MM-DD.md`                 | This skill (report mode).              |
 | The source artefact's document-level `## Open Items` section. | This skill (sync writes back IDs only). |
@@ -315,7 +315,7 @@ MUST NOT touch artefact body content outside the document-level `## Open Items` 
 
 - [`rules/open-items-governance.md`](../rules/open-items-governance.md) — canonical
   contract; the rule wins on every conflict.
-- [`project-control/open-items/README.md`](../project-control/open-items/README.md) —
+- [`docs/project-control/open-items/README.md`](../docs/project-control/open-items/README.md) —
   operator orientation for the central control plane.
 - `util-metamodel-audit/references/check-catalogue.md` — governance-drift audit (report
   only; never mutates).

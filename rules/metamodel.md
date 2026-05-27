@@ -732,9 +732,10 @@ Summary of the contract (full details in the dedicated rule):
   `Source anchor` (short fragment identifier like `#q3`) and a `Source heading` (the full
   human-readable heading text). The pair survives anchor renames and heading edits.
 - **Central control plane:** the consolidated living ledger is
-  `project-control/open-items/` — deliberately outside `docs/` because it is an
-  operational system of record, not a product artefact. Product backlog (PRDs, FBS, epics)
-  remains separate.
+  `docs/project-control/open-items/` — under `docs/` for unified navigation but in a
+  dedicated `project-control/` folder because it is an operational system of record, not
+  a product artefact (so product-spec audits don't sweep it). Product backlog (PRDs, FBS,
+  epics) remains separate.
 - **Tooling boundaries:** `util-docs-audit` stays generic. `util-open-items` performs
   ledger CRUD. `util-metamodel-audit` is report-only and verifies governance drift.
 
