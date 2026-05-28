@@ -1,6 +1,6 @@
 ---
 name: arch-c4
-description: "Author and refresh C4 diagrams via the Structurizr DSL, producing arc42 §3 (Context), §5 (Building Blocks), and §7 (Deployment) markdown with embedded SVGs. Four modes: context (Level 1 — system + actors + external systems), container (Level 2 — internal containers + tech stack), component (Level 3 — one drill per CON-NN, derives from BC-NN.AGG-NN domain aggregates), deployment (per-environment nodes + container instances). Mints SYS-NN / CON-NN / CMP-NN / DN-NN. Edits docs/architecture/c4/workspace.dsl (foundation managed by arch-structurizr); writes arc42 markdown under docs/architecture/arc42/. Enforces boundary discipline: BBV components reference domain aggregates via properties.implements; BBV is the STATIC technical decomposition, NOT a re-statement of the domain model. Triggers on: C4 diagram, C4 context, system context, container diagram, component diagram, deployment view, arc42 §3, arc42 §5, arc42 §7, building block view, render C4, architecture diagram, draw architecture, c4 model."
+description: "Author and refresh C4 diagrams via the Structurizr DSL, producing arc42 §3 (Context), §5 (Building Blocks), §6 (Runtime View), and §7 (Deployment) markdown with embedded SVGs. Five modes: context (Level 1 — system + actors + external systems), container (Level 2 — internal containers + tech stack), component (Level 3 — one drill per CON-NN, derives from BC-NN.AGG-NN domain aggregates), deployment (per-environment nodes + container instances), runtime (dynamic view — key runtime scenarios as sequenced container interactions, mints SCN-NN). Mints SYS-NN / CON-NN / CMP-NN / DN-NN / SCN-NN. Edits docs/architecture/c4/workspace.dsl (foundation managed by arch-structurizr); writes arc42 markdown under docs/architecture/arc42/. Enforces boundary discipline: BBV components reference domain aggregates via properties.implements; BBV is the STATIC technical decomposition, NOT a re-statement of the domain model. Triggers on: C4 diagram, C4 context, system context, container diagram, component diagram, deployment view, runtime view, runtime scenario, sequence diagram, arc42 §3, arc42 §5, arc42 §6, arc42 §7, building block view, render C4, architecture diagram, draw architecture, c4 model, dynamic view."
 version: "1.0.0"
 status: active
 last_reviewed: 2026-05-28
@@ -28,7 +28,7 @@ Single skill, four modes — each owns one arc42 architecture section and the co
 ## What this skill is NOT
 
 - **Not a substitute for `domain-model`.** The Building Block View is technical decomposition (containers, components, modules — Spring Boot apps, Postgres databases, Kafka topics). It is **not** a re-statement of the domain model. See `references/boundary-discipline.md` for the three tests that keep them separate.
-- **Not the runtime view.** Dynamic scenarios (orchestration across containers, sequence diagrams) belong to `arch-runtime-view` (Milestone 2). This skill only produces **static** views — context, container, component, deployment.
+- **Not a substitute for `domain-model` state machines.** Runtime scenarios show how containers exchange messages to fulfil a use case. They are NOT per-aggregate lifecycle diagrams (those live in `docs/domain/07b-models/`). See `references/boundary-discipline.md` for the dynamic/behavioral boundary.
 - **Not a one-off renderer.** Every edit goes through `workspace.dsl` so the model stays consistent across views. Direct SVG hand-editing is forbidden — `arch-structurizr verify` will flag drift.
 
 ---
@@ -43,6 +43,7 @@ Each mode (a) edits `workspace.dsl`, (b) runs `render.sh` to produce one or more
 | `container` | §5.1 | Level 2 — Container | `container` | `containers` | `docs/architecture/arc42/05-building-blocks.md` (§5.1) |
 | `component` | §5.2 / §5.3 | Level 3 — Component | `component` | `components-<CON-NN>` | `docs/architecture/arc42/05-building-blocks.md` (one §5.2.x per drilled container) |
 | `deployment` | §7 | Deployment | `deployment` | `deployment-<env-slug>` | `docs/architecture/arc42/07-deployment.md` (one §7.x per environment) |
+| `runtime` | §6 | Dynamic (runtime) | `dynamic` | `runtime-<SCN-NN>-<slug>` | `docs/architecture/arc42/06-runtime-view.md` (one §6.x per scenario) |
 
 ---
 
@@ -216,7 +217,58 @@ Map containers onto infrastructure for one or more environments (dev / staging /
 
 ---
 
-## DSL editing rules (apply to all four modes)
+## Mode 5 — `runtime` (arc42 §6)
+
+Key runtime scenarios showing how containers (and optionally external systems) collaborate over time to fulfil an important use case. Uses Structurizr **dynamic views** — the same DSL elements, but ordered as a sequence with step numbers.
+
+### Pre-flight
+
+1. Container view exists (`CON-NN` identifiers are in the DSL). Runtime views reference those identifiers — containers must be defined first.
+2. Read `docs/business/04-value-streams.md` if present — value stream stages and pain points indicate which scenarios matter most.
+3. Read `docs/domain/07b-models/{bc-slug}.md` if present — commands and events in the domain model map to messages in the runtime scenario.
+
+### Step 0 — Context questions
+
+```
+1. Which use case / user story does this scenario illustrate?
+   A. Happy path for a core capability (recommended first scenario)
+   B. Error / fallback path for an existing happy-path scenario
+   C. A cross-cutting concern (auth, audit, notification) that touches many containers
+   D. Describe — I'll name the scenario
+
+2. Level of detail?
+   A. Container-to-container (Level 2) — recommended default
+   B. Component-to-component (Level 3) — only if CON-NN has been drilled via `component` mode
+
+3. Participants?
+   A. Auto-detect from the domain model commands/events for the relevant BC
+   B. I'll list the participants explicitly
+```
+
+### Fill process
+
+1. Assign the next `SCN-NN` ID to the scenario; choose a slug (e.g. `scn-01-claim-submission`).
+2. Inside the DSL `dynamic` block, list elements and relationships in step order: `<source> -> <target> "<message>" { properties { "step" "1" } }`.
+3. Add or update a `dynamic SYS_NN "runtime-<SCN-NN>-<slug>"` view block.
+4. Run `./docs/architecture/c4/render.sh runtime-<SCN-NN>-<slug>` — confirm `views/runtime-<SCN-NN>-<slug>.svg` is produced.
+5. Append a §6.x subsection to `docs/architecture/arc42/06-runtime-view.md` from `templates/arc42-06-runtime-view.md`:
+   - Embed the rendered SVG.
+   - Fill the step table (step number, sender, receiver, message, notes).
+   - Annotate any error flows inline or as a sub-subsection.
+
+### Boundary rules — runtime vs domain-model
+
+| This view | Domain model (`docs/domain/07b-models/`) |
+|---|---|
+| Shows HOW containers communicate to deliver a use case | Shows WHAT aggregates do internally (state transitions, invariants) |
+| Messages are wire-level (HTTP, Kafka events, gRPC calls) | Messages are domain commands and events |
+| Participants are `CON-NN` containers (or `CMP-NN` for Level 3) | Participants are `BC-NN.AGG-NN` aggregates |
+| Timeline is the call chain across deployment units | Timeline is the aggregate's own lifecycle |
+| **Do NOT** show intra-aggregate state transitions here | **Do NOT** show inter-container call chains there |
+
+---
+
+## DSL editing rules (apply to all five modes)
 
 1. **Forward references are forbidden** — declare every identifier before any relationship that uses it. The `validate` step in `render.sh` catches violations but the skill avoids creating them in the first place.
 2. **Identifier convention** — kit IDs (`SYS-NN`, `CON-NN`, `CMP-NN`, `DN-NN`, `P-NN`) use hyphens in display names; DSL identifiers use underscores (`SYS_NN`, `CON_NN`, …). See `arch-structurizr/references/dsl-conventions.md`.
@@ -243,6 +295,7 @@ Map containers onto infrastructure for one or more environments (dev / staging /
 - `references/arc42-mapping.md` — exact mapping table from C4 levels to arc42 sections; what each arc42 section requires that C4 doesn't natively cover (e.g. arc42 §3.2 Technical Context — channels + protocols, which C4 doesn't model directly)
 - `references/arc42-section-03.md` — arc42 §3 specification (embedded from arc42 v9.0 template; required reading before `context` mode)
 - `references/arc42-section-05.md` — arc42 §5 specification (embedded); §5.1 / §5.2 / §5.3 structure rules
+- `references/arc42-section-06.md` — arc42 §6 specification (embedded); runtime view purpose, content, and quality criteria
 - `references/arc42-section-07.md` — arc42 §7 specification (embedded)
 - `references/dsl-recipes.md` — copy-paste DSL fragments per mode
 - `references/view-styling.md` — tag-driven styling cookbook; `-mode dark` rendering note
@@ -252,6 +305,7 @@ Map containers onto infrastructure for one or more environments (dev / staging /
 
 - `templates/arc42-03-context.md` — §3 markdown skeleton (Business Context + Technical Context tables; SVG embed)
 - `templates/arc42-05-building-blocks.md` — §5 markdown skeleton (Level 1 whitebox + Level 2 black-box template; first-time generation only)
+- `templates/arc42-06-runtime-view.md` — §6 markdown skeleton (one §6.x per scenario; SVG embed + step table)
 - `templates/arc42-07-deployment.md` — §7 markdown skeleton (one §7.x per environment)
 
 ---
@@ -266,4 +320,6 @@ Map containers onto infrastructure for one or more environments (dev / staging /
 - [ ] SVG rendered and committed under `docs/architecture/c4/views/`
 - [ ] arc42 markdown file exists at canonical path and has standard frontmatter (see `rules/artefact-frontmatter.md`)
 - [ ] Every container/component row in arc42 §5 carries the `Domain aggregates implemented` field
+- [ ] (`runtime` mode) Every step in the `dynamic` view block has a step-number annotation; no orphan relationships
+- [ ] (`runtime` mode) Step table in §6.x matches the DSL step count exactly
 - [ ] Closing report delivered
