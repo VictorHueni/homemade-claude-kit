@@ -35,7 +35,7 @@ set -euo pipefail
 # Chromium runtime needed for direct SVG export. The base
 # `structurizr/structurizr:${STRUCTURIZR_VERSION}` tag CANNOT export
 # SVG (Playwright executable is missing). Do not strip the suffix.
-STRUCTURIZR_VERSION="{{structurizr_version}}"
+STRUCTURIZR_VERSION="2026.05.22"
 IMAGE="structurizr/structurizr:${STRUCTURIZR_VERSION}-playwright"
 
 # ─── UID/GID — write SVGs as the invoking user, not root ──────────────

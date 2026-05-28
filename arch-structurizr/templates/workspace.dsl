@@ -104,6 +104,9 @@ workspace "{{project_name}}" "{{project_description}}" {
             }
         }
 
-        theme default
+        // NOTE: `theme default` (which fetches from static.structurizr.com)
+        // is intentionally NOT used here — that cloud service EOLs on
+        // 2026-09-30. The styles{} block above already covers what the
+        // default theme provides for the kit's tag taxonomy.
     }
 }

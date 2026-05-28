@@ -221,7 +221,7 @@ Map containers onto infrastructure for one or more environments (dev / staging /
 1. **Forward references are forbidden** — declare every identifier before any relationship that uses it. The `validate` step in `render.sh` catches violations but the skill avoids creating them in the first place.
 2. **Identifier convention** — kit IDs (`SYS-NN`, `CON-NN`, `CMP-NN`, `DN-NN`, `P-NN`) use hyphens in display names; DSL identifiers use underscores (`SYS_NN`, `CON_NN`, …). See `arch-structurizr/references/dsl-conventions.md`.
 3. **One element per line** — even if the DSL accepts collapsed forms, write one element per line so the kit's audit can grep it.
-4. **`properties.implements` is mandatory on every component** — the cross-reference to `domain-model` aggregates. Empty string `""` is permitted only if the component genuinely implements no domain logic (e.g. an HTTP framework wrapper); flag any non-`""` component without `implements` set.
+4. **`properties.implements` is mandatory on every component** — the cross-reference to `domain-model` aggregates. Use `"BC-NN.AGG-NN"` (or a comma-separated list) for domain components; use the sentinel `"none"` for tech-only components (HTTP framework wrappers, generic middleware, observability hooks). Empty string `""` is **not** valid — Structurizr DSL rejects empty property values. Any component missing the `implements` property fails the boundary discipline check.
 5. **Tag policy** — apply kit-standard tags only (see `arch-structurizr/references/structurizr-cheatsheet.md` §Tag conventions). Don't invent new tags without updating the styling block.
 
 ---

@@ -94,7 +94,16 @@ A BBV component card might say "Claim Command Handler — Fastify route that tra
 
 Every C4 Component card in arc42 §5 carries a **`Domain aggregates implemented`** column listing `BC-NN.AGG-NN` IDs. This is the structural link from BBV → domain model. The kit's audit (Check 7 in `util-metamodel-audit`) will surface CMP-NN rows missing this column.
 
-Empty is acceptable for components that genuinely implement no domain logic — HTTP framework wrappers, generic middleware, observability hooks. The audit accepts empty as long as the component's responsibility statement makes the absence obvious.
+The DSL field is `properties.implements`. Two valid forms:
+
+| Value | Meaning |
+|---|---|
+| `"BC-NN.AGG-NN"` (or comma-separated list) | The component implements one or more domain aggregates |
+| `"none"` | The component genuinely has no domain mapping — HTTP framework wrappers, generic middleware, observability hooks |
+
+**Empty string `""` is NOT valid** — Structurizr DSL rejects empty property values at validation time. Always use the `"none"` sentinel for tech-only components so the absence is explicit (a quick `grep -c '"implements" "none"'` audit surfaces all tech-only components for review).
+
+In the arc42 §5 markdown table, render `"none"` as an em-dash (`—`) in the `Domain aggregates implemented` column.
 
 ---
 

@@ -37,7 +37,7 @@ The pinned image is the `-playwright` variant — it bundles headless Chromium f
 
 | Tool | Pinned version |
 |---|---|
-| `structurizr/structurizr` | `{{structurizr_version}}-playwright` |
+| `structurizr/structurizr` | `2026.05.22-playwright` |
 
 To bump this, invoke the **`arch-structurizr upgrade`** skill. Do not edit the pin by hand — the upgrade flow re-renders every view to surface visual diffs before you commit.
 

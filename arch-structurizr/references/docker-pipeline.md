@@ -18,20 +18,18 @@ Single-stage pipeline that turns `workspace.dsl` into committed SVGs using the *
 
 ---
 
-## Important — first-run Chromium download
+## Performance — image pull is the only slow step
 
-The `-playwright` image runs headless Chromium inside the container to render SVGs. On the **first** invocation, Chromium is downloaded into the running container. This takes 3+ minutes. Subsequent runs are fast (typically < 5 seconds per view).
+The `-playwright` image bundles a Chromium runtime in the image itself (verified against `2026.05.22-playwright` — ~1.8 GB on-disk, no on-demand download). Once the image is pulled:
 
-If you want to pre-warm Chromium on a developer machine, run:
+- A full render of 4 views completes in **~5–10 seconds** on a typical developer machine.
+- Validate alone runs in **~1–2 seconds**.
 
-```bash
-docker run --rm structurizr/structurizr:2026.05.22-playwright export \
-    -workspace /dev/null -format svg 2>&1 | tail -2
-```
+The only slow operation is the **initial `docker pull`** (~1.8 GB download, ~3–5 minutes depending on bandwidth). After that, renders are fast.
 
-The render will fail (no workspace) but Chromium will be downloaded and cached in the image layer.
-
-CI nuance: ephemeral CI runners that wipe the container layer every job will re-download Chromium every time. Either (a) accept the 3-min cold start, (b) cache the container layer between jobs, or (c) build a project-specific image extending `structurizr/structurizr:<pin>-playwright` with Chromium pre-fetched.
+CI nuance: ephemeral CI runners that wipe the image cache every job will re-pull the 1.8 GB image. Mitigations:
+- Cache the Docker image layer between jobs (most CI providers support this — see §CI hook recommendations).
+- Build a project-specific image extending `structurizr/structurizr:<pin>-playwright` and host it in the project's registry to skip the public-pull step.
 
 ---
 
@@ -118,7 +116,7 @@ For CI performance, cache the Docker image:
 |---|---|---|
 | `docker: not found` | Docker not installed or daemon not running | Install Docker; on WSL2 confirm Docker Desktop integration |
 | `Unable to find image structurizr/structurizr:<pin>-playwright` after pull | Pin no longer exists upstream | Run `arch-structurizr upgrade`; bump pin table in this file |
-| Cold render takes 3+ minutes | First-run Chromium download | Expected. Pre-warm (see §First-run Chromium download) or accept once-per-cache-clear cost |
+| Initial `docker pull` takes 3+ minutes | One-time 1.8 GB image download | Expected. Renders themselves are 5–10 s after the image is cached. |
 | `Parse error at line N` from structurizr validate | Brace placement or forward reference (see `dsl-conventions.md` §1) | Fix the DSL; never disable validate |
 | Render produces empty SVG | View has `include *` but no elements assigned to that view's scope | Add elements to the DSL or remove the empty view |
 | `Error: browserType.launch: Executable doesn't exist` | Using the **base** `2026.05.22` tag instead of `2026.05.22-playwright` | Bump pin to `-playwright` variant via `arch-structurizr upgrade` |

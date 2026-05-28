@@ -121,7 +121,7 @@ CON_02 = container "CON-02 — Claims API" "..." "Node.js 20 + Fastify" {
     CMP_01 = component "CMP-01 — Submit Claim Endpoint" "HTTP POST /claims handler" "Fastify route" {
         tags "endpoint"
         properties {
-            "implements" ""
+            "implements" "none"
             "code-path" "src/claims/http/SubmitClaimRoute.ts"
         }
     }
@@ -269,7 +269,8 @@ If you have a web app and a mobile app talking to the same API, both are separat
 ## What NOT to do
 
 - ❌ **Defining a Container with no technology label** — empty `technology` makes the §5.1 table column blank.
-- ❌ **Defining Components without `properties.implements`** — boundary discipline check will flag it.
+- ❌ **Defining Components without `properties.implements`** — boundary discipline check will flag it. Use `"none"` if the component is tech-only.
+- ❌ **Using empty `""` for any property value** — Structurizr DSL rejects this at validation. Use a sentinel like `"none"` or `"_TODO_"`.
 - ❌ **Putting Components inside the top-level `model { ... }` instead of inside their parent `container { ... }`** — Structurizr parses this but the component won't be reachable from the container view.
 - ❌ **Reusing a DSL identifier across blocks** — identifiers must be unique within the workspace.
 - ❌ **Using `:latest` in `containerInstance` properties or anywhere else** — the kit forbids unpinned references.

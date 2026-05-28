@@ -59,7 +59,7 @@ c4/views/*.svg         ← committed; embedded in arc42 markdown
 
 A **`validate`** step runs before `export` on every invocation. If the DSL fails validation, render does not run and the script exits non-zero with a clear error.
 
-**First-run note:** the `-playwright` image downloads Chromium inside the container on first use (3+ minutes). Subsequent renders are fast. The base `structurizr/structurizr:<pin>` (no `-playwright` suffix) lacks Chromium and cannot export SVG — `render.sh` and `verify` mode require the Playwright variant.
+**First-time note:** the `-playwright` image is ~1.8 GB (Chromium runtime is bundled, not downloaded on demand). The initial `docker pull` takes 3–5 minutes; afterwards renders complete in 5–10 seconds. The base `structurizr/structurizr:<pin>` (no `-playwright` suffix) lacks Chromium and cannot export SVG — `render.sh` and `verify` mode require the Playwright variant.
 
 The old EOL Docker images (`structurizr/cli`, `structurizr/lite`) and the old two-stage pipeline (`structurizr-cli` → C4-PlantUML → `plantuml/plantuml` → SVG) are not used — the consolidated tool replaces them ([docs/export/png-and-svg](https://docs.structurizr.com/export/png-and-svg)).
 
@@ -78,7 +78,7 @@ Scaffold the `docs/architecture/c4/` tree from `templates/`. Substitute the proj
 6. Copy `templates/c4-readme.md` → `docs/architecture/c4/README.md` with the same substitution.
 7. Create `docs/architecture/c4/views/.gitkeep`.
 8. Run Mode 2 (`verify`) automatically to confirm the scaffold works.
-9. Warn the user that the first render will pull the `-playwright` image (~1.8 GB) and download Chromium inside the container (3+ minutes one-time cost).
+9. Warn the user that the initial `docker pull` for the `-playwright` image is ~1.8 GB (~3–5 min one-time cost); renders themselves are ~5–10 s once cached.
 10. Print a closing report (see §Closing report).
 
 ### Mode 2 — `verify`
