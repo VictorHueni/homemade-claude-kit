@@ -1,7 +1,7 @@
 ---
 name: dev-git-init
 description: 'Scaffold the deterministic git enforcement stack for a project in one Q&A pass — husky hooks (commit-msg, pre-commit, pre-push), commitlint with Conventional Commits, gitleaks secret detection, .gitignore + .gitattributes + .editorconfig, CONTRIBUTING.md narrative, GitHub PR template + CODEOWNERS + 3 issue templates, optional GitHub Actions workflows for CI gates, and a copy-paste-ready scripts/setup-branch-protection.sh. Two modes: scaffold (interactive Q&A; idempotent — never blindly overwrites) and audit (read-only check of which components are in place). Does NOT execute installers or apply branch protection — emits the install command and writes the protection script for operator review. Triggers on: scaffold git, git init, set up git hooks, install husky, install commitlint, set up commit conventions, set up PR template, set up CODEOWNERS, branch protection, git workflow setup, dev workflow setup, repo conventions, scaffold contributing.'
-version: "1.0.1"
+version: "1.0.2"
 status: active
 last_reviewed: 2026-05-28
 review_interval: 180d
@@ -81,7 +81,12 @@ Run first whenever the project already has any of the stack components.
 ### Step 1 — detect existing files
 
 ```bash
-# Run from project root
+# Run from project root.
+# NOTE on slot counting (see §Counting convention below the loop):
+#   - commitlint.config.{js,mjs} + .commitlintrc.{yaml,json} = 1 slot (any one variant counts)
+#   - .github/ISSUE_TEMPLATE/{bug,feature,docs}.md = 1 slot (3 files)
+#   - .github/workflows/{lint-build,typecheck,test,gitleaks}.yml = 1 slot (4 files)
+#   The loop checks ~20 paths; the audit denominator is 14 logical slots.
 for f in \
   .husky/commit-msg .husky/pre-commit .husky/pre-push \
   commitlint.config.js commitlint.config.mjs .commitlintrc.yaml .commitlintrc.json \
@@ -106,7 +111,7 @@ Also detect:
     || gh repo view --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null \
     || git branch --show-current
   ```
-  The `symbolic-ref` form is only populated if the repo was cloned with `--origin` or if `git remote set-head origin -a` has been run — unreliable on fresh clones. `gh repo view` is authoritative when `gh` is authenticated. `git branch --show-current` is the final fallback (returns whatever branch the operator is currently on).
+  The `symbolic-ref` form is only populated if the repo was cloned with `--origin` or if `git remote set-head origin -a` has been run — unreliable on fresh clones. `gh repo view` is authoritative when `gh` is authenticated. `git branch --show-current` is the final fallback (returns whatever branch the operator is currently on). **Caveat:** if `gh` is unauthenticated AND the operator is currently on a non-default branch (e.g. a feature branch), the chain resolves to the feature branch — wrong answer. Detection is reliable when at least one of: (a) `gh auth login` has been run with repo scope, OR (b) the operator runs the skill from `main` / the actual default branch. When both fail, prompt the operator to confirm the detected branch before proceeding.
 - Repo platform: `git remote get-url origin` (github.com / gitlab.com / bitbucket.org)
 
 **Counting convention for the audit report below:** the denominator is **14 logical slots**, one per row in the §Output catalogue table. Each grouped row counts as one slot regardless of how many files it expands to — `.github/ISSUE_TEMPLATE/{bug,feature,docs}.md` is 3 files / 1 slot; `.github/workflows/{lint-build,typecheck,test,gitleaks}.yml` is 4 files / 1 slot; the four `commitlint.config.*` filename variants count toward the single `commitlint.config.*` slot. Mark a slot as **in place** when at least one file in the family exists; mark **missing** otherwise.
