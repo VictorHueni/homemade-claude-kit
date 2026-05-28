@@ -54,7 +54,9 @@ what order, and where to put it**.
 - `util-docs-audit` — general doc staleness scan (file-level freshness, dead prose)
 - `util-metamodel-audit` — deep metamodel compliance audit: 16 checks covering stack progress, folder placement, internal + external links, ID integrity + cross-references, dependency enforcement, _TODO_ density, mandatory sections, confidence distribution, expiry + staleness, orphaned files, research sync, ADR chains, FBS + epic delivery progress → report at `var/reports/metamodel-audit/`; report-only with proposed fix per finding; run monthly (active dev) or quarterly (maintenance)
 - `util-metamodel-migration` — one-time migration doctor for repos built before the metamodel: scans any docs/ folder, detects misplaced files using tiered confidence scoring (filename → folder name → content signals), emits atomic fix blocks (git mv + sed link repairs) per file → report at `var/reports/metamodel-migration/`; report-only; run once before the first `util-metamodel-audit`
-- `dev-*` skills — developer workflow (git, PR, worktree, ralph loop)
+- `dev-stack-guide` — research a technology stack's latest official docs + MCP server, then write a developer guide covering core patterns, anti-patterns, best practices, and coding-agent integration; three modes: research (→ `docs/dev-guides/research/{tech-slug}-research.md`), draft (→ `docs/dev-guides/{tech-slug}.md`), refresh; no metamodel IDs — path-referenced only
+- `dev-getting-started` — scaffold and populate a project-specific getting-started guide; reads project files (package.json, docker-compose, .env.example, Makefile, CLAUDE.md) to emit exact commands; three modes: scaffold, fill, refresh → `docs/dev-guides/getting-started.md`; singleton per project
+- `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-ralph-loop` — developer workflow (commit, pull-request, worktree, ralph loop)
 - `com-slide-deck` — HTML slide presentations → `docs/communication/slides/{slug}/` (one folder per deck, named after the presentation in kebab-case)
 
 ---
@@ -687,14 +689,19 @@ docs/
 │           ├── src/                                     ← slide partials (source of truth)
 │           ├── dist/                                    ← built HTML + prototypes/
 │           └── config.yaml
-└── discovery/                                           ← `discovery-` skills (pre-formal evidence layer; cross-cutting; feeds every downstream artefact)
-    ├── ideation/                                       ← discovery-idea (IDEA-NNNN)
-    │   ├── INDEX.md
-    │   └── IDEA-NNNN-{slug}.md (one per idea)
-    ├── interviews/                                     ← discovery-research
-    │   └── interview-{persona-id-or-slug}-{topic}.md · research-synthesis-{date}-{topic}.md · research-plan-{topic}.md
-    └── workshops/                                      ← discovery-workshop
-        └── workshop-{slug}-{date}.md · workshop-synthesis-{slug}-{date}.md
+├── discovery/                                           ← `discovery-` skills (pre-formal evidence layer; cross-cutting; feeds every downstream artefact)
+│   ├── ideation/                                       ← discovery-idea (IDEA-NNNN)
+│   │   ├── INDEX.md
+│   │   └── IDEA-NNNN-{slug}.md (one per idea)
+│   ├── interviews/                                     ← discovery-research
+│   │   └── interview-{persona-id-or-slug}-{topic}.md · research-synthesis-{date}-{topic}.md · research-plan-{topic}.md
+│   └── workshops/                                      ← discovery-workshop
+│       └── workshop-{slug}-{date}.md · workshop-synthesis-{slug}-{date}.md
+└── dev-guides/                                         ← `dev-stack-guide` + `dev-getting-started` (developer reference; not a metamodel step)
+    ├── getting-started.md                              ← dev-getting-started (singleton — project onboarding guide)
+    ├── {tech-slug}.md (one per technology)             ← dev-stack-guide (stack guide: patterns, anti-patterns, MCP)
+    └── research/                                       ← dev-stack-guide research scratch (internal; committed for traceability)
+        └── {tech-slug}-research.md
 ```
 
 **Prefix → folder mapping (memorise this):**
@@ -708,7 +715,7 @@ docs/
 | `domain-` | `docs/domain/` | DDD artefacts — the shared language between business and tech (bounded contexts, glossary, domain model) |
 | `ops-` | `docs/ops/` | Subfolders per artefact (`runbooks/`, `rcas/`) |
 | `com-` | `docs/communication/` | Communication artefacts (slide decks, presentations). Subfolders per artefact type (e.g. `slides/`). |
-| `dev-` | *(no doc folder)* | Developer-workflow utilities |
+| `dev-` | *(no doc folder)* for workflow utilities · **exception:** `dev-stack-guide` → `docs/dev-guides/{tech-slug}.md` + `docs/dev-guides/research/`; `dev-getting-started` → `docs/dev-guides/getting-started.md` | Developer-workflow utilities; `dev-stack-guide` and `dev-getting-started` are the only `dev-` skills that write to `docs/` |
 | `util-` | *(no doc folder)* | Housekeeping |
 
 ---
@@ -781,6 +788,9 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 | New artefact step, new canonical path | `util-metamodel-scaffold/references/index-template.md` → §Detection bash block + §Template stack-progress table (add detection command + row) |
 
 Failing to update these files after a metamodel change will cause the audit and migration skills to silently miss the new artefact — the most dangerous kind of drift.
+
+**Already-updated coupling (dev-stack-guide + dev-getting-started, 2026-05-28):**
+`rules/metamodel.md` supporting-skills list (dev-* bullet expanded to 4 bullets: dev-stack-guide, dev-getting-started, workflow utilities, com-slide-deck) + canonical paths tree (`docs/dev-guides/` subtree added after `discovery/`) + prefix→folder mapping (`dev-` row updated with exception note) + this table · `util-metamodel-audit/references/check-catalogue.md` Check 2 (docs/dev-guides/ added as canonical path; getting-started.md + {tech-slug}.md + research/ exempt from misplacement) · `util-metamodel-migration/references/detection-signals.md` §Filename patterns (getting-started.md under docs/dev-guides/ → dev-getting-started; {tech-slug}-research.md under docs/dev-guides/research/ → dev-stack-guide) + §Folder patterns (dev-guides/ folder) + §Content signals (## Stack identity → dev-stack-guide) · `BACKLOG.md` (Shipped 2026-05-28 section added)
 
 **Already-updated coupling (arch-cli-contract promoted to Step 8.5 + ER symmetry fix, 2026-05-26):**
 `rules/metamodel.md` artefact count (16→18) + artefact table (row 8.5 added) + supporting-skills list (arch-cli-contract bullet removed — promoted to step) + DAG (Step 8.5 node alongside arch-adr) + ER diagram (merge conflict resolved: IDEA entity from branch merged; CLI_SURFACE.BC_NN FK added; CLI_COMMAND.BC_NN_CTR_NN FK added; CLI_SURFACE→BOUNDED_CONTEXT, CLI_SURFACE→ADR, CLI_COMMAND→QUALITY_ATTRIBUTES, CLI_COMMAND→PRD, CLI_COMMAND→INTERFACE_CONTRACT relationships added) + build order §8.5 added + this coupling table · `README.md` artefact count (16→18) + flowchart (ARCH subgraph with S7c + S8_5 nodes + all edges) + ER diagram (INTERFACE_CONTRACT entity added; CLI_SURFACE/CLI_COMMAND FKs + relationships updated to match metamodel)

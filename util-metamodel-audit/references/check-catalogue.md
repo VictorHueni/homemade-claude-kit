@@ -69,6 +69,10 @@ Then compare each path against the canonical map:
 - `{bc-slug}.md` (no `cli-` prefix) under `docs/architecture/interfaces/` → service contract (`arch-service-contract`), correct
 - `cli-{slug}.md` under `docs/architecture/interfaces/` → CLI contract (`arch-cli-contract`), correct
 - `*.md` under `docs/architecture/` but NOT in `decisions/`, `interfaces/`, or `research/` → likely misplaced architecture file
+- `getting-started.md` → must be at `docs/dev-guides/getting-started.md` (singleton — `dev-getting-started` skill)
+- `{tech-slug}.md` under `docs/dev-guides/` (no `research/` subfolder, not `getting-started.md`) → correct (`dev-stack-guide` output)
+- `{tech-slug}-research.md` under `docs/dev-guides/research/` → correct (`dev-stack-guide` research scratch)
+- `*.md` under `docs/dev-guides/` but NOT matching the above patterns → likely misplaced
 
 **Severity:** Warning
 

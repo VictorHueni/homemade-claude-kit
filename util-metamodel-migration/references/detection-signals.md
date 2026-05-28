@@ -34,6 +34,8 @@ A file whose name matches one of these patterns is likely the artefact type list
 | `*objectives*.md` or `*okr*.md` or `*key-results*.md` | Business objectives | `business-objective` | `docs/business/04b-objectives.md` |
 | `*interface-contract*.md` or `*service-contract*.md` or `*api-contract*.md` or `*api-surface*.md` (outside `docs/architecture/interfaces/`) | Service contract | `arch-service-contract` | `docs/architecture/interfaces/{bc-slug}.md` |
 | `*cli-contract*.md` or `*cli-surface*.md` (outside `docs/architecture/interfaces/`) | CLI contract | `arch-cli-contract` | `docs/architecture/interfaces/cli-{slug}.md` |
+| `getting-started.md` outside `docs/dev-guides/` | Getting started guide | `dev-getting-started` | `docs/dev-guides/getting-started.md` |
+| `*-research.md` under a `dev-guides/` folder but not at `docs/dev-guides/research/` | Stack guide research scratch | `dev-stack-guide` | `docs/dev-guides/research/{tech-slug}-research.md` |
 | `IDEA-[0-9][0-9][0-9][0-9]-*.md` or `*idea*.md` outside canonical | Discovery idea | `discovery-idea` | `docs/discovery/ideation/IDEA-NNNN-{slug}.md` |
 | `interview-*.md` or `research-synthesis-*.md` or `research-plan-*.md` outside canonical | Discovery research | `discovery-research` | `docs/discovery/interviews/` |
 | `workshop-*.md` or `workshop-synthesis-*.md` outside canonical | Discovery workshop | `discovery-workshop` | `docs/discovery/workshops/` |
@@ -65,6 +67,7 @@ A folder whose name matches one of these patterns, AND is not already at the can
 | `models/` containing `*model*.md` files | `business-quantitative-model` or `domain-model` | `docs/business/06a-models/` or `docs/domain/` | Confirm with Tier 1 + Tier 3 |
 | `ideas/` or `proposals/` or `ideation/` | `discovery-idea` | `docs/discovery/ideation/` | `find docs -type d \( -iname "idea*" -o -iname "proposal*" -o -iname "ideation*" \) \| grep -v "docs/discovery/ideation"` |
 | `business/discovery/` (legacy — discovery promoted to top-level) | `discovery-*` family | `docs/discovery/` | `find docs/business -type d -iname "discovery"` |
+| `dev-guides/` or `developer-guides/` or `stack-guides/` not at `docs/dev-guides/` | Developer guides | `dev-stack-guide` / `dev-getting-started` | `find docs -type d \( -iname "dev-guide*" -o -iname "developer-guide*" -o -iname "stack-guide*" \) \| grep -v "docs/dev-guides"` |
 
 ---
 
@@ -94,6 +97,8 @@ Read only `head -50 {file}`. Check for these high-signal headings. A content sig
 | `## Objective.*Epic traceability` | `business-objective` |
 | `## §0 Traceability` with `BC-NN.CTR-NN` or `CTR-NN` pattern | `arch-service-contract` (service / interface contract) |
 | `## §2 Command catalogue` or `## §7 Error contract` with `CMD-NN` pattern | `arch-cli-contract` (CLI contract) |
+| `## Stack identity` with `verified-for:` in frontmatter | `dev-stack-guide` (stack developer guide) |
+| `## Clone & bootstrap` or `## Running locally` with `## Coding agent setup` | `dev-getting-started` (project getting-started guide) |
 
 ---
 

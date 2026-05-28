@@ -4,6 +4,16 @@ Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-
 
 ---
 
+## Shipped — 2026-05-28
+
+| Skill / task | What was done |
+|---|---|
+| **`dev-stack-guide`** | New skill — researches a technology stack's latest official docs, finds the official MCP server (four-step discovery process: modelcontextprotocol/servers index → vendor GitHub → community search → tech's own docs), and writes a developer guide covering core patterns (5–10), anti-patterns, project conventions, and coding-agent integration. Three modes: `research` (→ `docs/dev-guides/research/{tech-slug}-research.md`), `draft` (→ `docs/dev-guides/{tech-slug}.md`), `refresh` (re-researches, diffs version pin, updates). Frontmatter `verified-for:` field pins the exact verified version; `review_interval: 90d` triggers staleness flag. References: `references/research-methodology.md` (source quality tiers, MCP discovery decision tree, pattern extraction heuristics, version pinning strategy), `templates/guide-template.md` (canonical output). |
+| **`dev-getting-started`** | New skill — scaffolds and populates a project-specific getting-started guide at `docs/dev-guides/getting-started.md`. Reads project files (package.json, go.mod, docker-compose.yml, .env.example, Makefile/justfile/Taskfile, CI config, CLAUDE.md, .mcp.json) to emit exact commands — no invented content. Covers: prerequisites, clone & bootstrap, environment setup (every .env.example var documented), running locally (services + ports), common dev tasks, coding agent setup (CLAUDE.md + MCP servers), troubleshooting (3 universal entries + project-specific). Three modes: `scaffold` (structure + auto-detects runtime), `fill` (populates from project files), `refresh` (detects changes, updates stale sections). `review_interval: 180d`. Template: `templates/guide-template.md`. |
+| **Metamodel updated** | `rules/metamodel.md`: supporting-skills list expanded (dev-stack-guide + dev-getting-started bullets; dev-* workflow bullet split from new doc-producing skills) + canonical paths tree (`docs/dev-guides/` subtree added after `discovery/`) + prefix→folder mapping (`dev-` row updated with exception note for the two new skills) + maintenance coupling log entry. `util-metamodel-audit/references/check-catalogue.md`: Check 2 updated (docs/dev-guides/ paths added as canonical). `util-metamodel-migration/references/detection-signals.md`: §Filename patterns (getting-started.md + {tech-slug}-research.md), §Folder patterns (dev-guides/), §Content signals (## Stack identity → dev-stack-guide; ## Clone & bootstrap → dev-getting-started). |
+
+---
+
 ## Shipped — 2026-05-25
 
 | Skill / task | What was done |
