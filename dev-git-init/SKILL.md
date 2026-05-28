@@ -1,7 +1,7 @@
 ---
 name: dev-git-init
-description: 'Scaffold the deterministic git enforcement stack for a project in one Q&A pass — husky hooks (commit-msg, pre-commit, pre-push), commitlint with Conventional Commits, gitleaks secret detection, .gitignore + .gitattributes + .editorconfig, CONTRIBUTING.md narrative, GitHub PR template + CODEOWNERS + 3 issue templates, optional GitHub Actions workflows for CI gates, and a copy-paste-ready scripts/setup-branch-protection.sh. Two modes: scaffold (interactive Q&A; idempotent — never blindly overwrites) and audit (read-only check of which components are in place). Does NOT execute installers or apply branch protection — emits the install command and writes the protection script for operator review. Triggers on: scaffold git, git init, set up git hooks, install husky, install commitlint, set up commit conventions, set up PR template, set up CODEOWNERS, branch protection, git workflow setup, dev workflow setup, repo conventions, scaffold contributing.'
-version: "1.0.2"
+description: 'Scaffold the deterministic git enforcement stack for a Node or Python project — husky/pre-commit hooks, commitlint/commitizen with Conventional Commits, gitleaks, .gitignore + .gitattributes + .editorconfig, CONTRIBUTING.md, GitHub PR template + CODEOWNERS + 3 issue templates, CI workflows, scripts/setup-branch-protection.sh. Two modes: audit (read-only) and scaffold (3-question Q&A: stack · branching strategy · reviewer model). Uniformly skip-if-exists. Emits install + branch-protection commands; never executes them. Post-scaffold prompt asks whether to record decisions as an ADR via arch-adr. Triggers on: scaffold git, git init, set up git hooks, install husky, install commitlint, install commitizen, install pre-commit, set up commit conventions, set up PR template, set up CODEOWNERS, branch protection, git workflow setup, dev workflow setup, repo conventions, scaffold contributing.'
+version: "2.0.0"
 status: active
 last_reviewed: 2026-05-28
 review_interval: 180d
@@ -17,49 +17,66 @@ metadata:
 
 ## Overview
 
-`dev-git-init` provisions the **deterministic git enforcement stack** for a project — the layered set of client-side hooks, server-side checks, and convention files that make every contributor (human or AI) produce compliant commits, branches, and PRs without having to remember the rules. It is the one-shot scaffolder that lands before the project's first real commit.
+`dev-git-init` provisions the **deterministic git enforcement stack** for a Node or Python project — the layered set of client-side hooks, server-side checks, and convention files that make every contributor (human or AI) produce compliant commits, branches, and PRs without having to remember the rules. It is the one-shot scaffolder that lands before the project's first real commit.
 
 **Two-layer model the skill assumes** (per industry standard pre-AI tooling):
 
-- **Client-side hooks** = fast, bypassable feedback (husky / commitlint / gitleaks pre-commit)
+- **Client-side hooks** = fast, bypassable feedback (husky / pre-commit / commitlint / commitizen / gitleaks pre-commit)
 - **Server-side checks** = authoritative, unbypassable truth (GitHub Actions + branch protection)
 
 Both layers exist; the AI-skill layer is purely a *compliance helper* on top — it does not replace enforcement.
 
+**Opinionated defaults** (v2.0.0). Most prior choice-points have been replaced by sensible defaults that match the patterns the skill is designed for:
+
+- **Default branch:** assumed `main`. Override only if needed.
+- **Commit types:** always the minimal 7 (`feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`). Teams wanting `style/build/ci/revert` edit `commitlint.config.js` post-scaffold.
+- **CI workflows:** always scaffolded. Opt-out is `rm -rf .github/workflows`.
+- **`.gitignore` on conflict:** skip-if-exists like every other file. Operator manually merges missing patterns.
+- **No `--force` mode:** to overwrite an existing file, `rm` it and re-run.
+
+**Three choices preserved** (genuinely vary across projects):
+
+- **Q1 — Stack:** pnpm / npm / yarn / Python (4 options)
+- **Q2 — Branching strategy + merge mode:** trunk-based + squash / GitLab Flow / GitFlow (3 options)
+- **Q3 — Reviewer model:** solo founder admin-bypass / mutual peer / CODEOWNERS-driven (3 options — **no default; operator must make an explicit governance choice**)
+
 **Scope discipline:**
-- This skill **writes files** — it does NOT install dependencies (`pnpm add ...`), execute hooks, or apply remote configuration (branch protection on GitHub). It emits commands for the operator to run.
-- It **never blindly overwrites** existing files. Every detected conflict prompts the operator: skip / overwrite / diff.
-- It produces no `.claude/*.yaml` config file. The scaffolded standard files (`commitlint.config.js`, `.husky/`, `CONTRIBUTING.md`, `.github/*`) ARE the source of truth that downstream skills (`dev-git-commit`, `dev-pr`) read.
+- This skill **writes files** — it does NOT install dependencies (`pnpm add ...`, `pip install ...`), execute hooks, or apply remote configuration (branch protection on GitHub). It emits commands for the operator to run.
+- It is **uniformly skip-if-exists**: every existing file is preserved untouched. To replace one, delete it and re-run.
+- It produces no `.claude/*.yaml` config file. The scaffolded standard files (`commitlint.config.js` / commitizen `pyproject.toml` section, `.husky/` or `.pre-commit-config.yaml`, `CONTRIBUTING.md`, `.github/*`) ARE the source of truth that downstream skills (`dev-git-commit`, `dev-pr`) read.
 
 ---
 
 ## Output catalogue
 
-What the skill writes when all questions answered with defaults:
+**All files are skip-if-exists.** To overwrite, delete the file and re-run scaffold. No `--force` flag.
 
-| File | Purpose | Skipped if exists? |
-|---|---|---|
-| `.husky/commit-msg` | Runs commitlint on the just-written message | Prompt |
-| `.husky/pre-commit` | Runs gitleaks on staged diff | Prompt |
-| `.husky/pre-push` | Optional heavy checks (project-defined) | Prompt |
-| `commitlint.config.js` | Allowed types / scope rules / subject case / max length | Prompt |
-| `.gitleaks.toml` | Allowlist for known false-positive patterns | Prompt |
-| `.gitignore` | Stack-appropriate ignores (Node / Python / Go / etc.) | Merge if exists |
-| `.gitattributes` | Line endings + binary marking | Prompt |
-| `.editorconfig` | Universal indent / charset / EOL per file type | Prompt |
-| `CONTRIBUTING.md` | Branching + commit + PR + reviewer + protection conventions | Prompt |
-| `.github/PULL_REQUEST_TEMPLATE.md` | Auto-loaded PR body skeleton | Prompt |
-| `.github/CODEOWNERS` | Reviewer routing (default: `* <owner>`) | Prompt |
-| `.github/ISSUE_TEMPLATE/{bug,feature,docs}.md` | Structured issue templates | Prompt each |
-| `.github/workflows/{lint-build,typecheck,test,gitleaks}.yml` | CI gate workflows | Prompt each (gated by Q6) |
-| `scripts/setup-branch-protection.sh` | Idempotent `gh api` script to apply branch protection rules | Prompt |
+| # | Slot | Files (1 slot = these files) | Stack-specific |
+|---|---|---|---|
+| 1 | `.husky/commit-msg` *(Node only)* | `.husky/commit-msg` | Node — Python uses `.pre-commit-config.yaml` instead |
+| 2 | `.husky/pre-commit` *(Node only)* | `.husky/pre-commit` | Node — see above |
+| 3 | `.husky/pre-push` *(Node only)* | `.husky/pre-push` | Node — see above |
+| 1–3 (Python) | `.pre-commit-config.yaml` *(Python only)* | `.pre-commit-config.yaml` | Python — replaces the 3 husky slots |
+| 4 | Commit linter config | Node: `commitlint.config.js` · Python: `pyproject.toml` `[tool.commitizen]` section appended | Both |
+| 5 | `.gitleaks.toml` | `.gitleaks.toml` | Both |
+| 6 | `.gitignore` | `.gitignore` | Both (stack-appropriate base) |
+| 7 | `.gitattributes` | `.gitattributes` | Both |
+| 8 | `.editorconfig` | `.editorconfig` | Both |
+| 9 | `CONTRIBUTING.md` | `CONTRIBUTING.md` | Both (text varies per Q2 + Q3) |
+| 10 | `.github/PULL_REQUEST_TEMPLATE.md` | (file) | Both |
+| 11 | `.github/CODEOWNERS` | (file) | Both |
+| 12 | `.github/ISSUE_TEMPLATE/*` | `bug.md` + `feature.md` + `docs.md` (3 files) | Both |
+| 13 | `.github/workflows/*` | `lint-build.yml` + `typecheck.yml` + `test.yml` + `gitleaks.yml` (4 files) | Both (runtime + commands differ) |
+| 14 | `scripts/setup-branch-protection.sh` | (file) | Both |
+
+**14 logical slots.** Node projects fill slots 1–3 with husky; Python fills the same 3 slots with `.pre-commit-config.yaml`. Everything else is the same across stacks.
 
 What the skill does **NOT** write:
-- `lint-staged` config (varies too much by stack — defer to per-stack skill)
-- PR title enforcement Action like `amannn/action-semantic-pull-request` (commitlint on commits + reviewer's checklist on PR title covers it at MVP)
-- ADRs (the operator runs `arch-adr` separately if they want one — closing report names this)
-- `package.json` script entries (operator adds via the emitted install command — skill does not silently mutate package.json)
-- `.claude/*.yaml` config (classical configs above ARE the source of truth — no parallel schema)
+- `lint-staged` config (Node) or per-language lint runners — varies too much within each ecosystem; deferred to follow-up per-stack skills
+- PR title enforcement Action like `amannn/action-semantic-pull-request` — commitlint/commitizen on commits + reviewer's checklist on PR title covers it at MVP
+- ADRs directly — closing report invokes `arch-adr` via the post-scaffold prompt
+- `package.json` / `pyproject.toml` script entries — operator adds via the emitted install command
+- `.claude/*.yaml` config — classical configs above ARE the source of truth
 
 ---
 
@@ -67,10 +84,8 @@ What the skill does **NOT** write:
 
 | Mode | Purpose | Side effects |
 |---|---|---|
-| `scaffold` | Interactive Q&A → generate the stack | Writes files (with confirmation on conflict) |
 | `audit` | Read-only check: which stack components are in place vs missing | None — report only |
-
-`refresh` mode (detect drift between declared conventions and what's installed) is deferred to a future version. For now, re-running `scaffold` against an existing project performs the equivalent function via the per-file conflict prompts.
+| `scaffold` | 3-question Q&A → generate the stack | Writes files; never overwrites existing ones |
 
 ---
 
@@ -83,12 +98,14 @@ Run first whenever the project already has any of the stack components.
 ```bash
 # Run from project root.
 # NOTE on slot counting (see §Counting convention below the loop):
-#   - commitlint.config.{js,mjs} + .commitlintrc.{yaml,json} = 1 slot (any one variant counts)
+#   - .husky/* (Node) or .pre-commit-config.yaml (Python) = slots 1–3 (one stack populates them)
+#   - commitlint.config.{js,mjs} / .commitlintrc.{yaml,json} (Node) OR pyproject.toml [tool.commitizen] (Python) = 1 slot (any one variant)
 #   - .github/ISSUE_TEMPLATE/{bug,feature,docs}.md = 1 slot (3 files)
 #   - .github/workflows/{lint-build,typecheck,test,gitleaks}.yml = 1 slot (4 files)
-#   The loop checks ~20 paths; the audit denominator is 14 logical slots.
+#   Loop checks ~20 paths; audit denominator is 14 logical slots.
 for f in \
   .husky/commit-msg .husky/pre-commit .husky/pre-push \
+  .pre-commit-config.yaml \
   commitlint.config.js commitlint.config.mjs .commitlintrc.yaml .commitlintrc.json \
   .gitleaks.toml \
   .gitignore .gitattributes .editorconfig \
@@ -100,21 +117,20 @@ for f in \
   scripts/setup-branch-protection.sh; do
   [ -e "$f" ] && echo "✅ $f" || echo "⬜ $f"
 done
+
+# Also check pyproject.toml for [tool.commitizen] section (Python path)
+[ -f pyproject.toml ] && grep -q '^\[tool\.commitizen\]' pyproject.toml \
+  && echo "✅ pyproject.toml [tool.commitizen]" \
+  || echo "⬜ pyproject.toml [tool.commitizen]"
 ```
 
 Also detect:
-- Stack: presence of `package.json` (Node) · `pyproject.toml` (Python) · `go.mod` (Go) · `Cargo.toml` (Rust). **If none match, classify as `none / docs-only`** — Node/Python/Go/Rust-flavoured pieces (husky, commitlint, lint runners) cannot run without an app first. Recommend either deferring the scaffold or running it with Q1=G (plain git) to land only the stack-agnostic pieces (`.editorconfig`, `.gitattributes`, `.gitignore`, CONTRIBUTING, `.github/*`, `scripts/setup-branch-protection.sh`).
-- Package manager (Node only): presence of `pnpm-lock.yaml` / `yarn.lock` / `package-lock.json`
-- Default branch — **try in order until one returns a non-empty value:**
-  ```bash
-  git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' \
-    || gh repo view --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null \
-    || git branch --show-current
-  ```
-  The `symbolic-ref` form is only populated if the repo was cloned with `--origin` or if `git remote set-head origin -a` has been run — unreliable on fresh clones. `gh repo view` is authoritative when `gh` is authenticated. `git branch --show-current` is the final fallback (returns whatever branch the operator is currently on). **Caveat:** if `gh` is unauthenticated AND the operator is currently on a non-default branch (e.g. a feature branch), the chain resolves to the feature branch — wrong answer. Detection is reliable when at least one of: (a) `gh auth login` has been run with repo scope, OR (b) the operator runs the skill from `main` / the actual default branch. When both fail, prompt the operator to confirm the detected branch before proceeding.
-- Repo platform: `git remote get-url origin` (github.com / gitlab.com / bitbucket.org)
+- **Stack:** presence of `package.json` (Node) · `pyproject.toml` (Python). **If neither matches, classify as `none / docs-only`** — hook-based pieces cannot run without an app. Recommend either deferring the scaffold or running it after `pnpm init` / `python -m venv && touch pyproject.toml`.
+- **Package manager (Node only):** presence of `pnpm-lock.yaml` / `yarn.lock` / `package-lock.json`
+- **Default branch:** assumed `main`. Operator may override via Q-skip with `--default-branch <name>` flag. Detection is intentionally not chained — assumption is cheaper, override is one flag.
+- **Repo platform:** `git remote get-url origin` (github.com / gitlab.com / bitbucket.org)
 
-**Counting convention for the audit report below:** the denominator is **14 logical slots**, one per row in the §Output catalogue table. Each grouped row counts as one slot regardless of how many files it expands to — `.github/ISSUE_TEMPLATE/{bug,feature,docs}.md` is 3 files / 1 slot; `.github/workflows/{lint-build,typecheck,test,gitleaks}.yml` is 4 files / 1 slot; the four `commitlint.config.*` filename variants count toward the single `commitlint.config.*` slot. Mark a slot as **in place** when at least one file in the family exists; mark **missing** otherwise.
+**Counting convention for the audit report below:** the denominator is **14 logical slots**, one per row in the §Output catalogue. Each grouped row counts as one slot regardless of how many files it expands to (issue templates = 3 files / 1 slot; workflows = 4 files / 1 slot; commitlint config variants count toward the single commit-linter slot). Mark a slot as **in place** when at least one file in the family exists. For slots 1–3 the rule is: if `.pre-commit-config.yaml` exists (Python), it fills all three; otherwise check each `.husky/*` file (Node).
 
 ### Step 2 — report
 
@@ -124,7 +140,7 @@ Report format (in-place count + missing count must always sum to 14):
 ## Audit — git enforcement stack
 
 **Stack detected:** Node + pnpm (pnpm-lock.yaml present)
-**Default branch:** main
+**Default branch:** main (assumed; override via --default-branch if wrong)
 **Platform:** github.com (<owner>/<repo>)
 
 **In place (6 of 14):**
@@ -139,26 +155,26 @@ Report format (in-place count + missing count must always sum to 14):
 - ⬜ .husky/commit-msg
 - ⬜ .husky/pre-commit
 - ⬜ .husky/pre-push
-- ⬜ commitlint.config.*  (1 slot — any of .js / .mjs / .yaml / .json)
+- ⬜ commitlint.config.*  (1 slot — any variant)
 - ⬜ .gitleaks.toml
 - ⬜ .gitattributes
 - ⬜ .editorconfig
 - ⬜ .github/workflows/{lint-build, typecheck, test, gitleaks}.yml  (1 slot — 4 files)
 
 **Next action:** run `scaffold` mode to fill the missing 8 components.
-The 6 in-place components will be skipped automatically (prompted only if --force).
+The 6 in-place components will be skipped automatically (manual rm + re-run to overwrite).
 ```
 
-**Docs-only project variant** — when stack detection returns `none / docs-only`, the report's **Next action** should differ:
+**Docs-only project variant** — when stack detection returns `none / docs-only`, the **Next action** changes:
 
 ```
-**Next action:** stack is docs-only — Node/Python/Go/Rust hook-based pieces
-(husky + commitlint + lint runner) cannot run without an app first. Two paths:
-  (1) Defer scaffold until the app is scaffolded.
-  (2) Run scaffold with Q1=G (plain git) now to land only the stack-agnostic
-      pieces: .editorconfig · .gitattributes · .gitignore · CONTRIBUTING.md ·
-      .github/* · scripts/setup-branch-protection.sh.
-The hook + commitlint + workflow pieces stay deferred until the app exists.
+**Next action:** stack is docs-only — hook-based pieces (husky/pre-commit + commitlint/commitizen)
+cannot run without an app first. Two paths:
+  (1) Defer scaffold until the app is scaffolded (recommended).
+  (2) Run `pnpm init` (or `touch pyproject.toml`) first to seed a minimal app,
+      then re-run dev-git-init scaffold.
+The scaffold WILL run on a docs-only repo but the hook layer will be inert until
+an app exists and the install command is executed.
 ```
 
 End audit mode.
@@ -169,133 +185,125 @@ End audit mode.
 
 ### Step 0 — ask the question set
 
-Ask all questions in one message. User responds like `1A, 2A, 3B, 4A, 5A, 6yes, 7no`.
+Three questions upfront. User responds like `1A, 2A, 3` — and for Q3 you MUST wait for an explicit answer (there is no default).
 
 ```
-1. Language / package manager?
-   A. pnpm (Node) — recommended for new projects
+1. Stack?
+   A. pnpm (Node) — recommended for new Node projects
    B. npm (Node)
    C. yarn (Node)
    D. python + pre-commit framework
-   E. go
-   F. rust
-   G. other / no package manager — install hooks via plain git
 
-2. Default branch?
-   A. main (recommended)
-   B. master
-   C. custom (specify)
-
-3. Conventional Commit types allowed?
-   A. Minimal recommended: feat, fix, docs, chore, refactor, test, perf
-   B. Full standard set: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-   C. Custom (specify list)
-
-4. Branching strategy + merge mode?
-   A. Trunk-based + squash-merge (recommended for solo + small teams + continuous deploy)
+2. Branching strategy + merge mode?
+   A. Trunk-based + squash-merge — recommended for solo + small teams + continuous deploy
    B. GitLab Flow with develop integration branch + squash to main on release cadence
    C. GitFlow (develop + release/* + hotfix/*)
 
-5. Reviewer model?
-   A. Solo founder — admin bypass for self-merge (no required approval at start)
-   B. Mutual peer review — every PR needs 1 approval from any team member
-   C. CODEOWNERS-driven — required approval from owners of changed paths
-
-6. Generate GitHub Actions workflows for the four CI gates (lint-build, typecheck, test, gitleaks)?
-   A. Yes — scaffold workflow shells (mostly _TODO_ until the app exists)
-   B. No — I'll add later
-
-7. Closing report should suggest recording the branching decision as an ADR via arch-adr?
-   A. Yes (default)
-   B. No
+3. Reviewer model? (no default — make an explicit governance choice)
+   - Solo founder, admin bypass for self-merge — required-review off; you self-merge via `gh pr merge --admin`
+   - Mutual peer review — every PR needs 1 approval from any team member
+   - CODEOWNERS-driven — required approval from owners of the changed paths
 ```
 
-Recommended default answers: `1A, 2A, 3A, 4A, 5A, 6A, 7A`.
+If the operator declines to answer Q3 or asks for a recommendation, **do not pick on their behalf** — re-explain the governance trade-off and re-ask. Q3 is the one decision that has too much downstream consequence (branch protection rules, PR auto-assignment, founder admin-bypass policy) to default.
 
 ### Step 1 — detect existing project state
 
-Run the audit detection from §Mode: audit. Capture the list of files that already exist — those go into the "skip / prompt" set for Step 3.
+Run the audit detection from §Mode: audit Step 1. Capture the list of files that already exist — those will be silently skipped in Step 3.
 
 Also capture:
-- Owner for CODEOWNERS catch-all: `gh repo view --json owner -q .owner.login 2>/dev/null` or `git config user.name`
-- Repo full name: `gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null` or parse from `git remote get-url origin`
+- **Owner for CODEOWNERS catch-all:** `gh repo view --json owner -q .owner.login 2>/dev/null || git config user.name`
+- **Repo full name:** `gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null` or parse from `git remote get-url origin`
+- **Whether an ADR for git branching strategy already exists:** `grep -l -i "branching strategy\|merge mode" docs/architecture/decisions/adr-*.md 2>/dev/null` — if it returns a match, the post-scaffold ADR prompt (Step 4) will be skipped and the closing report will note the existing ADR.
 
 ### Step 2 — confirm scope
 
-Echo back the scoped plan:
+Echo back the scoped plan with the answer summary at the top:
 
 ```
 ## Plan
 
-**Will scaffold (6 missing files):**
+**Answers:** Q1=A (pnpm), Q2=A (trunk-based + squash), Q3=solo founder + admin bypass
+
+**Will scaffold (8 missing slots):**
 - .husky/commit-msg, .husky/pre-commit, .husky/pre-push
 - commitlint.config.js
 - .gitleaks.toml
-- .editorconfig
 - .gitattributes
+- .editorconfig
 - .github/workflows/{lint-build, typecheck, test, gitleaks}.yml
 
-**Will skip (8 already exist, use --force to overwrite):**
-- CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, .github/CODEOWNERS,
+**Will skip (6 already exist — manual rm + re-run to overwrite):**
+- .gitignore, CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, .github/CODEOWNERS,
   .github/ISSUE_TEMPLATE/{bug, feature, docs}.md, scripts/setup-branch-protection.sh
 
 **Will emit (not execute):**
 - pnpm install command for husky + commitlint + gitleaks
 - `./scripts/setup-branch-protection.sh` instruction (run after first CI workflow)
-- arch-adr instruction to record branching decision (per Q7)
+- Post-scaffold ADR prompt (skipped — `adr-0010-git-branching-strategy-and-merge-mode.md` already exists)
 
 Proceed? (y/n)
 ```
 
-Wait for confirmation. Stop on n.
+Wait for confirmation. Stop on `n`.
 
 ### Step 3 — write files
 
 For each file in the scoped scaffold list, write the appropriate template from §File templates below, substituting per-answer values.
 
-**Idempotency:**
-- File exists → skip silently (already reported as "Will skip" in Step 2)
+**Idempotency (uniform — applies to every file):**
+- File exists → **skip silently**
 - File doesn't exist + parent dir doesn't exist → create dir + file
 - File doesn't exist + parent dir exists → create file
+- **To overwrite an existing file:** the operator deletes it and re-runs. No `--force` flag exists.
 
-**Special case — `.gitignore` (the only file that supports merge-if-exists):**
-- If `.gitignore` doesn't exist → write the full stack-appropriate template
-- If `.gitignore` exists → **append missing patterns** rather than skip or overwrite. Algorithm:
-  1. Read existing `.gitignore`; collect patterns (one per non-blank, non-comment line)
-  2. Read the proposed template; collect proposed patterns
-  3. Diff: identify patterns in proposed that are absent from existing
-  4. Show the diff to the operator: `+ pattern1`, `+ pattern2`, ...
-  5. On `y` → append a section header (`# Added by dev-git-init YYYY-MM-DD`) plus the missing patterns to the existing file. On `n` → skip.
-- This is the **only** file in the catalogue where merge-on-conflict is the default behaviour. All others are skip-or-prompt-only.
+Make scripts executable: `chmod +x .husky/* scripts/*.sh` after writing.
 
-`--force` mode (operator-flagged): for each existing file, prompt:
+### Step 4 — post-scaffold ADR prompt
+
+After all files are written, ask the operator:
+
 ```
-File exists: CONTRIBUTING.md (1247 bytes, modified 2026-05-25)
-  o = overwrite with skill template
-  s = skip (keep existing)
-  d = show diff between existing and template
-Choice [s]:
+Scaffold complete. Want me to record the branching strategy (Q2) + reviewer
+model (Q3) decisions as an ADR for revisitability?
+
+This invokes the arch-adr skill to create:
+  docs/architecture/decisions/adr-XXXX-git-branching-strategy-and-merge-mode.md
+
+The ADR will document:
+  - Q2 = <chosen> as the canonical decision with triggers to revisit
+  - Q3 = <chosen> as the reviewer model
+  - Cross-references to CONTRIBUTING.md and the branch-protection script
+
+Recommended: yes — makes the decision revisitable rather than silent convention.
+
+(y/n)
 ```
 
-Never blindly overwrite. The default action on conflict is always skip.
+**Skip this prompt entirely** if Step 1 detected an existing branching-strategy ADR (the existence check from `grep -l ... docs/architecture/decisions/adr-*.md`). In that case the closing report mentions the existing ADR and suggests amending it if the scaffold's Q2/Q3 answers differ from the existing ADR's choices.
 
-### Step 4 — closing report
+On `y`: the closing report's Next-steps section adds an explicit `arch-adr create ...` instruction with the Q2 + Q3 values to seed the ADR.
+
+On `n`: the closing report omits the ADR step.
+
+### Step 5 — closing report
 
 ```
 ## Scaffolded
 - ✅ .husky/commit-msg (calls commitlint)
 - ✅ .husky/pre-commit (calls gitleaks)
 - ✅ .husky/pre-push (placeholder for heavy checks)
-- ✅ commitlint.config.js (Conventional Commits + 7-type subset per Q3)
+- ✅ commitlint.config.js (Conventional Commits + minimal 7-type set)
 - ✅ .gitleaks.toml (default + project allowlist scaffold)
 - ✅ .gitattributes (LF line endings, binary marking)
 - ✅ .editorconfig (2-space indent, UTF-8, LF, trim trailing whitespace)
-- ✅ .github/workflows/lint-build.yml (shell with _TODO_ until app scaffolds)
-- ✅ .github/workflows/typecheck.yml (shell)
-- ✅ .github/workflows/test.yml (shell)
+- ✅ .github/workflows/lint-build.yml
+- ✅ .github/workflows/typecheck.yml
+- ✅ .github/workflows/test.yml
 - ✅ .github/workflows/gitleaks.yml (full-history scan)
 
-## Skipped (already present — use --force to overwrite)
+## Skipped (already present — manual rm + re-run to overwrite)
+- .gitignore
 - CONTRIBUTING.md
 - .github/PULL_REQUEST_TEMPLATE.md
 - .github/CODEOWNERS
@@ -304,16 +312,23 @@ Never blindly overwrite. The default action on conflict is always skip.
 
 ## Next steps
 
-1. Install dependencies (run as operator — skill does not execute):
+1. Install dependencies (operator runs — skill does not execute):
 
+   # Node:
    pnpm add -D husky @commitlint/cli @commitlint/config-conventional
    pnpm exec husky init
-   # gitleaks installed via OS package (brew install gitleaks / scoop install gitleaks / etc.)
+   # Python:
+   pip install pre-commit commitizen
+   pre-commit install --hook-type commit-msg --hook-type pre-commit
+   # gitleaks (both stacks): install via OS package manager
+   brew install gitleaks   # macOS
+   scoop install gitleaks  # Windows
+   apt install gitleaks    # Debian/Ubuntu
 
 2. Verify hooks fire:
 
-   echo "test commit" | pnpm exec commitlint     # should reject
-   echo "feat: test commit" | pnpm exec commitlint  # should pass
+   echo "test commit" > .git/COMMIT_EDITMSG && pnpm exec commitlint --edit  # should reject
+   echo "feat: test commit" > .git/COMMIT_EDITMSG && pnpm exec commitlint --edit  # should pass
 
 3. Commit the scaffold:
 
@@ -326,11 +341,22 @@ Never blindly overwrite. The default action on conflict is always skip.
 
    ./scripts/setup-branch-protection.sh
 
-6. (Per Q7) Record the branching decision as an ADR:
+[If Step 4 = yes:]
+6. Record the branching decisions as an ADR:
 
-   Run the arch-adr skill: arch-adr create "ADR-XXXX — Git Branching Strategy and Merge Mode"
-   (Use trunk-based + squash-merge from Q4 as the chosen option; document the triggers
-    that would re-open the decision.)
+   Run the arch-adr skill:
+     arch-adr create "ADR-XXXX — Git Branching Strategy and Merge Mode"
+
+   Seed with: Q2 = <chosen branching strategy> · Q3 = <chosen reviewer model>.
+   Include the triggers to revisit (team > 3 contributors, scheduled release
+   cadence, multi-PR launch coordination, etc.) so the deferral of any
+   alternative is documented rather than silent.
+
+[If Step 4 was skipped because an ADR already exists:]
+6. An existing ADR was detected:
+     docs/architecture/decisions/adr-XXXX-...md
+   If the Q2/Q3 answers above differ from what that ADR documents, amend the
+   ADR (don't create a duplicate). Otherwise, no action needed.
 ```
 
 End scaffold mode.
@@ -341,7 +367,7 @@ End scaffold mode.
 
 The templates below are inline for self-contained execution. Substitute placeholders per the Q&A answers.
 
-### `.husky/commit-msg`
+### `.husky/commit-msg` *(Node only — Q1 = A/B/C)*
 
 ```sh
 #!/usr/bin/env sh
@@ -350,15 +376,14 @@ The templates below are inline for self-contained execution. Substitute placehol
 npx --no -- commitlint --edit "$1"
 ```
 
-Make executable: `chmod +x .husky/commit-msg`.
+`chmod +x .husky/commit-msg`.
 
-### `.husky/pre-commit`
+### `.husky/pre-commit` *(Node only)*
 
 ```sh
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Secret scanning on staged diff
 if command -v gitleaks >/dev/null 2>&1; then
   gitleaks protect --staged --no-banner --redact
 else
@@ -366,9 +391,9 @@ else
 fi
 ```
 
-Make executable: `chmod +x .husky/pre-commit`.
+`chmod +x .husky/pre-commit`.
 
-### `.husky/pre-push`
+### `.husky/pre-push` *(Node only)*
 
 ```sh
 #!/usr/bin/env sh
@@ -379,11 +404,28 @@ Make executable: `chmod +x .husky/pre-commit`.
 # pnpm test
 ```
 
-Make executable: `chmod +x .husky/pre-push`.
+`chmod +x .husky/pre-push`.
 
-### `commitlint.config.js` (per Q3 answer)
+### `.pre-commit-config.yaml` *(Python only — Q1 = D)*
 
-For Q3 = A (minimal 7-type subset):
+```yaml
+# https://pre-commit.com
+# Install hooks: pre-commit install --hook-type commit-msg --hook-type pre-commit
+repos:
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.20.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+        stages: [pre-commit]
+```
+
+### `commitlint.config.js` *(Node — minimal 7-type set, always)*
 
 ```js
 /** @type {import('@commitlint/types').UserConfig} */
@@ -399,9 +441,23 @@ module.exports = {
 };
 ```
 
-For Q3 = B (full standard set): omit the `type-enum` override (use the preset's default list).
+### `pyproject.toml [tool.commitizen]` *(Python — minimal 7-type set, always)*
 
-For Q3 = C (custom list): substitute the custom array in `type-enum`.
+Append (or merge) the following block in `pyproject.toml`:
+
+```toml
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "v$version"
+# Restrict to the minimal 7-type set
+[tool.commitizen.customize]
+example = "feat(scope): short subject"
+schema = "<type>(<scope>): <subject>"
+schema_pattern = "^(feat|fix|docs|chore|refactor|test|perf)(\\(.+\\))?: .{1,72}$"
+```
+
+(If `pyproject.toml` already has a `[tool.commitizen]` section, skip per the skip-if-exists rule.)
 
 ### `.gitleaks.toml`
 
@@ -421,7 +477,9 @@ regexes = [
 
 ### `.gitignore`
 
-Per Q1 stack, write the appropriate ignore set. For Node + Next.js:
+Per Q1 stack, write the appropriate ignore set.
+
+**Node template:**
 
 ```
 # Node
@@ -431,11 +489,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Next.js
+# Build
 .next/
 out/
 build/
-.vercel/
+dist/
 
 # Environment
 .env
@@ -452,17 +510,42 @@ build/
 # OS
 .DS_Store
 Thumbs.db
-
-# Supabase local
-supabase/.branches/
-supabase/.temp/
 ```
 
-For other stacks, generate from https://www.toptal.com/developers/gitignore equivalent ruleset.
+**Python template:**
 
-If `.gitignore` already exists, append missing sections rather than overwrite (prompt confirms append).
+```
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
-### `.gitattributes`
+# Virtual envs
+.venv/
+venv/
+.python-version
+
+# Build
+build/
+dist/
+
+# Environment
+.env
+.env.local
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+```
+
+### `.gitattributes` (stack-agnostic)
 
 ```
 # Normalize line endings on checkout to LF
@@ -474,12 +557,13 @@ If `.gitignore` already exists, append missing sections rather than overwrite (p
 *.yml    text
 *.yaml   text
 *.sh     text eol=lf
+*.py     text
 *.js     text
 *.ts     text
 *.tsx    text
 *.css    text
 
-# Binary types (never diff or merge)
+# Binary types
 *.png    binary
 *.jpg    binary
 *.jpeg   binary
@@ -506,6 +590,9 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 max_line_length = 100
 
+[*.py]
+indent_size = 4
+
 [*.md]
 trim_trailing_whitespace = false
 max_line_length = off
@@ -516,7 +603,15 @@ indent_style = tab
 
 ### `CONTRIBUTING.md`
 
-(Generated from `references/templates/contributing-template.md` with per-answer substitution. The template covers: TL;DR · branching strategy per Q4 · branch naming table per Q3 type set · Conventional Commits per Q3 · PR workflow · CI gates per Q6 · reviewer's checklist · review model per Q5 · local pre-flight · AI-assisted dev habits · branch protection rules per Q5 + Q6 · conventions-change process. Include the canonical-rationale pointer to the ADR if Q7 = yes.)
+A narrative document covering: TL;DR · branching strategy per Q2 · branch naming table · Conventional Commits (minimal 7-type set) · PR workflow · CI gates (lint-build, typecheck, test, gitleaks) · reviewer's checklist · review model per Q3 · local pre-flight · AI-assisted dev habits · branch protection rules per Q3 · conventions-change process. Length target: ~200 lines. Per-Q substitution:
+
+- **Q2 = A** → trunk-based + squash; one long-lived branch (`main`); branch lifetime < 1 day
+- **Q2 = B** → trunk-based-ish with `develop` integration; squash to `main` on release cadence
+- **Q2 = C** → full GitFlow with `develop`, `release/*`, `hotfix/*`; merge-commits to `develop`, squash to `main` on release
+
+- **Q3 = solo + admin bypass** → "Founder reviews all PRs; founder uses `gh pr merge --admin` to self-merge"; branch protection rules section explicitly notes "Do not allow bypassing the above settings" stays UNCHECKED
+- **Q3 = mutual peer** → "Every PR needs 1 approval from any team member"; "Do not allow bypassing" UNCHECKED at start (small team), CHECKED once trust established
+- **Q3 = CODEOWNERS-driven** → "Required approval from CODEOWNERS of the changed paths"; "Require review from Code Owners" enabled; "Do not allow bypassing" CHECKED
 
 ### `.github/PULL_REQUEST_TEMPLATE.md`
 
@@ -541,7 +636,7 @@ References:
 
 <!--
 Anti-scope-creep checkpoint. List anything a reviewer might expect to see here that
-you intentionally deferred to another PR. If nothing, write "Nothing — fully scoped."
+you intentionally deferred. If nothing, write "Nothing — fully scoped."
 -->
 
 ## Pre-flight (tick before requesting review)
@@ -564,21 +659,12 @@ you intentionally deferred to another PR. If nothing, write "Nothing — fully s
 
 ```
 # CODEOWNERS — first-match-wins; later patterns override earlier ones.
-# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners
+# Catch-all routes every PR to the owner.
 
-# Catch-all — every file requires owner visibility by default
 *    @{{owner}}
 ```
 
-Substitute `{{owner}}` with the detected GitHub username.
-
-For Q5 = C (CODEOWNERS-driven), include path-specific entries the operator can extend:
-
-```
-*                      @{{owner}}
-/.github/              @{{owner}}
-/CONTRIBUTING.md       @{{owner}}
-```
+Substitute `{{owner}}` with the detected GitHub username. For Q3 = CODEOWNERS-driven, prepend a comment noting that path-specific owners should be added as the team grows; the catch-all is the floor, not the ceiling.
 
 ### `.github/ISSUE_TEMPLATE/bug.md`
 
@@ -592,11 +678,7 @@ labels: bug
 
 ## What happened
 
-<!-- 1–2 sentences. What did you observe? -->
-
 ## What you expected
-
-<!-- 1 sentence. What should have happened instead? -->
 
 ## Steps to reproduce
 
@@ -611,8 +693,6 @@ labels: bug
 - Timestamp:
 
 ## Screenshots / logs
-
-<!-- Paste relevant link, console output, or screenshot -->
 ```
 
 ### `.github/ISSUE_TEMPLATE/feature.md`
@@ -656,7 +736,9 @@ labels: documentation
 ## What should it say
 ```
 
-### `.github/workflows/lint-build.yml` (per Q6)
+### `.github/workflows/lint-build.yml` (per Q1 stack)
+
+**Node template:**
 
 ```yaml
 name: lint-build
@@ -671,71 +753,56 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v3   # omit for npm/yarn
         with:
           version: latest
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: pnpm
+          cache: pnpm                 # 'npm' or 'yarn' as appropriate
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm build
 ```
 
-Substitute `{{default_branch}}` per Q2. Adapt commands per Q1 stack (npm / yarn / Python / Go / Rust).
+**Python template:**
+
+```yaml
+name: lint-build
+on:
+  pull_request:
+    branches: [{{default_branch}}]
+  push:
+    branches: [{{default_branch}}]
+
+jobs:
+  lint-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: pyproject.toml
+      - run: pip install -e .[dev]
+      - run: ruff check .
+      - run: python -m build
+```
+
+Substitute `{{default_branch}}` per detected/assumed value (default `main`).
 
 ### `.github/workflows/typecheck.yml`
 
-```yaml
-name: typecheck
-on:
-  pull_request:
-    branches: [{{default_branch}}]
-  push:
-    branches: [{{default_branch}}]
+**Node:** runs `pnpm typecheck` (project-defined; typically `tsc --noEmit`).
+**Python:** runs `mypy .` or `pyright`.
 
-jobs:
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: latest
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-```
+(Structure mirrors `lint-build.yml` with the relevant runtime setup.)
 
 ### `.github/workflows/test.yml`
 
-```yaml
-name: test
-on:
-  pull_request:
-    branches: [{{default_branch}}]
-  push:
-    branches: [{{default_branch}}]
+**Node:** runs `pnpm test`.
+**Python:** runs `pytest`.
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: latest
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test
-```
+(Structure mirrors `lint-build.yml`.)
 
 ### `.github/workflows/gitleaks.yml`
 
@@ -753,11 +820,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # full history for full-repo scan
+          fetch-depth: 0
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # GITLEAKS_LICENSE: not required for public repos; required for private orgs at scale
 ```
 
 ### `scripts/setup-branch-protection.sh`
@@ -787,9 +853,9 @@ gh api "repos/${REPO}/branches/${BRANCH}/protection" -X PUT --input - <<'JSON'
     "strict": true,
     "contexts": ["lint-build", "typecheck", "test", "gitleaks"]
   },
-  "enforce_admins": false,
+  "enforce_admins": {{enforce_admins}},
   "required_pull_request_reviews": {
-    "required_approving_review_count": {{required_approving_review_count}},
+    "required_approving_review_count": 1,
     "dismiss_stale_reviews": true,
     "require_code_owner_reviews": {{require_code_owner_reviews}}
   },
@@ -805,68 +871,70 @@ echo "✅ Branch protection applied. Verify in the GitHub UI:"
 echo "   https://github.com/${REPO}/settings/branches"
 ```
 
-Substitute per Q5 answer:
-- Q5 = A (solo founder): `required_approving_review_count: 1`, `require_code_owner_reviews: true`, **leave `enforce_admins: false`** so founder can `gh pr merge --admin`
-- Q5 = B (mutual): `required_approving_review_count: 1`, `require_code_owner_reviews: false`, `enforce_admins: false`
-- Q5 = C (CODEOWNERS): `required_approving_review_count: 1`, `require_code_owner_reviews: true`, `enforce_admins: true` (stricter — admins can't bypass)
+Per-Q3 substitution:
 
-Make executable: `chmod +x scripts/setup-branch-protection.sh`.
+| Q3 | `enforce_admins` | `require_code_owner_reviews` |
+|---|---|---|
+| Solo founder + admin bypass | `false` | `true` |
+| Mutual peer | `false` | `false` |
+| CODEOWNERS-driven | `true` | `true` |
+
+`chmod +x scripts/setup-branch-protection.sh`.
 
 ---
 
-## Stack-specific adaptations (Q1)
+## Stack-specific install commands (closing report)
 
-| Q1 answer | Hook manager | Lint runner | Workflow runtime |
-|---|---|---|---|
-| pnpm (Node) — default | husky | (project's `pnpm lint`) | `pnpm/action-setup@v3` + `actions/setup-node@v4` |
-| npm (Node) | husky | `npm run lint` | `actions/setup-node@v4` |
-| yarn (Node) | husky | `yarn lint` | `actions/setup-node@v4` |
-| python + pre-commit framework | `pre-commit` (`.pre-commit-config.yaml`) | covered by pre-commit hooks | `actions/setup-python@v5` + `pre-commit/action@v3` |
-| go | `lefthook` or plain `.git/hooks/` install script | `golangci-lint` | `actions/setup-go@v5` + `golangci/golangci-lint-action@v4` |
-| rust | `cargo-husky` (committed as dev-dependency in `Cargo.toml`) | `cargo clippy` | `actions-rust-lang/setup-rust-toolchain@v1` |
-| other / plain git | shell scripts installed manually | project-defined | project-defined |
+| Q1 | Install command |
+|---|---|
+| pnpm (Node) | `pnpm add -D husky @commitlint/cli @commitlint/config-conventional && pnpm exec husky init` |
+| npm (Node) | `npm install -D husky @commitlint/cli @commitlint/config-conventional && npx husky init` |
+| yarn (Node) | `yarn add -D husky @commitlint/cli @commitlint/config-conventional && yarn husky init` |
+| Python | `pip install pre-commit commitizen && pre-commit install --hook-type commit-msg --hook-type pre-commit` |
 
-For non-Node stacks the hook installation step changes — the closing report's "Next steps" should emit the right install command for the chosen stack.
+gitleaks for all: `brew install gitleaks` (macOS) · `scoop install gitleaks` (Windows) · `apt install gitleaks` (Debian/Ubuntu) · or download a binary release from https://github.com/gitleaks/gitleaks/releases
 
 ---
 
 ## Anti-patterns
 
-1. **Silently overwriting existing files.** If `CONTRIBUTING.md` already exists, the operator wrote it for a reason. Always prompt; default to skip.
-2. **Running installers.** The skill is a scaffolder, not an installer. Emit `pnpm add -D ...` for the operator to run; do not invoke it.
+1. **Silently overwriting existing files.** Every file is skip-if-exists. To replace one, the operator deletes it and re-runs. No `--force` flag — explicit > magic.
+2. **Running installers.** The skill is a scaffolder, not an installer. Emit `pnpm add -D ...` for the operator; do not invoke it.
 3. **Applying branch protection from the skill.** Branch protection is a remote side effect with lockout risk. Write the script; do not run it.
 4. **Generating `.claude/dev-skills.yaml`.** The classical configs ARE the source of truth. Do not mint a parallel schema.
-5. **Hardcoding project-specific scopes** (insurance domain, claims lifecycle, etc.) in templates. Templates must be domain-agnostic; operators add project-specific content in their CONTRIBUTING.md after scaffolding.
-6. **Skipping the audit step on existing projects.** Always detect what's present before scaffolding; never blindly write.
-7. **Forgetting `chmod +x` on `.husky/*` and `scripts/*.sh`.** Hooks won't fire if not executable. The skill's file-write step must explicitly set the executable bit on scripts.
+5. **Hardcoding project-specific scopes** in templates. Templates are domain-agnostic; operators add project-specific content in their CONTRIBUTING.md after scaffolding.
+6. **Skipping the audit step on existing projects.** Always detect what's present before scaffolding. The Step 2 scope-confirmation prevents surprises.
+7. **Defaulting Q3 (reviewer model).** This is the one decision with too much downstream consequence (branch protection rules, founder admin-bypass policy) to default. If the operator declines to answer, re-explain the trade-off and re-ask. Do not pick on their behalf.
+8. **Creating duplicate ADRs.** Step 1 detects an existing branching-strategy ADR via grep; the post-scaffold ADR prompt (Step 4) is skipped if one exists. The closing report notes the existing ADR and suggests amending it instead.
+9. **Forgetting `chmod +x` on `.husky/*` and `scripts/*.sh`.** Hooks won't fire if not executable. Step 3 must explicitly set the executable bit on scripts.
 
 ---
 
 ## Checklist
 
-**Before reporting done in scaffold mode:**
+**Scaffold mode:**
 
-- [ ] Q&A answers captured in scope summary (Step 2)
-- [ ] Existing-file conflicts surfaced; operator decisions respected
-- [ ] All written files exist at their target paths
+- [ ] 3 questions asked; Q3 answered explicitly (no default applied)
+- [ ] Step 1 detected stack + default branch + existing files + existing branching-strategy ADR (if any)
+- [ ] Step 2 scope summary echoed with answers + scaffold list + skip list; operator confirmed
+- [ ] Every written file exists at its target path; existing files skipped silently
 - [ ] All `.husky/*` and `.sh` files are executable (`chmod +x` applied)
-- [ ] Closing report lists what was scaffolded vs skipped
-- [ ] Next-steps section names the install command for the chosen stack
-- [ ] If Q7 = yes, closing report explicitly suggests `arch-adr create "ADR-XXXX — Git Branching Strategy and Merge Mode"` with the chosen Q4 + Q5 values to seed the ADR
+- [ ] Step 4 ADR prompt asked (unless skipped per existing-ADR detection)
+- [ ] Closing report lists scaffolded vs skipped + emits install command for the chosen Q1 stack + conditional ADR step per Step 4 answer
 
-**In audit mode:**
+**Audit mode:**
 
-- [ ] All 14 standard files checked
-- [ ] Stack + default branch + repo platform detected
-- [ ] Report shows in-place / missing split
+- [ ] Detection loop run; all 14 logical slots checked
+- [ ] Stack + default branch + repo platform detected; docs-only branch handled if no stack
+- [ ] Report shows in-place / missing split summing to 14
 - [ ] Next-action recommendation given
 
 ---
 
 ## Relations to other skills
 
-- **Consumed by `dev-git-commit`** (post-rewrite): reads `commitlint.config.js` for type/scope rules, `.husky/commit-msg` to know what's about to run, `package.json scripts` for pre-flight commands, `CONTRIBUTING.md` for narrative fallback
-- **Consumed by `dev-pr`** (post-rewrite): reads `commitlint.config.js` for PR title format, `.github/PULL_REQUEST_TEMPLATE.md` for body skeleton, `.github/CODEOWNERS` for reviewer acknowledgement, `docs/architecture/decisions/adr-*.md` glob for auto-linking ADR references
-- **Suggests `arch-adr`** (post-scaffold, via closing report): operator runs arch-adr to record the branching decision formally
+- **Consumed by `dev-git-commit`** (post-rewrite): reads `commitlint.config.js` (Node) / `pyproject.toml [tool.commitizen]` (Python) for type/scope rules; `.husky/commit-msg` or `.pre-commit-config.yaml` to know what's about to run; project script files for pre-flight commands; `CONTRIBUTING.md` for narrative fallback
+- **Consumed by `dev-pr`** (post-rewrite): reads `commitlint.config.js` / commitizen schema for PR title format; `.github/PULL_REQUEST_TEMPLATE.md` for body skeleton; `.github/CODEOWNERS` for reviewer acknowledgement; `docs/architecture/decisions/adr-*.md` glob for auto-linking ADR references
+- **Invokes `arch-adr`** via the Step 4 post-scaffold prompt (operator runs separately): records the Q2 + Q3 decisions as an ADR for revisitability
 - **Independent of `dev-git-worktree`, `dev-ralph-loop`, `dev-stack-guide`** — they operate alongside the enforcement stack without depending on its scaffolding state
-- **Detected by `util-metamodel-audit`** indirectly — the optional ADR (if scaffolded via arch-adr) is checked for frontmatter validity and ID conventions
+- **Detected by `util-metamodel-audit`** indirectly — the optional ADR (if created via Step 4 prompt) is checked for frontmatter validity and ID conventions
