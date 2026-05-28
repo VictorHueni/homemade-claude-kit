@@ -42,10 +42,14 @@ A file whose name matches one of these patterns is likely the artefact type list
 | `workspace.dsl` (Structurizr DSL) anywhere | C4 workspace | `arch-structurizr` | `docs/architecture/c4/workspace.dsl` |
 | `*.dsl` outside `docs/architecture/c4/` that contains `workspace "..."` | Misplaced Structurizr DSL | `arch-structurizr` | `docs/architecture/c4/workspace.dsl` |
 | `render.sh` containing `structurizr/structurizr` reference outside `docs/architecture/c4/` | Misplaced render pipeline | `arch-structurizr` | `docs/architecture/c4/render.sh` |
-| `03-context.md`, `05-building-blocks.md`, `07-deployment.md` outside `docs/architecture/arc42/` | arc42 markdown sections | `arch-c4` | `docs/architecture/arc42/{03,05,07}-*.md` |
+| `03-context.md`, `05-building-blocks.md`, `06-runtime-view.md`, `07-deployment.md` outside `docs/architecture/arc42/` | arc42 diagram sections | `arch-c4` | `docs/architecture/arc42/{03,05,06,07}-*.md` |
+| `02-constraints.md`, `04-solution-strategy.md`, `08-cross-cutting-concepts.md`, `11-risks.md` outside `docs/architecture/arc42/` | arc42 narrative sections | `arch-arc42` | `docs/architecture/arc42/{02,04,08,11}-*.md` |
 | `*context*.md` or `*system-context*.md` containing `arc42 §3` reference, outside canonical | arc42 §3 misplaced | `arch-c4` | `docs/architecture/arc42/03-context.md` |
 | `*building-blocks*.md` or `*building_block*.md` containing `arc42 §5` reference, outside canonical | arc42 §5 misplaced | `arch-c4` | `docs/architecture/arc42/05-building-blocks.md` |
+| `*runtime-view*.md` or `*runtime*.md` containing `arc42 §6` or `SCN-` reference, outside canonical | arc42 §6 misplaced | `arch-c4` | `docs/architecture/arc42/06-runtime-view.md` |
 | `*deployment-view*.md` or `*deployment*.md` containing `arc42 §7` reference, outside canonical | arc42 §7 misplaced | `arch-c4` | `docs/architecture/arc42/07-deployment.md` |
+| `*cross-cutting*.md` or `*cross_cutting*.md` containing `CC-` ID or `arc42 §8` reference, outside canonical | arc42 §8 misplaced | `arch-arc42` | `docs/architecture/arc42/08-cross-cutting-concepts.md` |
+| `*risks*.md` or `*risk-register*.md` containing `RSK-` ID or `arc42 §11` reference, outside canonical | arc42 §11 misplaced | `arch-arc42` | `docs/architecture/arc42/11-risks.md` |
 
 **ADR naming redundancy rule:** if a file is already in `docs/architecture/decisions/` and its name contains `-adr-` (e.g. `0003-adr-clean-architecture.md`), flag as Tier 1 naming issue. Proposed fix: `git mv 0003-adr-clean-architecture.md 0003-clean-architecture.md`. The `-adr-` prefix is redundant since the folder already signals the type.
 

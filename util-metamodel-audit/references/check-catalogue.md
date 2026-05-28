@@ -31,9 +31,14 @@ find docs/architecture/interfaces -name "*.md" ! -name "cli-*.md" 2>/dev/null | 
 find docs/architecture/interfaces -name "cli-*.md" 2>/dev/null | head -1                  # CLI contract (supporting skill, per tool)
 find docs/architecture/c4 -name "workspace.dsl" 2>/dev/null                       # arch-structurizr foundation
 find docs/architecture/c4/views -name "*.svg" 2>/dev/null | head -1               # arch-c4 rendered views (committed)
+find docs/architecture/arc42 -name "02-constraints.md" 2>/dev/null               # arch-arc42 constraints mode
 find docs/architecture/arc42 -name "03-context.md" 2>/dev/null                    # arch-c4 context mode
+find docs/architecture/arc42 -name "04-solution-strategy.md" 2>/dev/null          # arch-arc42 solution-strategy mode
 find docs/architecture/arc42 -name "05-building-blocks.md" 2>/dev/null            # arch-c4 container + component modes
+find docs/architecture/arc42 -name "06-runtime-view.md" 2>/dev/null               # arch-c4 runtime mode
 find docs/architecture/arc42 -name "07-deployment.md" 2>/dev/null                 # arch-c4 deployment mode
+find docs/architecture/arc42 -name "08-cross-cutting-concepts.md" 2>/dev/null     # arch-arc42 cross-cutting mode
+find docs/architecture/arc42 -name "11-risks.md" 2>/dev/null                      # arch-arc42 risks mode
 ```
 
 **Status assignment:**
@@ -78,8 +83,9 @@ Then compare each path against the canonical map:
 - `render.sh` → must be at `docs/architecture/c4/render.sh` (executable; `arch-structurizr` writes; `chmod +x` expected)
 - `*.svg` under `docs/architecture/c4/views/` → committed C4 renders from `arch-c4`; correct
 - `*.puml` under `docs/architecture/c4/` (anywhere) → intermediate PlantUML export; should be gitignored, not committed
-- `03-context.md`, `05-building-blocks.md`, `07-deployment.md` → must be under `docs/architecture/arc42/` (`arch-c4` writes; one file per arc42 section)
-- `*.md` under `docs/architecture/arc42/` matching `0?-*.md` not in the canonical three → likely a Milestone 2 narrative section (`02-constraints.md`, `04-solution-strategy.md`, `06-runtime-view.md`, `08-cross-cutting.md`, `11-risks.md`) — accept once those skills exist
+- `02-constraints.md`, `04-solution-strategy.md`, `08-cross-cutting-concepts.md`, `11-risks.md` → must be under `docs/architecture/arc42/` (`arch-arc42` writes)
+- `03-context.md`, `05-building-blocks.md`, `06-runtime-view.md`, `07-deployment.md` → must be under `docs/architecture/arc42/` (`arch-c4` writes; one file per arc42 section)
+- `*.md` under `docs/architecture/arc42/` not matching the canonical eight (`02`, `03`, `04`, `05`, `06`, `07`, `08`, `11`) → likely misplaced
 - `getting-started.md` → must be at `docs/dev-guides/getting-started.md` (singleton — `dev-getting-started` skill)
 - `{tech-slug}.md` under `docs/dev-guides/` (no `research/` subfolder, not `getting-started.md`) → correct (`dev-stack-guide` output)
 - `{tech-slug}-research.md` under `docs/dev-guides/research/` → correct (`dev-stack-guide` research scratch)
@@ -188,6 +194,10 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `CON-NN` | `\bCON-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `CON_NN` in `container` block) |
 | `CMP-NN` | `\bCMP-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `CMP_NN` in `component` block) |
 | `DN-NN` | `\bDN-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `DN_NN` in `deploymentNode` block) |
+| `SCN-NN` | `\bSCN-[0-9]{2}\b` | `docs/architecture/arc42/06-runtime-view.md` (`arch-c4` runtime mode) |
+| `CST-NN` | `\bCST-[0-9]{2}\b` | `docs/architecture/arc42/02-constraints.md` (`arch-arc42` constraints mode) |
+| `CC-NN` | `\bCC-[0-9]{2}\b` | `docs/architecture/arc42/08-cross-cutting-concepts.md` (`arch-arc42` cross-cutting mode) |
+| `RSK-NN` | `\bRSK-[0-9]{2}\b` | `docs/architecture/arc42/11-risks.md` (`arch-arc42` risks mode) |
 
 **Detection (example for P-NN):**
 ```bash
@@ -356,9 +366,14 @@ done | sort -rn
 | `docs/discovery/ideation/IDEA-*.md` | `## Problem statement`, `## Not doing`, `## Open Items`, `## Changelog`; frontmatter must include `idea_id`, `domain`, `lifecycle`, `graduates_to` | `grep -q '## Problem statement\|## Not doing'` and `grep -q '^idea_id:\|^lifecycle:\|^graduates_to:'` |
 | `docs/architecture/c4/workspace.dsl` | `workspace "..."` block, `model { ... }` block, `views { ... }` block, at least one `systemContext` view | `grep -q '^workspace\|^[[:space:]]*model {\|^[[:space:]]*views {'` |
 | `docs/architecture/c4/render.sh` | Pinned image (no `:latest`), `validate` step before `export`, `--user` flag on every `docker run`, exit codes documented in header | `grep -q 'STRUCTURIZR_VERSION=' && grep -q 'validate -workspace' && grep -q -- '--user'` |
+| `docs/architecture/arc42/02-constraints.md` | `# 2. Architecture Constraints`, `## 2.1 Technical Constraints`, `## 2.2 Organizational Constraints`, `## 2.3 Legal and Regulatory Constraints`, `## Open Items` | `grep -q '## 2.1 Technical\|## 2.2 Organizational\|## 2.3 Legal'` |
 | `docs/architecture/arc42/03-context.md` | `# 3. Context and Scope`, `## 3.1 Business Context` (with embedded `systemContext.svg`), `## 3.2 Technical Context`, `## Open Items` | `grep -q '## 3.1 Business Context\|## 3.2 Technical Context'` |
+| `docs/architecture/arc42/04-solution-strategy.md` | `# 4. Solution Strategy`, `## 4.1 Technology Decisions`, `## 4.2 Top-Level Decomposition`, `## 4.3 Quality Goal`, `## Open Items` | `grep -q '## 4.1 Technology\|## 4.3 Quality Goal'` |
 | `docs/architecture/arc42/05-building-blocks.md` | `# 5. Building Block View`, `## 5.1 Whitebox Overall System` with containers table including `Domain aggregates implemented` column, at least one `## 5.2.x` drill, `## Open Items` | `grep -q '## 5.1 Whitebox\|Domain aggregates implemented'` |
+| `docs/architecture/arc42/06-runtime-view.md` | `# 6. Runtime View`, at least one `## 6.x` scenario subsection with `SCN-NN` ID + step table, `## Open Items` | `grep -q '## 6\.\|SCN-[0-9]'` |
 | `docs/architecture/arc42/07-deployment.md` | `# 7. Deployment View`, `## 7.1` overview, at least one per-environment `### Production` (or named env), Mapping table, `## Open Items` | `grep -q '## 7.1\|Mapping of building blocks'` |
+| `docs/architecture/arc42/08-cross-cutting-concepts.md` | `# 8. Cross-Cutting Concepts`, `## Concept catalogue` table with `CC-NN` IDs and `Applies to` column, `## Open Items` | `grep -q '## Concept catalogue\|CC-[0-9]'` |
+| `docs/architecture/arc42/11-risks.md` | `# 11. Risks and Technical Debt`, `## 11.1 Active Risks` table with `RSK-NN` IDs, `## 11.2 Technical Debt`, `## Open Items` | `grep -q '## 11.1\|RSK-[0-9]'` |
 
 **Detection (example for process doc):**
 ```bash

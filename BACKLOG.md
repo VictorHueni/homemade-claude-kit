@@ -4,7 +4,17 @@ Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-
 
 ---
 
-## Shipped — 2026-05-28
+## Shipped — 2026-05-28 (Milestone 2)
+
+| Skill / task | What was done |
+|---|---|
+| **`arch-c4` runtime mode** (arc42 §6) | Fifth mode added to the existing skill — `runtime` produces arc42 §6 Runtime View via Structurizr `dynamic` view blocks. Mints `SCN-NN` IDs. One scenario per invocation; each appends a `## 6.x` subsection to `06-runtime-view.md` with an embedded SVG + step table. Boundary rules added: runtime view shows HOW containers collaborate (wire-level messages) — NOT per-aggregate state machines (those stay in domain-model). New files: `references/arc42-section-06.md` (embedded §6 spec), `templates/arc42-06-runtime-view.md`. |
+| **`arch-arc42`** (arc42 §2 / §4 / §8 / §11) | New four-mode skill covering the narrative arc42 sections with no C4 diagram counterpart. `constraints` mode (§2): three-category table (technical / organizational / legal-regulatory), mints `CST-NN`, cites source + ADR per constraint. `solution-strategy` mode (§4): navigation aid — technology decision table + quality goal → tactic mapping table; links to ADR-NNNN, never re-states rationale; no new IDs. `cross-cutting` mode (§8): eleven-area concept catalogue (authentication, authorisation, session, logging, tracing, error-handling, persistence, caching, i18n, transport security, feature flags), mints `CC-NN`, each entry names governing ADR + affected CON-NN containers. `risks` mode (§11): risk register with four types (`architectural`, `technical-debt`, `dependency`, `security`), mints `RSK-NN`, explicit boundary with ops runbooks, hook left for future `dev-tech-debt` skill. Each mode reads upstream artefacts before proposing content. Embedded arc42 §2/§4/§8/§11 specs + methodology-references bibliography + four output templates. |
+| **Metamodel updated** | `rules/metamodel.md`: `arch-c4` bullet updated (5 modes + SCN-NN); `arch-arc42` bullet added; ID conventions table (`SCN-NN`, `CST-NN`, `CC-NN`, `RSK-NN`); canonical paths tree (arc42/ subtree expanded to all 8 sections). `README.md`: `arch-arc42` row + updated `arch-c4` row. `util-metamodel-audit/references/check-catalogue.md`: Check 1 (5 new arc42 file detectors) + Check 5 (4 new ID patterns) + Check 9 (5 new mandatory-section rules). `util-metamodel-migration/references/detection-signals.md`: 6 new filename patterns (§6 + §2/§4/§8/§11 canonical + misplaced) + content signals. |
+
+---
+
+## Shipped — 2026-05-28 (Milestone 1)
 
 | Skill / task | What was done |
 |---|---|
