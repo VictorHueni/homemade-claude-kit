@@ -189,6 +189,7 @@ Overwrite rules:
 | ADRs (ADR-NNNN) | Aggregate boundary decisions, event sourcing decisions, and CQRS choices → Architecture Decision Records |
 | PRDs (PRD-NNNN) | PRDs should reference BC-NN.AGG-NN and BC-NN.EVT-NN in acceptance criteria |
 | Implementation Plans | Increments should be scoped per aggregate or per bounded context — not per entity |
+| C4 Building Block View (CMP-NN) | Each aggregate MAY carry an optional `Realised by: CMP-NN (in CON-NN)` field pointing at the C4 Component(s) that implement it. The field is filled by `arch-c4 component` once components exist; safe to leave empty before then. The canonical back-reference is the BBV's `Domain aggregates implemented` column (`properties.implements` in the DSL) — this field on the aggregate side is a convenience for navigation, not a structural foreign key. |
 
 ---
 

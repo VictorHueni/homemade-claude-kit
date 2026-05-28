@@ -46,6 +46,8 @@ what order, and where to put it**.
 - `discovery-idea` — captures, refines, and graduates pre-formal ideas → `docs/discovery/ideation/IDEA-{NNNN}-{slug}.md` with a single `INDEX.md` at folder root; mints `IDEA-NNNN` (4-digit zero-padded); each idea carries a `graduates_to:` pointer naming the downstream skill that owns the matured artefact (`spec-prd`, `arch-adr`, `business-persona`, `business-objective`, `business-model-canvas`, `arch-research`, `business-process`, or `spec-functional-breakdown-structure`); pre-Step-0 cross-cutting node — the skill itself never writes downstream artefacts, only invokes the right one at graduation
 - `spec-peer-review` — reviews PRDs / plans
 - `arch-research` — Architecture Research notes that inform ADR decisions → `docs/architecture/research/{NNNN}-{slug}.md`; mints `Research-NNNN` in-doc ID (4-digit zero-padded, same convention as `ADR-NNNN`); lifecycle: Draft → Active → Frozen (once feeding ADRs land) → Superseded
+- `arch-structurizr` — one-time foundation skill that scaffolds the Structurizr DSL workspace (`docs/architecture/c4/workspace.dsl`) and the Docker-based render pipeline (`render.sh` + pinned `structurizr/structurizr:<pin>-playwright` image); three modes: `init` (scaffold), `verify` (check Docker + DSL), `upgrade` (bump pinned version + re-render). Mints no IDs (infrastructure-only). Companion to `arch-c4`.
+- `arch-c4` — author C4 diagrams via the Structurizr DSL; produces arc42 §3 (Context), §5 (Building Blocks), §7 (Deployment) markdown with embedded SVGs under `docs/architecture/arc42/`; four modes: `context` (Level 1, mints `SYS-NN`), `container` (Level 2, mints `CON-NN`), `component` (Level 3, one drill per CON-NN; mints `CMP-NN`; carries `properties.implements "BC-NN.AGG-NN"` back-reference into `domain-model` or `"none"` for tech-only components), `deployment` (per-environment, mints `DN-NN`). **Boundary rule:** Building Block View is the STATIC technical decomposition — components reference domain aggregates via `properties.implements`, never re-state aggregate invariants or lifecycle (those stay in `domain-model`). Requires `arch-structurizr init` to have run first.
 - `business-competitive-landscape` — Porter Five Forces + Strategic Group Map + Value Curve + per-competitor profiles → `docs/business/01b-competitive-landscape/`; mints `CO-NN` per Tier-1 competitor profile; soft-links to personas (P-NN), BMC, capability map (C-N.M), quantitative models; run **after Step 1 (Personas)** so competitor ICPs can be mapped to persona IDs, and **before Step 2 (BMC) is filled** so competitive positioning informs the Value Propositions block rather than following it; alternatively run alongside Step 6 (quantitative models) when the primary need is competitor pricing or market-sizing data
 - `discovery-research` — hypothesis-anchored interview scripts + research synthesis + research plans → `docs/discovery/interviews/`; run alongside any step where upstream artefacts carry `Assumed` claims; especially valuable after Step 1 (Personas), Step 2 (BMC), and Step 6 (Quantitative Models); synthesis feeds confidence ratings (`Assumed → Tested → Validated`) back into those artefacts; companion to `discovery-workshop` (individual reality-check vs. group reality-check) and `discovery-idea` (validates Must-be-true assumptions raised during idea refinement)
 - `discovery-workshop` — workshop facilitation guides + series plans + synthesis → `docs/discovery/workshops/`; run when stakeholder alignment or group reality-checking is needed; especially valuable before Step 2 (BMC) and Step 4 (Value Streams) to build shared understanding; companion to `discovery-research` (group reality-check vs. individual reality-check); the three `discovery-*` skills share the `docs/discovery/` parent folder
@@ -616,6 +618,10 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `BC-NN.CLI-NN` | CLI tool surface, **BC-scoped** — one CLI per BC/service | `arch-cli-contract` |
 | `CLI-NN` | CLI tool surface, **product-level** — one CLI spanning multiple BCs; BC-NN column per command records the BC it delegates to | `arch-cli-contract` |
 | `BC-NN.CLI-NN.CMD-NN` or `CLI-NN.CMD-NN` | CLI command — scoped to match the parent CLI tool's ID format | `arch-cli-contract` |
+| `SYS-NN` | Software System in the C4 model (DSL identifier `SYS_NN`) — system being documented + external systems | `arch-c4` (context mode) |
+| `CON-NN` | Container in the C4 model (DSL identifier `CON_NN`) — deployable runtime unit (app, service, database, message broker) | `arch-c4` (container mode) |
+| `CMP-NN` | Component in the C4 model (DSL identifier `CMP_NN`) — code module inside a container; carries `properties.implements "BC-NN.AGG-NN"` back-reference into `domain-model` (or `"none"` for tech-only) | `arch-c4` (component mode) |
+| `DN-NN` | Deployment Node in the C4 model (DSL identifier `DN_NN`) — infrastructure element (region, cluster, VM, managed service) | `arch-c4` (deployment mode) |
 | `E-NN` | Epic + walking skeleton + phase plan (delivery roadmap) | `spec-delivery-roadmap` |
 | `QA-XXNN` | Quality attribute (characteristic prefix + counter, e.g. `QA-PE01`, `QA-SE03`) | `spec-quality-attributes` |
 | `PRD-NNNN` | PRD ID | `spec-prd` |
@@ -666,10 +672,23 @@ docs/
 ├── architecture/                                        ← `arch-` skills
 │   ├── decisions/                                       ← arch-adr writes here
 │   │   └── adr-{NNNN}-{slug}.md
-│   └── interfaces/                                      ← arch-service-contract + arch-cli-contract
-│       ├── {bc-slug}.md  (BC-scoped API, one per BC)    ← arch-service-contract (BC-NN.CTR-NN)
-│       ├── {slug}.md  (product-level API, spans BCs)    ← arch-service-contract (CTR-NN)
-│       └── cli-{slug}.md  (one per CLI tool)            ← arch-cli-contract (BC-NN.CLI-NN or CLI-NN)
+│   ├── interfaces/                                      ← arch-service-contract + arch-cli-contract
+│   │   ├── {bc-slug}.md  (BC-scoped API, one per BC)    ← arch-service-contract (BC-NN.CTR-NN)
+│   │   ├── {slug}.md  (product-level API, spans BCs)    ← arch-service-contract (CTR-NN)
+│   │   └── cli-{slug}.md  (one per CLI tool)            ← arch-cli-contract (BC-NN.CLI-NN or CLI-NN)
+│   ├── c4/                                              ← arch-structurizr foundation
+│   │   ├── workspace.dsl                                ← Structurizr DSL (single source of truth for C4 model)
+│   │   ├── render.sh                                    ← Docker render pipeline (pinned structurizr/structurizr:<pin>-playwright)
+│   │   ├── README.md                                    ← per-project render + pinning conventions
+│   │   └── views/                                       ← rendered SVGs (committed)
+│   │       ├── systemContext.svg                        ← arc42 §3 visual
+│   │       ├── containers.svg                           ← arc42 §5.1 visual
+│   │       ├── components-CON-NN.svg                    ← arc42 §5.2 visuals (one per drilled container)
+│   │       └── deployment-{env}.svg                     ← arc42 §7 visuals (one per environment)
+│   └── arc42/                                           ← arch-c4 writes here (markdown sections that embed C4 SVGs)
+│       ├── 03-context.md                                ← arc42 §3 (SYS-NN context + actors + external systems)
+│       ├── 05-building-blocks.md                        ← arc42 §5 (containers + components; CON-NN, CMP-NN)
+│       └── 07-deployment.md                             ← arc42 §7 (per-environment deployment; DN-NN)
 ├── domain/                                              ← `domain-` skills (DDD artefacts — numbered by step)
 │   ├── 02b-bounded-contexts.md                          ← domain-bounded-context (BC-NN)
 │   ├── 02b-context-map.md                               ← domain-bounded-context (context map)
@@ -788,6 +807,9 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 | New artefact step, new canonical path | `util-metamodel-scaffold/references/index-template.md` → §Detection bash block + §Template stack-progress table (add detection command + row) |
 
 Failing to update these files after a metamodel change will cause the audit and migration skills to silently miss the new artefact — the most dangerous kind of drift.
+
+**Already-updated coupling (arch-structurizr + arch-c4, 2026-05-28):**
+`rules/metamodel.md` supporting-skills list (2 new bullets after `arch-research`) + ID conventions table (SYS-NN, CON-NN, CMP-NN, DN-NN — all owned by `arch-c4`) + canonical paths tree (`docs/architecture/c4/` foundation + `docs/architecture/arc42/` markdown sections under the existing `architecture/` subtree) + this table · `README.md` skill index (2 new rows) · `util-metamodel-audit/references/check-catalogue.md` Check 1 (arc42 markdown detection at `docs/architecture/arc42/{03,05,07}*.md`) + Check 2 (`docs/architecture/c4/` + `docs/architecture/arc42/` canonical paths) + Check 5 (regex patterns `SYS-\d{2}`, `CON-\d{2}`, `CMP-\d{2}`, `DN-\d{2}`) + Check 9 (mandatory `Domain aggregates implemented` column in §5 component tables) · `util-metamodel-migration/references/detection-signals.md` §Filename patterns (`workspace.dsl`, `03-context.md`, `05-building-blocks.md`, `07-deployment.md`) + §Folder patterns (`architecture/c4/`, `architecture/arc42/`) + §Content signals (Structurizr DSL `workspace "..."`, arc42 section headings) · `BACKLOG.md` (Shipped 2026-05-28 section: `arch-c4` Tier 1 entry retired, new pair logged) · `domain-model/SKILL.md` (minor additive: optional `Realised by: CMP-NN (in CON-NN)` field per aggregate, filled by `arch-c4 component`; empty before then) · `examples/c4-demo/` (kit-internal validation snapshot exercising all 4 modes end-to-end)
 
 **Already-updated coupling (dev-stack-guide + dev-getting-started, 2026-05-28):**
 `rules/metamodel.md` supporting-skills list (dev-* bullet expanded to 4 bullets: dev-stack-guide, dev-getting-started, workflow utilities, com-slide-deck) + canonical paths tree (`docs/dev-guides/` subtree added after `discovery/`) + prefix→folder mapping (`dev-` row updated with exception note) + this table · `util-metamodel-audit/references/check-catalogue.md` Check 2 (docs/dev-guides/ added as canonical path; getting-started.md + {tech-slug}.md + research/ exempt from misplacement) · `util-metamodel-migration/references/detection-signals.md` §Filename patterns (getting-started.md under docs/dev-guides/ → dev-getting-started; {tech-slug}-research.md under docs/dev-guides/research/ → dev-stack-guide) + §Folder patterns (dev-guides/ folder) + §Content signals (## Stack identity → dev-stack-guide) · `BACKLOG.md` (Shipped 2026-05-28 section added)

@@ -29,6 +29,11 @@ find docs/domain -maxdepth 1 -name "02c-glossary.md" 2>/dev/null                
 find docs/domain/07b-models -name "*.md" 2>/dev/null | head -1             # Step 7b (per BC)
 find docs/architecture/interfaces -name "*.md" ! -name "cli-*.md" 2>/dev/null | head -1  # Step 7c (service contract, per BC)
 find docs/architecture/interfaces -name "cli-*.md" 2>/dev/null | head -1                  # CLI contract (supporting skill, per tool)
+find docs/architecture/c4 -name "workspace.dsl" 2>/dev/null                       # arch-structurizr foundation
+find docs/architecture/c4/views -name "*.svg" 2>/dev/null | head -1               # arch-c4 rendered views (committed)
+find docs/architecture/arc42 -name "03-context.md" 2>/dev/null                    # arch-c4 context mode
+find docs/architecture/arc42 -name "05-building-blocks.md" 2>/dev/null            # arch-c4 container + component modes
+find docs/architecture/arc42 -name "07-deployment.md" 2>/dev/null                 # arch-c4 deployment mode
 ```
 
 **Status assignment:**
@@ -68,7 +73,13 @@ Then compare each path against the canonical map:
 - `*.md` under `docs/architecture/decisions/` → ADRs, correct
 - `{bc-slug}.md` (no `cli-` prefix) under `docs/architecture/interfaces/` → service contract (`arch-service-contract`), correct
 - `cli-{slug}.md` under `docs/architecture/interfaces/` → CLI contract (`arch-cli-contract`), correct
-- `*.md` under `docs/architecture/` but NOT in `decisions/`, `interfaces/`, or `research/` → likely misplaced architecture file
+- `*.md` under `docs/architecture/` but NOT in `decisions/`, `interfaces/`, `research/`, `c4/`, or `arc42/` → likely misplaced architecture file
+- `workspace.dsl` → must be at `docs/architecture/c4/workspace.dsl` (singleton — `arch-structurizr` foundation)
+- `render.sh` → must be at `docs/architecture/c4/render.sh` (executable; `arch-structurizr` writes; `chmod +x` expected)
+- `*.svg` under `docs/architecture/c4/views/` → committed C4 renders from `arch-c4`; correct
+- `*.puml` under `docs/architecture/c4/` (anywhere) → intermediate PlantUML export; should be gitignored, not committed
+- `03-context.md`, `05-building-blocks.md`, `07-deployment.md` → must be under `docs/architecture/arc42/` (`arch-c4` writes; one file per arc42 section)
+- `*.md` under `docs/architecture/arc42/` matching `0?-*.md` not in the canonical three → likely a Milestone 2 narrative section (`02-constraints.md`, `04-solution-strategy.md`, `06-runtime-view.md`, `08-cross-cutting.md`, `11-risks.md`) — accept once those skills exist
 - `getting-started.md` → must be at `docs/dev-guides/getting-started.md` (singleton — `dev-getting-started` skill)
 - `{tech-slug}.md` under `docs/dev-guides/` (no `research/` subfolder, not `getting-started.md`) → correct (`dev-stack-guide` output)
 - `{tech-slug}-research.md` under `docs/dev-guides/research/` → correct (`dev-stack-guide` research scratch)
@@ -173,6 +184,10 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `BC-NN.CLI-NN` | `\bBC-[0-9]{2}\.CLI-[0-9]{2}\b` | `docs/architecture/interfaces/cli-{slug}.md` |
 | `CLI-NN` | `\bCLI-[0-9]{2}\b` | `docs/architecture/interfaces/cli-{slug}.md` (product-level) |
 | `CLI-NN.CMD-NN` | `\bCLI-[0-9]{2}\.CMD-[0-9]{2}\b` | `docs/architecture/interfaces/cli-{slug}.md` |
+| `SYS-NN` | `\bSYS-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `SYS_NN` in `softwareSystem` block) |
+| `CON-NN` | `\bCON-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `CON_NN` in `container` block) |
+| `CMP-NN` | `\bCMP-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `CMP_NN` in `component` block) |
+| `DN-NN` | `\bDN-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `DN_NN` in `deploymentNode` block) |
 
 **Detection (example for P-NN):**
 ```bash
@@ -339,6 +354,11 @@ done | sort -rn
 | `docs/architecture/interfaces/*.md` (not `cli-*.md`) | `## §0 Traceability`, `## §3 Error contract`, `## §4 Versioning & deprecation policy`, `## §5 Security surface`, `## Open Items`, `## Changelog` | `grep -q '§0 Traceability\|§3 Error contract'` |
 | `docs/architecture/interfaces/cli-*.md` | `## §0 Traceability`, `## §2 Command catalogue`, `## §5 Output contract`, `## §7 Error contract`, `## Open Items`, `## Changelog` | `grep -q 'Command catalogue\|§7 Error contract'` |
 | `docs/discovery/ideation/IDEA-*.md` | `## Problem statement`, `## Not doing`, `## Open Items`, `## Changelog`; frontmatter must include `idea_id`, `domain`, `lifecycle`, `graduates_to` | `grep -q '## Problem statement\|## Not doing'` and `grep -q '^idea_id:\|^lifecycle:\|^graduates_to:'` |
+| `docs/architecture/c4/workspace.dsl` | `workspace "..."` block, `model { ... }` block, `views { ... }` block, at least one `systemContext` view | `grep -q '^workspace\|^[[:space:]]*model {\|^[[:space:]]*views {'` |
+| `docs/architecture/c4/render.sh` | Pinned image (no `:latest`), `validate` step before `export`, `--user` flag on every `docker run`, exit codes documented in header | `grep -q 'STRUCTURIZR_VERSION=' && grep -q 'validate -workspace' && grep -q -- '--user'` |
+| `docs/architecture/arc42/03-context.md` | `# 3. Context and Scope`, `## 3.1 Business Context` (with embedded `systemContext.svg`), `## 3.2 Technical Context`, `## Open Items` | `grep -q '## 3.1 Business Context\|## 3.2 Technical Context'` |
+| `docs/architecture/arc42/05-building-blocks.md` | `# 5. Building Block View`, `## 5.1 Whitebox Overall System` with containers table including `Domain aggregates implemented` column, at least one `## 5.2.x` drill, `## Open Items` | `grep -q '## 5.1 Whitebox\|Domain aggregates implemented'` |
+| `docs/architecture/arc42/07-deployment.md` | `# 7. Deployment View`, `## 7.1` overview, at least one per-environment `### Production` (or named env), Mapping table, `## Open Items` | `grep -q '## 7.1\|Mapping of building blocks'` |
 
 **Detection (example for process doc):**
 ```bash

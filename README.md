@@ -29,10 +29,16 @@ A personal Claude Code toolkit — composable skills for business architecture, 
 | `spec-` | `spec-prd` | Product Requirements Document — `PRD-NNNN` |
 | `spec-` | `spec-implementation-plan` | Atomic increment plan |
 | `spec-` | `spec-peer-review` | PRD / plan review |
-| `arch-` | `arch-adr` | Architecture Decision Records |
-| `arch-` | `arch-research` | Evidence base for ADRs |
+| `arch-` | `arch-adr` | Architecture Decision Records — `ADR-NNNN` |
+| `arch-` | `arch-research` | Evidence base for ADRs — `Research-NNNN` |
+| `arch-` | `arch-service-contract` | Service interface contract per BC — `BC-NN.CTR-NN` / `CTR-NN` |
+| `arch-` | `arch-cli-contract` | CLI surface contract — `BC-NN.CLI-NN.CMD-NN` / `CLI-NN.CMD-NN` |
+| `arch-` | `arch-structurizr` | Structurizr DSL workspace + Docker render pipeline (foundation for `arch-c4`) |
+| `arch-` | `arch-c4` | C4 diagrams → arc42 §3 / §5 / §7 markdown — `SYS-NN`, `CON-NN`, `CMP-NN`, `DN-NN` |
 | `ops-` | `ops-runbook` | Operator runbooks |
 | `ops-` | `ops-bug-rca` | Root cause analysis |
+| `dev-` | `dev-stack-guide` | Per-technology developer guide + MCP discovery — `docs/dev-guides/{tech-slug}.md` |
+| `dev-` | `dev-getting-started` | Project onboarding guide — `docs/dev-guides/getting-started.md` |
 | `dev-` | `dev-git-commit` | Conventional commit generation |
 | `dev-` | `dev-pr` | Pull request creation |
 | `dev-` | `dev-git-worktree` | Isolated git worktrees |
