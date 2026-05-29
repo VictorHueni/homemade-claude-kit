@@ -207,7 +207,8 @@ via `util-open-items` or direct artefact edits.
 
 ## 8. Skill conformance checklist
 
-When a skill emits or governs unresolved work, its `SKILL.md` and template files must:
+When a skill emits or governs unresolved work **in the artefacts it produces** (under a
+project's `docs/`), its `SKILL.md` instructions and template files must:
 
 1. Use the canonical `## Open Items` heading at document level.
 2. Reference the column schema in §4 (either inline or by linking to this rule).
@@ -222,9 +223,34 @@ Templates SHOULD include the bare table header with the canonical columns and a 
 
 ---
 
-## 9. See also
+## 9. Scope boundary — skill folders are tooling, not artefacts
+
+The `## Open Items` contract governs **project artefacts** (PRDs, ADRs, domain models,
+research notes, and the like) — the documents a skill *produces* under a project's `docs/`.
+It does **not** apply to the skill definitions themselves.
+
+A skill folder (`<skill>/SKILL.md` and its `references/`, `templates/`, `scripts/`) is
+tooling, not a governed artefact. It **MUST NOT** contain a `## Open Items` section tracking
+the skill's own development. Such a section is swept by no ledger, drifts silently, and
+mis-signals to `util-metamodel-audit` (which expects open items only in project artefacts).
+
+Follow-up work on a skill — new modes, extra checks, deferred refinements — is recorded in
+the kit `BACKLOG.md` (§Open follow-ups) for kit-level work, or in the relevant project's
+central ledger (§5) for project-scoped work. A skill's `SKILL.md` may carry at most a short
+**"Follow-up work"** pointer naming where its items live; it never carries the canonical
+`## Open Items` table.
+
+Restated:
+
+- Items a skill tells Claude to **write into produced artefacts** → governed by §1–§8.
+- Items about the **skill's own evolution** → kit `BACKLOG.md`, never inside the skill folder.
+
+---
+
+## 10. See also
 
 - `rules/metamodel.md` — strategic-architecture build order; references this contract.
+- `BACKLOG.md` — kit-level skill backlog + §Open follow-ups (per §9).
 - `util-open-items/SKILL.md` — operating manual for the living ledger.
 - `util-metamodel-audit/references/check-catalogue.md` — exact audit checks for governance
   drift, schema compliance, and provenance.

@@ -119,13 +119,8 @@ Audit existing `.tf` without executing anything. Read the project, then check ag
 - [ ] Zones/types are variables, validated against the provider's accepted values.
 - [ ] If shared/team infra: remote state in SOS configured, locking caveat communicated.
 
-## Open Items
+## Follow-up work
 
-| OI-ID  | Type           | Summary                                                                             | Source anchor | Source heading | Resolution path                                                                 | Priority | Status | Owner  | Due / Review date | Tracker ref |
-| :----- | :------------- | :---------------------------------------------------------------------------------- | :------------ | :------------- | :------------------------------------------------------------------------------ | :------- | :----- | :----- | :---------------- | :---------- |
-| OI-001 | execution-item | Expand native Exoscale checks beyond EXO-001 (permissive egress, public DBaaS, unencrypted volumes) | #mode-3       | Mode 3 — Check | Add checks to `scripts/exoscale-policy.sh` following the EXO-001 pattern | medium   | open   | victor | 2026-08-29        | _TBD_       |
-| OI-002 | execution-item | Evaluate Checkov (reliable custom Terraform policies) as a second scanner            | #mode-3       | Mode 3 — Check | Spike Checkov YAML/Python policies on Exoscale HCL; decide keep/drop              | low      | open   | _TBD_  | 2026-08-29        | _TBD_       |
-
-Delivered: built-in Trivy misconfig + secret scan (auto-detected) and the native `EXO-001` Exoscale check. The rows above track residual coverage work. (Trivy custom-Rego gating was evaluated and rejected — it does not reliably fire for Terraform; see `references/toolchain.md`.)
-
-Chain to `util-open-items` to sync this section into the central ledger.
+Skill follow-ups are tracked in the kit `BACKLOG.md` (§Open follow-ups), not in this
+SKILL.md — see `rules/open-items-governance.md` §9. Current items: expand native
+Exoscale checks beyond `EXO-001`; evaluate Checkov as a second scanner.

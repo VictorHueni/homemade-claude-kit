@@ -4,6 +4,14 @@ Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-
 
 ---
 
+## Shipped — 2026-05-29
+
+| Skill / task | What was done |
+|---|---|
+| **`ops-terraform-exoscale`** | New `ops-` skill (infra/devops automation utility) — scaffolds, lints, validates, scans, and plans Terraform for Exoscale. Companion to HashiCorp `terraform-code-generation` (defers HCL style + `.tftest.hcl`). Pipeline (plan-only; secrets via `EXOSCALE_API_KEY`/`SECRET` env only): `fmt → validate → tflint → native exoscale-policy → trivy fs (misconfig+secret) → plan`; never runs `apply`/`destroy`. Exoscale gating is a native dependency-free check (`scripts/exoscale-policy.sh`, starter `EXO-001`: SSH `0.0.0.0/0`) because Trivy custom-Rego does not reliably fire for Terraform in 0.70. Pins: provider `~> 0.69`, tflint `v0.62.1`, trivy `v0.70.0`. Broadened the `ops-` category in `skill-creation-sync.md` to cover automation utilities, not only `docs/ops/` doc artefacts. Verified end-to-end with real binaries (EXO-001 fires + no false positives; secret scan fires; fmt/validate/tflint/trivy green). |
+
+---
+
 ## Shipped — 2026-05-28 (Milestone 2)
 
 | Skill / task | What was done |
@@ -62,6 +70,18 @@ Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-
 | **`com-slide-deck`** | Renamed from `dev-slide-deck`. Introduced new `com-` prefix category for communication artefacts. install.sh dangling-symlink prune bug fixed. |
 | **v2 path simplification** | All 11 singleton artefacts flattened to numbered files (`01-personas.md`, `02-bmc.md`, `03-capability-map.md`, `04-value-streams.md`, `04b-objectives.md`, `07-fbs.md`, `08-delivery-roadmap.md`, `09-quality-attributes.md`; domain singletons flattened; domain models consolidated into `docs/domain/07b-models/{bc-slug}.md`). Kit fully updated: 15 SKILL.md files, metamodel.md, README.md, check-catalogue.md, detection-signals.md. 4 pre-existing `epic-catalogue.md` bugs fixed. |
 | **`util-metamodel-migration` Mode 4** | Schema migration mode — reads `references/path-migration-v2.md`, generates atomic `git mv` + `sed` script for v1→v2 project migration. Dry-run default; `--apply` opt-in; post-migration audit hook. |
+
+---
+
+## Open follow-ups (shipped skills)
+
+Residual work on skills that have already shipped. Skill folders do **not** carry their own
+`## Open Items` sections (see `rules/open-items-governance.md` §9) — kit-level follow-ups live here.
+
+| OI-ID  | Skill                    | Type           | Summary                                                                          | Priority | Status | Owner  | Review date | Tracker ref |
+| :----- | :----------------------- | :------------- | :------------------------------------------------------------------------------- | :------- | :----- | :----- | :---------- | :---------- |
+| OI-001 | `ops-terraform-exoscale` | execution-item | Expand native Exoscale checks beyond `EXO-001` (permissive egress, public DBaaS, unencrypted volumes) — add to `scripts/exoscale-policy.sh` | medium   | open   | victor | 2026-08-29  | _TBD_       |
+| OI-002 | `ops-terraform-exoscale` | execution-item | Evaluate Checkov (reliable custom Terraform policies) as a second scanner — spike on Exoscale HCL, decide keep/drop | low      | open   | _TBD_  | 2026-08-29  | _TBD_       |
 
 ---
 
