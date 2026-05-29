@@ -30,7 +30,7 @@ check_file() {
 check_folder() {
   local pattern="$1"
   local count
-  count=$(find . -path "$pattern" 2>/dev/null | wc -l)
+  count=$(find . -path "./$pattern" 2>/dev/null | wc -l)
   [ "$count" -gt 0 ] && echo "✅" || echo "⬜"
 }
 
