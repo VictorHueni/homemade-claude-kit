@@ -238,8 +238,9 @@ Follow-up work on a skill — new modes, extra checks, deferred refinements — 
 governance work on the kit itself**, so the kit dogfoods this very contract: such items live
 in the kit's own central ledger at `docs/project-control/open-items/open-items.md` (§5), as
 central-only rows (`Source heading: _central-only_`, empty `Source anchor`). They do **not**
-live in the skill folder, and they are **not** roadmap entries — `BACKLOG.md` tracks
-candidate/shipped skills, not open items. A skill's `SKILL.md` may carry at most a short
+live in the skill folder. The same ledger also holds the kit's candidate-skill backlog and
+structural-decision items (the former `BACKLOG.md`, merged in); shipped-skill history is
+recorded under `docs/project-control/open-items/archive/`. A skill's `SKILL.md` may carry at most a short
 **"Follow-up work"** pointer to the ledger; it never carries the canonical `## Open Items`
 table.
 
@@ -261,8 +262,7 @@ Restated:
 ## 10. See also
 
 - `rules/metamodel.md` — strategic-architecture build order; references this contract.
-- `docs/project-control/open-items/open-items.md` — the kit's own ledger (kit-dev open items per §9).
-- `BACKLOG.md` — kit-level skill backlog (candidate + shipped skills; not open items).
+- `docs/project-control/open-items/open-items.md` — the kit's own ledger: kit-dev open items (per §9) **and** the merged skill backlog (candidate skills + structural decisions). Shipped history under `archive/`.
 - `util-open-items/SKILL.md` — operating manual for the living ledger.
 - `util-metamodel-audit/references/check-catalogue.md` — exact audit checks for governance
   drift, schema compliance, and provenance.

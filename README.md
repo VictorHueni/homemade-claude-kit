@@ -83,7 +83,10 @@ git pull
 
 ## Backlog
 
-Planned skills, known issues, and shipped items are tracked in [`BACKLOG.md`](./BACKLOG.md).
+Planned skills, decision gaps, and follow-ups are tracked as open items in the kit's own
+control plane, [`docs/project-control/open-items/open-items.md`](./docs/project-control/open-items/open-items.md)
+(`OI-NNNN`). Shipped-skill history is archived under
+[`docs/project-control/open-items/archive/`](./docs/project-control/open-items/archive/).
 
 ## Rules
 

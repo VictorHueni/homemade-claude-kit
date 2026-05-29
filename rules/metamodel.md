@@ -818,6 +818,9 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 
 Failing to update these files after a metamodel change will cause the audit and migration skills to silently miss the new artefact — the most dangerous kind of drift.
 
+**Already-updated coupling (BACKLOG.md merged into the open-items ledger, 2026-05-29):**
+Repo-root `BACKLOG.md` removed; its candidate-skill backlog (Tier 1/2/3) + structural-decision items merged into `docs/project-control/open-items/open-items.md` as `OI-0003`–`OI-0018` (Tier→Priority high/medium/low; decisions as `decision-gap`); shipped-skill history moved to `docs/project-control/open-items/archive/2026-Q2-shipped.md`. Updated: `README.md` §Backlog, `rules/open-items-governance.md` §9 + §10. Earlier coupling notes below still name `BACKLOG.md` — they are historical records of those past changes, not live pointers.
+
 **Already-updated coupling (arch-c4 runtime mode + arch-arc42, 2026-05-28):**
 `rules/metamodel.md` supporting-skills list (`arch-c4` bullet updated to 5 modes + SCN-NN; `arch-arc42` bullet added) + ID conventions table (`SCN-NN`, `CST-NN`, `CC-NN`, `RSK-NN`) + canonical paths tree (`arc42/` subtree expanded to all 8 sections: §2/§3/§4/§5/§6/§7/§8/§11) + this table · `README.md` skill index (`arch-arc42` row added) · `util-metamodel-audit/references/check-catalogue.md` Check 1 (arc42 §2/§4/§6/§8/§11 file detection added) + Check 5 (`SCN-\d{2}`, `CST-\d{2}`, `CC-\d{2}`, `RSK-\d{2}` ID patterns added) + Check 9 (mandatory section rules for §2, §4, §6, §8, §11 added) · `util-metamodel-migration/references/detection-signals.md` §Filename patterns (02-constraints.md, 04-solution-strategy.md, 06-runtime-view.md, 08-cross-cutting-concepts.md, 11-risks.md) + §Content signals (CST-NN, SCN-NN, CC-NN, RSK-NN ID patterns) · `BACKLOG.md` (Milestone 2 shipped block added)
 

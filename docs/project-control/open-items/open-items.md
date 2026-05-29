@@ -41,11 +41,35 @@ rule), then move to `archive/`.
 | :------ | :------------- | :--------------------------------------------------------------------------------------------------- | :---------------------------------------------------- | :------------ | :-------------- | :------------------------------------------------------------------------- | :------- | :----- | :----- | :---------------- | :---------- |
 | OI-0001 | execution-item | Expand native Exoscale checks beyond `EXO-001` (permissive egress, public DBaaS, unencrypted volumes) | `ops-terraform-exoscale/scripts/exoscale-policy.sh`   |               | _central-only_  | Add checks to `exoscale-policy.sh` following the `EXO-001` pattern          | medium   | open   | victor | 2026-08-29        | _TBD_       |
 | OI-0002 | execution-item | Evaluate Checkov as a second Terraform scanner (reliable custom policies)                            | `ops-terraform-exoscale/`                             |               | _central-only_  | Spike Checkov YAML/Python policies on Exoscale HCL; decide keep/drop        | low      | open   | _TBD_  | 2026-08-29        | _TBD_       |
+| OI-0003 | execution-item | Add `domain-event-storming` skill — Event Storming to discover bounded contexts before Step 2b (mints `ES-EVT-NN`, `ES-CMD-NN`) | `docs/domain/event-storming/` (planned) | | _central-only_ | Build the skill; feeds `BC-NN` / `BC-NN.EVT-NN` | high | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0004 | execution-item | Add `spec-test-strategy` skill — test pyramid + coverage + `QA-XXNN`→test-type mapping (mints `TS-NN`) | `docs/product-specs/test-strategy/` (planned) | | _central-only_ | Build the skill | high | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0005 | execution-item | Add `business-customer-journey-map` skill — experience-view journeys (mints `CJ-N.M`) | `docs/business/customer-journeys/` (planned) | | _central-only_ | Build the skill | high | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0006 | execution-item | Add `arch-team-topology` skill — Team Topologies from `BC-NN` (mints `TEAM-NN`) | `docs/architecture/team-topology/` (planned) | | _central-only_ | Build the skill | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0007 | execution-item | Add `ops-slo` skill — SLI/SLO/error budgets from `QA-XXNN` (mints `SLO-NN`) | `docs/ops/slos/` (planned) | | _central-only_ | Build the skill | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0008 | execution-item | Add `arch-threat-model` skill — STRIDE per data-flow; feeds ADRs + security QAs (mints `THR-NN`) | `docs/architecture/threat-model/` (planned) | | _central-only_ | Build the skill | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0009 | execution-item | Add `domain-integration-contract` skill — concrete contract per BC-pair (mints `INT-NN`) | `docs/domain/integration-contracts/` (planned) | | _central-only_ | Build the skill | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0010 | execution-item | Cross-skill web visualisations — shared HTML/SVG views from canonical Markdown (capability maps, BMC, roadmaps, FBS) | (cross-cutting) | | _central-only_ | Design + build shared presentation layer | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0011 | execution-item | Add `spec-release-plan` skill — rollout/comms/rollback per `E-NN` | (planned) | | _central-only_ | Build the skill | low | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0012 | execution-item | Add `ops-post-mortem` skill — blameless incident review (broader than `ops-bug-rca`) | (planned) | | _central-only_ | Build the skill | low | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0013 | execution-item | Add `business-stakeholder-map` skill — RACI / influence-interest grid | (planned) | | _central-only_ | Build the skill | low | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0014 | execution-item | Add `dev-changelog` skill — CHANGELOG.md per Keep a Changelog | (planned) | | _central-only_ | Build the skill | low | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0015 | execution-item | Add `dev-tech-debt` skill — log/triage/close/report tech + docs debt → `TECH_DEBT.md` | (planned) | | _central-only_ | Build the skill | low | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0016 | execution-item | Add deterministic runner/CLI for `util-open-items` — parse tables, mint `OI-NNNN`, sync, validate, archive | `util-open-items/` | | _central-only_ | Build the runner | low | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0017 | decision-gap | PRD naming with epic reference — encode epic in filename vs subfolder vs keep-flat (audit-enforced) | `docs/product-specs/prds/` | | _central-only_ | Decide convention; update metamodel + `spec-prd` | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
+| OI-0018 | decision-gap | Exec-plan folder ↔ PRD link — match NNNN vs reference-PRD-in-name vs nest-under-PRD | `docs/exec-plans/active/` | | _central-only_ | Decide convention; update metamodel + `spec-implementation-plan` | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
 
-OI-0001 / OI-0002 are kit-development items raised directly at the central plane (the kit
-dogfoods its own open-items contract per `rules/open-items-governance.md` §9). They carry
-`_central-only_` provenance because they have no source-artefact `## Open Items` section —
-skill folders do not carry one.
+All rows are kit-development items raised directly at the central plane (the kit dogfoods its
+own open-items contract per `rules/open-items-governance.md` §9), so they carry `_central-only_`
+provenance — they have no source-artefact `## Open Items` section (skill folders do not carry
+one). `OI-0001`/`OI-0002` are `ops-terraform-exoscale` follow-ups; `OI-0003`–`OI-0018` are the
+former `BACKLOG.md` candidate-skill backlog (Tier 1 → `high`, Tier 2 → `medium`, Tier 3 →
+`low`) and structural-decision items, merged here so the kit has a single control plane.
+
+**Recommended build order** (former BACKLOG guidance, by structural impact, not strict
+priority): `OI-0003` domain-event-storming → `OI-0004` spec-test-strategy → `OI-0006`
+arch-team-topology → `OI-0007` ops-slo. Tier 2/3 items improve completeness but are not
+structural metamodel gaps. Shipped-skill history lives in
+[`archive/2026-Q2-shipped.md`](./archive/2026-Q2-shipped.md).
 
 ---
 
