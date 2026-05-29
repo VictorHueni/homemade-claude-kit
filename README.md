@@ -49,7 +49,7 @@ A personal Claude Code toolkit — composable skills for business architecture, 
 | `util-` | `util-metamodel-audit` | Artefact stack health check |
 | `util-` | `util-metamodel-migration` | Docs folder migration report |
 | `util-` | `util-docs-audit` | Documentation freshness audit |
-| `util-` | `util-docs-lint` | Docs CI scaffold |
+| `util-` | `util-docs-lint` | Docs lint toolchain (dprint/Vale/lychee) — audit, enforce, CI |
 | `util-` | `util-toolkit-doctor` | Claude Code setup health |
 
 ---

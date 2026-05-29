@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync glossary alias rules
         run: |
-          if [ -f scripts/sync_glossary_rules.py ] && [ -f docs/domain/glossary.md ]; then
+          if [ -f scripts/sync_glossary_rules.py ] && [ -f docs/domain/02c-glossary.md ]; then
             python3 scripts/sync_glossary_rules.py
           fi
       - uses: errata-ai/vale-action@reviewdog/v2
@@ -41,13 +41,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   links:
-    name: Link check (markdown-link-check)
+    name: Link check (lychee)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      - name: Link check
+        uses: lycheeverse/lychee-action@v2
         with:
-          use-quiet-mode: "yes"
-          use-verbose-mode: "yes"
-          config-file: ".mlc-config.json"
-          folder-path: "docs/"
+          args: "--config lychee.toml 'docs/**/*.md'"
+          fail: true

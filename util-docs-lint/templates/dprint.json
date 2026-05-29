@@ -1,6 +1,7 @@
 {
   "markdown": {
     "lineWidth": 120,
+    "textWrap": "never",
     "emphasisKind": "asterisks",
     "strongKind": "asterisks"
   },

@@ -1,0 +1,22 @@
+# lychee link-check rules for docs/. Auto-discovered from the repo root.
+# Reference: https://lychee.cli.rs/usage/config/
+
+# Network resilience for flaky/rate-limited hosts.
+max_retries = 3
+retry_wait_time = 30
+timeout = 20
+
+# Accept all 2xx; treat 429 (rate-limited) as success rather than a dead link.
+accept = ["200..=299", "429"]
+
+# Skip loopback / localhost example URLs that are intentionally unreachable in CI.
+exclude_loopback = true
+exclude = [
+  "^https?://localhost",
+  "^https?://127\\.0\\.0\\.1",
+  "^https?://0\\.0\\.0\\.0",
+]
+
+# Fragment (#anchor) checking is off by default — flip to true to verify that
+# in-page anchors resolve (slower, and noisy on generated heading slugs).
+include_fragments = false

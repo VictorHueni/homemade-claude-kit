@@ -1,9 +1,9 @@
 ---
 name: util-docs-lint
-description: "Scaffold a GitHub Actions CI workflow that lints docs/ for markdown formatting, dead links (internal + external), and prose style. Three parallel jobs: dprint (formatting), Vale + Microsoft style (prose), markdown-link-check (links). Triggers on: scaffold docs lint, add docs CI, setup docs linting, docs quality workflow, lint docs CI."
-version: "1.0.0"
+description: "Local-first docs/ quality toolchain for Markdown — format (dprint), prose style (Vale + Microsoft), links (lychee). Tools are referenced, not installed (pinned via mise/dotfiles); rules live in project-root configs dprint.json / .vale.ini / lychee.toml. Five modes: scaffold (write root configs + .gitignore), audit (read-only dprint check + vale + lychee, ranked issues), enforce (dprint fmt writes formatting fixes incl. un-hard-wrapping prose — prose/link findings are report-only, never auto-rewritten), scaffold-ci (GitHub Actions workflow), add-glossary (Vale Local style from docs/domain/02c-glossary.md aliases). Scope: docs/**. Triggers on: docs lint, lint docs, markdown lint, dprint, vale, lychee, prose lint, dead links, link check, docs quality, audit docs, fix markdown formatting, un-hard-wrap, docs CI, scaffold docs lint."
+version: "2.0.0"
 user-invocable: true
-allow_implicit_invocation: false
+allow_implicit_invocation: true
 impact: "low"
 metadata:
   category: "utility"
@@ -12,163 +12,115 @@ status: active
 last_reviewed: 2026-05-29
 ---
 
-# Docs Lint — CI Scaffold
+# util-docs-lint
 
-Scaffold a GitHub Actions workflow that enforces docs/ quality on every push
-and PR touching documentation. Three parallel jobs; no local runtime required.
+Local-first Markdown quality toolchain for a project's `docs/`. This skill owns a deterministic local pipeline — `dprint` (formatting) → `vale` (prose) → `lychee` (links) — and the GitHub Actions workflow that mirrors it. Tools are **referenced, not installed**; the rules live in **project-root config files**.
 
-## Jobs
+Pinned/managed elsewhere (bump in your dotfiles, not here):
 
-| Job | Tool | What it checks |
-|---|---|---|
-| `format` | `dprint/check@v2.2` | Markdown formatting (line width, emphasis style, list consistency) |
-| `prose` | `errata-ai/vale-action@reviewdog/v2` + Microsoft style | Passive voice, weasel words, abbreviations, capitalisation |
-| `links` | `gaurav-nelson/github-action-markdown-link-check@v1` | Internal + external dead links; hard fail on 404 |
+- `dprint`, `vale`, `lychee` — installed via **mise/dotfiles** (`~/.mise.toml`), never by this skill.
 
-Prose job posts inline PR review comments via reviewdog. Link job fails the
-workflow on any dead link (including external).
+## Architecture (where things live)
 
----
+- **Tool versions** → machine-global in dotfiles (`~/.mise.toml`). Not per-project, not rules.
+- **Rules** → per-project at the **repo root**: `dprint.json`, `.vale.ini`, `lychee.toml`. Version-controlled with the docs they govern, so every contributor gets the same rules.
+- **Canonical templates** → this skill's `templates/`. The skill copies them out; it never restates the rules inline.
 
-## Mode: scaffold
+## Safety rule (non-negotiable)
 
-Scaffold all required files into the target project. Run this once on a new
-project. Existing files are not overwritten without confirmation.
+**`enforce` only auto-writes the mechanically safe subset — `dprint fmt` (formatting, including un-hard-wrapping prose via `textWrap: "never"`).** Prose (Vale) and link (lychee) findings are **reported, never auto-rewritten** — rewording prose or changing a URL is a human judgement call. No mode ever edits prose content.
 
-### Step 1 — read templates from this skill
+## Companion setup (install the tools once)
 
-Read each of these files from the skill directory:
-
-```
-~/.claude/skills/util-docs-lint/templates/docs-lint.yml
-~/.claude/skills/util-docs-lint/templates/.vale.ini
-~/.claude/skills/util-docs-lint/templates/dprint.json
-~/.claude/skills/util-docs-lint/templates/.mlc-config.json
-```
-
-### Step 2 — write to target project
-
-Write to these paths at the project root:
-
-| Template | Target path |
-|---|---|
-| `docs-lint.yml` | `.github/workflows/docs-lint.yml` |
-| `.vale.ini` | `.vale.ini` |
-| `dprint.json` | `dprint.json` |
-| `.mlc-config.json` | `.mlc-config.json` |
-
-Create `.github/workflows/` if it does not exist.
-
-### Step 3 — write glossary sync script (optional)
-
-If the project has or plans to have a domain glossary (`docs/domain/02c-glossary.md`),
-also copy the sync script:
-
-```
-~/.claude/skills/util-docs-lint/scripts/sync_glossary_rules.py
-  → scripts/sync_glossary_rules.py
-```
-
-The workflow already calls this script conditionally — it only runs if both
-`scripts/sync_glossary_rules.py` and `docs/domain/02c-glossary.md` exist. Safe to
-include even before a glossary exists.
-
-### Step 4 — add .gitignore entries
-
-Add these lines to `.gitignore` if not already present:
-
-```
-.vale/styles/Microsoft/
-.vale/styles/Local/
-```
-
-`Microsoft/` is downloaded by Vale on each CI run — never commit it.
-`Local/` is generated by `sync_glossary_rules.py` — also ephemeral in CI.
-
-### Step 5 — pin dprint plugin version
-
-The scaffolded `dprint.json` uses `markdown-0.17.8.wasm`. After scaffolding,
-tell the user to run:
+The tools are referenced, not installed by this skill. Ensure they are on `PATH` via mise/dotfiles:
 
 ```bash
-dprint config update
+# in your dotfiles ~/.mise.toml [tools]: dprint = "latest", vale = "latest", lychee = "latest"
+mise install
+dprint --version && vale --version && lychee --version
 ```
 
-This pins the plugin to the latest version with a checksum. If dprint is not
-installed locally, the CI run will pin it on first execution and report the
-correct URL in the job log.
+If a tool is absent, `audit`/`enforce` skip that stage with a warning (partial lint still runs).
 
-### Step 6 — post-scaffold checklist
+## The five modes
 
-Tell the user:
+Pick the mode from the user's intent. When ambiguous, ask.
 
-1. Commit all scaffolded files
-2. Push — the workflow triggers automatically on any `docs/**` change
-3. On first run Vale will download the Microsoft style package (~2 MB, cached
-   in the runner)
-4. Check the Actions tab for job results; the `prose` job posts inline comments
-   on the PR diff
+### Mode 1 — scaffold
 
----
+Stand up the rule configs in a project. Run once per project. Do not overwrite existing files without confirmation.
 
-## Mode: add-glossary
+1. Copy the templates to the **project root**:
 
-Run after `docs/domain/02c-glossary.md` exists and has `**Deprecated aliases:**`
-entries.
+   | Template | Target path |
+   |---|---|
+   | `templates/dprint.json` | `dprint.json` |
+   | `templates/.vale.ini` | `.vale.ini` |
+   | `templates/lychee.toml` | `lychee.toml` |
 
-1. Confirm `scripts/sync_glossary_rules.py` is present (copy from skill if not)
-2. Add `, Local` to `BasedOnStyles` in `.vale.ini`:
+2. Add to `.gitignore` (Vale styles are downloaded/generated, never committed):
+
    ```
-   BasedOnStyles = Microsoft, Local
+   .vale/styles/Microsoft/
+   .vale/styles/Local/
    ```
-3. Tell the user the workflow will now generate and apply alias substitution
-   rules on every CI run
 
----
+3. Pin the dprint plugin: tell the user to run `dprint config update` (pins the markdown plugin with a checksum). If dprint is absent, CI pins it on first run.
+4. Finish by running **Mode 2 (audit)** so the scaffold is verified.
 
-## Config reference
+### Mode 2 — audit (read-only)
 
-### `.vale.ini`
+Run `scripts/docs-lint.sh` (defaults to `./docs`). It runs, aggregating findings (never stops on first failure):
 
-```ini
-StylesPath = .vale/styles
-MinAlertLevel = warning      # suggestion | warning | error
+1. `dprint check` — formatting (scope from `dprint.json` includes).
+2. `vale docs/` — prose against Microsoft style (+ `Local` glossary aliases if present); refreshes the generated alias style first.
+3. `lychee 'docs/**/*.md'` — links, using root `lychee.toml`.
 
-Packages = Microsoft         # downloaded by vale sync on first run
+Each tool auto-detected; missing → skipped with a warning. Exits non-zero if any present tool reports issues. Surface ranked findings (formatting → prose → links) with file/line and the fix; for formatting issues, offer **Mode 3**.
 
-[*.md]
-BasedOnStyles = Microsoft    # add ', Local' after add-glossary mode
-```
+### Mode 3 — enforce (writes formatting only)
 
-Change `MinAlertLevel = error` to make prose violations block the workflow.
-Default is `warning` (reported but non-blocking via reviewdog annotations).
+Run `scripts/docs-lint.sh --fix`. `dprint fmt` writes formatting fixes — normalises emphasis/lists/whitespace/tables **and un-hard-wraps prose** (`textWrap: "never"` collapses hard-wrapped paragraphs to single lines). Vale and lychee still run **read-only** in the same pass and report. Per the Safety rule, prose and links are never auto-modified.
 
-### `dprint.json`
+### Mode 4 — scaffold-ci
 
-```json
-{
-  "markdown": {
-    "lineWidth": 120,
-    "emphasisKind": "asterisks",
-    "strongKind": "asterisks"
-  },
-  "includes": ["docs/**/*.md"],
-  "plugins": ["https://plugins.dprint.dev/markdown-x.y.z.wasm"]
-}
-```
+Write the GitHub Actions workflow that mirrors the local pipeline. Copy `templates/docs-lint.yml` → `.github/workflows/docs-lint.yml` (create `.github/workflows/` if needed). Three jobs on any `docs/**` change: `format` (dprint), `prose` (Vale + Microsoft via reviewdog inline comments), `links` (lychee-action, fails on dead links). Remind the user to commit the root configs too — CI reads the same `dprint.json` / `.vale.ini` / `lychee.toml`.
 
-Run `dprint config update` to refresh the plugin URL.
+### Mode 5 — add-glossary
 
-### `.mlc-config.json`
+Run after `docs/domain/02c-glossary.md` exists with `**Aliases (deprecated):**` entries.
 
-```json
-{
-  "ignorePatterns": [...],
-  "timeout": "20s",
-  "retryOn429": true,
-  "retryCount": 3
-}
-```
+1. Ensure `scripts/sync_glossary_rules.py` is present (copy from this skill's `scripts/` if not).
+2. Add `, Local` to `BasedOnStyles` in `.vale.ini`: `BasedOnStyles = Microsoft, Local`.
+3. The local pipeline and CI now generate `.vale/styles/Local/GlossaryAliases.yml` from the glossary's deprecated aliases (one substitution rule per alias → "Use '{Canonical}' instead of '{alias}'.") on every run.
 
-Add patterns to `ignorePatterns` for URLs that are intentionally
-unreachable from CI (internal corporate URLs, localhost examples, etc.).
+## Reference materials
+
+- `scripts/docs-lint.sh` — the local pipeline (auto-detect, `--fix`).
+- `scripts/sync_glossary_rules.py` — generates the Vale `Local` alias style from the glossary.
+- `templates/dprint.json` — formatting rules (`textWrap: "never"`, asterisk emphasis, `docs/**` scope).
+- `templates/.vale.ini` — prose style (Microsoft, `MinAlertLevel = warning`).
+- `templates/lychee.toml` — link rules (2xx + 429 accepted, loopback excluded, fragments off).
+- `templates/docs-lint.yml` — the CI mirror.
+
+## Tuning the rules (per project, in the root configs)
+
+- **Stricter prose:** lower `MinAlertLevel` in `.vale.ini` from `warning` to `suggestion` to surface the full Microsoft set (Passive, Wordiness, ComplexWords, …), or raise to `error` to make prose block.
+- **Different prose style:** swap `Packages`/`BasedOnStyles` to `Google` etc.
+- **Link anchors:** set `include_fragments = true` in `lychee.toml` to verify in-page `#anchor` targets.
+- **Scope:** widen `dprint.json` `includes` and the vale/lychee paths beyond `docs/**` if desired.
+
+## Anti-patterns
+
+- Putting rules in `~/.mise.toml` (it pins versions only) or restating rule values in this `SKILL.md` (templates are the source of truth).
+- Committing `.vale/styles/Microsoft/` or `.vale/styles/Local/` (downloaded/generated).
+- Auto-rewriting prose or links (forbidden — Safety rule).
+- Using `textWrap: "always"` (re-hard-wraps prose — the opposite of the project rule).
+
+## Checklist (before handoff)
+
+- [ ] Root configs present: `dprint.json`, `.vale.ini`, `lychee.toml`; `.gitignore` covers `.vale/styles/`.
+- [ ] `docs-lint.sh` runs clean (or findings surfaced); formatting auto-fixed via `--fix` if asked.
+- [ ] dprint plugin pinned (`dprint config update`).
+- [ ] If CI wanted: workflow scaffolded and root configs committed.
+- [ ] If glossary exists: `add-glossary` wired and `Local` style generating.
