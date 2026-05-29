@@ -182,51 +182,11 @@ touch docs/project-control/open-items/archive/.gitkeep
 
 Then write two stub files:
 
-**`docs/project-control/open-items/open-items.md`** — empty ledger with canonical schema,
-sourced from `util-open-items/references/template.md §1` (canonical ledger table skeleton):
-
-```markdown
-# Open Items — Living Ledger
-
-This is the consolidated, repo-wide ledger of unresolved work synced from every
-artefact's local `## Open Items` section. It is the operational system of record
-described in §5 of `rules/open-items-governance.md`.
-
-The ledger is **not** a product artefact — no frontmatter, no review cadence.
-See `README.md` for purpose, lifecycle, and operator guidance.
-
----
-
-## How rows arrive here
-
-1. A skill emits an open item into the source artefact's `## Open Items` section.
-2. `util-open-items sync` reads the local section, deduplicates, assigns `OI-NNNN`,
-   and writes the row here — extended with `Source artefact` (relative repo path).
-
----
-
-## Live items
-
-| OI-ID | Type | Summary | Source artefact | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref |
-| :---- | :--- | :------ | :-------------- | :------------ | :------------- | :-------------- | :------- | :----- | :---- | :---------------- | :---------- |
-
-_None at present._ The ledger initialises empty; the first sync from any artefact
-will populate it.
-
----
-
-## Status snapshot
-
-_No snapshot yet — the ledger has not received its first sync._
-
----
-
-## See also
-
-- `README.md` — operator guidance for this folder.
-- `rules/open-items-governance.md` — canonical schema, taxonomy, lifecycle.
-- `util-open-items/SKILL.md` — ledger CRUD operating manual.
-```
+**`docs/project-control/open-items/open-items.md`** — empty ledger. Copy the canonical
+ledger skeleton from [`util-open-items/references/template.md`](../util-open-items/references/template.md)
+§1 verbatim (title, "How rows arrive here", an empty `## Live items` table, "Status
+snapshot", "See also"; `_None at present._` initial state). Do not reproduce the schema
+table here — it is sourced once from that template (per `rules/open-items-governance.md` §9).
 
 **`docs/project-control/open-items/README.md`** — operator orientation. Copy the content of
 the existing `docs/project-control/open-items/README.md` in the kit as-is — it is

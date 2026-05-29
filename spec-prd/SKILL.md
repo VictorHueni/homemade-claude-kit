@@ -309,15 +309,12 @@ Narrative discussion section — unresolved scope debates, persona edge cases, o
 
 This is the document-level canonical Open Items section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4. The PRD is a first adopter of the contract.
 
-**Schema (fixed column order):**
-
-```markdown
-## Open Items
-
-| OI-ID  | Type           | Summary                       | Source anchor | Source heading                          | Resolution path                                  | Priority | Status      | Owner   | Due / Review date | Tracker ref       |
-| :----- | :------------- | :---------------------------- | :------------ | :-------------------------------------- | :----------------------------------------------- | :------- | :---------- | :------ | :---------------- | :---------------- |
-| OI-001 | decision-gap   | Auth model for partner API    | #us-003       | US-003 Partner authentication           | Open ADR on token strategy                       | high     | open        | _TBD_   | 2026-06-15        | _TBD_             |
-```
+**Schema:** the PRD's `## Open Items` section uses the canonical 11-column order
+(`OI-ID`, `Type`, `Summary`, `Source anchor`, `Source heading`, `Resolution path`,
+`Priority`, `Status`, `Owner`, `Due / Review date`, `Tracker ref`) defined in
+[`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md)
+§4 — see the rule for the column list and a worked example row. Do not reproduce the
+schema table in this skill (per §9: skill files carry no Open Items table).
 
 **Rules:**
 

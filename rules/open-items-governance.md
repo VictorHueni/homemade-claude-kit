@@ -240,6 +240,14 @@ central ledger (§5) for project-scoped work. A skill's `SKILL.md` may carry at 
 **"Follow-up work"** pointer naming where its items live; it never carries the canonical
 `## Open Items` table.
 
+**No embedded schema tables either.** When a skill documents or instructs the `## Open Items`
+section of the artefact it produces, it references the §4 schema **by pointer** — it MUST NOT
+embed the canonical column table or example rows inside the `SKILL.md` (or its inline
+instructions). The schema lives once in §4; inline copies drift. The sole exception is a
+produced-artefact **output template** under a skill's `templates/` (or a `references/template.md`
+skeleton that is copied verbatim into `docs/`): those *are* the artefact, so they carry the
+canonical table header as their initial empty state per §8.
+
 Restated:
 
 - Items a skill tells Claude to **write into produced artefacts** → governed by §1–§8.

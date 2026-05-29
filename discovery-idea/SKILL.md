@@ -175,10 +175,9 @@ section is empty.
 
 ## Open Items
 
-Canonical document-level section per `rules/open-items-governance.md` §4. Schema:
-
-| OI-ID  | Type            | Summary | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref |
-| :----- | :-------------- | :------ | :------------ | :------------- | :-------------- | :------- | :----- | :---- | :---------------- | :---------- |
+The output idea-file carries a document-level `## Open Items` section using the canonical
+11-column schema in `rules/open-items-governance.md` §4 — do not reproduce the schema table
+in this skill (per §9: skill files carry no Open Items table).
 
 Use the `Type` taxonomy: `doc-gap` (missing info needed before graduation) · `decision-gap`
 (unresolved choice between variations) · `execution-item` (validation task — invoke
