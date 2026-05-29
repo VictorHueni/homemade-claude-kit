@@ -307,14 +307,10 @@ Narrative discussion section — unresolved scope debates, persona edge cases, o
 
 ### 9. Open Items
 
-This is the document-level canonical Open Items section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4. The PRD is a first adopter of the contract.
-
-**Schema:** the PRD's `## Open Items` section uses the canonical 11-column order
-(`OI-ID`, `Type`, `Summary`, `Source anchor`, `Source heading`, `Resolution path`,
-`Priority`, `Status`, `Owner`, `Due / Review date`, `Tracker ref`) defined in
-[`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md)
-§4 — see the rule for the column list and a worked example row. Do not reproduce the
-schema table in this skill (per §9: skill files carry no Open Items table).
+The PRD carries a document-level `## Open Items` section for unresolved work. Its schema and
+lifecycle are governed by [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md),
+which applies to every artefact automatically — emit the section using the PRD output
+structure; do not restate the schema here.
 
 **Rules:**
 

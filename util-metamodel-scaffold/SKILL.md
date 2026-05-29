@@ -185,8 +185,7 @@ Then write two stub files:
 **`docs/project-control/open-items/open-items.md`** — empty ledger. Copy the canonical
 ledger skeleton from [`util-open-items/references/template.md`](../util-open-items/references/template.md)
 §1 verbatim (title, "How rows arrive here", an empty `## Live items` table, "Status
-snapshot", "See also"; `_None at present._` initial state). Do not reproduce the schema
-table here — it is sourced once from that template (per `rules/open-items-governance.md` §9).
+snapshot", "See also"; `_None at present._` initial state).
 
 **`docs/project-control/open-items/README.md`** — operator orientation. Copy the content of
 the existing `docs/project-control/open-items/README.md` in the kit as-is — it is

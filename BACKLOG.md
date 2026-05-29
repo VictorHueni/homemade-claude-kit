@@ -73,18 +73,6 @@ Candidate skills to add to the kit, ordered by metamodel impact. Generated 2026-
 
 ---
 
-## Open follow-ups (shipped skills)
-
-Residual work on skills that have already shipped. Skill folders do **not** carry their own
-`## Open Items` sections (see `rules/open-items-governance.md` §9) — kit-level follow-ups live here.
-
-| OI-ID  | Skill                    | Type           | Summary                                                                          | Priority | Status | Owner  | Review date | Tracker ref |
-| :----- | :----------------------- | :------------- | :------------------------------------------------------------------------------- | :------- | :----- | :----- | :---------- | :---------- |
-| OI-001 | `ops-terraform-exoscale` | execution-item | Expand native Exoscale checks beyond `EXO-001` (permissive egress, public DBaaS, unencrypted volumes) — add to `scripts/exoscale-policy.sh` | medium   | open   | victor | 2026-08-29  | _TBD_       |
-| OI-002 | `ops-terraform-exoscale` | execution-item | Evaluate Checkov (reliable custom Terraform policies) as a second scanner — spike on Exoscale HCL, decide keep/drop | low      | open   | _TBD_  | 2026-08-29  | _TBD_       |
-
----
-
 ## Tier 1 — High impact, direct metamodel gap
 
 | Skill | Output path | Gap filled | New ID | Upstream links |

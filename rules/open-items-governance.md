@@ -234,31 +234,35 @@ tooling, not a governed artefact. It **MUST NOT** contain a `## Open Items` sect
 the skill's own development. Such a section is swept by no ledger, drifts silently, and
 mis-signals to `util-metamodel-audit` (which expects open items only in project artefacts).
 
-Follow-up work on a skill — new modes, extra checks, deferred refinements — is recorded in
-the kit `BACKLOG.md` (§Open follow-ups) for kit-level work, or in the relevant project's
-central ledger (§5) for project-scoped work. A skill's `SKILL.md` may carry at most a short
-**"Follow-up work"** pointer naming where its items live; it never carries the canonical
-`## Open Items` table.
+Follow-up work on a skill — new modes, extra checks, deferred refinements — is **real
+governance work on the kit itself**, so the kit dogfoods this very contract: such items live
+in the kit's own central ledger at `docs/project-control/open-items/open-items.md` (§5), as
+central-only rows (`Source heading: _central-only_`, empty `Source anchor`). They do **not**
+live in the skill folder, and they are **not** roadmap entries — `BACKLOG.md` tracks
+candidate/shipped skills, not open items. A skill's `SKILL.md` may carry at most a short
+**"Follow-up work"** pointer to the ledger; it never carries the canonical `## Open Items`
+table.
 
-**No embedded schema tables either.** When a skill documents or instructs the `## Open Items`
-section of the artefact it produces, it references the §4 schema **by pointer** — it MUST NOT
-embed the canonical column table or example rows inside the `SKILL.md` (or its inline
-instructions). The schema lives once in §4; inline copies drift. The sole exception is a
-produced-artefact **output template** under a skill's `templates/` (or a `references/template.md`
-skeleton that is copied verbatim into `docs/`): those *are* the artefact, so they carry the
-canonical table header as their initial empty state per §8.
+**Skills do not restate the schema.** A skill that produces an artefact carrying Open Items
+does **not** embed the canonical table, an example row, or a §4 column recital in its
+`SKILL.md` or inline instructions. The schema is supplied by the artefact's own **output
+template** (under the skill's `templates/`, or a `references/template.md` copied verbatim
+into `docs/`), and by this rule, which applies to every artefact globally — so the skill has
+nothing to point at. The sole place an Open Items table literally appears in a skill folder
+is such an output template: that template *is* the artefact's initial state (§8).
 
 Restated:
 
-- Items a skill tells Claude to **write into produced artefacts** → governed by §1–§8.
-- Items about the **skill's own evolution** → kit `BACKLOG.md`, never inside the skill folder.
+- Items a skill tells Claude to **write into produced artefacts** → governed by §1–§8; schema comes from the output template, not from the SKILL.md.
+- Items about the **skill's own evolution** → the kit's `docs/project-control/open-items/` ledger, never inside the skill folder.
 
 ---
 
 ## 10. See also
 
 - `rules/metamodel.md` — strategic-architecture build order; references this contract.
-- `BACKLOG.md` — kit-level skill backlog + §Open follow-ups (per §9).
+- `docs/project-control/open-items/open-items.md` — the kit's own ledger (kit-dev open items per §9).
+- `BACKLOG.md` — kit-level skill backlog (candidate + shipped skills; not open items).
 - `util-open-items/SKILL.md` — operating manual for the living ledger.
 - `util-metamodel-audit/references/check-catalogue.md` — exact audit checks for governance
   drift, schema compliance, and provenance.

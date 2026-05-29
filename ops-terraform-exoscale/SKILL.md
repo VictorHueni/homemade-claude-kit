@@ -121,6 +121,6 @@ Audit existing `.tf` without executing anything. Read the project, then check ag
 
 ## Follow-up work
 
-Skill follow-ups are tracked in the kit `BACKLOG.md` (§Open follow-ups), not in this
-SKILL.md — see `rules/open-items-governance.md` §9. Current items: expand native
-Exoscale checks beyond `EXO-001`; evaluate Checkov as a second scanner.
+Kit-development follow-ups for this skill live in the kit's own ledger at
+`docs/project-control/open-items/open-items.md` (`OI-0001` expand native checks, `OI-0002`
+evaluate Checkov) — not in this SKILL.md, per `rules/open-items-governance.md` §9.

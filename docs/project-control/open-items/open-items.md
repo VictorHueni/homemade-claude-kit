@@ -37,12 +37,15 @@ This table is the only authoritative view of currently open governance work. Clo
 dropped rows linger here for one review cycle (default 30 days per §6 of the governance
 rule), then move to `archive/`.
 
-| OI-ID | Type | Summary | Source artefact | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref |
-| :---- | :--- | :------ | :-------------- | :------------ | :------------- | :-------------- | :------- | :----- | :---- | :---------------- | :---------- |
+| OI-ID   | Type           | Summary                                                                                              | Source artefact                                       | Source anchor | Source heading  | Resolution path                                                            | Priority | Status | Owner  | Due / Review date | Tracker ref |
+| :------ | :------------- | :--------------------------------------------------------------------------------------------------- | :---------------------------------------------------- | :------------ | :-------------- | :------------------------------------------------------------------------- | :------- | :----- | :----- | :---------------- | :---------- |
+| OI-0001 | execution-item | Expand native Exoscale checks beyond `EXO-001` (permissive egress, public DBaaS, unencrypted volumes) | `ops-terraform-exoscale/scripts/exoscale-policy.sh`   |               | _central-only_  | Add checks to `exoscale-policy.sh` following the `EXO-001` pattern          | medium   | open   | victor | 2026-08-29        | _TBD_       |
+| OI-0002 | execution-item | Evaluate Checkov as a second Terraform scanner (reliable custom policies)                            | `ops-terraform-exoscale/`                             |               | _central-only_  | Spike Checkov YAML/Python policies on Exoscale HCL; decide keep/drop        | low      | open   | _TBD_  | 2026-08-29        | _TBD_       |
 
-_None at present._ The ledger initialises empty; the first sync from any artefact will
-populate it. Do not scaffold placeholder rows here — empty is the correct initial state
-per §2 of the governance rule.
+OI-0001 / OI-0002 are kit-development items raised directly at the central plane (the kit
+dogfoods its own open-items contract per `rules/open-items-governance.md` §9). They carry
+`_central-only_` provenance because they have no source-artefact `## Open Items` section —
+skill folders do not carry one.
 
 ---
 
