@@ -175,6 +175,34 @@ If a source artefact is renamed, the central ledger row is updated; if a heading
 renamed, the `Source heading` field is updated while the anchor remains stable, or the
 anchor is updated and the new heading recorded.
 
+### 5.1 Ledger column layout
+
+The ledger uses the §4 canonical columns plus one ledger-only column, `Source artefact`
+(the relative repo path), inserted **after `Summary`**:
+
+```
+OI-ID | Type | Summary | Source artefact | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref
+```
+
+This is the one sanctioned deviation from §4's "additional columns only after `Tracker ref`"
+rule — it applies to the ledger surface only, never to a local `## Open Items` section.
+
+### 5.2 Central-only rows (governance work with no source artefact)
+
+Most rows originate in an artefact's local `## Open Items` section and carry full provenance.
+Some governance work is raised **directly at the central plane** and has no artefact home —
+e.g. kit-development items (per §9), or repo-wide decisions not owned by any single document.
+These **central-only** rows are valid and use this provenance form:
+
+- `Source heading` = `_central-only_`
+- `Source anchor` = empty
+- `Source artefact` = the owning folder/skill or scope marker (e.g. `ops-terraform-exoscale/`),
+  or `(cross-cutting)` when no single location applies.
+
+`util-metamodel-audit` MUST NOT flag central-only rows as orphaned or as provenance-drift
+findings. All other §4 column rules (valid `Type`, lifecycle `Status`, `_TBD_`-until-terminal
+`Tracker ref`, ISO date) apply unchanged.
+
 ---
 
 ## 6. Archive and snapshots
