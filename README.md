@@ -45,6 +45,7 @@ A personal Claude Code toolkit — composable skills for business architecture, 
 | `dev-` | `dev-git-worktree` | Isolated git worktrees |
 | `dev-` | `dev-ralph-loop` | Autonomous increment execution |
 | `com-` | `com-slide-deck` | HTML slide deck builder |
+| `com-` | `com-artefact-viz` | Interactive HTML views of artefacts (capability map · FBS · roadmap · BMC) |
 | `util-` | `util-metamodel-scaffold` | Canonical docs/ folder tree + INDEX.md + CLAUDE.md wiring |
 | `util-` | `util-metamodel-audit` | Artefact stack health check |
 | `util-` | `util-metamodel-migration` | Docs folder migration report |

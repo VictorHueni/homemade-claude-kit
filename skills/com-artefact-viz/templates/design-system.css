@@ -1,0 +1,55 @@
+/*
+ * Default design-system tokens for com-artefact-viz.
+ *
+ * These are intentionally neutral. To theme a view with a project's own
+ * design system, pass `--design-system path/to/styles.css` to render.py;
+ * that sheet is inlined AFTER this one, so its :root tokens override these.
+ *
+ * Renderers reference ONLY these tokens via var(); they never hard-code a
+ * colour, font, or radius. That contract is what makes re-theming free.
+ */
+:root {
+  /* palette */
+  --ink:        #1a1f29;
+  --muted:      #6b7280;
+  --canvas-bg:  #f6f7f9;
+  --surface:    #ffffff;
+  --surface-2:  #eef1f5;
+  --border:     #d7dce3;
+  --accent:     #3b6ef5;
+  --accent-ink: #ffffff;
+
+  /* strategic-importance / status accents (override per project palette) */
+  --differentiator: #d9534f;  /* "where the business wins or loses" */
+  --necessary:      #f0ad4e;  /* required for operation */
+  --commodity:      #6b7280;  /* could be outsourced */
+  --status-shipped: #2e9e5b;  /* ✅ */
+  --status-planned: #3b6ef5;  /* 🔄 */
+  --status-backlog: #9aa3af;  /* ⬜ */
+
+  /* pain index (delivery roadmap) */
+  --pain-critical: #d9534f;
+  --pain-high:     #f0ad4e;
+  --pain-medium:   #3b6ef5;
+  --pain-low:      #9aa3af;
+
+  /* confidence (BMC) */
+  --conf-assumed:   #9aa3af;
+  --conf-tested:    #f0ad4e;
+  --conf-validated: #2e9e5b;
+
+  /* typography */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  --title-size: 1.6rem;
+
+  /* spacing + shape */
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --shell-max: 1400px;
+  --card-radius: 12px;
+  --btn-radius: 8px;
+  --node-radius: 10px;
+  --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.10);
+}

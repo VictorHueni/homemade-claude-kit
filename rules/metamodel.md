@@ -61,6 +61,7 @@ what order, and where to put it**.
 - `dev-getting-started` — scaffold and populate a project-specific getting-started guide; reads project files (package.json, docker-compose, .env.example, Makefile, CLAUDE.md) to emit exact commands; three modes: scaffold, fill, refresh → `docs/dev-guides/getting-started.md`; singleton per project
 - `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-ralph-loop` — developer workflow (commit, pull-request, worktree, ralph loop)
 - `com-slide-deck` — HTML slide presentations → `docs/communication/slides/{slug}/` (one folder per deck, named after the presentation in kebab-case)
+- `com-artefact-viz` — renders canonical artefacts (capability map, FBS, delivery roadmap, BMC/Lean Canvas) into single-file interactive HTML views → `docs/communication/visualisations/{kind}.html`; parse→model→render pipeline (Python stdlib only) with a token-driven design system that a project re-themes via one CSS sheet (`--design-system`, e.g. a `com-slide-deck` stylesheet); mints no IDs and is not a build-order step — a derived, regenerable read-out of artefacts that remain the source of truth; companion to `com-slide-deck`
 
 ---
 
