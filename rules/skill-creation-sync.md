@@ -4,7 +4,7 @@ How to create a new Claude skill, publish it to `homemade-claude-kit`, and make 
 
 ## Where new skills live
 
-New skills belong in `<KIT_DIR>/<skill-name>/SKILL.md` (with optional `references/` and `scripts/` subdirs).
+New skills belong in `<KIT_DIR>/skills/<skill-name>/SKILL.md` (with optional `references/` and `scripts/` subdirs). All skill folders live under `skills/`; the repo root holds only `install.sh`, `README.md`, and the non-skill dirs `commands/`, `rules/`, `docs/`, `scripts/`, `var/`.
 
 **Finding the kit:** `homemade-claude-kit` is always a sibling of the current project — the parent folder name varies by machine (`projets/` vs `projects/`). Derive it reliably from the current git root:
 
@@ -15,7 +15,7 @@ KIT_DIR="$(dirname "$(git rev-parse --show-toplevel)")/homemade-claude-kit"
 ## Standard skill structure
 
 ```
-<KIT_DIR>/<skill-name>/
+<KIT_DIR>/skills/<skill-name>/
   SKILL.md              # required — YAML frontmatter + Claude-facing instructions
   references/           # optional — markdown content the skill loads on demand
   scripts/              # optional — runtime helpers
@@ -111,8 +111,8 @@ When only ONE skill exists per artefact, **drop the verb suffix**. The "build" i
 When you create or rename a skill, verify name consistency:
 
 ```bash
-for skill in */; do
-  skill_name="${skill%/}"
+for skill in skills/*/; do
+  skill_name="$(basename "${skill%/}")"
   [ -f "$skill/SKILL.md" ] && name=$(grep "^name:" "$skill/SKILL.md" | sed -E 's/name: *//; s/^"//; s/"$//')
   [ "$skill_name" != "$name" ] && echo "MISMATCH: folder=$skill_name name=$name"
 done
@@ -276,8 +276,8 @@ For each skill whose output *should reference the new artefact's IDs or path*, a
 
 ```bash
 # 1. Naming consistency
-for skill in */; do
-  skill_name="${skill%/}"
+for skill in skills/*/; do
+  skill_name="$(basename "${skill%/}")"
   [ -f "$skill/SKILL.md" ] && name=$(grep "^name:" "$skill/SKILL.md" | sed -E 's/name: *//; s/^"//; s/"$//')
   [ "$skill_name" != "$name" ] && echo "MISMATCH: folder=$skill_name name=$name"
 done

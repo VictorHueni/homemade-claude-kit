@@ -148,7 +148,7 @@ sync_skills() {
     local target="$1"
     local -n _chg="$2" _prun="$3" _same="$4"
 
-    for skill_dir in "$SCRIPT_DIR"/*/; do
+    for skill_dir in "$SCRIPT_DIR"/skills/*/; do
         local skill_name link desired resolved
         skill_name="$(basename "${skill_dir%/}")"
         [[ -f "$skill_dir/SKILL.md" ]] || continue
@@ -183,7 +183,7 @@ sync_skills() {
         else
             resolved=""
         fi
-        if [[ -L "$link" ]] && [[ "$resolved" == "$SCRIPT_DIR/"* ]] && [[ ! -d "$SCRIPT_DIR/$skill_name" ]]; then
+        if [[ -L "$link" ]] && [[ "$resolved" == "$SCRIPT_DIR/"* ]] && [[ ! -d "$SCRIPT_DIR/skills/$skill_name" ]]; then
             rm "$link"
             log_verbose "  ✗ pruned skill: $skill_name"
             _prun=$(( _prun + 1 ))

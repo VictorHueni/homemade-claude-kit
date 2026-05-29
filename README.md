@@ -77,7 +77,7 @@ git pull
 
 ## Adding a skill
 
-1. Create `{skill-name}/SKILL.md` — follow the naming convention in [`rules/skill-creation-sync.md`](./rules/skill-creation-sync.md)
+1. Create `skills/{skill-name}/SKILL.md` — follow the naming convention in [`rules/skill-creation-sync.md`](./rules/skill-creation-sync.md)
 2. Run `./install.sh` to symlink it
 3. Commit and push
 
