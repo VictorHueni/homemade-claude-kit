@@ -6,6 +6,7 @@ status: active
 last_reviewed: 2026-05-22
 review_interval: 180d
 user-invocable: true
+impact: "low"
 ---
 
 # Ops Runbook Creator

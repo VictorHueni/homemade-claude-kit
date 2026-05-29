@@ -8,6 +8,8 @@ impact: "low"
 metadata:
   category: "specification"
   complexity: "medium"
+status: active
+last_reviewed: 2026-05-29
 ---
 
 # Business Process Analyst

@@ -8,6 +8,8 @@ impact: 'high'
 metadata:
   category: 'execution'
   complexity: 'high'
+status: active
+last_reviewed: 2026-05-29
 ---
 
 # Ralph Loop Runner

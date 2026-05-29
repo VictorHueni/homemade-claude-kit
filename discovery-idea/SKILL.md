@@ -8,6 +8,8 @@ impact: "low"
 metadata:
   category: "discovery"
   complexity: "medium"
+status: active
+last_reviewed: 2026-05-29
 ---
 
 # Discovery — Idea Capture, Refinement, and Graduation

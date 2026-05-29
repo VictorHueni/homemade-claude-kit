@@ -10,6 +10,10 @@ description: >
   asks to define or update a design system for a presentation. Do NOT use for
   PowerPoint (.pptx) files, PDF exports, or Google Slides.
 version: "1.0.0"
+status: active
+last_reviewed: 2026-05-29
+user-invocable: true
+impact: "low"
 ---
 
 # Slide Builder

@@ -8,6 +8,8 @@ impact: "medium"
 metadata:
   category: "specification"
   complexity: "low"
+status: active
+last_reviewed: 2026-05-29
 ---
 
 # Product Vision Builder

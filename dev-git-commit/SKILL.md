@@ -4,6 +4,10 @@ description: 'Execute git commit with conventional commit message analysis, inte
 license: MIT
 allowed-tools: Bash
 version: "1.0.0"
+status: active
+last_reviewed: 2026-05-29
+user-invocable: true
+impact: "low"
 ---
 
 # Git Commit with Conventional Commits

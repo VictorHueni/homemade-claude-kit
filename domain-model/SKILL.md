@@ -8,6 +8,8 @@ impact: "low"
 metadata:
   category: "domain"
   complexity: "high"
+status: active
+last_reviewed: 2026-05-29
 ---
 
 # Domain Model Builder

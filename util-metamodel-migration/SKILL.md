@@ -8,6 +8,8 @@ impact: "low"
 metadata:
   category: "utility"
   complexity: "high"
+status: active
+last_reviewed: 2026-05-29
 ---
 
 # Metamodel Migration Doctor

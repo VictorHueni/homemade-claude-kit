@@ -8,6 +8,8 @@ impact: "low"
 metadata:
   category: "utility"
   complexity: "low"
+status: active
+last_reviewed: 2026-05-29
 ---
 
 # Docs Lint — CI Scaffold
