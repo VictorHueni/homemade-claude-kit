@@ -1,0 +1,80 @@
+# Worked recipe: SSH key + security group (least-privilege SSH) + private network
+# + Ubuntu compute instance. All environment-specific values are variables.
+
+variable "instance_name" {
+  description = "Name for the compute instance and derived resources."
+  type        = string
+}
+
+variable "template_name" {
+  description = "OS template name to resolve into an image ID."
+  type        = string
+  default     = "Linux Ubuntu 24.04 LTS 64-bit"
+}
+
+variable "disk_size" {
+  description = "Root disk size in GB."
+  type        = number
+  default     = 50
+}
+
+variable "ssh_public_key" {
+  description = "Public key material for the deploy keypair."
+  type        = string
+}
+
+data "exoscale_template" "os" {
+  zone = var.zone
+  name = var.template_name
+}
+
+resource "exoscale_ssh_key" "deploy" {
+  name       = "${var.instance_name}-deploy"
+  public_key = var.ssh_public_key
+}
+
+resource "exoscale_security_group" "app" {
+  name = "${var.instance_name}-sg"
+}
+
+resource "exoscale_security_group_rule" "ssh" {
+  security_group_id = exoscale_security_group.app.id
+  type              = "INGRESS"
+  protocol          = "TCP"
+  start_port        = 22
+  end_port          = 22
+  cidr              = var.admin_cidr # scoped — never 0.0.0.0/0
+}
+
+resource "exoscale_private_network" "app" {
+  zone     = var.zone
+  name     = "${var.instance_name}-net"
+  netmask  = "255.255.255.0"
+  start_ip = "10.0.0.20"
+  end_ip   = "10.0.0.250"
+}
+
+resource "exoscale_compute_instance" "app" {
+  name        = var.instance_name
+  zone        = var.zone
+  type        = var.instance_type
+  template_id = data.exoscale_template.os.id
+  disk_size   = var.disk_size
+  ssh_keys    = [exoscale_ssh_key.deploy.name]
+
+  security_group_ids = [exoscale_security_group.app.id]
+
+  network_interface {
+    network_id = exoscale_private_network.app.id
+  }
+}
+
+output "instance_id" {
+  description = "ID of the compute instance."
+  value       = exoscale_compute_instance.app.id
+}
+
+output "instance_public_ip" {
+  description = "Public IPv4 address of the compute instance."
+  value       = exoscale_compute_instance.app.public_ip_address
+}

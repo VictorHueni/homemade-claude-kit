@@ -1,0 +1,21 @@
+# OPTIONAL — remote state in Exoscale SOS (S3-compatible). See references/sos-backend.md.
+# Backend needs SOS creds via AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (set to your Exoscale key/secret).
+# NOTE: SOS has no native state locking — serialise applies. This skill never applies.
+#
+# Uncomment and fill in to enable:
+#
+# terraform {
+#   backend "s3" {
+#     bucket = "tfstate-CHANGEME"
+#     key    = "infra/terraform.tfstate"
+#     region = "ch-gva-2"
+#
+#     endpoints = { s3 = "https://sos-ch-gva-2.exo.io" }
+#
+#     skip_region_validation      = true
+#     skip_credentials_validation = true
+#     skip_requesting_account_id  = true
+#     skip_metadata_api_check     = true
+#     use_path_style              = true
+#   }
+# }

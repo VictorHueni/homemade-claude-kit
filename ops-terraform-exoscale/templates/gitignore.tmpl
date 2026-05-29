@@ -1,0 +1,18 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl.bak
+
+# State — may contain secrets in plaintext. Never commit.
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Variable files may hold sensitive inputs. Commit *.tfvars.example instead.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# Crash / plan output
+crash.log
+crash.*.log
+*.tfplan

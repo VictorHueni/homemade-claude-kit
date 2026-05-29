@@ -41,7 +41,7 @@ Skill folder name + `name:` frontmatter field must follow this exact pattern:
 | `spec-` | `docs/product-specs/`, `docs/exec-plans/` | `spec-prd`, `spec-functional-breakdown-structure`, `spec-implementation-plan`, `spec-peer-review` |
 | `arch-` | `docs/architecture/` (subfolders per artefact type) | `arch-adr` (writes to `docs/architecture/decisions/`) |
 | `domain-` | `docs/domain/` | DDD artefacts — bounded contexts, glossary, domain model; the shared language between business and tech | `domain-bounded-context`, `domain-glossary`, `domain-model` |
-| `ops-` | `docs/ops/` (subfolders per artefact type) | `ops-runbook` (→ `docs/ops/runbooks/`), `ops-bug-rca` (→ `docs/ops/rcas/`) |
+| `ops-` | `docs/ops/` for doc artefacts; *(no doc folder)* for infra/devops automation | `ops-runbook` (→ `docs/ops/runbooks/`), `ops-bug-rca` (→ `docs/ops/rcas/`), `ops-terraform-exoscale` *(infra automation — scaffolds into the project's `infra/`, no `docs/ops/` output)* |
 | `dev-` | *(no doc folder — developer workflow utility)* | `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-ralph-loop` |
 | `com-` | `docs/communication/` (subfolders per artefact type, e.g. `slides/`) | `com-slide-deck` (→ `docs/communication/slides/{slug}/`) |
 | `util-` | *(no doc folder — housekeeping)* | `util-docs-audit`, `util-toolkit-doctor` |
