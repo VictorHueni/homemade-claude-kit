@@ -138,7 +138,7 @@ hardening tasks that should not block first use (execution-item), known
 workarounds to be paid back later (tech-debt). When the runbook carries such
 work, add a document-level `## Open Items` section per
 [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md)
-§1 + §4 (canonical 11-column schema; rows carry `Source anchor` +
+(rows carry `Source anchor` +
 `Source heading` pointing back to the originating runbook step — e.g.
 `#step-3` + "Step 3 — Restore from backup").
 

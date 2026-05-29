@@ -109,7 +109,7 @@ doc-gaps to fill before a specific increment can start, follow-up execution
 items that should not block the plan but must not be lost, tech-debt items
 explicitly deferred. When the plan carries such work, add a document-level
 `## Open Items` section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md)
-§1 + §4 (canonical 11-column schema; rows carry `Source anchor` +
+(rows carry `Source anchor` +
 `Source heading` pointing back to the originating increment — e.g.
 `#increment-03` + "Increment 03: Normalize Existing Artefact Templates").
 

@@ -123,7 +123,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
      - BMC blocks: which blocks promote from `Assumed` to `Tested` (or get demoted)
      - Model assumptions: which inputs recalibrate (e.g., recovery rate 50% → 65%)
      - Competitive landscape: which competitor claims gain evidence
-   - **Open Items** (document-level canonical section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4) — actionable unresolved work surfaced by the wave: what wasn't answered (next-wave research), decisions deferred, follow-up execution items. Each row carries `Source anchor` + `Source heading` pointing into the synthesis (e.g. Per-hypothesis verdict, Theme cluster N). Empty is acceptable — `_None at present._` is correct if nothing actionable remains. Do NOT scaffold placeholder rows. Schema: OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref.
+   - **Open Items** (document-level canonical section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4) — actionable unresolved work surfaced by the wave: what wasn't answered (next-wave research), decisions deferred, follow-up execution items. Each row carries `Source anchor` + `Source heading` pointing into the synthesis (e.g. Per-hypothesis verdict, Theme cluster N). Empty is acceptable — `_None at present._` is correct if nothing actionable remains. Do NOT scaffold placeholder rows.
    - **Confidence summary** — count of claims now Validated vs Tested vs still Assumed
 
 ### Mode 4 — Research plan (optional)

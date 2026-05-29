@@ -328,7 +328,7 @@ Before declaring the work done:
 - [ ] Header has Status / Date / Author / Last verified / Feeds ADRs (Superseded by may be empty).
 - [ ] §Questions index lists every Q numbered.
 - [ ] Every Q section has its 4 sub-sections (Context / Sources consulted / Finding / Implication for ADRs). Per-Q gaps are consolidated into the single document-level §Open Items section — no `###` open-gap subsection per question.
-- [ ] Document-level §Open Items section present with the canonical schema from `rules/open-items-governance.md` §4 (OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref). Each row from a per-Q gap carries `Source anchor = #qN` and `Source heading = "Qn — restated question"`.
+- [ ] Document-level §Open Items section present per `rules/open-items-governance.md`. Each row from a per-Q gap carries `Source anchor = #qN` and `Source heading = "Qn — restated question"`.
 - [ ] §Sources consulted tables have: URL · Type · Last verified · Confidence · Quote (no missing columns).
 - [ ] No confidence inflation (consultancy blogs not rated above ★★).
 - [ ] No citation without quote.

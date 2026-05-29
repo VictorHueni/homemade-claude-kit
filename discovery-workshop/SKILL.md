@@ -139,7 +139,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
    - **Follow-up commitments** (with owners + dates)
    - **Updates to upstream artefacts** (BMC blocks promoted, personas refined, value-stream stages added, etc.)
    - **What went well / what to change** for next workshop
-   - **Open Items** (document-level canonical section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4) — actionable unresolved work surfaced during the workshop: questions the room could not close, decisions deferred, follow-ups for the next wave. Each row carries `Source anchor` + `Source heading` pointing into the synthesis (Decisions made, Follow-up commitments, etc.). Empty is acceptable — `_None at present._` is correct if nothing actionable remains. Do NOT scaffold placeholder rows. Schema: OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref.
+   - **Open Items** (document-level canonical section per [`rules/open-items-governance.md`](https://github.com/VictorHueni/homemade-claude-kit/blob/main/rules/open-items-governance.md) §1 + §4) — actionable unresolved work surfaced during the workshop: questions the room could not close, decisions deferred, follow-ups for the next wave. Each row carries `Source anchor` + `Source heading` pointing into the synthesis (Decisions made, Follow-up commitments, etc.). Empty is acceptable — `_None at present._` is correct if nothing actionable remains. Do NOT scaffold placeholder rows.
    - **Cross-link to series file** if applicable
 
 ---
