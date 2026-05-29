@@ -1,5 +1,5 @@
 # lychee link-check rules for docs/. Auto-discovered from the repo root.
-# Reference: https://lychee.cli.rs/usage/config/
+# Reference: https://github.com/lycheeverse/lychee/blob/master/lychee.example.toml
 
 # Network resilience for flaky/rate-limited hosts.
 max_retries = 3
@@ -17,6 +17,6 @@ exclude = [
   "^https?://0\\.0\\.0\\.0",
 ]
 
-# Fragment (#anchor) checking is off by default — flip to true to verify that
-# in-page anchors resolve (slower, and noisy on generated heading slugs).
-include_fragments = false
+# Fragment (#anchor) checking is OFF by default (key omitted). To verify that
+# in-page anchors resolve, add: include_fragments = "full"  (a string, not a
+# boolean — lychee errors on `false`; slower and noisy on generated heading slugs).

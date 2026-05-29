@@ -109,7 +109,7 @@ Run after `docs/domain/02c-glossary.md` exists with `**Aliases (deprecated):**` 
 
 - **Stricter prose:** lower `MinAlertLevel` in `.vale.ini` from `warning` to `suggestion` to surface the full Microsoft set (Passive, Wordiness, ComplexWords, …), or raise to `error` to make prose block.
 - **Different prose style:** swap `Packages`/`BasedOnStyles` to `Google` etc.
-- **Link anchors:** set `include_fragments = true` in `lychee.toml` to verify in-page `#anchor` targets.
+- **Link anchors:** add `include_fragments = "full"` to `lychee.toml` to verify in-page `#anchor` targets (string value — lychee errors on a boolean).
 - **Scope:** widen `dprint.json` `includes` and the vale/lychee paths beyond `docs/**` if desired.
 
 ## Anti-patterns
