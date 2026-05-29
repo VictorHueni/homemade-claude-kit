@@ -8,8 +8,11 @@ Deterministic, well-known tools only. Pinned versions (bump here on refresh, the
 | Exoscale provider | `~> 0.69` (0.69.2) | provider plugin |
 | tflint | `v0.62.1` | HCL linter (correctness, deprecations, naming) |
 | Trivy | `v0.70.0` | Built-in IaC misconfig + secret scan (`trivy fs --scanners misconfig,secret`) |
+| Exoscale CLI (`exo`) | `latest` | **Read-only** post-apply deployment verification (`exo … list`) — Mode 5 |
 
 Trivy is **auto-detected**: the scan runs when `trivy` is on `PATH` and is skipped (with a warning, not a failure) when it is absent. Checkov remains out of scope.
+
+`exo` is likewise **auto-detected** and **never part of the `tf-check.sh` plan pipeline** — it powers the separate post-apply verification step (`scripts/exo-verify.sh`, Mode 5). The skill invokes it for inventory reads only (`list` / `show`); mutating verbs are forbidden by Safety rule 1.
 
 ## The pipeline (what `scripts/tf-check.sh` runs)
 
@@ -21,6 +24,18 @@ Trivy is **auto-detected**: the scan runs when `trivy` is on `PATH` and is skipp
 6. `terraform plan` — read-only diff against the real API (needs `EXOSCALE_API_KEY`/`SECRET`, and a real `init` if a backend is configured). **The pipeline stops here — never `apply`.**
 
 The script exits non-zero on the first failing stage and prints which tool is missing if a binary isn't on `PATH`.
+
+## Deployment verification with `exo` (read-only, post-apply)
+
+`scripts/exo-verify.sh` lists what is actually deployed in the Exoscale account so you can diff reality against the Terraform config **after a human has applied**. It calls only read-only `exo … list` subcommands (compute instances, security groups, private networks, anti-affinity groups, NLBs `exo compute load-balancer list`, SKS clusters, DBaaS, SOS buckets, DNS) and prints them; pass `--json` for `exo --output-format json`.
+
+- It is **never** wired into `tf-check.sh` — that pipeline is the *pre-apply* gate (ends at `plan`). Verification is a *post-apply* read.
+- `exo` auto-detected: absent → skipped with a warning (exit 0, non-blocking). Present but unconfigured → run `exo config` or export `EXOSCALE_API_KEY` / `EXOSCALE_API_SECRET`. The CLI stores config in `~/.config/exoscale/exoscale.toml`.
+- Per-resource calls are best-effort: a subcommand absent on a given `exo` version is skipped, not fatal.
+- For a Terraform-native drift signal instead of / alongside `exo`, re-run `terraform plan` — a clean "no changes" plan means live state matches config.
+- **Mutation is forbidden.** The skill only ever runs read-only `exo` verbs. `exo` can create/delete/scale live infra; that is out of bounds exactly as `terraform apply` is (Safety rule 1).
+
+See the [exo CLI command reference](https://community.exoscale.com/reference/cli/exo/) for the full subcommand tree.
 
 ## Installing the tools
 
@@ -47,6 +62,14 @@ trivy --version   # expect 0.70.0
 ```
 
 (macOS: `brew install trivy`; verify the version matches the pin.)
+
+**Exoscale CLI (`exo`)** — via [mise](https://mise.jdx.dev/) (`exo = "latest"` in `~/.mise.toml`, then `mise install`), or the [official releases](https://github.com/exoscale/cli/releases):
+
+```bash
+mise use -g exo@latest   # or: download the release binary
+exo config               # one-time: stores API key/secret in ~/.config/exoscale/exoscale.toml
+exo version
+```
 
 ## Scanning notes
 

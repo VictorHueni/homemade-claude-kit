@@ -1,7 +1,7 @@
 ---
 name: ops-terraform-exoscale
-description: "Scaffold, lint, validate, and plan Terraform infrastructure for Exoscale following best practices. Companion to HashiCorp's terraform-code-generation plugin (defers HCL style + .tftest.hcl to it; owns the Exoscale provider, resource recipes, and a deterministic fmt -> validate -> tflint -> exoscale-policy -> trivy -> plan toolchain). Four modes: scaffold (provider/versions/variables/.tflint.hcl/.gitignore + optional SOS remote state), add-resource (compute, private network, security group, SKS, DBaaS, NLB, IAM recipes), check (run the pipeline), review (audit existing .tf). PLAN-ONLY: never runs apply/destroy, never writes secrets to disk (creds via EXOSCALE_API_KEY/EXOSCALE_API_SECRET env vars). Triggers on: exoscale terraform, provision exoscale, exoscale provider, terraform exoscale, exoscale compute instance, exoscale SKS, exoscale dbaas, terraform lint, tflint, trivy, iac scan, terraform plan exoscale, IaC exoscale, scaffold terraform, SOS backend."
-version: "1.0.0"
+description: "Scaffold, lint, validate, and plan Terraform infrastructure for Exoscale following best practices. Companion to HashiCorp's terraform-code-generation plugin (defers HCL style + .tftest.hcl to it; owns the Exoscale provider, resource recipes, and a deterministic fmt -> validate -> tflint -> exoscale-policy -> trivy -> plan toolchain). Five modes: scaffold (provider/versions/variables/.tflint.hcl/.gitignore + optional SOS remote state), add-resource (compute, network, security group, SKS, DBaaS, NLB, IAM), check (run the pipeline), review (audit existing .tf), verify (read-only post-apply inventory via the exo CLI). PLAN-ONLY: never runs apply/destroy, only read-only exo list/show, never writes secrets to disk (creds via EXOSCALE_API_KEY/EXOSCALE_API_SECRET env vars). Triggers on: exoscale terraform, provision exoscale, exoscale provider, exoscale SKS, exoscale dbaas, terraform lint, tflint, trivy, iac scan, verify exoscale deployment, exo cli, IaC exoscale, scaffold terraform, SOS backend."
+version: "1.1.0"
 status: active
 last_reviewed: 2026-05-29
 review_interval: 90d
@@ -24,10 +24,11 @@ Pinned versions this skill targets (bump in `references/toolchain.md` when refre
 - Trivy: `v0.70.0` (auto-detected; built-in misconfig + secret scan; skipped if absent)
 - Terraform: `>= 1.6`
 - Exoscale-specific gating: native `scripts/exoscale-policy.sh` (no external dep)
+- Exoscale CLI (`exo`): `latest` — **read-only** deployment verification (auto-detected; skipped if absent)
 
 ## Safety rules (non-negotiable)
 
-1. **Plan-only.** This skill may run `terraform fmt`, `validate`, `init`, `plan`. It MUST NEVER run `terraform apply`, `terraform destroy`, `terraform import`, `terraform state rm/mv`, or anything that mutates live infrastructure or state. A human runs `apply` themselves after reviewing the plan.
+1. **Plan-only.** This skill may run `terraform fmt`, `validate`, `init`, `plan`. It MUST NEVER run `terraform apply`, `terraform destroy`, `terraform import`, `terraform state rm/mv`, or anything that mutates live infrastructure or state. A human runs `apply` themselves after reviewing the plan. This extends to the `exo` CLI: only **read-only** `exo … list` / `show` subcommands are ever invoked (deployment verification). Never run a mutating `exo` verb (`create`, `delete`, `update`, `scale`, `start`, `stop`, `reboot`, `reset`, …) — `exo` can mutate live infra and is out of bounds here exactly as `terraform apply` is.
 2. **No secrets on disk.** Never write API key/secret literals into any `.tf` or `.tfvars` file. Credentials reach Terraform only through `EXOSCALE_API_KEY` / `EXOSCALE_API_SECRET` environment variables. The `provider "exoscale"` block is left credential-less.
 3. **Secret/state hygiene.** Every scaffold writes a `.gitignore` excluding `.terraform/`, `*.tfstate`, `*.tfstate.*`, `*.tfvars` (except `*.tfvars.example`), and crash logs.
 4. **Pin everything.** Provider and `required_version` are always pinned; never emit an unconstrained `required_providers` block.
@@ -47,7 +48,7 @@ claude plugin install terraform-code-generation@hashicorp
 
 That plugin's `terraform-style-guide` skill governs HCL formatting/idioms and `terraform-test` governs `.tftest.hcl`. This skill does **not** restate those rules — it assumes them and layers Exoscale specifics on top. If the user cannot install it, fall back to `terraform fmt` + the conventions in `references/terraform-best-practices.md`.
 
-## The four modes
+## The five modes
 
 Pick the mode from the user's intent. When ambiguous, ask.
 
@@ -95,12 +96,22 @@ Run `scripts/tf-check.sh <dir>` (defaults to `infra/`). The script executes, in 
 
 Audit existing `.tf` without executing anything. Read the project, then check against `references/terraform-best-practices.md` and Exoscale gotchas: hardcoded secrets, unpinned/missing provider constraints, missing `required_version`, committed state, literal zones/types, deprecated resources, missing remote state for shared infra, overly permissive security-group rules (`0.0.0.0/0` on SSH). Emit ranked findings (critical → low) with the exact file/line and the fix. Do not modify files unless the user asks.
 
+### Mode 5 — Verify deployment (read-only, post-apply)
+
+Confirm that what a human actually applied matches what the config/plan intended. This mode runs **after** `terraform apply` (which a human ran, never this skill) and reads live infrastructure — it never mutates anything.
+
+1. Run `scripts/exo-verify.sh` (`--json` for machine-readable output). It calls only read-only `exo … list` subcommands across the core resource types (compute instances, security groups, private networks, anti-affinity groups, NLBs, SKS clusters, DBaaS, SOS buckets, DNS) and prints a live inventory. `exo` is **auto-detected**: absent → warns and skips (non-blocking, like trivy); present but unconfigured → run `exo config` (or export `EXOSCALE_API_KEY`/`SECRET`) so the API answers.
+2. Cross-check the inventory against the Terraform config / the last `plan`: every resource the config declares should appear, with matching name/zone/type; flag anything live that the config does **not** declare (drift / out-of-band change) and anything declared but missing (failed/partial apply).
+3. As a complementary Terraform-native drift check, you MAY run `terraform plan` again (Mode 3, stops before apply): a clean "no changes" plan means live state matches config. A non-empty plan after a supposed-complete apply signals drift.
+4. Report findings; never `apply` to "fix" drift — surface it and let the human decide. Mutating `exo` verbs are forbidden (Safety rule 1).
+
 ## Reference materials
 
 - `references/exoscale-provider.md` — auth, zones, instance types, resource catalogue + recipes, gotchas.
 - `references/terraform-best-practices.md` — layout, pinning, state & secret hygiene; pointers to the HashiCorp companion.
 - `references/toolchain.md` — fmt/validate/tflint usage, pinned versions, install commands, `.tflint.hcl` rationale.
 - `references/sos-backend.md` — Exoscale SOS (S3-compatible) remote-state setup + the state-locking caveat.
+- `scripts/exo-verify.sh` — read-only `exo` CLI inventory for Mode 5 (post-apply deployment verification).
 
 ## Anti-patterns
 
@@ -118,6 +129,7 @@ Audit existing `.tf` without executing anything. Read the project, then check ag
 - [ ] `tf-check.sh` reached `plan` cleanly (fmt/validate/tflint green; trivy scan clean or consciously skipped).
 - [ ] Zones/types are variables, validated against the provider's accepted values.
 - [ ] If shared/team infra: remote state in SOS configured, locking caveat communicated.
+- [ ] After a human applies: Mode 5 (`exo-verify.sh`) inventory cross-checked against the config; no unexplained drift. Only read-only `exo` calls were made.
 
 ## Follow-up work
 
