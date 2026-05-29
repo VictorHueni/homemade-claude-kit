@@ -414,4 +414,4 @@ Before saving the PRD:
 - [ ] Success metrics anchored to persona context and value-stream pain index
 - [ ] Saved to `docs/product-specs/prds/prd-NNNN-{feature}.md`
 - [ ] FBS promotion instructions provided (⬜ → 🔄 for committed functionalities)
-- [ ] §Open Items section present with the canonical schema (OI-ID · Type · Summary · Source anchor · Source heading · Resolution path · Priority · Status · Owner · Due / Review date · Tracker ref); empty (`_None at present._`) is acceptable. No placeholder-only rows.
+- [ ] §Open Items section present per `rules/open-items-governance.md`; empty (`_None at present._`) is acceptable. No placeholder-only rows.
