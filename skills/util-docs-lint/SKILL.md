@@ -35,7 +35,9 @@ Pinned/managed elsewhere (bump in your dotfiles, not here):
 The tools are referenced, not installed by this skill. Ensure they are on `PATH` via mise/dotfiles:
 
 ```bash
-# in your dotfiles ~/.mise.toml [tools]: dprint = "latest", vale = "latest", lychee = "latest"
+# in your dotfiles ~/.mise.toml [tools]:
+#   dprint = "latest", vale = "latest", "ubi:lycheeverse/lychee" = "latest"
+#   (lychee needs the ubi backend — its release nests the binary, breaking the default aqua shim)
 mise install
 dprint --version && vale --version && lychee --version
 ```

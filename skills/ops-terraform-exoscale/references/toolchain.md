@@ -63,10 +63,10 @@ trivy --version   # expect 0.70.0
 
 (macOS: `brew install trivy`; verify the version matches the pin.)
 
-**Exoscale CLI (`exo`)** — via [mise](https://mise.jdx.dev/) (`exo = "latest"` in `~/.mise.toml`, then `mise install`), or the [official releases](https://github.com/exoscale/cli/releases):
+**Exoscale CLI (`exo`)** — via [mise](https://mise.jdx.dev/) (no bare `exo` short name in the registry — use the full aqua backend id `"aqua:exoscale/cli" = "latest"` in `~/.mise.toml`, then `mise install`), or the [official releases](https://github.com/exoscale/cli/releases):
 
 ```bash
-mise use -g exo@latest   # or: download the release binary
+mise use -g aqua:exoscale/cli@latest   # ships the `exo` binary
 exo config               # one-time: stores API key/secret in ~/.config/exoscale/exoscale.toml
 exo version
 ```
