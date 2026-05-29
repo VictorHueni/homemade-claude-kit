@@ -44,6 +44,7 @@ A personal Claude Code toolkit — composable skills for business architecture, 
 | `dev-` | `dev-pr` | Pull request creation |
 | `dev-` | `dev-git-worktree` | Isolated git worktrees |
 | `dev-` | `dev-ralph-loop` | Autonomous increment execution |
+| `design-` | `design-system` | Project visual source of truth — `docs/design/design-system.md` → `tokens.css` (themes the `com-` layer) |
 | `com-` | `com-slide-deck` | HTML slide deck builder |
 | `com-` | `com-artefact-viz` | Interactive HTML views of artefacts (capability map · FBS · roadmap · BMC) |
 | `util-` | `util-metamodel-scaffold` | Canonical docs/ folder tree + INDEX.md + CLAUDE.md wiring |

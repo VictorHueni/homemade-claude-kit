@@ -50,7 +50,8 @@ a supporting skill, like `com-slide-deck`.
 |---|---|
 | Render an artefact (auto-detect kind) | `python scripts/render.py docs/business/03a-capability-map.md` |
 | Force the kind | `python scripts/render.py SRC.md --kind fbs` |
-| Theme with a project design system | `python scripts/render.py SRC.md --design-system docs/communication/slides/{slug}/design/styles.css` |
+| Theme from the shared design system | automatic — `docs/design/tokens.css` (from the `design-system` skill) is auto-detected |
+| Theme with a specific sheet | `python scripts/render.py SRC.md --design-system path/to/styles.css` |
 | Override the capability/FBS left-axis label | `python scripts/render.py SRC.md --left-axis-label "Customer Journey" --left-axis-arrow "→"` |
 | Choose the output path | `python scripts/render.py SRC.md --out docs/communication/visualisations/capability-map.html` |
 | Just print the detected kind | `python scripts/render.py SRC.md --detect` |
@@ -66,13 +67,15 @@ Default output: `docs/communication/visualisations/<kind>.html`.
    by the owning skill (see the table above). If the artefact does not exist
    yet, stop and point the user at the skill that builds it — this skill
    visualises, it does not author.
-2. **Pick or confirm the design system.** By default the view ships with the
-   skill's neutral token set (`templates/design-system.css`). If the project
-   has a design system — most commonly the `design/styles.css` of a
-   `com-slide-deck` project — pass it with `--design-system`. Its `:root`
-   tokens are inlined last and win. This is the supported way to make every
-   view match the project's look (the user's "style applied per project design
-   system" requirement).
+2. **Pick or confirm the design system.** Resolution order: (a) an explicit
+   `--design-system PATH`; (b) the shared `docs/design/tokens.css` produced by
+   the **`design-system`** skill, auto-detected if present (the view prints
+   "using shared design system …"); (c) the skill's neutral defaults
+   (`templates/design-system.css`). The project sheet's `:root` tokens are
+   inlined last and win. Prefer the shared `design-system` skill so decks and
+   views theme from one source; you can still point `--design-system` at a
+   `com-slide-deck` `design/styles.css`. This is the supported way to make
+   every view match the project's look.
 3. **Render.** Run `scripts/render.py`. One self-contained HTML file is written
    (all CSS + JS inlined — no runtime, no network, diff-friendly, shareable).
 4. **Verify in a browser.** Open the file. Check the verification list below.
@@ -162,5 +165,6 @@ visualisations).
 
 - `references/parsing-contract.md` — exact Markdown each parser reads, field by field.
 - `references/viz-discipline.md` — design principles and boundaries (what this skill is NOT).
+- `design-system/SKILL.md` — the shared design system; its `docs/design/tokens.css` is auto-detected as the theme.
 - `com-slide-deck/SKILL.md` — sibling HTML builder; share its `design/styles.css` via `--design-system`.
 - `rules/skill-creation-sync.md` · `rules/artefact-frontmatter.md` · `rules/diagramming-mermaid.md`.

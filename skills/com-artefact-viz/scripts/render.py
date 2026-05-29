@@ -78,9 +78,19 @@ def build(source_path, args):
     rendered = renderers.RENDERERS[kind](model, options)
 
     # Design system: defaults first, then the project sheet (project tokens win).
+    # Resolution order for the project sheet:
+    #   1. explicit --design-system
+    #   2. the shared design-system skill's output: docs/design/tokens.css
+    #   3. none (skill defaults only)
     ds = _read(os.path.join(TEMPLATE_DIR, "design-system.css"))
-    if args.design_system:
-        ds += "\n\n/* ---- project design system (overrides) ---- */\n" + _read(args.design_system)
+    project_sheet = args.design_system
+    if not project_sheet:
+        shared = os.path.join("docs", "design", "tokens.css")
+        if os.path.isfile(shared):
+            project_sheet = shared
+            print(f"using shared design system {shared} (pass --design-system to override)")
+    if project_sheet:
+        ds += "\n\n/* ---- project design system (overrides) ---- */\n" + _read(project_sheet)
 
     runtime = _read(os.path.join(TEMPLATE_DIR, "runtime.js"))
     title = args.title or model["title"]
