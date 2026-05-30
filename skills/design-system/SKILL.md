@@ -100,9 +100,12 @@ python scripts/generate_tokens.py generate docs/design/design-system.md
 `tokens.css` defines one agreed `:root` vocabulary so any `com-*` renderer can
 rely on the same variable names. The canonical names, grouped, live in
 `references/token-contract.md` and in `templates/tokens.template.css` (the
-generator validates against the latter). Groups: base palette · strategic
-importance · delivery status · pain index · confidence · typography · spacing &
-shape.
+generator validates against the latter). Groups: base palette · generic
+semantic state (`--success/--warning/--danger/--info`) · typography · spacing &
+shape. The contract stays generic on purpose — kit-domain tokens (delivery
+status, pain, confidence, importance) are **consumer-derived** as aliases to the
+generics (see `references/token-contract.md`), so a project themes four portable
+names instead of kit jargon.
 
 **Discipline:** renderers reference `var(--token)` only — never a literal
 colour, font, or radius. A renderer that hard-codes `#3b6ef5` is a bug. That
