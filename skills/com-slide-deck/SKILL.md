@@ -8,10 +8,10 @@ description: >
   requesting a new slide, editing an existing slide, prototyping visual
   variations, or working with the slide-builder folder. Also use when the user
   asks to define or update a design system for a presentation. Do NOT use for
-  PowerPoint (.pptx) files, PDF exports, or Google Slides.
+  PowerPoint (.pptx) files or Google Slides (this skill exports its own decks to PDF via render.py).
 version: "1.0.0"
 status: active
-last_reviewed: 2026-05-29
+last_reviewed: 2026-05-30
 user-invocable: true
 impact: "low"
 ---
@@ -35,6 +35,7 @@ project-specific content.
 | Restyle globally             | Edit project's `design/styles.css`                        |
 | Prototype a variation        | Create file in project's `dist/prototypes/`               |
 | Build shareable HTML         | `python scripts/build.py --config path/to/config.yaml`    |
+| Export deck to PDF           | `python scripts/render.py --config path/to/config.yaml [--recipient NAME]` (optional Playwright) |
 | Split an existing deck       | `python scripts/split.py <file> --config path/to/config.yaml` |
 | Cite a source on a slide     | Add `data-sources="key1,key2"` to the `.slide` div; add entries to `context/bibliography.yaml` |
 | Add a new source             | Add a keyed entry to `context/bibliography.yaml` |
@@ -302,6 +303,10 @@ python scripts/split.py existing.html --config ./my-deck/config.yaml
 
 # Dev server with file watching
 python scripts/dev_server.py --config ./my-deck/config.yaml --port 3000
+
+# Export to PDF (optional Playwright dependency; one slide per page)
+python scripts/render.py --config ./my-deck/config.yaml
+python scripts/render.py --config ./my-deck/config.yaml --recipient "Acme Corp"
 ```
 
 ---
@@ -326,7 +331,25 @@ Run through this before every build. Items 1-4 are startup gates.
 
 ---
 
+## PDF Export (leave-behind)
+
+`render.py` renders the built single-file deck to a PDF — one slide per page at the canvas
+size, backgrounds preserved, with an optional per-recipient footer stamp
+(`--recipient "Name"` → "Prepared for Name · <date>"). It drives headless Chromium via
+Playwright (so Lucide icons and web fonts render correctly), injects its own pagination
+CSS, and writes to `<deck>/output/pdf/`.
+
+PDF export is **optional**: `render.py` checks for Playwright and **fails with install
+guidance** if it is missing — it never auto-installs. Build the deck first (`build.py`),
+then render.
+
+```bash
+python scripts/render.py --config path/to/config.yaml --recipient "Partner Name"
+```
+
 ## Dependencies
 
 - Python 3.8+
 - PyYAML (`pip install pyyaml`)
+- **Playwright** — optional, only for `render.py` PDF export:
+  `pip install playwright && python -m playwright install chromium`
