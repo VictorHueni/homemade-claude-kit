@@ -32,7 +32,8 @@ project-specific content.
 | New project from scratch     | `python scripts/init.py docs/communication/slides/{slug}` then fill brief + design system |
 | Add a slide                  | Create partial in project's `src/`, add to `config.yaml`  |
 | Edit a slide                 | Edit the partial directly, run `build.py --config`        |
-| Restyle globally             | Edit project's `design/styles.css`                        |
+| Re-theme the brand (palette/fonts) | Edit `docs/design/design-system.md` → `design-system generate` (shared `tokens.css` re-themes deck + viz) |
+| Restyle the deck only        | Edit project's `design/styles.css` (bridge + deck-only tokens + components) |
 | Prototype a variation        | Create file in project's `dist/prototypes/`               |
 | Build shareable HTML         | `python scripts/build.py --config path/to/config.yaml`    |
 | Export deck to PDF           | `python scripts/render.py --config path/to/config.yaml [--recipient NAME]` (optional Playwright) |
@@ -119,19 +120,30 @@ should feel. Every content decision flows from it.
 
 ### Step 2: Design System
 
-The design system defines every visual decision in the deck.
+The base palette and typography come from the **project design system**
+(`docs/design/tokens.css`, produced by the `design-system` skill) — the single
+source of truth shared with `com-artefact-viz`. `build.py` inlines it BEFORE the
+deck's `styles.css`. The deck's `styles.css` therefore does **not** redefine the
+base palette; it adds a semantic bridge (`--success: var(--status-shipped)`, …),
+deck-only tokens (`--dim`, `--accent-lt`), components, and fonts — all using the
+contract token names via `var()`, never hard-coded hex.
 
-1. Read the project's `design/design-system.md`.
-2. **If the file contains placeholder text:**
-   - STOP. Do not proceed.
-   - Read `design/design-system-template.md` for the expected structure.
-   - Walk the user through every section: colors, fonts, philosophy,
-     spacing, icon library, atoms, components.
+1. **Ensure the project design system exists.** If `docs/design/tokens.css` is
+   missing, scaffold it first: `design-system scaffold` then fill
+   `docs/design/design-system.md` and run `design-system generate`. (If the deck
+   is intentionally standalone, skip — `build.py` falls back to deck styles only.)
+2. Read the project's `design/design-system.md` (deck-level: bridge + deck-only
+   tokens + components + type scale).
+3. **If it contains placeholder text:**
+   - STOP. Read `design/design-system-template.md` for the expected structure
+     (note its §2 token tables now use the contract vocabulary + migration map).
+   - Walk the user through philosophy, the semantic bridge, deck-only tokens,
+     fonts, spacing, icon library, atoms, components.
    - Save the completed version as `design/design-system.md`.
-   - Generate `design/styles.css` implementing all tokens, atoms, and
-     components defined in the design system.
-   - Verify the 12-item checklist at the bottom is fully checked.
-3. **If the file is complete:** load it into context.
+   - Generate `design/styles.css` implementing the bridge + deck-only tokens +
+     atoms + components, referencing the contract tokens via `var()`.
+   - Verify the checklist at the bottom is fully checked.
+4. **If it is complete:** load it into context.
 
 ### Step 3: Load Context
 
@@ -313,21 +325,22 @@ python scripts/render.py --config ./my-deck/config.yaml --recipient "Acme Corp"
 
 ## Verification Checklist
 
-Run through this before every build. Items 1-4 are startup gates.
+Run through this before every build. Items 1-5 are startup gates.
 
 1. [ ] Project directory exists with `config.yaml`
 2. [ ] `context/brief.md` exists, fully completed, no placeholders
-3. [ ] `design/design-system.md` exists, fully completed, no placeholders
-4. [ ] `design/styles.css` implements all tokens and components
-5. [ ] Slide class name does not conflict with existing slides
-6. [ ] All colors, fonts, spacing use `var(--token)`, no raw values
-7. [ ] `<div class="slide-number"></div>` present in every partial
-8. [ ] Slide added to `config.yaml` in the correct position
-9. [ ] Content aligns with the brief (tone, audience, key messages)
-10. [ ] Build runs without errors
-11. [ ] Output file opens correctly in a browser
-12. [ ] Slides scale correctly on mobile viewports (baseline responsive is auto-injected by build.py)
-13. [ ] Every external figure on a slide has a matching key in `context/bibliography.yaml`
+3. [ ] `docs/design/tokens.css` exists (shared design system) — or the deck is intentionally standalone
+4. [ ] `design/design-system.md` exists, fully completed, no placeholders
+5. [ ] `design/styles.css` defines the semantic bridge + deck-only tokens + components (does NOT redefine the inherited base palette)
+6. [ ] Slide class name does not conflict with existing slides
+7. [ ] All colors, fonts, spacing use `var(--token)` (contract names), no raw hex; build log shows the shared `Tokens:` line
+8. [ ] `<div class="slide-number"></div>` present in every partial
+9. [ ] Slide added to `config.yaml` in the correct position
+10. [ ] Content aligns with the brief (tone, audience, key messages)
+11. [ ] Build runs without errors
+12. [ ] Output file opens correctly in a browser
+13. [ ] Slides scale correctly on mobile viewports (baseline responsive is auto-injected by build.py)
+14. [ ] Every external figure on a slide has a matching key in `context/bibliography.yaml`
 
 ---
 

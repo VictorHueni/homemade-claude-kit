@@ -25,39 +25,66 @@ presentation convey? What principles guide layout and decoration choices?_
 
 ## 2. Color Tokens
 
-Define every color as a CSS custom property on `:root`. No hardcoded hex
-values should appear anywhere else in the stylesheet.
+The deck uses the **project design system as its single source of truth**: the
+base palette and typography are defined once in `docs/design/tokens.css` by the
+[`design-system`](../../../../design-system/SKILL.md) skill and inlined by
+`build.py` **before** this stylesheet. **Do NOT redefine base palette values
+here** — reference them with `var()` and adopt the contract token names. Run
+`design-system scaffold` (then `generate`) if `docs/design/tokens.css` does not
+exist yet.
 
-### Core Palette
+### Core palette — inherited from `docs/design/tokens.css` (do not redefine)
 
-| Token         | Hex Value | Usage                                      |
-|---------------|-----------|---------------------------------------------|
-| `--bg`        |           | Slide background                            |
-| `--text`      |           | Primary text color                          |
-| `--muted`     |           | Secondary text (descriptions, body)         |
-| `--dim`       |           | Tertiary text (timestamps, meta, captions)  |
-| `--border`    |           | Card borders, dividers, separators          |
-| `--accent`    |           | Primary accent (CTAs, highlights, labels)   |
-| `--accent-lt` |           | Light accent (backgrounds, hover states)    |
-| `--card-bg`   |           | Card and cell background                    |
+Use these contract names everywhere in the stylesheet and in slide partials:
 
-### Semantic Colors (optional, add rows as needed)
+| Token          | Usage                                          |
+|----------------|------------------------------------------------|
+| `--canvas-bg`  | Slide / page background                        |
+| `--surface`    | Card and cell background                       |
+| `--surface-2`  | Recessed / grouped background                  |
+| `--ink`        | Primary text                                   |
+| `--muted`      | Secondary text (descriptions, body)            |
+| `--border`     | Card borders, dividers, separators             |
+| `--accent`     | Primary accent (CTAs, highlights, labels)      |
+| `--accent-ink` | Text on accent fills                           |
 
-| Token         | Hex Value | Usage                                      |
-|---------------|-----------|---------------------------------------------|
-| `--success`   |           | Positive / done / green states              |
-| `--warning`   |           | Caution / in-progress states                |
-| `--danger`    |           | Negative / error / problem states           |
-| `--danger-lt` |           | Light danger background                     |
+### Semantic state colors — map to the shared semantics
 
-### Extended Palette (optional, for multi-level or multi-category systems)
+State colours resolve to the shared semantic tokens so status reads the same
+across decks and artefact visualisations. Define these aliases in *this* deck's
+`styles.css` `:root` (the bridge), then use `--success` / `--warning` /
+`--danger` in partials:
 
-_If the deck uses color to distinguish levels, categories, or columns,
-define each named color here._
+```css
+:root {
+  --success: var(--status-shipped);   /* positive / done */
+  --warning: var(--pain-high);        /* caution / in-progress */
+  --danger:  var(--pain-critical);    /* negative / error */
+}
+```
 
-| Name   | Hex Value | Usage                          |
-|--------|-----------|--------------------------------|
-|        |           |                                |
+### Deck-only tokens (define here — not in the shared sheet)
+
+Tokens with no contract equivalent stay deck-local. Define them in `:root`:
+
+| Token         | Usage                                          |
+|---------------|------------------------------------------------|
+| `--dim`       | Tertiary text (timestamps, meta, captions)     |
+| `--accent-lt` | Light accent (subtle backgrounds, hover)       |
+| _extended_    | Per-level / per-category colours for multi-column decks |
+
+### Migration map (renaming an older deck onto the contract)
+
+| Old deck token | Contract token |
+|----------------|----------------|
+| `--bg`         | `--canvas-bg`  |
+| `--text`       | `--ink`        |
+| `--card-bg`    | `--surface`    |
+| `--muted`      | `--muted` (unchanged) |
+| `--border`     | `--border` (unchanged) |
+| `--accent`     | `--accent` (unchanged) |
+| `--success` / `--warning` / `--danger` | bridge → `--status-shipped` / `--pain-high` / `--pain-critical` |
+| `--dim` / `--accent-lt` / extended | keep as deck-only tokens |
 
 ---
 
@@ -65,11 +92,19 @@ define each named color here._
 
 ### Font Stack
 
-| Token            | Font Family + Fallback           | Usage                     |
-|------------------|----------------------------------|---------------------------|
-| `--font-heading` |                                  | Titles, hero text, h1-h2  |
-| `--font-body`    |                                  | Body text, labels, cards  |
-| `--font-mono`    |                                  | Code, tags, metadata      |
+Typography tokens are inherited from `docs/design/tokens.css` — reference them,
+do not redefine:
+
+| Token         | Usage                              | Source            |
+|---------------|------------------------------------|-------------------|
+| `--font-sans` | Headings + body text, labels, cards | contract (inherited) |
+| `--font-mono` | Code, tags, metadata, slide numbers | contract (inherited) |
+
+If the deck needs a distinct heading face, add a **deck-only** `--font-heading`
+in this stylesheet's `:root` (defaulting to `var(--font-sans)`); otherwise use
+`--font-sans` for both headings and body. Set the actual font families and web-
+font loading in `docs/design/design-system.md` (and the `fonts:` block of
+`config.yaml` for the Google-Fonts `<link>`), so they flow from the one source.
 
 ### Font Loading
 

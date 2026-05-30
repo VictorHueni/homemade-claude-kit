@@ -39,12 +39,19 @@ Internal guidance for the `design-system` skill.
   scoped to one deck folder. A deck may still keep deck-specific CSS, but it
   should source its base tokens here.
 
-## Relationship to com-slide-deck (current state)
+## Relationship to the consumers
 
-`com-slide-deck` predates this skill and generates its own `design/styles.css`
-per deck from a deck-local `design-system.md`. Today the integration is
-**convention-level**: when authoring a deck's `styles.css`, reference the same
-token values as `docs/design/tokens.css`. Full unification — having the deck's
-`styles.css` `@import` or inherit `tokens.css` directly — is a deferred
-follow-up tracked in the kit ledger. `com-artefact-viz` already consumes
-`tokens.css` directly (auto-detected).
+Both `com-*` skills inherit this skill's `tokens.css` directly:
+
+- **`com-artefact-viz`** auto-detects `docs/design/tokens.css` and inlines it as
+  the theme (override with `--design-system`).
+- **`com-slide-deck`** — `build.py` locates `docs/design/tokens.css` (config
+  `paths.design_tokens` or auto-detect by walking up) and inlines it **before**
+  the deck's `styles.css`, so base palette + typography flow from here. The deck
+  adopts the contract token names, adds a semantic bridge
+  (`--success: var(--status-shipped)`, …) and deck-only tokens. A deck with no
+  shared sheet still builds standalone (backwards compatible). This unification
+  resolved OI-0019.
+
+Because both consumers rely on the contract token **names**, never rename or
+drop a token; change values freely.
