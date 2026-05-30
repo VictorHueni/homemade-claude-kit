@@ -79,10 +79,12 @@ def build(source_path, args):
 
     # Design system: defaults first, then the project sheet (project tokens win).
     # Resolution order for the project sheet:
-    #   1. explicit --design-system
-    #   2. the shared design-system skill's output: docs/design/tokens.css
-    #   3. none (skill defaults only)
-    ds = _read(os.path.join(TEMPLATE_DIR, "design-system.css"))
+    # Token layering (same model as com-slide-deck):
+    #   1. tokens.fallback.css   — shipped neutral generic contract (zero-config)
+    #   2. docs/design/tokens.css — project override (explicit --design-system, or
+    #                                auto-detected; project values win)
+    #   3. tokens.domain.css     — viz domain tokens derived from the generics
+    ds = _read(os.path.join(TEMPLATE_DIR, "tokens.fallback.css"))
     project_sheet = args.design_system
     if not project_sheet:
         shared = os.path.join("docs", "design", "tokens.css")
@@ -91,6 +93,7 @@ def build(source_path, args):
             print(f"using shared design system {shared} (pass --design-system to override)")
     if project_sheet:
         ds += "\n\n/* ---- project design system (overrides) ---- */\n" + _read(project_sheet)
+    ds += "\n\n/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))
 
     runtime = _read(os.path.join(TEMPLATE_DIR, "runtime.js"))
     title = args.title or model["title"]

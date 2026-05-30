@@ -63,8 +63,8 @@ themes four portable names instead of kit jargon.
 
 The contract stays generic; consumers map their domain semantics onto it in
 their own bundled stylesheet (not in the project `tokens.css`). `com-artefact-viz`
-defines these aliases so a project re-theming `--success/--warning/--danger/--info`
-re-themes every view:
+defines these aliases in `templates/tokens.domain.css` so a project re-theming
+`--success/--warning/--danger/--info` re-themes every view:
 
 | Domain token (viz) | Derived from | Where |
 |---|---|---|

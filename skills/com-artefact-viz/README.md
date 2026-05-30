@@ -51,7 +51,8 @@ com-artefact-viz/
   README.md                    This file
   templates/
     base.html.tmpl             Shell with {{slots}}
-    design-system.css          Default :root tokens (project sheet overrides)
+    tokens.fallback.css        Shipped generic contract defaults (zero-config; project sheet overrides)
+    tokens.domain.css          Domain tokens derived from the generics (status/pain/confidence/importance)
     runtime.js                 Vanilla JS: collapse, orientation, disclosure
   scripts/
     render.py                  CLI entrypoint (parse -> render -> write)

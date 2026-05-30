@@ -1,0 +1,28 @@
+/*
+ * tokens.domain.css — com-artefact-viz domain tokens, DERIVED from the generic
+ * contract. Inlined after tokens.fallback.css + the project sheet, so these
+ * follow whatever --success/--warning/--danger/--info/--muted resolve to.
+ *
+ * Renderers reference these domain names (var(--status-shipped) etc.); a project
+ * never sets them — it themes the four generics and these follow. Override a
+ * domain token directly only for finer control.
+ */
+:root {
+  /* strategic importance (capability map) */
+  --differentiator: var(--danger);
+  --necessary:      var(--warning);
+  --commodity:      var(--muted);
+  /* delivery status (FBS, roadmap) */
+  --status-shipped: var(--success);
+  --status-planned: var(--info);
+  --status-backlog: var(--muted);
+  /* pain index (delivery roadmap) */
+  --pain-critical:  var(--danger);
+  --pain-high:      var(--warning);
+  --pain-medium:    var(--info);
+  --pain-low:       var(--muted);
+  /* confidence (BMC / Lean Canvas) */
+  --conf-assumed:   var(--muted);
+  --conf-tested:    var(--warning);
+  --conf-validated: var(--success);
+}

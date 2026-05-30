@@ -28,6 +28,11 @@ except ImportError:
     print("PyYAML is required. Install it with: pip install pyyaml")
     sys.exit(1)
 
+# Shipped neutral fallback (generic token contract) — inlined before everything
+# so a deck renders correctly with no project design system. Mirrors
+# com-artefact-viz/templates/tokens.fallback.css (same name, same role).
+FALLBACK_TOKENS = Path(__file__).resolve().parent.parent / "templates" / "tokens.fallback.css"
+
 
 def load_config(config_path: Path) -> dict:
     with open(config_path, "r", encoding="utf-8") as f:
@@ -303,17 +308,18 @@ def build(config_path: Path, output_override: str = None):
     baseline_css = make_baseline_css(canvas_w, canvas_h)
     baseline_js  = make_baseline_js(canvas_w)
 
-    # Styles — layered so values cascade in the right order:
-    #   1. shared design-system tokens (docs/design/tokens.css) — base palette,
-    #      typography, spacing; the project-wide source of truth
-    #   2. the deck's own styles.css — semantic bridge + deck-only tokens + components
-    #   3. baseline CSS — structural defaults
-    # Absent shared tokens → deck builds standalone (backwards compatible).
+    # Styles — layered so values cascade in the right order (same model as
+    # com-artefact-viz):
+    #   1. tokens.fallback.css    — shipped neutral generic contract (zero-config)
+    #   2. docs/design/tokens.css — project override (the source of truth; wins)
+    #   3. the deck's own styles.css — deck-only tokens + components
+    #   4. baseline CSS           — structural defaults
+    fallback_css = read_file(FALLBACK_TOKENS)
     tokens_css, tokens_src = find_design_tokens(cfg, base)
     if tokens_src:
         print(f"[BUILD] Tokens:  {tokens_src} (shared design system)")
     css = read_file(styles_path)
-    layers = [c for c in (tokens_css, css, baseline_css) if c]
+    layers = [c for c in (fallback_css, tokens_css, css, baseline_css) if c]
     parts.append("<style>\n" + "\n".join(layers) + "\n</style>")
     parts.append("</head>\n<body>\n")
 
