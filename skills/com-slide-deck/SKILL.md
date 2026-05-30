@@ -33,7 +33,7 @@ project-specific content.
 | Add a slide                  | Create partial in project's `src/`, add to `config.yaml`  |
 | Edit a slide                 | Edit the partial directly, run `build.py --config`        |
 | Re-theme the brand (palette/fonts) | Edit `docs/design/design-system.md` → `design-system generate` (shared `tokens.css` re-themes deck + viz) |
-| Restyle the deck only        | Edit project's `design/styles.css` (bridge + deck-only tokens + components) |
+| Restyle the deck only        | Edit project's `design/styles.css` (deck-only tokens + components) |
 | Prototype a variation        | Create file in project's `dist/prototypes/`               |
 | Build shareable HTML         | `python scripts/build.py --config path/to/config.yaml`    |
 | Export deck to PDF           | `python scripts/render.py --config path/to/config.yaml [--recipient NAME]` (optional Playwright) |
@@ -123,8 +123,9 @@ should feel. Every content decision flows from it.
 The base palette and typography come from the **project design system**
 (`docs/design/tokens.css`, produced by the `design-system` skill) — the single
 source of truth shared with `com-artefact-viz`. `build.py` inlines it BEFORE the
-deck's `styles.css`. The deck's `styles.css` therefore does **not** redefine the
-base palette; it adds a semantic bridge (`--success: var(--status-shipped)`, …),
+deck's `styles.css`. The contract includes the base palette, typography, and the
+generic semantic state tokens (`--success`/`--warning`/`--danger`/`--info`). The
+deck's `styles.css` therefore does **not** redefine any of those; it adds only
 deck-only tokens (`--dim`, `--accent-lt`), components, and fonts — all using the
 contract token names via `var()`, never hard-coded hex.
 
@@ -132,16 +133,16 @@ contract token names via `var()`, never hard-coded hex.
    missing, scaffold it first: `design-system scaffold` then fill
    `docs/design/design-system.md` and run `design-system generate`. (If the deck
    is intentionally standalone, skip — `build.py` falls back to deck styles only.)
-2. Read the project's `design/design-system.md` (deck-level: bridge + deck-only
-   tokens + components + type scale).
+2. Read the project's `design/design-system.md` (deck-level: deck-only tokens +
+   components + type scale).
 3. **If it contains placeholder text:**
    - STOP. Read `design/design-system-template.md` for the expected structure
-     (note its §2 token tables now use the contract vocabulary + migration map).
-   - Walk the user through philosophy, the semantic bridge, deck-only tokens,
-     fonts, spacing, icon library, atoms, components.
+     (note its §2 token tables use the contract vocabulary + a migration map).
+   - Walk the user through philosophy, deck-only tokens, fonts, spacing, icon
+     library, atoms, components.
    - Save the completed version as `design/design-system.md`.
-   - Generate `design/styles.css` implementing the bridge + deck-only tokens +
-     atoms + components, referencing the contract tokens via `var()`.
+   - Generate `design/styles.css` implementing the deck-only tokens + atoms +
+     components, referencing the contract tokens via `var()`.
    - Verify the checklist at the bottom is fully checked.
 4. **If it is complete:** load it into context.
 
@@ -331,7 +332,7 @@ Run through this before every build. Items 1-5 are startup gates.
 2. [ ] `context/brief.md` exists, fully completed, no placeholders
 3. [ ] `docs/design/tokens.css` exists (shared design system) — or the deck is intentionally standalone
 4. [ ] `design/design-system.md` exists, fully completed, no placeholders
-5. [ ] `design/styles.css` defines the semantic bridge + deck-only tokens + components (does NOT redefine the inherited base palette)
+5. [ ] `design/styles.css` defines only deck-only tokens + components (does NOT redefine the inherited base palette or semantic state tokens)
 6. [ ] Slide class name does not conflict with existing slides
 7. [ ] All colors, fonts, spacing use `var(--token)` (contract names), no raw hex; build log shows the shared `Tokens:` line
 8. [ ] `<div class="slide-number"></div>` present in every partial

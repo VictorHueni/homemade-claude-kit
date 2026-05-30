@@ -42,38 +42,14 @@ visualisations theme from the tokens below.
 | `--accent` | `#0f9d8f` | Primary action, links, IDs |
 | `--accent-ink` | `#ffffff` | Text on accent fills |
 
-### Strategic importance (capability map)
+### Semantic state (generic — portable)
 
 | Token | Value | Role |
 |---|---|---|
-| `--differentiator` | `#c2453d` | Where the business wins or loses |
-| `--necessary` | `#e0973a` | Required for operation |
-| `--commodity` | `#5f6b69` | Could be outsourced |
-
-### Delivery status (FBS, roadmap)
-
-| Token | Value | Role |
-|---|---|---|
-| `--status-shipped` | `#2e9e5b` | Shipped (✅) |
-| `--status-planned` | `#0f9d8f` | Planned (🔄) |
-| `--status-backlog` | `#9aa3af` | Backlog (⬜) |
-
-### Pain index (delivery roadmap)
-
-| Token | Value | Role |
-|---|---|---|
-| `--pain-critical` | `#c2453d` | Critical pain |
-| `--pain-high` | `#e0973a` | High pain |
-| `--pain-medium` | `#0f9d8f` | Medium pain |
-| `--pain-low` | `#9aa3af` | Low pain |
-
-### Confidence (BMC / Lean Canvas)
-
-| Token | Value | Role |
-|---|---|---|
-| `--conf-assumed` | `#9aa3af` | Assumed |
-| `--conf-tested` | `#e0973a` | Tested |
-| `--conf-validated` | `#2e9e5b` | Validated |
+| `--success` | `#2e9e5b` | Positive / done / validated |
+| `--warning` | `#e0973a` | Caution / in-progress / tested |
+| `--danger` | `#c2453d` | Negative / error / critical |
+| `--info` | `#0f9d8f` | Informational / planned / neutral-active |
 
 ### Typography
 

@@ -23,29 +23,19 @@ generator validates against it.
 | `--accent` | Primary action, links, IDs |
 | `--accent-ink` | Text on accent fills |
 
-### Strategic importance (capability map)
+### Semantic state (generic — portable)
 | Token | Role |
 |---|---|
-| `--differentiator` | Where the business wins or loses |
-| `--necessary` | Required for operation |
-| `--commodity` | Could be outsourced |
+| `--success` | Positive / done / validated |
+| `--warning` | Caution / in-progress / tested |
+| `--danger` | Negative / error / critical |
+| `--info` | Informational / planned / neutral-active |
 
-### Delivery status (FBS, roadmap)
-| Token | Role |
-|---|---|
-| `--status-shipped` | Shipped (✅) |
-| `--status-planned` | Planned (🔄) |
-| `--status-backlog` | Backlog (⬜) |
-
-### Pain index (delivery roadmap)
-| Token | Role |
-|---|---|
-| `--pain-critical` · `--pain-high` · `--pain-medium` · `--pain-low` | Pain bands |
-
-### Confidence (BMC / Lean Canvas)
-| Token | Role |
-|---|---|
-| `--conf-assumed` · `--conf-tested` · `--conf-validated` | Confidence ratings |
+These four are the ONLY semantic tokens in the project contract. Kit-domain
+tokens (delivery status, pain index, confidence, strategic importance) are
+**consumer-derived**: each consumer defines them in its own stylesheet as
+aliases to these generics (see "Consumer-derived tokens" below), so a project
+themes four portable names instead of kit jargon.
 
 ### Typography
 | Token | Role |
@@ -64,14 +54,24 @@ generator validates against it.
 
 ## Consumer mapping
 
-| Token group | Used by |
+| Contract group | Used by |
 |---|---|
 | Base palette, typography, spacing | `com-slide-deck`, `com-artefact-viz` (all views) |
-| Strategic importance | `com-artefact-viz` capability-map |
-| Delivery status | `com-artefact-viz` fbs + roadmap |
-| Pain index | `com-artefact-viz` roadmap |
-| Confidence | `com-artefact-viz` bmc |
+| Semantic state (`--success/--warning/--danger/--info`) | `com-slide-deck` (state colours) + `com-artefact-viz` (via the derived tokens below) |
 
-`com-slide-deck` consumes the base palette + typography + spacing groups; the
-semantic groups are viz-specific but harmless in a deck context (unused tokens
-cost nothing).
+### Consumer-derived tokens
+
+The contract stays generic; consumers map their domain semantics onto it in
+their own bundled stylesheet (not in the project `tokens.css`). `com-artefact-viz`
+defines these aliases so a project re-theming `--success/--warning/--danger/--info`
+re-themes every view:
+
+| Domain token (viz) | Derived from | Where |
+|---|---|---|
+| `--differentiator` / `--necessary` / `--commodity` | `--danger` / `--warning` / `--muted` | capability-map |
+| `--status-shipped` / `--status-planned` / `--status-backlog` | `--success` / `--info` / `--muted` | fbs + roadmap |
+| `--pain-critical` / `--pain-high` / `--pain-medium` / `--pain-low` | `--danger` / `--warning` / `--info` / `--muted` | roadmap |
+| `--conf-assumed` / `--conf-tested` / `--conf-validated` | `--muted` / `--warning` / `--success` | bmc |
+
+A project MAY still override a domain token directly (e.g. `--pain-critical`) if
+it wants finer control, but it never has to — theming the four generics is enough.

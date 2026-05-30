@@ -48,20 +48,17 @@ Use these contract names everywhere in the stylesheet and in slide partials:
 | `--accent`     | Primary accent (CTAs, highlights, labels)      |
 | `--accent-ink` | Text on accent fills                           |
 
-### Semantic state colors — map to the shared semantics
+### Semantic state colors — inherited from `docs/design/tokens.css`
 
-State colours resolve to the shared semantic tokens so status reads the same
-across decks and artefact visualisations. Define these aliases in *this* deck's
-`styles.css` `:root` (the bridge), then use `--success` / `--warning` /
-`--danger` in partials:
+State colours are part of the shared contract — use them directly in partials,
+do not redefine:
 
-```css
-:root {
-  --success: var(--status-shipped);   /* positive / done */
-  --warning: var(--pain-high);        /* caution / in-progress */
-  --danger:  var(--pain-critical);    /* negative / error */
-}
-```
+| Token | Usage |
+|---|---|
+| `--success` | Positive / done |
+| `--warning` | Caution / in-progress |
+| `--danger` | Negative / error |
+| `--info` | Informational / neutral-active |
 
 ### Deck-only tokens (define here — not in the shared sheet)
 
@@ -83,7 +80,8 @@ Tokens with no contract equivalent stay deck-local. Define them in `:root`:
 | `--muted`      | `--muted` (unchanged) |
 | `--border`     | `--border` (unchanged) |
 | `--accent`     | `--accent` (unchanged) |
-| `--success` / `--warning` / `--danger` | bridge → `--status-shipped` / `--pain-high` / `--pain-critical` |
+| `--success` / `--warning` / `--danger` | `--success` / `--warning` / `--danger` (now in the contract) |
+| `--danger-lt` | derive locally, e.g. `color-mix(in srgb, var(--danger) 14%, var(--surface))` |
 | `--dim` / `--accent-lt` / extended | keep as deck-only tokens |
 
 ---

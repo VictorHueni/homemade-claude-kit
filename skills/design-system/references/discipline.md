@@ -17,6 +17,15 @@ Internal guidance for the `design-system` skill.
    the token *names* in `references/token-contract.md`. Change values freely to
    re-brand; never rename or drop a token. Extending with extra tokens is fine.
 
+3a. **Keep the contract generic; consumers derive domain tokens.** The project
+   `tokens.css` carries only portable names — base palette, `--success/--warning/
+   --danger/--info`, typography, spacing. Kit-domain vocabulary (delivery status,
+   pain index, confidence, strategic importance) is **not** in the contract; each
+   consumer defines those in its own stylesheet as aliases to the generics (e.g.
+   `com-artefact-viz`: `--status-shipped: var(--success)`). This keeps a project's
+   design system interoperable across the kit and the project's other tooling —
+   themers touch four generic names, not kit jargon.
+
 4. **Domain-agnostic.** Unlike Anthropic's `brand-guidelines` (which hard-codes
    Anthropic's palette), the kit is user-global, so this skill ships only
    neutral defaults and a fillable template. No real brand colour, font, or
@@ -47,11 +56,11 @@ Both `com-*` skills inherit this skill's `tokens.css` directly:
   the theme (override with `--design-system`).
 - **`com-slide-deck`** — `build.py` locates `docs/design/tokens.css` (config
   `paths.design_tokens` or auto-detect by walking up) and inlines it **before**
-  the deck's `styles.css`, so base palette + typography flow from here. The deck
-  adopts the contract token names, adds a semantic bridge
-  (`--success: var(--status-shipped)`, …) and deck-only tokens. A deck with no
-  shared sheet still builds standalone (backwards compatible). This unification
-  resolved OI-0019.
+  the deck's `styles.css`, so base palette + typography + the generic semantic
+  state tokens (`--success/--warning/--danger/--info`) flow from here. The deck
+  adopts the contract names and adds only deck-only tokens. A deck with no shared
+  sheet still builds standalone (backwards compatible). This unification resolved
+  OI-0019.
 
 Because both consumers rely on the contract token **names**, never rename or
 drop a token; change values freely.

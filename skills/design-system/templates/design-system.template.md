@@ -51,38 +51,18 @@ placeholders; keep it short.*
 | `--accent` | `#3b6ef5` | Primary action, links, IDs |
 | `--accent-ink` | `#ffffff` | Text on accent fills |
 
-### Strategic importance (capability map)
+### Semantic state (generic — portable)
+
+Generic, tool-agnostic state colours. Consumers derive their domain-specific
+tokens from these (e.g. `com-artefact-viz` maps delivery status / pain / confidence
+onto these in its own stylesheet), so a project only ever themes these four.
 
 | Token | Value | Role |
 |---|---|---|
-| `--differentiator` | `#d9534f` | Where the business wins or loses |
-| `--necessary` | `#f0ad4e` | Required for operation |
-| `--commodity` | `#6b7280` | Could be outsourced |
-
-### Delivery status (FBS, roadmap)
-
-| Token | Value | Role |
-|---|---|---|
-| `--status-shipped` | `#2e9e5b` | Shipped (✅) |
-| `--status-planned` | `#3b6ef5` | Planned (🔄) |
-| `--status-backlog` | `#9aa3af` | Backlog (⬜) |
-
-### Pain index (delivery roadmap)
-
-| Token | Value | Role |
-|---|---|---|
-| `--pain-critical` | `#d9534f` | Critical pain |
-| `--pain-high` | `#f0ad4e` | High pain |
-| `--pain-medium` | `#3b6ef5` | Medium pain |
-| `--pain-low` | `#9aa3af` | Low pain |
-
-### Confidence (BMC / Lean Canvas)
-
-| Token | Value | Role |
-|---|---|---|
-| `--conf-assumed` | `#9aa3af` | Assumed |
-| `--conf-tested` | `#f0ad4e` | Tested |
-| `--conf-validated` | `#2e9e5b` | Validated |
+| `--success` | `#2e9e5b` | Positive / done / validated |
+| `--warning` | `#f0ad4e` | Caution / in-progress / tested |
+| `--danger` | `#d9534f` | Negative / error / critical |
+| `--info` | `#3b6ef5` | Informational / planned / neutral-active |
 
 ### Typography
 

@@ -159,12 +159,8 @@ if (typeof lucide !== 'undefined') lucide.createIcons();
  */
 
 :root {
-  /* Semantic state colours -> shared semantics (consistent with artefact views) */
-  --success: var(--status-shipped);   /* positive / done */
-  --warning: var(--pain-high);         /* caution / in-progress */
-  --danger:  var(--pain-critical);     /* negative / error */
-
-  /* Deck-only tokens (no contract equivalent) */
+  /* Deck-only tokens (no contract equivalent). Base palette, typography, and
+     semantic state (--success/--warning/--danger/--info) come from tokens.css. */
   --dim:       var(--muted);           /* tertiary text; override with a dimmer value if desired */
   --accent-lt: color-mix(in srgb, var(--accent) 14%, var(--surface));  /* subtle accent background */
 }
