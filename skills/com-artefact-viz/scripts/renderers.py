@@ -9,7 +9,7 @@ Each renderer returns a dict with:
   content    : the main HTML fragment
 
 render.py drops these into templates/base.html.tmpl. All visual styling flows
-through CSS custom properties defined in templates/design-system.css (or a
+through CSS custom properties defined in templates/tokens.fallback.css (or a
 project sheet), so renderers reference var(--token) and never literal colours.
 """
 

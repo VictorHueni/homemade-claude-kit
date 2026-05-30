@@ -29,7 +29,7 @@ TEMPLATE_DIR = os.path.join(os.path.dirname(HERE), "templates")
 
 def watched_paths(source):
     paths = [source]
-    for name in ("base.html.tmpl", "design-system.css", "runtime.js"):
+    for name in ("base.html.tmpl", "tokens.fallback.css", "tokens.domain.css", "runtime.js"):
         paths.append(os.path.join(TEMPLATE_DIR, name))
     return paths
 

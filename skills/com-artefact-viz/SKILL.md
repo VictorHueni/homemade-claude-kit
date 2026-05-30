@@ -70,9 +70,9 @@ Default output: `docs/communication/visualisations/<kind>.html`.
 2. **Pick or confirm the design system.** Resolution order: (a) an explicit
    `--design-system PATH`; (b) the shared `docs/design/tokens.css` produced by
    the **`design-system`** skill, auto-detected if present (the view prints
-   "using shared design system …"); (c) the skill's neutral defaults
-   (`templates/design-system.css`). The project sheet's `:root` tokens are
-   inlined last and win. Prefer the shared `design-system` skill so decks and
+   "using shared design system …"); (c) the skill's shipped defaults
+   (`templates/tokens.fallback.css`). The project sheet's `:root` tokens are
+   inlined over the fallback and win. Prefer the shared `design-system` skill so decks and
    views theme from one source; you can still point `--design-system` at a
    `com-slide-deck` `design/styles.css`. This is the supported way to make
    every view match the project's look.
@@ -89,12 +89,15 @@ Default output: `docs/communication/visualisations/<kind>.html`.
 The pipeline keeps parsing, structure, and styling independent so each can
 evolve alone:
 
-1. **Design tokens** — `templates/design-system.css` defines `:root` custom
-   properties (`--accent`, `--surface`, `--differentiator`, `--status-shipped`,
-   `--pain-critical`, `--conf-validated`, spacing, radii, fonts). A project
-   sheet passed via `--design-system` is inlined after the defaults and wins.
-   **Renderers reference only `var(--token)` — never a literal colour, font, or
-   radius.** That contract is what makes re-theming a one-file operation.
+1. **Design tokens** — layered like `com-slide-deck`: `templates/tokens.fallback.css`
+   (shipped generic contract — base palette, `--success`/`--warning`/`--danger`/
+   `--info`, typography, spacing) is inlined first; the project sheet
+   (`docs/design/tokens.css` or `--design-system`) is inlined over it and wins;
+   then `templates/tokens.domain.css` maps viz's domain names
+   (`--status-shipped: var(--success)`, `--pain-critical: var(--danger)`, …) onto
+   the generics. **Renderers reference only `var(--token)` — never a literal
+   colour, font, or radius.** That contract is what makes re-theming a one-file
+   operation (theme the four generics; every view follows).
 2. **Base layout** — `templates/base.html.tmpl` is the shell with slots
    (`{{TITLE}}`, `{{KIND}}`, `{{META}}`, `{{TOOLBAR}}`, `{{CONTENT}}`,
    `{{DESIGN_SYSTEM_CSS}}`, `{{VIEW_CSS}}`, `{{RUNTIME_JS}}`, `{{FOOTER}}`).

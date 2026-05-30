@@ -22,7 +22,8 @@ Internal guidance for the `design-system` skill.
    --danger/--info`, typography, spacing. Kit-domain vocabulary (delivery status,
    pain index, confidence, strategic importance) is **not** in the contract; each
    consumer defines those in its own stylesheet as aliases to the generics (e.g.
-   `com-artefact-viz`: `--status-shipped: var(--success)`). This keeps a project's
+   `com-artefact-viz/templates/tokens.domain.css`: `--status-shipped: var(--success)`).
+   This keeps a project's
    design system interoperable across the kit and the project's other tooling —
    themers touch four generic names, not kit jargon.
 
