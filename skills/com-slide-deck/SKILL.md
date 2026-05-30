@@ -3,13 +3,14 @@ name: com-slide-deck
 description: >
   Build single-file HTML slide presentations from modular partials, a shared
   design system, and a Python build pipeline. Use this skill any time the user
-  wants to create, edit, split, stitch, or prototype HTML slide decks. Triggers
-  include: any mention of "slides", "presentation", "deck", "slide builder",
-  requesting a new slide, editing an existing slide, prototyping visual
-  variations, or working with the slide-builder folder. Also use when the user
-  asks to define or update a design system for a presentation. Do NOT use for
+  wants to create, edit, split, stitch, prototype, or migrate HTML slide decks.
+  Triggers include: any mention of "slides", "presentation", "deck", "slide
+  builder", requesting a new slide, editing an existing slide, prototyping visual
+  variations, migrating an old deck onto the design system, or working with the
+  slide-builder folder. Also use when the user asks to define or update a design
+  system for a presentation. Do NOT use for
   PowerPoint (.pptx) files or Google Slides (this skill exports its own decks to PDF via render.py).
-version: "1.0.0"
+version: "1.1.0"
 status: active
 last_reviewed: 2026-05-30
 user-invocable: true
@@ -38,6 +39,7 @@ project-specific content.
 | Build shareable HTML         | `python scripts/build.py --config path/to/config.yaml`    |
 | Export deck to PDF           | `python scripts/render.py --config path/to/config.yaml [--recipient NAME]` (optional Playwright) |
 | Split an existing deck       | `python scripts/split.py <file> --config path/to/config.yaml` |
+| Migrate an old deck to the design system | `python scripts/migrate.py --config path/to/config.yaml` (report) · `--apply` (alias shim) · `--rename` (rewrite names) |
 | Cite a source on a slide     | Add `data-sources="key1,key2"` to the `.slide` div; add entries to `context/bibliography.yaml` |
 | Add a new source             | Add a keyed entry to `context/bibliography.yaml` |
 
@@ -297,6 +299,43 @@ and run a build to verify.
 
 ---
 
+## Migrating an Existing Deck onto the Design System
+
+A deck built before the shared design system keeps building unchanged — the
+shipped `tokens.fallback.css` is a harmless base layer and the deck's own
+`styles.css` (inlined after it) overrides any overlapping tokens. Migration is
+**optional**, and only needed to make the deck theme from the project's
+`docs/design/tokens.css` (so deck + artefact views share one source).
+
+`scripts/migrate.py` automates the token-name part. **Commit the deck first.**
+
+1. **Stand up the design system** (if absent): `design-system scaffold`, port the
+   deck's palette values into `docs/design/design-system.md`, `design-system generate`.
+2. **Report** what needs changing (read-only):
+   ```bash
+   python scripts/migrate.py --config path/to/config.yaml
+   ```
+   It flags the project design system, the legacy token names in use
+   (with file + count), the rename mapping, deck-only tokens to keep, and any
+   base palette still hard-coded in `styles.css`.
+3. **Pick a path:**
+   - `--apply` — adds a backwards-compatible alias `:root` shim to `styles.css`
+     (`--bg: var(--canvas-bg)`, `--text: var(--ink)`, `--card-bg: var(--surface)`,
+     `--font-body: var(--font-sans)`). **No partial edits** — old `var(--bg)` keeps
+     working, now resolving to the contract value. Low-risk, reversible.
+   - `--rename` — rewrites the changed names → contract names across `styles.css`
+     and every partial (whole-token match). Thorough; no shim needed afterwards.
+4. **Finish the values:** move any hard-coded base/semantic values out of
+   `styles.css` into `docs/design/design-system.md` (the report lists them), then
+   `design-system generate`. Keep deck-only tokens (`--dim`, `--accent-lt`,
+   `--danger-lt`, `--font-heading`, extended palette) in `styles.css`.
+5. **Rebuild** and verify (`build.py` prints the shared `Tokens:` line).
+
+`migrate.py` only touches token **names** — it never relocates values or edits
+component rules. Hard-coded hex in partials is reported context but not changed.
+
+---
+
 ## Build Commands
 
 All scripts require `--config` pointing to the project's config.yaml:
@@ -313,6 +352,11 @@ python scripts/build.py --config ./my-deck/config.yaml --output ./dist/deck.html
 
 # Split an existing deck into a project
 python scripts/split.py existing.html --config ./my-deck/config.yaml
+
+# Migrate a pre-design-system deck onto the shared token contract
+python scripts/migrate.py --config ./my-deck/config.yaml            # report (read-only)
+python scripts/migrate.py --config ./my-deck/config.yaml --apply    # add alias shim to styles.css
+python scripts/migrate.py --config ./my-deck/config.yaml --rename   # rewrite legacy names in place
 
 # Dev server with file watching
 python scripts/dev_server.py --config ./my-deck/config.yaml --port 3000

@@ -40,6 +40,7 @@ com-slide-deck/
     init.py                      Scaffolds a new project directory
     build.py                     Stitches slide partials into one HTML
     split.py                     Splits a single-file deck into partials
+    migrate.py                   Migrate an old deck onto the shared design-system tokens
     dev_server.py                Auto-rebuild + local HTTP server
 ```
 
