@@ -48,7 +48,7 @@ rule), then move to `archive/`.
 | OI-0007 | execution-item | Add `ops-slo` skill — SLI/SLO/error budgets from `QA-XXNN` (mints `SLO-NN`) | `docs/ops/slos/` (planned) | | _central-only_ | Build the skill | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
 | OI-0008 | execution-item | Add `arch-threat-model` skill — STRIDE per data-flow; feeds ADRs + security QAs (mints `THR-NN`) | `docs/architecture/threat-model/` (planned) | | _central-only_ | Build the skill | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
 | OI-0009 | execution-item | Add `domain-integration-contract` skill — concrete contract per BC-pair (mints `INT-NN`) | `docs/domain/integration-contracts/` (planned) | | _central-only_ | Build the skill | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
-| OI-0010 | execution-item | Cross-skill web visualisations — shared HTML/SVG views from canonical Markdown (capability maps, BMC, roadmaps, FBS) | `skills/com-artefact-viz/` | | _central-only_ | Built as `com-artefact-viz`: parse→model→render pipeline, four renderers, token-driven design system. Close on merge | medium | in-progress | victor | 2026-08-29 | _TBD_ |
+| OI-0010 | execution-item | Cross-skill web visualisations — shared HTML/SVG views from canonical Markdown (capability maps, BMC, roadmaps, FBS) | `skills/com-artefact-viz/` | | _central-only_ | Built as `com-artefact-viz`: parse→model→render pipeline, four renderers, shared `design-system` token sheet. Merged to main | medium | closed | victor | 2026-05-30 | [9c9cf00](https://github.com/VictorHueni/homemade-claude-kit/commit/9c9cf00) |
 | OI-0011 | execution-item | Add `spec-release-plan` skill — rollout/comms/rollback per `E-NN` | (planned) | | _central-only_ | Build the skill | low | open | _TBD_ | 2026-08-29 | _TBD_ |
 | OI-0012 | execution-item | Add `ops-post-mortem` skill — blameless incident review (broader than `ops-bug-rca`) | (planned) | | _central-only_ | Build the skill | low | open | _TBD_ | 2026-08-29 | _TBD_ |
 | OI-0013 | execution-item | Add `business-stakeholder-map` skill — RACI / influence-interest grid | (planned) | | _central-only_ | Build the skill | low | open | _TBD_ | 2026-08-29 | _TBD_ |
@@ -94,7 +94,7 @@ Skills and audits MAY render summary counts here (e.g. open / in-progress / bloc
 closed / dropped totals), but the snapshot must always derive from the live table above —
 never the other way around. The live table is the source of truth.
 
-_No snapshot yet — the ledger has not received its first sync._
+As of 2026-05-30 (19 rows): **open 18** · in-progress 0 · blocked 0 · **closed 1** (`OI-0010`) · dropped 0. The closed row lingers on the live ledger for one review cycle (30 days) before archival per §6.
 
 ---
 
