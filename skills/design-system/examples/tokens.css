@@ -1,0 +1,58 @@
+/*
+ * tokens.css — canonical design-system token contract.
+ *
+ * GENERATED from skills/design-system/examples/design-system.sample.md by the design-system skill on 2026-05-29.
+ * Edit the token tables in design-system.md and re-run `generate`; do not
+ * hand-edit here (changes are overwritten on refresh).
+ *
+ * Every com-* renderer references these variables via var() and never
+ * hard-codes a colour/font/radius — so editing values re-themes every deck
+ * and view with no renderer change.
+ */
+:root {
+  /* ---- Base palette ---- */
+  --ink:        #13211f;
+  --muted:      #5f6b69;
+  --canvas-bg:  #f4f7f6;
+  --surface:    #ffffff;
+  --surface-2:  #e8efed;
+  --border:     #cfdbd8;
+  --accent:     #0f9d8f;
+  --accent-ink: #ffffff;
+
+  /* ---- Strategic importance (capability map) ---- */
+  --differentiator: #c2453d;
+  --necessary:      #e0973a;
+  --commodity:      #5f6b69;
+
+  /* ---- Delivery status (FBS, roadmap) ---- */
+  --status-shipped: #2e9e5b;
+  --status-planned: #0f9d8f;
+  --status-backlog: #9aa3af;
+
+  /* ---- Pain index (delivery roadmap) ---- */
+  --pain-critical: #c2453d;
+  --pain-high:     #e0973a;
+  --pain-medium:   #0f9d8f;
+  --pain-low:      #9aa3af;
+
+  /* ---- Confidence (BMC / Lean Canvas) ---- */
+  --conf-assumed:   #9aa3af;
+  --conf-tested:    #e0973a;
+  --conf-validated: #2e9e5b;
+
+  /* ---- Typography ---- */
+  --font-sans:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:  ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  --title-size: 1.7rem;
+
+  /* ---- Spacing & shape ---- */
+  --space-sm:    0.5rem;
+  --space-md:    1rem;
+  --space-lg:    2rem;
+  --shell-max:   1400px;
+  --card-radius: 14px;
+  --btn-radius:  8px;
+  --node-radius: 10px;
+  --shadow:      0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.10);
+}

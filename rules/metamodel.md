@@ -60,7 +60,9 @@ what order, and where to put it**.
 - `dev-stack-guide` — research a technology stack's latest official docs + MCP server, then write a developer guide covering core patterns, anti-patterns, best practices, and coding-agent integration; three modes: research (→ `docs/dev-guides/research/{tech-slug}-research.md`), draft (→ `docs/dev-guides/{tech-slug}.md`), refresh; no metamodel IDs — path-referenced only
 - `dev-getting-started` — scaffold and populate a project-specific getting-started guide; reads project files (package.json, docker-compose, .env.example, Makefile, CLAUDE.md) to emit exact commands; three modes: scaffold, fill, refresh → `docs/dev-guides/getting-started.md`; singleton per project
 - `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-ralph-loop` — developer workflow (commit, pull-request, worktree, ralph loop)
-- `com-slide-deck` — HTML slide presentations → `docs/communication/slides/{slug}/` (one folder per deck, named after the presentation in kebab-case)
+- `design-system` — project visual source of truth; authors `docs/design/design-system.md` (brand rationale + token tables) and generates `docs/design/tokens.css`, a canonical `:root` variable contract the `com-` presentation layer themes from (`var(--token)` only, never hard-coded colour/font/radius); modes: scaffold, generate/refresh (`design-system.md → tokens.css`); **cross-cutting foundation** — mints no IDs, carries no FK links to other artefacts, and sits outside the dependency graph (no ER entity, no ID-conventions row); scaffold it any time before producing communication artefacts. Adapts Anthropic's `brand-guidelines` skill pattern, kept domain-agnostic. New `design-` category → `docs/design/`.
+- `com-slide-deck` — HTML slide presentations → `docs/communication/slides/{slug}/` (one folder per deck, named after the presentation in kebab-case); should reference the `design-system` tokens when generating its deck `styles.css`
+- `com-artefact-viz` — renders canonical artefacts (capability map, FBS, delivery roadmap, BMC/Lean Canvas) into single-file interactive HTML views → `docs/communication/visualisations/{kind}.html`; parse→model→render pipeline (Python stdlib only) with a token-driven design system — auto-detects the shared `docs/design/tokens.css` from the `design-system` skill (or override with `--design-system`); mints no IDs and is not a build-order step — a derived, regenerable read-out of artefacts that remain the source of truth; companion to `com-slide-deck`
 
 ---
 
@@ -566,6 +568,7 @@ Not numbered in the linear build order but sequencing matters:
 - `ops-bug-rca` → root cause analyses post-incident
 - `discovery-idea` → pre-formal idea capture, refinement, and graduation (an idea graduates to whichever downstream skill matches its matured form — `spec-prd`, `arch-adr`, `business-persona`, `business-objective`, etc.)
 - `spec-peer-review` → PRD / plan review before implementation
+- `design-system` → scaffold the project visual source of truth (`docs/design/design-system.md` → `tokens.css`) before producing any communication artefact, so every slide deck and artefact visualisation themes consistently; cross-cutting, mints no IDs, re-run `refresh` when the brand changes
 - `util-docs-audit` → periodic health check (quarterly)
 
 ---
@@ -710,7 +713,11 @@ docs/
 │   │   └── {slug}.md
 │   └── rcas/
 │       └── {YYYY-MM-DD}-{slug}.md
+├── design/                                              ← `design-system` (project visual source of truth; cross-cutting; mints no IDs)
+│   ├── design-system.md                                ← authored brand rationale + token tables
+│   └── tokens.css                                       ← generated :root token contract (themes the `com-` layer)
 ├── communication/                                       ← `com-` skills
+│   ├── visualisations/                                 ← com-artefact-viz ({kind}.html; derived read-outs)
 │   └── slides/
 │       └── {slug}/                                      ← com-slide-deck (one folder per deck)
 │           ├── context/
@@ -743,7 +750,8 @@ docs/
 | `arch-` | `docs/architecture/` | Subfolders per artefact (e.g., `decisions/` for ADRs) |
 | `domain-` | `docs/domain/` | DDD artefacts — the shared language between business and tech (bounded contexts, glossary, domain model) |
 | `ops-` | `docs/ops/` | Subfolders per artefact (`runbooks/`, `rcas/`) |
-| `com-` | `docs/communication/` | Communication artefacts (slide decks, presentations). Subfolders per artefact type (e.g. `slides/`). |
+| `design-` | `docs/design/` | Project visual source of truth — `design-system.md` + generated `tokens.css`. Cross-cutting foundation for the `com-` presentation layer; mints no IDs, no FK links. |
+| `com-` | `docs/communication/` | Communication artefacts (slide decks, presentations, artefact visualisations). Subfolders per artefact type (e.g. `slides/`, `visualisations/`). |
 | `dev-` | *(no doc folder)* for workflow utilities · **exception:** `dev-stack-guide` → `docs/dev-guides/{tech-slug}.md` + `docs/dev-guides/research/`; `dev-getting-started` → `docs/dev-guides/getting-started.md` | Developer-workflow utilities; `dev-stack-guide` and `dev-getting-started` are the only `dev-` skills that write to `docs/` |
 | `util-` | *(no doc folder)* | Housekeeping |
 
@@ -817,6 +825,9 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 | New artefact step, new canonical path | `util-metamodel-scaffold/references/index-template.md` → §Detection bash block + §Template stack-progress table (add detection command + row) |
 
 Failing to update these files after a metamodel change will cause the audit and migration skills to silently miss the new artefact — the most dangerous kind of drift.
+
+**Already-updated coupling (com-artefact-viz + design-system + new `design-` category, 2026-05-29):**
+Two supporting communication skills + one new category, none minting IDs (no ER/ID-conventions/Check-5 changes). `com-artefact-viz` (renders capability map / FBS / delivery roadmap / BMC into single-file HTML; resolves OI-0010) and `design-system` (project visual source of truth → `docs/design/design-system.md` + `tokens.css`; adapts Anthropic's `brand-guidelines` pattern). Updated: `rules/metamodel.md` supporting-skills list (3 bullets: design-system, com-slide-deck note, com-artefact-viz) + Ongoing/cross-cutting build-order note (design-system) + canonical paths tree (`docs/design/` + `docs/communication/visualisations/`) + prefix→folder mapping (`design-` row; `com-` row updated) + this table · `rules/skill-creation-sync.md` categories table (`design-` row) · `README.md` skill index (design-system + com-artefact-viz rows) · `docs/project-control/open-items/open-items.md` (OI-0010 → in-progress; new row for deferred com-slide-deck token unification). No `util-metamodel-audit` / `util-metamodel-migration` changes required — both skills mint no IDs and their outputs (`docs/design/`, `docs/communication/`) are not product-spec artefacts swept by those tools.
 
 **Already-updated coupling (BACKLOG.md merged into the open-items ledger, 2026-05-29):**
 Repo-root `BACKLOG.md` removed; its candidate-skill backlog (Tier 1/2/3) + structural-decision items merged into `docs/project-control/open-items/open-items.md` as `OI-0003`–`OI-0018` (Tier→Priority high/medium/low; decisions as `decision-gap`); shipped-skill history moved to `docs/project-control/open-items/archive/2026-Q2-shipped.md`. Updated: `README.md` §Backlog, `rules/open-items-governance.md` §9 + §10. Earlier coupling notes below still name `BACKLOG.md` — they are historical records of those past changes, not live pointers.

@@ -1,0 +1,62 @@
+/*
+ * tokens.css — canonical design-system token contract.
+ *
+ * This :root block is the ONE vocabulary every com-* renderer agrees on.
+ * com-slide-deck and com-artefact-viz reference these variables via var();
+ * they never hard-code a colour, font, or radius. Re-theme a project by
+ * editing these values (or the design-system.md that generates this file) —
+ * every downstream view and deck updates with no renderer change.
+ *
+ * Generated from docs/design/design-system.md by the `design-system` skill
+ * (generate_tokens.py). Hand-edits are allowed but will be overwritten on the
+ * next `refresh` — author durable changes in design-system.md.
+ *
+ * Values below are NEUTRAL defaults. Replace them with the project brand.
+ */
+:root {
+  /* ---- Base palette ---- */
+  --ink:        #1a1f29;   /* primary text */
+  --muted:      #6b7280;   /* secondary text */
+  --canvas-bg:  #f6f7f9;   /* page background */
+  --surface:    #ffffff;   /* card / panel background */
+  --surface-2:  #eef1f5;   /* recessed / group background */
+  --border:     #d7dce3;   /* hairlines, dividers */
+  --accent:     #3b6ef5;   /* primary action, links, IDs */
+  --accent-ink: #ffffff;   /* text on accent fills */
+
+  /* ---- Semantic: strategic importance (capability map) ---- */
+  --differentiator: #d9534f;  /* where the business wins or loses */
+  --necessary:      #f0ad4e;  /* required for operation */
+  --commodity:      #6b7280;  /* could be outsourced */
+
+  /* ---- Semantic: delivery status (FBS, roadmap) ---- */
+  --status-shipped: #2e9e5b;  /* shipped */
+  --status-planned: #3b6ef5;  /* planned */
+  --status-backlog: #9aa3af;  /* backlog */
+
+  /* ---- Semantic: pain index (delivery roadmap) ---- */
+  --pain-critical: #d9534f;
+  --pain-high:     #f0ad4e;
+  --pain-medium:   #3b6ef5;
+  --pain-low:      #9aa3af;
+
+  /* ---- Semantic: confidence (BMC / Lean Canvas) ---- */
+  --conf-assumed:   #9aa3af;
+  --conf-tested:    #f0ad4e;
+  --conf-validated: #2e9e5b;
+
+  /* ---- Typography ---- */
+  --font-sans:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:  ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  --title-size: 1.6rem;
+
+  /* ---- Spacing & shape ---- */
+  --space-sm:    0.5rem;
+  --space-md:    1rem;
+  --space-lg:    2rem;
+  --shell-max:   1400px;
+  --card-radius: 12px;
+  --btn-radius:  8px;
+  --node-radius: 10px;
+  --shadow:      0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.10);
+}
