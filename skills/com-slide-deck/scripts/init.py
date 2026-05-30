@@ -150,8 +150,31 @@ if (typeof lucide !== 'undefined') lucide.createIcons();
 })();
 """
 
+    DEFAULT_STYLES = """/*
+ * Deck styles. Base palette + typography are inherited from the project design
+ * system (docs/design/tokens.css, from the `design-system` skill), inlined by
+ * build.py BEFORE this file. Use the contract token names via var() — do NOT
+ * redefine the base palette here. See design/design-system.md for the full
+ * token list and the migration map.
+ */
+
+:root {
+  /* Semantic state colours -> shared semantics (consistent with artefact views) */
+  --success: var(--status-shipped);   /* positive / done */
+  --warning: var(--pain-high);         /* caution / in-progress */
+  --danger:  var(--pain-critical);     /* negative / error */
+
+  /* Deck-only tokens (no contract equivalent) */
+  --dim:       var(--muted);           /* tertiary text; override with a dimmer value if desired */
+  --accent-lt: color-mix(in srgb, var(--accent) 14%, var(--surface));  /* subtle accent background */
+}
+
+/* Component styles go here — reference var(--ink), var(--surface), var(--accent),
+   var(--font-sans), var(--font-mono), etc. Never hard-code a hex value. */
+"""
+
     placeholders = [
-        ("design/styles.css", "/* Design tokens and component styles go here */\n"),
+        ("design/styles.css", DEFAULT_STYLES),
         ("design/script.js",  DEFAULT_SCRIPT),
     ]
     for rel, content in placeholders:

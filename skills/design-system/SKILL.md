@@ -88,8 +88,8 @@ python scripts/generate_tokens.py generate docs/design/design-system.md
 4. **Consume** from the presentation skills:
    - `com-artefact-viz` auto-detects `docs/design/tokens.css` (or pass
      `--design-system docs/design/tokens.css`).
-   - `com-slide-deck` references the same token values when generating its
-     deck `design/styles.css`.
+   - `com-slide-deck`'s `build.py` inlines `docs/design/tokens.css` before the
+     deck `styles.css` (config `paths.design_tokens`, or auto-detected).
 5. **Refresh** whenever the brand changes — re-run `generate`; every consumer
    re-themes on its next build.
 

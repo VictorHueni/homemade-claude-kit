@@ -46,6 +46,34 @@ def read_file(path: Path) -> str:
         return f.read()
 
 
+def find_design_tokens(cfg: dict, base: Path) -> tuple:
+    """Locate the shared design-system token sheet (docs/design/tokens.css).
+
+    The deck's base colour/type tokens are defined once, project-wide, by the
+    `design-system` skill. Resolution order:
+      1. `paths.design_tokens` in config (relative to the config file), if set.
+      2. Auto-detect: walk up from the deck dir to a `docs/design/tokens.css`.
+    Returns (css_text, source_path), or ("", None) when absent — the deck then
+    builds with its own styles only (fully backwards compatible).
+    """
+    configured = cfg.get("paths", {}).get("design_tokens")
+    if configured:
+        p = resolve_path(base, configured)
+        if p.exists():
+            return p.read_text(encoding="utf-8"), p
+        print(f"  [WARN] Configured design_tokens not found: {p}")
+        return "", None
+    cur = base.resolve()
+    for _ in range(8):  # walk up a bounded number of parents
+        candidate = cur / "docs" / "design" / "tokens.css"
+        if candidate.exists():
+            return candidate.read_text(encoding="utf-8"), candidate
+        if cur.parent == cur:
+            break
+        cur = cur.parent
+    return "", None
+
+
 def build_font_url(fonts: list) -> str:
     if not fonts:
         return ""
@@ -275,12 +303,18 @@ def build(config_path: Path, output_override: str = None):
     baseline_css = make_baseline_css(canvas_w, canvas_h)
     baseline_js  = make_baseline_js(canvas_w)
 
-    # Styles (project + baseline)
+    # Styles — layered so values cascade in the right order:
+    #   1. shared design-system tokens (docs/design/tokens.css) — base palette,
+    #      typography, spacing; the project-wide source of truth
+    #   2. the deck's own styles.css — semantic bridge + deck-only tokens + components
+    #   3. baseline CSS — structural defaults
+    # Absent shared tokens → deck builds standalone (backwards compatible).
+    tokens_css, tokens_src = find_design_tokens(cfg, base)
+    if tokens_src:
+        print(f"[BUILD] Tokens:  {tokens_src} (shared design system)")
     css = read_file(styles_path)
-    if css:
-        parts.append(f"<style>\n{css}\n{baseline_css}\n</style>")
-    else:
-        parts.append(f"<style>\n{baseline_css}\n</style>")
+    layers = [c for c in (tokens_css, css, baseline_css) if c]
+    parts.append("<style>\n" + "\n".join(layers) + "\n</style>")
     parts.append("</head>\n<body>\n")
 
     # Controls hint

@@ -112,7 +112,7 @@ placeholders; keep it short.*
 | Consumer | How it themes from this design system |
 |---|---|
 | `com-artefact-viz` | `python scripts/render.py SRC.md --design-system docs/design/tokens.css` (auto-detected if present) |
-| `com-slide-deck` | Reference these token values when generating the deck's `design/styles.css` |
+| `com-slide-deck` | `build.py` inlines this `tokens.css` before the deck's `design/styles.css` (config `paths.design_tokens`, or auto-detected) |
 
 ---
 
