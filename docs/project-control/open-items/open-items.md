@@ -58,6 +58,7 @@ rule), then move to `archive/`.
 | OI-0017 | decision-gap | PRD naming with epic reference — encode epic in filename vs subfolder vs keep-flat (audit-enforced) | `docs/product-specs/prds/` | | _central-only_ | Decide convention; update metamodel + `spec-prd` | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
 | OI-0018 | decision-gap | Exec-plan folder ↔ PRD link — match NNNN vs reference-PRD-in-name vs nest-under-PRD | `docs/exec-plans/active/` | | _central-only_ | Decide convention; update metamodel + `spec-implementation-plan` | medium | open | _TBD_ | 2026-08-29 | _TBD_ |
 | OI-0019 | execution-item | Unify `com-slide-deck` styling onto the shared `design-system` tokens — deck `styles.css` inherits the `tokens.css` `:root` contract instead of defining its own palette | `skills/com-slide-deck/` | | _central-only_ | `build.py` inlines `docs/design/tokens.css` before the deck styles; full rename to the contract vocabulary + semantic bridge. Merged to main | low | closed | victor | 2026-05-30 | [1147cf7](https://github.com/VictorHueni/homemade-claude-kit/commit/1147cf7) |
+| OI-0020 | execution-item | Make the `design-system` token contract generic + portable for cross-project interoperability — semantic layer is `--success/--warning/--danger/--info`; kit-domain tokens (status, pain, confidence, importance) are consumer-derived aliases | `skills/design-system/` | | _central-only_ | Invert the semantic layer: contract carries generics only; `com-artefact-viz` derives domain tokens from them; `com-slide-deck` drops the bridge. Merged to main | medium | closed | victor | 2026-05-30 | [e7302f8](https://github.com/VictorHueni/homemade-claude-kit/commit/e7302f8) |
 
 All rows are kit-development items raised directly at the central plane (the kit dogfoods its
 own open-items contract per `rules/open-items-governance.md` §9), so they carry `_central-only_`
@@ -94,7 +95,7 @@ Skills and audits MAY render summary counts here (e.g. open / in-progress / bloc
 closed / dropped totals), but the snapshot must always derive from the live table above —
 never the other way around. The live table is the source of truth.
 
-As of 2026-05-30 (19 rows): **open 17** · in-progress 0 · blocked 0 · **closed 2** (`OI-0010`, `OI-0019`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
+As of 2026-05-30 (20 rows): **open 17** · in-progress 0 · blocked 0 · **closed 3** (`OI-0010`, `OI-0019`, `OI-0020`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
 
 ---
 
