@@ -14,6 +14,26 @@ Trivy is **auto-detected**: the scan runs when `trivy` is on `PATH` and is skipp
 
 `exo` is likewise **auto-detected** and **never part of the `tf-check.sh` plan pipeline** — it powers the separate post-apply verification step (`scripts/exo-verify.sh`, Mode 5). The skill invokes it for inventory reads only (`list` / `show`); mutating verbs are forbidden by Safety rule 1.
 
+## Terraform or OpenTofu (`TF_BIN`)
+
+The pipeline runs on **either Terraform or [OpenTofu](https://opentofu.org/)** — OpenTofu is the MPL-2.0 OSS fork created after Terraform's 2023 BSL relicense, and its `tofu` CLI is flag-compatible with `terraform` for everything `tf-check.sh` does (`fmt`, `validate`, `init`, `plan`). The Exoscale provider, HCL, and the SOS backend are identical across both.
+
+`tf-check.sh` resolves the binary in this order:
+
+1. an explicit **`TF_BIN`** env var (`TF_BIN=tofu` or `TF_BIN=terraform`);
+2. else `terraform` if on `PATH` (back-compatible default);
+3. else `tofu` if on `PATH`;
+4. else it fails, naming both.
+
+Set `TF_BIN=tofu` in **OSS-strict projects that standardise on OpenTofu** (e.g. governed by an ADR excluding BSL Terraform). Everywhere below, "`terraform <cmd>`" reads as "the resolved `$TF_BIN <cmd>`".
+
+**Install OpenTofu** — via [mise](https://mise.jdx.dev/) (`opentofu = "latest"` in `~/.mise.toml`, then `mise install`; ships the `tofu` binary) or the [official install](https://opentofu.org/docs/intro/install/):
+
+```bash
+mise use -g opentofu@latest   # ships the `tofu` binary
+tofu version
+```
+
 ## The pipeline (what `scripts/tf-check.sh` runs)
 
 1. `terraform fmt -check -recursive -diff` — formatting. Deterministic; no network. Fix with `terraform fmt`.

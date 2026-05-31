@@ -45,21 +45,36 @@ require() {
 }
 
 [ -d "$DIR" ] || { red "✗ directory not found: $DIR"; exit 2; }
-require terraform
 
-bold "==> Terraform quality pipeline on '$DIR' (plan-only)"
+# IaC binary: Terraform (BSL) or OpenTofu (MPL-2.0, the `tofu` binary). Honour an
+# explicit TF_BIN; else auto-detect — prefer terraform when present for back-compat,
+# otherwise fall back to tofu. Set TF_BIN=tofu in OSS-strict projects that standardise
+# on OpenTofu (see references/toolchain.md). The CLIs are flag-compatible for this pipeline.
+if [ -n "${TF_BIN:-}" ]; then
+  require "$TF_BIN"
+elif command -v terraform >/dev/null 2>&1; then
+  TF_BIN=terraform
+elif command -v tofu >/dev/null 2>&1; then
+  TF_BIN=tofu
+else
+  red "✗ neither 'terraform' nor 'tofu' found on PATH"
+  echo "  install one (see references/toolchain.md), or set TF_BIN explicitly." >&2
+  exit 127
+fi
 
-bold "[1/6] terraform fmt -check"
-if terraform -chdir="$DIR" fmt -check -recursive -diff; then
+bold "==> IaC quality pipeline ($TF_BIN) on '$DIR' (plan-only)"
+
+bold "[1/6] $TF_BIN fmt -check"
+if "$TF_BIN" -chdir="$DIR" fmt -check -recursive -diff; then
   green "    formatting OK"
 else
-  red "    formatting issues above — run: terraform -chdir=$DIR fmt -recursive"
+  red "    formatting issues above — run: $TF_BIN -chdir=$DIR fmt -recursive"
   exit 1
 fi
 
-bold "[2/6] terraform validate"
-terraform -chdir="$DIR" init -backend=false -input=false >/dev/null
-terraform -chdir="$DIR" validate
+bold "[2/6] $TF_BIN validate"
+"$TF_BIN" -chdir="$DIR" init -backend=false -input=false >/dev/null
+"$TF_BIN" -chdir="$DIR" validate
 green "    config valid"
 
 bold "[3/6] tflint"
@@ -92,13 +107,13 @@ if [ "$NO_PLAN" -eq 1 ]; then
   exit 0
 fi
 
-bold "[6/6] terraform plan (read-only — NO apply)"
+bold "[6/6] $TF_BIN plan (read-only — NO apply)"
 if [ -z "${EXOSCALE_API_KEY:-}" ] || [ -z "${EXOSCALE_API_SECRET:-}" ]; then
   red "✗ EXOSCALE_API_KEY / EXOSCALE_API_SECRET not set — cannot plan."
   echo "  export them, or re-run with --no-plan to stop after lint." >&2
   exit 3
 fi
 # A real init is needed if a backend is configured; harmless otherwise.
-terraform -chdir="$DIR" init -input=false >/dev/null
-terraform -chdir="$DIR" plan -input=false -lock=false
-green "==> Pipeline complete. Review the plan above, then a HUMAN runs 'terraform apply'."
+"$TF_BIN" -chdir="$DIR" init -input=false >/dev/null
+"$TF_BIN" -chdir="$DIR" plan -input=false -lock=false
+green "==> Pipeline complete. Review the plan above, then a HUMAN runs '$TF_BIN apply'."
