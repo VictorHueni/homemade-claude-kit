@@ -10,9 +10,9 @@ description: >
   slide-builder folder. Also use when the user asks to define or update a design
   system for a presentation. Do NOT use for
   PowerPoint (.pptx) files or Google Slides (this skill exports its own decks to PDF via render.py).
-version: "1.1.0"
+version: "1.2.0"
 status: active
-last_reviewed: 2026-05-30
+last_reviewed: 2026-05-31
 user-invocable: true
 impact: "low"
 ---
@@ -42,6 +42,7 @@ project-specific content.
 | Migrate an old deck to the design system | `python scripts/migrate.py --config path/to/config.yaml` (report) · `--apply` (alias shim) · `--rename` (rewrite names) |
 | Cite a source on a slide     | Add `data-sources="key1,key2"` to the `.slide` div; add entries to `context/bibliography.yaml` |
 | Add a new source             | Add a keyed entry to `context/bibliography.yaml` |
+| Add custom `<head>` meta tags | Add a `meta:` list to `config.yaml` (`- {name: …, content: …}`) — injected into the built `<head>`. Use for rights/author/licence provenance (content is HTML-escaped) |
 
 ---
 

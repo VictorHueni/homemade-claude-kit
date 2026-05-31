@@ -16,6 +16,7 @@ Usage:
 """
 
 import argparse
+import html
 import re
 import sys
 import textwrap
@@ -251,6 +252,16 @@ def build_head(cfg: dict) -> str:
         f'<script src="{url}"></script>'
         for url in cfg.get("external_scripts", [])
     )
+    # Optional custom <meta> tags (e.g. rights / author / licence provenance).
+    # config.yaml: meta: [{name: author, content: "..."}, ...]
+    meta_tags = "\n".join(
+        f'<meta name="{html.escape(str(m["name"]), quote=True)}" '
+        f'content="{html.escape(str(m["content"]), quote=True)}">'
+        for m in cfg.get("meta", [])
+        if isinstance(m, dict) and m.get("name") and m.get("content") is not None
+    )
+    if meta_tags:
+        meta_tags += "\n"
     return textwrap.dedent(f"""\
     <!DOCTYPE html>
     <html lang="en">
@@ -258,7 +269,7 @@ def build_head(cfg: dict) -> str:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{cfg.get("title", "Presentation")}</title>
-    {font_tags}{scripts}
+    {meta_tags}{font_tags}{scripts}
     """)
 
 
