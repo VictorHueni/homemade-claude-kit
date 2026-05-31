@@ -397,8 +397,9 @@ size, backgrounds preserved, with an optional per-recipient footer stamp
 Playwright (so Lucide icons and web fonts render correctly), injects its own pagination
 CSS, and writes to `<deck>/output/pdf/`.
 
-PDF export is **optional**: `render.py` checks for Playwright and **fails with install
-guidance** if it is missing — it never auto-installs. Build the deck first (`build.py`),
+PDF export is **optional**: `render.py` checks for Playwright and **fails with an explicit
+message** if it is missing — it never auto-installs. The developer must provision Playwright
+(and its Chromium build) in their local environment first. Build the deck first (`build.py`),
 then render.
 
 ```bash

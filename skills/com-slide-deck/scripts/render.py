@@ -5,10 +5,8 @@ One slide per PDF page, at the deck's canvas size, with backgrounds preserved an
 optional per-recipient footer stamp ("Prepared for <recipient> · <date>").
 
 Optional dependency — NOT auto-installed. This script checks for Playwright (and its
-Chromium build) and fails with guidance if either is missing:
-
-    pip install playwright
-    python -m playwright install chromium
+Chromium build) and fails with an explicit message if either is missing; the developer
+must provision Playwright in their local environment before PDF export will work.
 
 Usage:
     python scripts/render.py --config path/to/config.yaml
@@ -33,16 +31,15 @@ def fail(msg: str, code: int = 1) -> None:
 
 
 def require_playwright():
-    """Import Playwright's sync API or fail with actionable guidance (never auto-install)."""
+    """Import Playwright's sync API or fail explicitly (never auto-install)."""
     try:
         from playwright.sync_api import sync_playwright  # noqa: WPS433 (local import by design)
     except ImportError:
         fail(
-            "Playwright is not installed. PDF export is an optional feature.\n"
-            "  Install it once with:\n"
-            "    pip install playwright\n"
-            "    python -m playwright install chromium\n"
-            "  (On a mise/chezmoi setup this is provisioned by run_onchange_install-playwright.)"
+            "Playwright is not available in this environment. PDF export is an optional "
+            "feature and this script does not install it.\n"
+            "  Provision Playwright (and its Chromium build) in your local environment, "
+            "then re-run this command."
         )
     return sync_playwright
 
@@ -134,7 +131,8 @@ def render(config_path: Path, recipient: str | None, date: str, output_override:
         except Exception as exc:  # noqa: BLE001 — surface a clean message
             fail(
                 f"Could not launch Chromium ({exc}).\n"
-                "  Install the browser once with: python -m playwright install chromium"
+                "  Ensure Playwright's Chromium build is available in your local environment, "
+                "then re-run this command."
             )
         page = browser.new_page(viewport={"width": width, "height": height})
         # Render screen-styled output (the deck is designed for screen media), while the
