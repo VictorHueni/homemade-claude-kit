@@ -39,8 +39,8 @@ paths:
   output_filename:   "presentation.html"
   # Shared design-system tokens (the `design-system` skill's output). Inlined
   # before styles.css so base palette/typography flow from the project's single
-  # source of truth. Omit to auto-detect docs/design/tokens.css by walking up
-  # from this deck; leave unset (and have no docs/design/tokens.css) to build
+  # source of truth. Omit to auto-detect docs/ux/tokens.css by walking up
+  # from this deck; leave unset (and have no docs/ux/tokens.css) to build
   # the deck standalone.
   # design_tokens:   "../../../design/tokens.css"
 

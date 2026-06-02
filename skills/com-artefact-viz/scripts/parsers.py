@@ -600,6 +600,349 @@ def parse_bmc(text):
 
 
 # --------------------------------------------------------------------------- #
+# Service blueprint — a COMPOSITION lens (multi-source, derived)
+#
+# Unlike the four single-file parsers above, this one composes several canonical
+# artefacts into one cross-process customer-visibility view. It is NOT a second
+# source of truth: it restates nothing — it reads the process docs (actors,
+# systems, steps, handoffs, pain points), drapes them under value-stream phase
+# columns, and DERIVES the only thing no source carries — the line of visibility
+# — from persona type. Anything it cannot classify is surfaced, not guessed.
+# Full derivation contract: references/parsing-contract.md.
+# --------------------------------------------------------------------------- #
+
+PERSONA_HEAD = re.compile(r"^###\s+(P-\d+)\s*·\s*(.+?)\s*$", re.MULTILINE)
+PTYPE_KEYWORDS = ("customer", "served", "primary", "secondary", "supplemental", "negative")
+VS_STAGE_HEAD = re.compile(r"^####\s+(VS-\d+\.\d+)\s*·\s*(.+?)\s*$", re.MULTILINE)
+_STOPWORDS = {
+    "the", "a", "an", "of", "and", "to", "in", "for", "with", "flow", "process",
+    "system", "intake", "team", "dept", "department", "service", "s",
+}
+
+
+def _tokens(text):
+    """Lower-case alphanumeric word set, stop-words removed — for fuzzy matching."""
+    words = re.findall(r"[a-z0-9]+", (text or "").lower())
+    return {w for w in words if w not in _STOPWORDS and len(w) > 1}
+
+
+def parse_persona_index(texts):
+    """
+    Build {persona-id: {name, role, tokens, ptype}} from one or more persona
+    docs. `ptype` is the lower-cased persona-type keyword (customer / served /
+    primary / …) used to classify front/back-stage; None when absent.
+    """
+    index = {}
+    for text in texts:
+        text = strip_frontmatter(text)
+        heads = list(PERSONA_HEAD.finditer(text))
+        for i, m in enumerate(heads):
+            pid = m.group(1)
+            head_tail = m.group(2)
+            # "Name — role tagline"  ->  name, role
+            name, _, role = head_tail.partition("—")
+            block = text[m.end(): heads[i + 1].start() if i + 1 < len(heads) else len(text)]
+            ptype = None
+            tm = re.search(r"\*\*Persona type:\*\*\s*([^\n|]+)", block)
+            if tm and not is_placeholder(tm.group(1)):
+                low = tm.group(1).lower()
+                ptype = next((k for k in PTYPE_KEYWORDS if k in low), None)
+            index[pid] = {
+                "name": clean(name),
+                "role": clean(role),
+                "tokens": _tokens(name) | _tokens(role),
+                "ptype": ptype,
+            }
+    return index
+
+
+def parse_value_stream_phases(text, stream=None):
+    """
+    Ordered phase columns from a value-stream doc: one per `#### VS-N.M · Stage`
+    heading, carrying the stage's pain index when present. `stream` (e.g. "VS-1")
+    filters to a single stream; None keeps every stage in document order.
+    """
+    text = strip_frontmatter(text)
+    heads = list(VS_STAGE_HEAD.finditer(text))
+    phases = []
+    for i, m in enumerate(heads):
+        sid = m.group(1)
+        if stream and not sid.startswith(stream + "."):
+            continue
+        name = clean(m.group(2))
+        if is_placeholder(name):
+            name = sid
+        block = text[m.end(): heads[i + 1].start() if i + 1 < len(heads) else len(text)]
+        pain = None
+        pm = re.search(r"pain point index[^\n|]*\|\s*\**\s*(critical|high|medium|low)", block, re.I)
+        if pm:
+            pain = pm.group(1).lower()
+        phases.append({"id": sid, "name": name, "pain": pain})
+    return phases
+
+
+def _section_after(text, *keywords):
+    """§-body lookup that tolerates the process docs' numbered `## 3. Actors` heads."""
+    return find_section(split_h2(strip_frontmatter(text)), *keywords)
+
+
+def parse_process(text):
+    """
+    Extract the blueprint-relevant slice of one business-process doc:
+    title, actors (§3), systems (§4 Data Stores), data-object handoffs (§5),
+    per-actor numbered steps (§6) and pain points (§9). Defensive: every part
+    degrades to empty when its section is missing or placeholder-filled.
+    """
+    text = strip_frontmatter(text)
+    sections = split_h2(text)
+    title = doc_title(text)
+    slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-") or "process"
+
+    def first_col(sec_keywords):
+        _, rows = parse_table(find_section(sections, *sec_keywords) or "")
+        out = []
+        for r in rows:
+            name = clean(r[0]) if r else ""
+            if name and not is_placeholder(name):
+                out.append(name)
+        return out
+
+    actors = first_col(("actors",))
+    systems = first_col(("data", "stores"))
+
+    # §5 Data Objects -> handoffs (Object | Created by | Consumed by)
+    objects = []
+    headers, rows = parse_table(find_section(sections, "data", "objects") or "")
+    if headers:
+        lower = [h.lower() for h in headers]
+        c_obj = 0
+        c_from = next((i for i, h in enumerate(lower) if "created" in h), None)
+        c_to = next((i for i, h in enumerate(lower) if "consumed" in h), None)
+        for r in rows:
+            d = row_dict(headers, r)
+            obj = clean(r[c_obj]) if c_obj < len(r) else ""
+            if not obj or is_placeholder(obj):
+                continue
+            objects.append({
+                "object": obj,
+                "from": clean(r[c_from]) if c_from is not None and c_from < len(r) else "",
+                "to": clean(r[c_to]) if c_to is not None and c_to < len(r) else "",
+            })
+
+    # §6 Activities -> per-actor numbered steps (### 6.x {Actor}'s flow)
+    steps_by_actor = {}
+    activities = find_section(sections, "activities") or ""
+    for chunk in re.split(r"^###\s+", activities, flags=re.MULTILINE)[1:]:
+        head = chunk.splitlines()[0]
+        actor = re.sub(r"^[0-9.]+\s*", "", head)            # drop "6.1 "
+        actor = re.sub(r"['’]s\s+flow\s*$", "", actor, flags=re.I).strip()
+        actor = re.sub(r"\bflow\s*$", "", actor, flags=re.I).strip()
+        if not actor or is_placeholder(actor):
+            continue
+        steps = []
+        for line in chunk.splitlines()[1:]:
+            sm = re.match(r"^\s*\d+\.\s+(.*)", line)
+            if not sm:
+                continue
+            raw = sm.group(1)
+            nm = re.match(r"\*\*(.+?)\*\*\s*(?:—\s*(.*))?$", raw)
+            label = clean(nm.group(1)) if nm else clean(raw)
+            if label and not is_placeholder(label):
+                steps.append(label)
+        if steps:
+            steps_by_actor[actor] = steps
+
+    # §9 pain points -> who-experiences set (for fail flags) + the rows themselves
+    pains = []
+    pain_actors = set()
+    headers, rows = parse_table(find_section(sections, "broken") or find_section(sections, "pain") or "")
+    if headers:
+        lower = [h.lower() for h in headers]
+        c_pp = 0
+        c_who = next((i for i, h in enumerate(lower) if "who" in h or "experien" in h), None)
+        c_where = next((i for i, h in enumerate(lower) if "where" in h), None)
+        for r in rows:
+            pp = clean(r[c_pp]) if c_pp < len(r) else ""
+            if not pp or is_placeholder(pp):
+                continue
+            who = clean(r[c_who]) if c_who is not None and c_who < len(r) else ""
+            pains.append({
+                "pain": pp,
+                "who": who,
+                "where": clean(r[c_where]) if c_where is not None and c_where < len(r) else "",
+            })
+            if who:
+                pain_actors |= _tokens(who)
+
+    return {
+        "title": title,
+        "slug": slug,
+        "actors": actors,
+        "systems": systems,
+        "objects": objects,
+        "steps_by_actor": steps_by_actor,
+        "pains": pains,
+        "pain_actors": pain_actors,
+    }
+
+
+# Band order, top -> bottom, with the three Shostack/Bitner control lines.
+BLUEPRINT_BANDS = ["evidence", "customer", "frontstage", "backstage", "systems", "unclassified"]
+CONTROL_LINES = {
+    "frontstage": "line of interaction",
+    "backstage": "line of visibility",
+    "systems": "line of internal interaction",
+}
+
+
+def _resolve_persona(actor_name, persona_index):
+    """Best persona match for an actor name by token overlap on name+role."""
+    at = _tokens(actor_name)
+    if not at:
+        return None
+    best, best_score = None, 0
+    for pid, p in persona_index.items():
+        score = len(at & p["tokens"])
+        if score > best_score:
+            best, best_score = p, score
+    return best if best_score else None
+
+
+def _looks_like_system(name):
+    low = name.lower()
+    return bool(re.search(r"\b(system|platform|service|api|engine|automation|bot|portal|registry|database|store)\b", low))
+
+
+def parse_service_blueprint(proc_texts, vs_text=None, persona_texts=None, options=None):
+    options = options or {}
+    persona_index = parse_persona_index(persona_texts or [])
+    phases = parse_value_stream_phases(vs_text, options.get("stream")) if vs_text else []
+
+    procs = [parse_process(t) for t in proc_texts]
+    title = options.get("title") or (
+        f"Service Blueprint — {procs[0]['title']}" if procs else "Service Blueprint"
+    )
+
+    # ---- 1. Gather every actor (union of §3 + §6) with its source proc ------
+    actor_order = []
+    actor_seen = {}
+    proc_pain_tokens = set()
+    for proc in procs:
+        proc_pain_tokens |= proc["pain_actors"]
+        names = list(proc["actors"]) + [a for a in proc["steps_by_actor"] if a not in proc["actors"]]
+        for name in names:
+            key = name.lower()
+            if key not in actor_seen:
+                lane = {
+                    "name": name, "proc": proc["slug"], "steps": [],
+                    "persona": None, "ptype": None, "band": None, "fail": False,
+                }
+                actor_seen[key] = lane
+                actor_order.append(lane)
+            # steps come from the proc that documents this actor's §6 flow
+            if name in proc["steps_by_actor"] and not actor_seen[key]["steps"]:
+                actor_seen[key]["steps"] = proc["steps_by_actor"][name]
+
+    # ---- 2. Resolve persona + classify into bands --------------------------
+    customer_keys = set()
+    for lane in actor_order:
+        p = _resolve_persona(lane["name"], persona_index)
+        if p:
+            lane["persona"] = p["name"]
+            lane["ptype"] = p["ptype"]
+        if lane["ptype"] in ("customer", "served"):
+            lane["band"] = "customer"
+            customer_keys.add(lane["name"].lower())
+        elif lane["ptype"] == "negative":
+            lane["band"] = "drop"
+        elif _looks_like_system(lane["name"]):
+            lane["band"] = "systems"
+
+    # touches_customer: an actor that exchanges a §5 data object with a customer
+    # actor sits ABOVE the line of visibility (frontstage); otherwise backstage.
+    touch = set()
+    connectors = []
+    for proc in procs:
+        for obj in proc["objects"]:
+            a, b = obj["from"].lower(), obj["to"].lower()
+            if a and b:
+                connectors.append({"object": obj["object"], "from": obj["from"], "to": obj["to"]})
+            if a in customer_keys and b:
+                touch.add(b)
+            if b in customer_keys and a:
+                touch.add(a)
+
+    for lane in actor_order:
+        if lane["band"] in ("customer", "systems", "drop"):
+            continue
+        if lane["persona"] is None and lane["ptype"] is None:
+            lane["band"] = "unclassified"
+        else:
+            lane["band"] = "frontstage" if lane["name"].lower() in touch else "backstage"
+
+    lanes = [l for l in actor_order if l["band"] != "drop"]
+
+    # fail flag: actor named in any §9 "who experiences it" cell
+    for lane in lanes:
+        if _tokens(lane["name"]) & proc_pain_tokens:
+            lane["fail"] = True
+
+    # ---- 3. Phase columns (VS stages, else ordinal fallback) ---------------
+    derived_phases = bool(phases)
+    max_steps = max((len(l["steps"]) for l in lanes), default=0)
+    if not phases:
+        n = max_steps or 1
+        phases = [{"id": None, "name": f"Step {i + 1}", "pain": None} for i in range(n)]
+    nph = len(phases)
+
+    # Place each step into a phase. VS columns: proportional ordinal mapping.
+    # Synthesised columns: one step per column (direct ordinal). Deterministic —
+    # no keyword guessing, so the view never silently mis-files a step.
+    for lane in lanes:
+        cells = [[] for _ in range(nph)]
+        ns = len(lane["steps"])
+        for i, step in enumerate(lane["steps"]):
+            if derived_phases:
+                pi = min(nph - 1, (i * nph) // ns) if ns else 0
+            else:
+                pi = min(i, nph - 1)
+            cells[pi].append({"label": step, "fail": lane["fail"]})
+        lane["cells"] = cells
+
+    # ---- 4. Evidence band: customer-facing systems / handoff artefacts ------
+    evidence = []
+    seen_ev = set()
+    for proc in procs:
+        for obj in proc["objects"]:
+            if (obj["from"].lower() in customer_keys or obj["to"].lower() in customer_keys):
+                if obj["object"].lower() not in seen_ev:
+                    evidence.append(obj["object"])
+                    seen_ev.add(obj["object"].lower())
+
+    # band -> ordered lanes
+    by_band = {b: [l for l in lanes if l["band"] == b] for b in BLUEPRINT_BANDS}
+
+    classified = sum(1 for l in lanes if l["band"] != "unclassified")
+    return {
+        "kind": "service-blueprint",
+        "title": title,
+        "phases": phases,
+        "derived_phases": derived_phases,
+        "by_band": by_band,
+        "evidence": evidence,
+        "connectors": connectors,
+        "stats": {
+            "procs": len(procs),
+            "actors": len(lanes),
+            "classified": classified,
+            "unclassified": len(lanes) - classified,
+            "personas": len(persona_index),
+            "phases": nph,
+        },
+    }
+
+
+# --------------------------------------------------------------------------- #
 # Dispatch by source path / content
 # --------------------------------------------------------------------------- #
 
@@ -610,10 +953,17 @@ PARSERS = {
     "bmc": parse_bmc,
 }
 
+# Multi-source kinds are handled directly by render.py (they take several files),
+# so they live outside the single-text PARSERS map but are still valid --kind
+# values and renderer keys.
+MULTISOURCE_KINDS = ("service-blueprint",)
+
 
 def detect_kind(path, text):
     """Guess the artefact type from filename, then from content headings."""
     p = path.lower()
+    if "service-blueprint" in p or "service_blueprint" in p:
+        return "service-blueprint"
     if "capability-map" in p or "capability_map" in p:
         return "capability-map"
     if "fbs" in p or "functional-breakdown" in p:

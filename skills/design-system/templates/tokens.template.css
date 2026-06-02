@@ -7,7 +7,7 @@
  * editing these values (or the design-system.md that generates this file) —
  * every downstream view and deck updates with no renderer change.
  *
- * Generated from docs/design/design-system.md by the `design-system` skill
+ * Generated from docs/ux/design-system.md by the `design-system` skill
  * (generate_tokens.py). Hand-edits are allowed but will be overwritten on the
  * next `refresh` — author durable changes in design-system.md.
  *

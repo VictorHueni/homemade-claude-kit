@@ -27,8 +27,19 @@ import render as render_mod  # noqa: E402
 TEMPLATE_DIR = os.path.join(os.path.dirname(HERE), "templates")
 
 
-def watched_paths(source):
-    paths = [source]
+def watched_paths(args):
+    paths = []
+    if args.source:
+        paths.append(args.source)
+    # service-blueprint composition lens: watch every composed source
+    paths += list(args.proc or [])
+    if args.value_stream:
+        paths.append(args.value_stream)
+    for p in args.personas or []:
+        if os.path.isdir(p):
+            paths += [os.path.join(p, n) for n in os.listdir(p) if n.lower().endswith(".md")]
+        else:
+            paths.append(p)
     for name in ("base.html.tmpl", "tokens.fallback.css", "tokens.domain.css", "runtime.js"):
         paths.append(os.path.join(TEMPLATE_DIR, name))
     return paths
@@ -46,27 +57,36 @@ def mtimes(paths):
 
 def main():
     ap = argparse.ArgumentParser(add_help=True)
-    ap.add_argument("source")
+    ap.add_argument("source", nargs="?")
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--kind", choices=None)
     ap.add_argument("--design-system", dest="design_system")
     ap.add_argument("--left-axis-label", dest="left_axis_label")
     ap.add_argument("--left-axis-arrow", dest="left_axis_arrow", default="▼")
     ap.add_argument("--title")
+    # service-blueprint composition lens (multi-source) — mirrors render.py
+    ap.add_argument("--proc", action="append", metavar="FILE")
+    ap.add_argument("--value-stream", dest="value_stream", metavar="FILE")
+    ap.add_argument("--personas", action="append", metavar="PATH")
+    ap.add_argument("--stream", metavar="VS-N")
     args = ap.parse_args()
     args.detect = False
 
-    if not os.path.isfile(args.source):
+    if args.source and not os.path.isfile(args.source):
         sys.exit(f"error: source not found: {args.source}")
+    if not args.source and not args.proc:
+        sys.exit("error: provide a SOURCE.md (or --proc for a service blueprint).")
 
     tmpdir = tempfile.mkdtemp(prefix="viz-")
     out_path = os.path.join(tmpdir, "index.html")
     args.out = out_path
 
+    label = args.source or ", ".join(args.proc or [])
+
     def rebuild():
         try:
             render_mod.build(args.source, args)
-            print(f"[{time.strftime('%H:%M:%S')}] rendered {args.source}")
+            print(f"[{time.strftime('%H:%M:%S')}] rendered {label}")
         except SystemExit as e:
             print(f"render error: {e}")
         except Exception as e:  # keep the server alive on parse errors
@@ -74,7 +94,7 @@ def main():
 
     rebuild()
 
-    paths = watched_paths(args.source)
+    paths = watched_paths(args)
     last = mtimes(paths)
 
     def watch():

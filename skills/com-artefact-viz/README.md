@@ -16,6 +16,7 @@ Markdown artefact ──parser──> model ──renderer──> one HTML file 
 | `fbs` | `spec-functional-breakdown-structure` | Collapsible tree, horizontal⇄vertical, status badges |
 | `delivery-roadmap` | `spec-delivery-roadmap` | Phase-column timeline + walking skeleton + expandable epic features |
 | `bmc` | `business-model-canvas` | 9-block canvas grid (BMC + Lean), confidence colour-coding |
+| `service-blueprint` | `business-process` + `business-value-stream` + `business-persona` *(composition)* | Swimlane grid with the line of visibility, phase columns, pain overlays + cross-actor handoff spine |
 
 ## Usage
 
@@ -33,6 +34,12 @@ python scripts/render.py docs/business/03a-capability-map.md \
 
 # Live preview while editing the source
 python scripts/dev_server.py docs/business/03a-capability-map.md --port 8000
+
+# Compose a service blueprint (multi-source: process + value stream + personas)
+python scripts/render.py --kind service-blueprint \
+  --proc docs/business/05a-processes/proc-03-slot-rebooking.md \
+  --value-stream docs/business/04a-value-stream.md \
+  --personas docs/business/03b-personas/
 ```
 
 Try it against the bundled fixtures:
@@ -41,6 +48,13 @@ Try it against the bundled fixtures:
 for k in capability-map fbs delivery-roadmap bmc; do
   python scripts/render.py examples/$k.sample.md --out /tmp/$k.html
 done
+
+# the service blueprint fixture is a multi-file set
+python scripts/render.py --kind service-blueprint \
+  --proc examples/service-blueprint/process-slot-rebooking.md \
+  --value-stream examples/service-blueprint/value-stream.md \
+  --personas examples/service-blueprint/personas.md \
+  --out /tmp/service-blueprint.html
 ```
 
 ## Layout

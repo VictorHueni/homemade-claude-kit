@@ -219,7 +219,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="Generate the design-system token sheet.")
     sub = ap.add_subparsers(dest="mode", required=True)
 
-    s = sub.add_parser("scaffold", help="Create docs/design/{design-system.md, tokens.css}")
+    s = sub.add_parser("scaffold", help="Create docs/ux/{design-system.md, tokens.css}")
     s.add_argument("docs_dir", nargs="?", default="docs")
 
     g = sub.add_parser("generate", aliases=["refresh"], help="design-system.md -> tokens.css")

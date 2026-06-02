@@ -91,7 +91,7 @@ onto these in its own stylesheet), so a project only ever themes these four.
 
 | Consumer | How it themes from this design system |
 |---|---|
-| `com-artefact-viz` | `python scripts/render.py SRC.md --design-system docs/design/tokens.css` (auto-detected if present) |
+| `com-artefact-viz` | `python scripts/render.py SRC.md --design-system docs/ux/tokens.css` (auto-detected if present) |
 | `com-slide-deck` | `build.py` inlines this `tokens.css` before the deck's `design/styles.css` (config `paths.design_tokens`, or auto-detected) |
 
 ---

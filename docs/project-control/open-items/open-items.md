@@ -63,6 +63,8 @@ rule), then move to `archive/`.
 | OI-0022 | execution-item | `com-slide-deck` migrate mode — help an existing pre-design-system deck adopt the shared token contract (detect legacy token names, emit a compatibility shim, or rewrite names in place) | `skills/com-slide-deck/` | | _central-only_ | New `scripts/migrate.py`: report (read-only) / `--apply` (alias shim) / `--rename` (rewrite); SKILL + README documented. Merged to main | low | closed | victor | 2026-05-30 | [e1d8e9f](https://github.com/VictorHueni/homemade-claude-kit/commit/e1d8e9f) |
 | OI-0023 | execution-item | `util-provenance` `--sign` step — detached digital signature of the digest (GPG or `openssl dgst -sign`) proving authorship by a key, fully local. Reserved flag already exits with a "planned" message | `skills/util-provenance/` | | _central-only_ | Implement `--sign` in `scripts/provenance.py`; decide signing-key model (self-managed vs CA-backed); emit a `.sig` + extend the provenance record. Must preserve the hash-only/local tenet | medium | open | victor | 2026-08-31 | _TBD_ |
 | OI-0024 | execution-item | `util-provenance` `--c2pa` step — embed a signed C2PA Content Credentials manifest (author + edit history). Reserved flag already exits with a "planned" message | `skills/util-provenance/` | | _central-only_ | Implement `--c2pa`; needs a `c2patool`/`c2pa-python` install; verify C2PA-for-PDF support (partial/evolving) else apply to per-page PNG renders. Best-effort companion to hash+timestamp | low | open | victor | 2026-08-31 | _TBD_ |
+| OI-0025 | execution-item | Service blueprint — front-stage/back-stage multi-actor view (actor lanes × steps, line of visibility, systems + notification spine); the only artefact showing a whole multi-actor coordination loop at once | `skills/com-artefact-viz/` | | _central-only_ | **Resolved as a composition lens, not a standalone skill.** Scoping found ~80% overlap with `business-process` (actor swimlanes, systems §4, steps §6, KPIs §8, pain points §9 already there); only the line of visibility + customer-perceived evidence were genuinely new. Shipped as `com-artefact-viz --kind service-blueprint` (5th renderer) composing `business-process` + `business-value-stream` + `business-persona` docs; **derives** front/back-stage from persona type, surfacing unclassifiable actors rather than guessing. Mints no IDs, authors no new artefact → no metamodel build-order/audit/migration/scaffold coupling. Closes the multi-actor-loop gap without a second source of truth | high | closed | victor | 2026-06-02 | _pending merge (`claude/metamodel-governance-rules-NoiJ3`)_ |
+| OI-0026 | execution-item | Establish the `ux-` design+experience category (`docs/ux/`); move `design-system`'s output `docs/design/` → `docs/ux/` (incl. `tokens.css`). The skill **keeps its name** `design-system` — a prefix→folder exception like `business-vision`→`docs/VISION.md`. Prerequisite for OI-0025; unifies visual + experience design under one `ux-` prefix instead of a split `design-`/`ux-` | `skills/design-system/`, `skills/com-slide-deck/`, `skills/com-artefact-viz/` | | _central-only_ | Done: `ux-` prefix→folder mapping added (with the `design-system` name exception); all `docs/design/` → `docs/ux/`; `com-` token auto-detect (build.py/render.py/migrate.py) hard-repointed to `docs/ux/tokens.css`, no fallback; metamodel paths+prefix table+bullets+coupling note, README, skill-creation-sync, and migration detection-signals updated; smoke-tested both detectors | high | closed | victor | 2026-06-02 | [1825c46](https://github.com/VictorHueni/homemade-claude-kit/commit/1825c46) |
 
 All rows are kit-development items raised directly at the central plane (the kit dogfoods its
 own open-items contract per `rules/open-items-governance.md` §9), so they carry `_central-only_`
@@ -70,11 +72,21 @@ provenance — they have no source-artefact `## Open Items` section (skill folde
 one). `OI-0001`/`OI-0002` are `ops-terraform-exoscale` follow-ups; `OI-0003`–`OI-0018` are the
 former `BACKLOG.md` candidate-skill backlog (Tier 1 → `high`, Tier 2 → `medium`, Tier 3 →
 `low`) and structural-decision items, merged here so the kit has a single control plane.
+`OI-0019`–`OI-0024` are later additions (`com-`/`design-` token unification and
+`util-provenance` follow-ups). `OI-0025`/`OI-0026` open the kit's UX layer: `OI-0026`
+establishes a unified `ux-` design+experience category (migrating `design-system` into it),
+and `OI-0025` closes the multi-actor-loop gap — the highest-leverage UX/UI gap, since no
+existing skill showed a multi-actor coordination loop whole. `OI-0025` was deliberately
+**not** built as a standalone `ux-service-blueprint` skill: it overlapped `business-process`
+too heavily, so it shipped as a derived composition lens in `com-artefact-viz`
+(`--kind service-blueprint`) that reads the process/value-stream/persona docs rather than
+restating them.
 
 **Recommended build order** (former BACKLOG guidance, by structural impact, not strict
-priority): `OI-0003` domain-event-storming → `OI-0004` spec-test-strategy → `OI-0006`
-arch-team-topology → `OI-0007` ops-slo. Tier 2/3 items improve completeness but are not
-structural metamodel gaps. Shipped-skill history lives in
+priority): `OI-0003` domain-event-storming → `OI-0004` spec-test-strategy → `OI-0026`
+establish `ux-` category + migrate `design-system` → `OI-0025` service-blueprint lens (done)
+→ `OI-0006` arch-team-topology → `OI-0007` ops-slo. Tier 2/3 items improve completeness but
+are not structural metamodel gaps. Shipped-skill history lives in
 [`archive/2026-Q2-shipped.md`](./archive/2026-Q2-shipped.md).
 
 ---
@@ -99,7 +111,7 @@ Skills and audits MAY render summary counts here (e.g. open / in-progress / bloc
 closed / dropped totals), but the snapshot must always derive from the live table above —
 never the other way around. The live table is the source of truth.
 
-As of 2026-05-30 (22 rows): **open 17** · in-progress 0 · blocked 0 · **closed 5** (`OI-0010`, `OI-0019`, `OI-0020`, `OI-0021`, `OI-0022`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
+As of 2026-06-02 (26 rows): **open 20** · in-progress 0 · blocked 0 · **closed 6** (`OI-0010`, `OI-0019`, `OI-0020`, `OI-0021`, `OI-0022`, `OI-0026`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
 
 ---
 
