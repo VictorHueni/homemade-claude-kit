@@ -50,7 +50,7 @@ a supporting skill, like `com-slide-deck`.
 |---|---|
 | Render an artefact (auto-detect kind) | `python scripts/render.py docs/business/03a-capability-map.md` |
 | Force the kind | `python scripts/render.py SRC.md --kind fbs` |
-| Theme from the shared design system | automatic — `docs/design/tokens.css` (from the `design-system` skill) is auto-detected |
+| Theme from the shared design system | automatic — `docs/ux/tokens.css` (from the `design-system` skill) is auto-detected |
 | Theme with a specific sheet | `python scripts/render.py SRC.md --design-system path/to/styles.css` |
 | Override the capability/FBS left-axis label | `python scripts/render.py SRC.md --left-axis-label "Customer Journey" --left-axis-arrow "→"` |
 | Choose the output path | `python scripts/render.py SRC.md --out docs/communication/visualisations/capability-map.html` |
@@ -68,7 +68,7 @@ Default output: `docs/communication/visualisations/<kind>.html`.
    yet, stop and point the user at the skill that builds it — this skill
    visualises, it does not author.
 2. **Pick or confirm the design system.** Resolution order: (a) an explicit
-   `--design-system PATH`; (b) the shared `docs/design/tokens.css` produced by
+   `--design-system PATH`; (b) the shared `docs/ux/tokens.css` produced by
    the **`design-system`** skill, auto-detected if present (the view prints
    "using shared design system …"); (c) the skill's shipped defaults
    (`templates/tokens.fallback.css`). The project sheet's `:root` tokens are
@@ -92,7 +92,7 @@ evolve alone:
 1. **Design tokens** — layered like `com-slide-deck`: `templates/tokens.fallback.css`
    (shipped generic contract — base palette, `--success`/`--warning`/`--danger`/
    `--info`, typography, spacing) is inlined first; the project sheet
-   (`docs/design/tokens.css` or `--design-system`) is inlined over it and wins;
+   (`docs/ux/tokens.css` or `--design-system`) is inlined over it and wins;
    then `templates/tokens.domain.css` maps viz's domain names
    (`--status-shipped: var(--success)`, `--pain-critical: var(--danger)`, …) onto
    the generics. **Renderers reference only `var(--token)` — never a literal
@@ -168,6 +168,6 @@ visualisations).
 
 - `references/parsing-contract.md` — exact Markdown each parser reads, field by field.
 - `references/viz-discipline.md` — design principles and boundaries (what this skill is NOT).
-- `design-system/SKILL.md` — the shared design system; its `docs/design/tokens.css` is auto-detected as the theme.
+- `design-system/SKILL.md` — the shared design system; its `docs/ux/tokens.css` is auto-detected as the theme.
 - `com-slide-deck/SKILL.md` — sibling HTML builder; share its `design/styles.css` via `--design-system`.
 - `rules/skill-creation-sync.md` · `rules/artefact-frontmatter.md` · `rules/diagramming-mermaid.md`.

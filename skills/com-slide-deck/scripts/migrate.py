@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 migrate.py — com-slide-deck: migrate a pre-design-system deck onto the shared
-token contract (the `design-system` skill's docs/design/tokens.css).
+token contract (the `design-system` skill's docs/ux/tokens.css).
 
 Detects legacy token names in the deck's styles.css and slide partials, maps the
 ones that changed to the generic contract, and either:
@@ -93,14 +93,14 @@ def scan(files):
 
 
 def find_tokens_css(base, cfg):
-    """Mirror build.py: configured design_tokens, else walk up to docs/design/tokens.css."""
+    """Mirror build.py: configured design_tokens, else walk up to docs/ux/tokens.css."""
     configured = cfg.get("paths", {}).get("design_tokens")
     if configured:
         p = resolve(base, configured)
         return p if p.exists() else None
     cur = base.resolve()
     for _ in range(8):
-        cand = cur / "docs" / "design" / "tokens.css"
+        cand = cur / "docs" / "ux" / "tokens.css"
         if cand.exists():
             return cand
         if cur.parent == cur:
@@ -138,7 +138,7 @@ def do_report(base, cfg, found, styles):
     if tokens_css:
         print(f"[ok]   project design system found: {rel(tokens_css, base)}")
     else:
-        print("[todo] no project design system (docs/design/tokens.css) found.")
+        print("[todo] no project design system (docs/ux/tokens.css) found.")
         print("       run first:  design-system scaffold   then fill + generate")
 
     if not found:
@@ -162,7 +162,7 @@ def do_report(base, cfg, found, styles):
     if palette:
         print("\n  [todo] styles.css still hard-codes base/semantic values for:")
         print("         " + ", ".join(palette))
-        print("         move these VALUES into docs/design/design-system.md, then "
+        print("         move these VALUES into docs/ux/design-system.md, then "
               "`design-system generate`,")
         print("         and delete them from styles.css so the deck inherits them.")
 

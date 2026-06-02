@@ -81,13 +81,13 @@ def build(source_path, args):
     # Resolution order for the project sheet:
     # Token layering (same model as com-slide-deck):
     #   1. tokens.fallback.css   — shipped neutral generic contract (zero-config)
-    #   2. docs/design/tokens.css — project override (explicit --design-system, or
+    #   2. docs/ux/tokens.css — project override (explicit --design-system, or
     #                                auto-detected; project values win)
     #   3. tokens.domain.css     — viz domain tokens derived from the generics
     ds = _read(os.path.join(TEMPLATE_DIR, "tokens.fallback.css"))
     project_sheet = args.design_system
     if not project_sheet:
-        shared = os.path.join("docs", "design", "tokens.css")
+        shared = os.path.join("docs", "ux", "tokens.css")
         if os.path.isfile(shared):
             project_sheet = shared
             print(f"using shared design system {shared} (pass --design-system to override)")

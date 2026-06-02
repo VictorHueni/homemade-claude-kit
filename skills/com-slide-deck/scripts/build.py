@@ -53,12 +53,12 @@ def read_file(path: Path) -> str:
 
 
 def find_design_tokens(cfg: dict, base: Path) -> tuple:
-    """Locate the shared design-system token sheet (docs/design/tokens.css).
+    """Locate the shared design-system token sheet (docs/ux/tokens.css).
 
     The deck's base colour/type tokens are defined once, project-wide, by the
     `design-system` skill. Resolution order:
       1. `paths.design_tokens` in config (relative to the config file), if set.
-      2. Auto-detect: walk up from the deck dir to a `docs/design/tokens.css`.
+      2. Auto-detect: walk up from the deck dir to a `docs/ux/tokens.css`.
     Returns (css_text, source_path), or ("", None) when absent — the deck then
     builds with its own styles only (fully backwards compatible).
     """
@@ -71,7 +71,7 @@ def find_design_tokens(cfg: dict, base: Path) -> tuple:
         return "", None
     cur = base.resolve()
     for _ in range(8):  # walk up a bounded number of parents
-        candidate = cur / "docs" / "design" / "tokens.css"
+        candidate = cur / "docs" / "ux" / "tokens.css"
         if candidate.exists():
             return candidate.read_text(encoding="utf-8"), candidate
         if cur.parent == cur:
@@ -322,7 +322,7 @@ def build(config_path: Path, output_override: str = None):
     # Styles — layered so values cascade in the right order (same model as
     # com-artefact-viz):
     #   1. tokens.fallback.css    — shipped neutral generic contract (zero-config)
-    #   2. docs/design/tokens.css — project override (the source of truth; wins)
+    #   2. docs/ux/tokens.css — project override (the source of truth; wins)
     #   3. the deck's own styles.css — deck-only tokens + components
     #   4. baseline CSS           — structural defaults
     fallback_css = read_file(FALLBACK_TOKENS)

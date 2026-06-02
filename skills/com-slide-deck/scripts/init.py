@@ -153,7 +153,7 @@ if (typeof lucide !== 'undefined') lucide.createIcons();
     DEFAULT_STYLES = """/*
  * Deck styles. Base palette + typography + semantic state come from the design
  * system, inlined by build.py BEFORE this file: tokens.fallback.css (shipped
- * defaults) then docs/design/tokens.css (project override, if present). Use the
+ * defaults) then docs/ux/tokens.css (project override, if present). Use the
  * contract token names via var() — do NOT redefine the base palette here. See
  * design/design-system.md for the full token list and the migration map.
  */

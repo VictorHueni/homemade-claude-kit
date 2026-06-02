@@ -33,7 +33,7 @@ project-specific content.
 | New project from scratch     | `python scripts/init.py docs/communication/slides/{slug}` then fill brief + design system |
 | Add a slide                  | Create partial in project's `src/`, add to `config.yaml`  |
 | Edit a slide                 | Edit the partial directly, run `build.py --config`        |
-| Re-theme the brand (palette/fonts) | Edit `docs/design/design-system.md` → `design-system generate` (shared `tokens.css` re-themes deck + viz) |
+| Re-theme the brand (palette/fonts) | Edit `docs/ux/design-system.md` → `design-system generate` (shared `tokens.css` re-themes deck + viz) |
 | Restyle the deck only        | Edit project's `design/styles.css` (deck-only tokens + components) |
 | Prototype a variation        | Create file in project's `dist/prototypes/`               |
 | Build shareable HTML         | `python scripts/build.py --config path/to/config.yaml`    |
@@ -124,7 +124,7 @@ should feel. Every content decision flows from it.
 ### Step 2: Design System
 
 The base palette and typography come from the **project design system**
-(`docs/design/tokens.css`, produced by the `design-system` skill) — the single
+(`docs/ux/tokens.css`, produced by the `design-system` skill) — the single
 source of truth shared with `com-artefact-viz`. `build.py` inlines it BEFORE the
 deck's `styles.css`. The contract includes the base palette, typography, and the
 generic semantic state tokens (`--success`/`--warning`/`--danger`/`--info`). The
@@ -132,9 +132,9 @@ deck's `styles.css` therefore does **not** redefine any of those; it adds only
 deck-only tokens (`--dim`, `--accent-lt`), components, and fonts — all using the
 contract token names via `var()`, never hard-coded hex.
 
-1. **Ensure the project design system exists.** If `docs/design/tokens.css` is
+1. **Ensure the project design system exists.** If `docs/ux/tokens.css` is
    missing, scaffold it first: `design-system scaffold` then fill
-   `docs/design/design-system.md` and run `design-system generate`. (If the deck
+   `docs/ux/design-system.md` and run `design-system generate`. (If the deck
    is intentionally standalone, skip — `build.py` falls back to deck styles only.)
 2. Read the project's `design/design-system.md` (deck-level: deck-only tokens +
    components + type scale).
@@ -306,12 +306,12 @@ A deck built before the shared design system keeps building unchanged — the
 shipped `tokens.fallback.css` is a harmless base layer and the deck's own
 `styles.css` (inlined after it) overrides any overlapping tokens. Migration is
 **optional**, and only needed to make the deck theme from the project's
-`docs/design/tokens.css` (so deck + artefact views share one source).
+`docs/ux/tokens.css` (so deck + artefact views share one source).
 
 `scripts/migrate.py` automates the token-name part. **Commit the deck first.**
 
 1. **Stand up the design system** (if absent): `design-system scaffold`, port the
-   deck's palette values into `docs/design/design-system.md`, `design-system generate`.
+   deck's palette values into `docs/ux/design-system.md`, `design-system generate`.
 2. **Report** what needs changing (read-only):
    ```bash
    python scripts/migrate.py --config path/to/config.yaml
@@ -327,7 +327,7 @@ shipped `tokens.fallback.css` is a harmless base layer and the deck's own
    - `--rename` — rewrites the changed names → contract names across `styles.css`
      and every partial (whole-token match). Thorough; no shim needed afterwards.
 4. **Finish the values:** move any hard-coded base/semantic values out of
-   `styles.css` into `docs/design/design-system.md` (the report lists them), then
+   `styles.css` into `docs/ux/design-system.md` (the report lists them), then
    `design-system generate`. Keep deck-only tokens (`--dim`, `--accent-lt`,
    `--danger-lt`, `--font-heading`, extended palette) in `styles.css`.
 5. **Rebuild** and verify (`build.py` prints the shared `Tokens:` line).
@@ -375,7 +375,7 @@ Run through this before every build. Items 1-5 are startup gates.
 
 1. [ ] Project directory exists with `config.yaml`
 2. [ ] `context/brief.md` exists, fully completed, no placeholders
-3. [ ] `docs/design/tokens.css` exists (shared design system) — or the deck is intentionally standalone
+3. [ ] `docs/ux/tokens.css` exists (shared design system) — or the deck is intentionally standalone
 4. [ ] `design/design-system.md` exists, fully completed, no placeholders
 5. [ ] `design/styles.css` defines only deck-only tokens + components (does NOT redefine the inherited base palette or semantic state tokens)
 6. [ ] Slide class name does not conflict with existing slides

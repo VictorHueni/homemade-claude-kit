@@ -17,17 +17,17 @@ it scaffolds a fillable design system rather than hard-coding a brand.
 ## Usage
 
 ```bash
-# Scaffold docs/design/{design-system.md, tokens.css} (neutral defaults)
+# Scaffold docs/ux/{design-system.md, tokens.css} (neutral defaults)
 python scripts/generate_tokens.py scaffold
 
 # After editing the token values in design-system.md, regenerate the CSS
-python scripts/generate_tokens.py generate docs/design/design-system.md
+python scripts/generate_tokens.py generate docs/ux/design-system.md
 ```
 
 Then the presentation skills theme from it:
 
 ```bash
-# com-artefact-viz auto-detects docs/design/tokens.css
+# com-artefact-viz auto-detects docs/ux/tokens.css
 python ../com-artefact-viz/scripts/render.py docs/business/03a-capability-map.md
 ```
 
@@ -49,4 +49,5 @@ design-system/
     design-system.sample.md      A filled example
 ```
 
-Output: `docs/design/` (the `design-` category folder). Python 3.8+, stdlib only.
+Output: `docs/ux/` (the `ux-` category folder; `design-system` keeps its name, a
+prefix→folder exception like `business-vision`). Python 3.8+, stdlib only.
