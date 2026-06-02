@@ -407,9 +407,182 @@ def render_bmc(model, options):
     }
 
 
+# --------------------------------------------------------------------------- #
+# Service blueprint — swimlane grid with the line of visibility
+# --------------------------------------------------------------------------- #
+
+BAND_LABELS = {
+    "evidence": "Physical / digital evidence",
+    "customer": "Customer actions",
+    "frontstage": "Frontstage (visible)",
+    "backstage": "Backstage (invisible)",
+    "systems": "Systems / automation",
+    "unclassified": "Unclassified",
+}
+# Control line drawn ABOVE the band whose key this is (matches parsers.CONTROL_LINES).
+CONTROL_LINES = {
+    "frontstage": "line of interaction",
+    "backstage": "line of visibility",
+    "systems": "line of internal interaction",
+}
+
+
+def render_service_blueprint(model, options):
+    phases = model["phases"]
+    nph = len(phases)
+    by_band = model["by_band"]
+    stats = model["stats"]
+
+    def phase_headers():
+        cells = ['<div class="sb-corner"></div>']
+        for p in phases:
+            pain = f' sb-ph--{esc(p["pain"])}' if p.get("pain") else ""
+            pid = f'<span class="sb-ph-id">{esc(p["id"])}</span>' if p.get("id") else ""
+            cells.append(
+                f'<div class="sb-ph{pain}">{pid}<span class="sb-ph-name">{esc(p["name"])}</span></div>'
+            )
+        return f'<div class="sb-row sb-row--head">{"".join(cells)}</div>'
+
+    def step_chip(s):
+        fail = " sb-step--fail" if s.get("fail") else ""
+        return f'<span class="sb-step{fail}">{esc(s["label"])}</span>'
+
+    def lane_row(lane):
+        label_bits = [f'<span class="sb-lane-name">{esc(lane["name"])}</span>']
+        if lane.get("persona"):
+            label_bits.append(f'<span class="sb-lane-persona">{esc(lane["persona"])}</span>')
+        if lane.get("band") == "unclassified":
+            label_bits.append('<span class="sb-badge sb-badge--warn" title="could not resolve a persona type — classify in the source persona doc">unclassified</span>')
+        if lane.get("fail"):
+            label_bits.append('<span class="sb-badge sb-badge--fail" title="named in a §9 pain point">⚠ pain</span>')
+        cells = [f'<div class="sb-lane-label">{"".join(label_bits)}</div>']
+        for pi in range(nph):
+            chips = "".join(step_chip(s) for s in lane["cells"][pi]) if lane.get("cells") else ""
+            cells.append(f'<div class="sb-cell">{chips}</div>')
+        return f'<div class="sb-row">{"".join(cells)}</div>'
+
+    def evidence_row():
+        ev = model.get("evidence", [])
+        if not ev:
+            return ""
+        chips = "".join(f'<span class="sb-evidence">{esc(x)}</span>' for x in ev)
+        body = f'<div class="sb-cell sb-cell--span" style="grid-column: 2 / {nph + 2};">{chips}</div>'
+        label = f'<div class="sb-lane-label"><span class="sb-lane-name">{esc(BAND_LABELS["evidence"])}</span></div>'
+        return f'<div class="sb-row">{label}{body}</div>'
+
+    def control_line(text):
+        return (
+            f'<div class="sb-line" style="grid-column: 1 / {nph + 2};">'
+            f'<span class="sb-line-label">{esc(text)}</span></div>'
+        )
+
+    rows = [phase_headers(), evidence_row()]
+    # ordered bands below evidence, inserting a control line above the marked ones
+    for band in ("customer", "frontstage", "backstage", "systems", "unclassified"):
+        lanes = by_band.get(band, [])
+        if not lanes:
+            continue
+        if band in CONTROL_LINES:
+            rows.append(control_line(CONTROL_LINES[band]))
+        rows.append(f'<div class="sb-band-tag">{esc(BAND_LABELS[band])}</div>')
+        rows.extend(lane_row(l) for l in lanes)
+
+    # comms spine — the cross-actor handoffs ("the dance")
+    spine = ""
+    if model.get("connectors"):
+        chips = "".join(
+            f'<span class="sb-handoff">{esc(c["from"])} <span class="sb-arrow">→</span> '
+            f'{esc(c["to"])}<span class="sb-handoff-obj">{esc(c["object"])}</span></span>'
+            for c in model["connectors"]
+        )
+        spine = (
+            '<section class="sb-spine"><h3 class="sb-spine-title">Notification / comms spine — handoffs</h3>'
+            f'<div class="sb-spine-chips">{chips}</div></section>'
+        )
+
+    has_grid = any(by_band.get(b) for b in by_band) or model.get("evidence")
+    if not has_grid:
+        grid = '<p class="viz-empty">No actors found in the source process docs.</p>'
+    else:
+        grid = (
+            f'<div class="sb-grid" style="grid-template-columns: var(--sb-lane-w) repeat({nph}, minmax(120px, 1fr));">'
+            + "".join(rows) + "</div>"
+        )
+    content = grid + spine
+
+    toolbar = ""
+    if stats["unclassified"]:
+        toolbar = (
+            f'<span class="sb-note">⚠ {stats["unclassified"]} of {stats["actors"]} actors unclassified — '
+            f'derived from persona type; set <code>Persona type</code> in the source persona doc to place them.</span>'
+        )
+
+    view_css = """
+:root { --sb-lane-w: 190px; }
+.sb-grid { display: grid; gap: 2px; background: var(--border); border: 1px solid var(--border);
+  border-radius: var(--card-radius); overflow: hidden; }
+.sb-row { display: contents; }
+.sb-corner { background: var(--surface-2); }
+.sb-ph { background: var(--surface-2); padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.1rem; }
+.sb-ph-id { font-family: var(--font-mono); font-size: 0.62rem; color: var(--accent); font-weight: 700; }
+.sb-ph-name { font-size: 0.82rem; font-weight: 700; }
+.sb-ph--critical { box-shadow: inset 0 -3px 0 var(--pain-critical); }
+.sb-ph--high { box-shadow: inset 0 -3px 0 var(--pain-high); }
+.sb-ph--medium { box-shadow: inset 0 -3px 0 var(--pain-medium); }
+.sb-ph--low { box-shadow: inset 0 -3px 0 var(--pain-low); }
+.sb-band-tag { grid-column: 1 / -1; background: var(--surface-2); color: var(--muted);
+  font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+  padding: 0.25rem 0.6rem; }
+.sb-lane-label { background: var(--surface); padding: 0.5rem 0.6rem; display: flex; flex-direction: column;
+  gap: 0.15rem; border-right: 2px solid var(--surface-2); }
+.sb-lane-name { font-size: 0.82rem; font-weight: 600; }
+.sb-lane-persona { font-size: 0.66rem; color: var(--muted); font-style: italic; }
+.sb-cell { background: var(--surface); padding: 0.4rem; display: flex; flex-wrap: wrap; gap: 0.3rem;
+  align-content: flex-start; }
+.sb-cell--span { align-items: center; }
+.sb-step { font-size: 0.72rem; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--node-radius); padding: 0.15rem 0.45rem; }
+.sb-step--fail { border-color: var(--pain-high); box-shadow: inset 3px 0 0 var(--pain-high); }
+.sb-evidence { font-size: 0.72rem; background: var(--surface); border: 1px dashed var(--accent);
+  border-radius: 999px; padding: 0.15rem 0.55rem; color: var(--ink); }
+.sb-line { background: var(--canvas-bg); border-top: 2px dashed var(--muted); height: 1.4rem;
+  display: flex; align-items: center; }
+.sb-line-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--muted); font-weight: 700; padding: 0 0.6rem; }
+.sb-badge { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
+  border-radius: 999px; padding: 0.05rem 0.4rem; width: fit-content; }
+.sb-badge--warn { background: var(--pain-medium); color: var(--accent-ink); }
+.sb-badge--fail { background: var(--pain-high); color: var(--accent-ink); }
+.sb-spine { margin-top: var(--space-lg); background: var(--surface-2); border-radius: var(--card-radius);
+  padding: var(--space-md); border-left: 4px solid var(--accent); }
+.sb-spine-title { margin: 0 0 0.5rem; font-size: 0.95rem; }
+.sb-spine-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.sb-handoff { font-size: 0.72rem; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--node-radius); padding: 0.2rem 0.5rem; display: inline-flex; align-items: center; gap: 0.3rem; }
+.sb-arrow { color: var(--accent); font-weight: 700; }
+.sb-handoff-obj { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted);
+  background: var(--surface-2); border-radius: 999px; padding: 0 0.4rem; margin-left: 0.2rem; }
+.sb-note { font-size: 0.74rem; color: var(--muted); }
+"""
+    meta = (
+        f'{stats["phases"]} phases · {stats["actors"]} actors across {stats["procs"]} '
+        f'process doc{"s" if stats["procs"] != 1 else ""} · {stats["classified"]} classified'
+        + (f' · {stats["unclassified"]} unclassified' if stats["unclassified"] else "")
+        + ("" if model["derived_phases"] else " · phase columns derived from §6 step order (no value stream supplied)")
+    )
+    return {
+        "kind_label": "service blueprint",
+        "meta": meta,
+        "toolbar": toolbar,
+        "view_css": view_css,
+        "content": content,
+    }
+
+
 RENDERERS = {
     "capability-map": render_capability_map,
     "fbs": render_fbs,
     "delivery-roadmap": render_roadmap,
     "bmc": render_bmc,
+    "service-blueprint": render_service_blueprint,
 }

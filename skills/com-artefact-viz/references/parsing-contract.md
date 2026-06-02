@@ -67,6 +67,36 @@ Source: `docs/business/02a-bmc.md` or `docs/business/02a-lean-canvas.md`
 
 ---
 
+## service-blueprint — composition lens (multi-source)
+
+Unlike every parser above, this one reads **several** files and composes them.
+It is invoked through `render.py` flags, not a single positional source:
+`--proc FILE` (repeatable), `--value-stream FILE` (optional), `--personas PATH`
+(file or directory, repeatable), `--stream VS-N` (optional column filter). It
+restates nothing — it reads the process docs and derives the rest.
+
+| Element | Read / derived from |
+|---|---|
+| Lanes (actors) | Union of each `business-process` **§3 Actors** first column and the **§6** `### N.M {Actor}'s flow` sub-headings. |
+| Lane steps | The numbered list inside each **§6** actor sub-section (`N. **Step** — …`). |
+| Systems lane | **§4 Data Stores** first column, plus any actor whose name reads as a system (`system`/`platform`/`service`/`api`/`engine`/`automation`/`portal`/`registry`/`database`/`store`). |
+| Handoff spine ("the dance") | **§5 Data Objects** `Created by` → `Consumed by` pairs; each becomes one cross-actor connector chip. |
+| Evidence band | §5 Data Objects whose `Created by` **or** `Consumed by` is a customer-lane actor (the customer-perceived touchpoints). |
+| Fail / pain flags | **§9 What's broken today** — an actor named in the `Who experiences it` cell gets a ⚠ pain badge. |
+| Phase columns | `business-value-stream` `#### VS-N.M · Stage` headings (filtered by `--stream`), with the stage `Pain point index` tinting the header. **Fallback** when no `--value-stream`: ordinal `Step 1…N` columns from §6 step order. |
+| **Line of visibility (derived)** | `business-persona` **`Persona type`**: a `Customer`/`Served` persona → **customer** lane; `Negative` → dropped; any other resolved actor → **frontstage** if it exchanges a §5 data object with a customer-lane actor, else **backstage**; an actor that resolves to no persona type → **unclassified** (badged, never guessed). |
+
+Step→column placement is deterministic, never keyword-guessed: with value-stream
+columns, step *i* of *n* maps to column `min(N-1, i*N // n)`; with the ordinal
+fallback, step *i* maps to column *i*. Persona resolution is token overlap on
+the persona's name + role against the actor name; ties resolve to the highest
+overlap, none → unclassified.
+
+A worked multi-file fixture is in `examples/service-blueprint/` (process +
+personas + value stream).
+
+---
+
 ## Adding a new artefact type
 
 1. Add `parse_<kind>(text) -> model` to `scripts/parsers.py`; register it in
