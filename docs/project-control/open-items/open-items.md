@@ -63,6 +63,7 @@ rule), then move to `archive/`.
 | OI-0022 | execution-item | `com-slide-deck` migrate mode — help an existing pre-design-system deck adopt the shared token contract (detect legacy token names, emit a compatibility shim, or rewrite names in place) | `skills/com-slide-deck/` | | _central-only_ | New `scripts/migrate.py`: report (read-only) / `--apply` (alias shim) / `--rename` (rewrite); SKILL + README documented. Merged to main | low | closed | victor | 2026-05-30 | [e1d8e9f](https://github.com/VictorHueni/homemade-claude-kit/commit/e1d8e9f) |
 | OI-0023 | execution-item | `util-provenance` `--sign` step — detached digital signature of the digest (GPG or `openssl dgst -sign`) proving authorship by a key, fully local. Reserved flag already exits with a "planned" message | `skills/util-provenance/` | | _central-only_ | Implement `--sign` in `scripts/provenance.py`; decide signing-key model (self-managed vs CA-backed); emit a `.sig` + extend the provenance record. Must preserve the hash-only/local tenet | medium | open | victor | 2026-08-31 | _TBD_ |
 | OI-0024 | execution-item | `util-provenance` `--c2pa` step — embed a signed C2PA Content Credentials manifest (author + edit history). Reserved flag already exits with a "planned" message | `skills/util-provenance/` | | _central-only_ | Implement `--c2pa`; needs a `c2patool`/`c2pa-python` install; verify C2PA-for-PDF support (partial/evolving) else apply to per-page PNG renders. Best-effort companion to hash+timestamp | low | open | victor | 2026-08-31 | _TBD_ |
+| OI-0025 | execution-item | Add `design-service-blueprint` skill — front-stage/back-stage multi-actor service blueprint (actor lanes × steps, line of visibility + line of interaction, system + notification spine); the only artefact showing a whole multi-actor coordination loop at once. Reads `VS-N.M` stages + `P-NN` actors; mints `SBP-NN` (blueprint) / `SBP-NN.STP-NN` (step) | `docs/design/service-blueprints/` (planned) | | _central-only_ | Build the skill; widen the `design-` category from visual-source-of-truth to include experience/service design (first ID-minting `design-` skill) + metamodel coupling (paths, ID conventions, prefix→folder note, audit/migration/scaffold) | high | open | _TBD_ | 2026-08-31 | _TBD_ |
 
 All rows are kit-development items raised directly at the central plane (the kit dogfoods its
 own open-items contract per `rules/open-items-governance.md` §9), so they carry `_central-only_`
@@ -70,11 +71,17 @@ provenance — they have no source-artefact `## Open Items` section (skill folde
 one). `OI-0001`/`OI-0002` are `ops-terraform-exoscale` follow-ups; `OI-0003`–`OI-0018` are the
 former `BACKLOG.md` candidate-skill backlog (Tier 1 → `high`, Tier 2 → `medium`, Tier 3 →
 `low`) and structural-decision items, merged here so the kit has a single control plane.
+`OI-0019`–`OI-0024` are later additions (`com-`/`design-` token unification and
+`util-provenance` follow-ups). `OI-0025` opens the kit's experience-design layer — the
+service blueprint is the highest-leverage UX/UI gap (no existing skill shows a multi-actor
+coordination loop whole), and it widens `design-` from a visual-only category to the design
+layer (visual + experience).
 
 **Recommended build order** (former BACKLOG guidance, by structural impact, not strict
-priority): `OI-0003` domain-event-storming → `OI-0004` spec-test-strategy → `OI-0006`
-arch-team-topology → `OI-0007` ops-slo. Tier 2/3 items improve completeness but are not
-structural metamodel gaps. Shipped-skill history lives in
+priority): `OI-0003` domain-event-storming → `OI-0004` spec-test-strategy → `OI-0025`
+design-service-blueprint (opens the experience-design layer) → `OI-0006` arch-team-topology
+→ `OI-0007` ops-slo. Tier 2/3 items improve completeness but are not structural metamodel
+gaps. Shipped-skill history lives in
 [`archive/2026-Q2-shipped.md`](./archive/2026-Q2-shipped.md).
 
 ---
@@ -99,7 +106,7 @@ Skills and audits MAY render summary counts here (e.g. open / in-progress / bloc
 closed / dropped totals), but the snapshot must always derive from the live table above —
 never the other way around. The live table is the source of truth.
 
-As of 2026-05-30 (22 rows): **open 17** · in-progress 0 · blocked 0 · **closed 5** (`OI-0010`, `OI-0019`, `OI-0020`, `OI-0021`, `OI-0022`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
+As of 2026-06-02 (25 rows): **open 20** · in-progress 0 · blocked 0 · **closed 5** (`OI-0010`, `OI-0019`, `OI-0020`, `OI-0021`, `OI-0022`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
 
 ---
 
