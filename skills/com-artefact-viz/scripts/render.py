@@ -91,6 +91,8 @@ def build(source_path, args):
         if os.path.isfile(shared):
             project_sheet = shared
             print(f"using shared design system {shared} (pass --design-system to override)")
+        elif os.path.isfile(os.path.join("docs", "design", "tokens.css")):  # OI-0026: tokens moved docs/design/ -> docs/ux/
+            print("[HINT] Legacy docs/design/tokens.css found but no docs/ux/tokens.css — design tokens moved to docs/ux/; rename the folder.")
     if project_sheet:
         ds += "\n\n/* ---- project design system (overrides) ---- */\n" + _read(project_sheet)
     ds += "\n\n/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))

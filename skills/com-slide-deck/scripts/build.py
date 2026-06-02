@@ -70,13 +70,18 @@ def find_design_tokens(cfg: dict, base: Path) -> tuple:
         print(f"  [WARN] Configured design_tokens not found: {p}")
         return "", None
     cur = base.resolve()
+    legacy = None
     for _ in range(8):  # walk up a bounded number of parents
         candidate = cur / "docs" / "ux" / "tokens.css"
         if candidate.exists():
             return candidate.read_text(encoding="utf-8"), candidate
+        if legacy is None and (cur / "docs" / "design" / "tokens.css").exists():
+            legacy = cur / "docs" / "design" / "tokens.css"
         if cur.parent == cur:
             break
         cur = cur.parent
+    if legacy:  # OI-0026: design tokens moved docs/design/ -> docs/ux/ — rename the folder to re-enable shared theming
+        print(f"  [HINT] Legacy {legacy} found but no docs/ux/tokens.css — design tokens moved to docs/ux/; rename the folder.")
     return "", None
 
 
