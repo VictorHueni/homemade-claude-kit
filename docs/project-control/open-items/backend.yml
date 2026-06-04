@@ -1,0 +1,7 @@
+# Open-items central-plane backend declaration (rules/open-items-governance.md §5.3).
+# Read by util-open-items and util-metamodel-audit. Absent file ⇒ markdown (default).
+backend: github
+repo: VictorHueni/homemade-claude-kit
+# project:  # Project (v2) number for the read-out — not yet created; Issues label `open-item` is the read-out for now
+# Cutover: 2026-06-04, one-way markdown→github migration (Mode 7). Pre-migration ledger
+# frozen at archive/2026-Q2-pre-github-migration.md; OI-NNNN→#N in migration-map.md.

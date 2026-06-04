@@ -70,7 +70,7 @@ Schema enforcement moves to an Issue Form (`.github/ISSUE_TEMPLATE/open-item.yml
 
 - **§4 is the shared contract.** Both backends serialize the one logical model defined in `open-items-governance.md` §4. The Issue Form field `id:` keys MUST mirror the §4 column names so `util-metamodel-audit` can read either backend from a single field map.
 - **Schema-interoperable always; instance-interoperable once, one-way.** A clean `markdown → github` migration is sanctioned at adoption time. Bidirectional or concurrent sync is **not** sanctioned — two live writers over two ID spaces is the dual-source-of-truth anti-pattern.
-- **The crossing is slightly lossy by design.** `OI-NNNN` is retired in favour of `#N` (identity is re-minted: `OI-0007` becomes `#42`), and the explicit `archive/` is absorbed into closed-issue search. Migration MUST emit an `OI-NNNN → #N` map so existing back-references (and any `Tracker ref` pointing at an old `OI-ID`) can be rewritten.
+- **The crossing is slightly lossy by design.** `OI-NNNN` is retired in favour of `#N` (identity is re-minted: a former `OI-NNNN` becomes its GitHub issue number `#N`), and the explicit `archive/` is absorbed into closed-issue search. Migration MUST emit an `OI-NNNN → #N` map so existing back-references (and any `Tracker ref` pointing at an old `OI-ID`) can be rewritten.
 - **`Status` is composite on the GitHub side** (open/closed + Project field + close-reason), not a single column — round-trippable, but not field-for-field.
 
 ### Tooling consequences
@@ -100,7 +100,7 @@ A dry-run of `util-open-items` Mode 7 against the kit repo
 (`VictorHueni/homemade-claude-kit` — personal, 0 existing issues) confirmed the migration
 *plan* (32 issues: 20 open + 12 closed; form-structured bodies render with all canonical
 slug fields) but surfaced four portability gaps that block a faithful `--apply` on a solo /
-personal repo. These are the concrete evidence for `OI-0032`:
+personal repo. These are the concrete evidence for `#36`:
 
 1. **Issue Types are org-level.** `repos/.../issue-types` → 404; `gh issue create --type
    doc-gap` cannot set a native Issue Type on a personal repo. The `type → Issue Type`
@@ -112,30 +112,30 @@ personal repo. These are the concrete evidence for `OI-0032`:
    lacked the `project` scope.
 4. **Form not installed** (expected — it ships as a skill template, copied on adoption).
 
-**Conclusion (input to OI-0032):** the `github` backend as specced assumes org-grade Issue
+**Conclusion (input to #36):** the `github` backend as specced assumes org-grade Issue
 Types + a Project + `owner`==login — fine for an org repo, not portable to a solo personal
 repo without adaptation. Generalising it to the universal contract should be **gated on a
 portability pass** (type→label fallback, owner→login mapping, label/Project bootstrap helper)
 rather than done as-is. The kit therefore **stays on the `markdown` backend** for now; no
 issues were created.
 
-**Update — portability pass done (OI-0033, PR #4).** The script-side gaps (1)–(3) are now
+**Update — portability pass done (#37, PR #4).** The script-side gaps (1)–(3) are now
 fixed in `migrate_markdown_to_github.py`: it auto-detects missing Issue Types and falls back
 to `type:<value>` labels, bootstraps `open-item` + `type:` labels idempotently, and takes
 `--assignee-map LEDGER_OWNER=LOGIN` (skipping `_TBD_`/unmapped owners instead of erroring). A
 re-run dry-run against the kit repo now plans all 33 issues cleanly (0 native `--type`, 33
 `type:` labels, assignees only for mapped owners). A real `--apply` is therefore viable;
-**OI-0032 (the generalise decision) stays open** pending an actual apply + an operating
+**#36 (the generalise decision) stays open** pending an actual apply + an operating
 period to judge the GitHub-Issues experience.
 
 ## Open Items
 
 | OI-ID | Type | Summary | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref |
 | :---- | :--- | :------ | :------------ | :------------- | :-------------- | :------- | :----- | :---- | :---------------- | :---------- |
-| OI-0027 | execution-item | Revise `open-items-governance.md` §5–§7 to define the two-backend model and adapter boundary | #tooling-consequences | Tooling consequences | Edit the governance rule | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
-| OI-0028 | execution-item | Add `backend:` setting + `github` mode (gh issue/project wrappers) to `util-open-items` | #tooling-consequences | Tooling consequences | Update `util-open-items/SKILL.md` + references | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
-| OI-0029 | execution-item | Add `github`-backend check path to `util-metamodel-audit` (read Issue-Form bodies via `gh`) | #tooling-consequences | Tooling consequences | Update audit check catalogue | medium | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
-| OI-0030 | execution-item | Author `.github/ISSUE_TEMPLATE/open-item.yml` with `id:` keys mirroring §4 columns | #data-model--interoperability | Data model & interoperability | Write the issue form | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
-| OI-0031 | execution-item | Build one-way `markdown → github` migration emitting an `OI-NNNN → #N` map | #data-model--interoperability | Data model & interoperability | Add a migration mode/script | medium | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
-| OI-0032 | decision-gap | Decide whether to generalise the `github` backend to the universal contract after dogfooding | #context-and-problem-statement | Context and Problem Statement | Follow-up ADR superseding/extending this one; gated on a portability pass (see §Dogfood findings, 2026-06-04) | low | open | victor | 2026-09-01 | _TBD_ |
-| OI-0033 | execution-item | Make Mode 7 portable to personal repos — Issue-Types→`type:` label fallback + owner→login `--assignee-map` + idempotent label bootstrap | #dogfood-findings--mode-7-dry-run-2026-06-04 | Dogfood findings — Mode 7 dry-run (2026-06-04) | Implement in `migrate_markdown_to_github.py`; re-validate via dry-run | medium | closed | victor | 2026-06-04 | [#4](https://github.com/VictorHueni/homemade-claude-kit/pull/4) |
+| #31 | execution-item | Revise `open-items-governance.md` §5–§7 to define the two-backend model and adapter boundary | #tooling-consequences | Tooling consequences | Edit the governance rule | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
+| #32 | execution-item | Add `backend:` setting + `github` mode (gh issue/project wrappers) to `util-open-items` | #tooling-consequences | Tooling consequences | Update `util-open-items/SKILL.md` + references | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
+| #33 | execution-item | Add `github`-backend check path to `util-metamodel-audit` (read Issue-Form bodies via `gh`) | #tooling-consequences | Tooling consequences | Update audit check catalogue | medium | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
+| #34 | execution-item | Author `.github/ISSUE_TEMPLATE/open-item.yml` with `id:` keys mirroring §4 columns | #data-model--interoperability | Data model & interoperability | Write the issue form | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
+| #35 | execution-item | Build one-way `markdown → github` migration emitting an `OI-NNNN → #N` map | #data-model--interoperability | Data model & interoperability | Add a migration mode/script | medium | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
+| #36 | decision-gap | Decide whether to generalise the `github` backend to the universal contract after dogfooding | #context-and-problem-statement | Context and Problem Statement | Follow-up ADR superseding/extending this one; gated on a portability pass (see §Dogfood findings, 2026-06-04) | low | open | victor | 2026-09-01 | _TBD_ |
+| #37 | execution-item | Make Mode 7 portable to personal repos — Issue-Types→`type:` label fallback + owner→login `--assignee-map` + idempotent label bootstrap | #dogfood-findings--mode-7-dry-run-2026-06-04 | Dogfood findings — Mode 7 dry-run (2026-06-04) | Implement in `migrate_markdown_to_github.py`; re-validate via dry-run | medium | closed | victor | 2026-06-04 | [#4](https://github.com/VictorHueni/homemade-claude-kit/pull/4) |

@@ -183,6 +183,10 @@ def rewrite_refs(docs: Path, mapping: dict[str, int], apply: bool) -> None:
         return
     pattern = re.compile(r"\b(" + "|".join(re.escape(k) for k in mapping) + r")\b")
     for md in sorted(docs.rglob("*.md")):
+        # The markdown ledger + migration map are the OI-NNNN-era record (frozen on cutover);
+        # never rewrite their IDs to #N.
+        if "project-control/open-items" in md.as_posix():
+            continue
         text = md.read_text(encoding="utf-8")
         new, n = pattern.subn(lambda m: f"#{mapping[m.group(1)]}", text)
         if n:
