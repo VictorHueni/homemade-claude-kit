@@ -63,13 +63,26 @@ rule), then move to `archive/`.
 | OI-0022 | execution-item | `com-slide-deck` migrate mode — help an existing pre-design-system deck adopt the shared token contract (detect legacy token names, emit a compatibility shim, or rewrite names in place) | `skills/com-slide-deck/` | | _central-only_ | New `scripts/migrate.py`: report (read-only) / `--apply` (alias shim) / `--rename` (rewrite); SKILL + README documented. Merged to main | low | closed | victor | 2026-05-30 | [e1d8e9f](https://github.com/VictorHueni/homemade-claude-kit/commit/e1d8e9f) |
 | OI-0023 | execution-item | `util-provenance` `--sign` step — detached digital signature of the digest (GPG or `openssl dgst -sign`) proving authorship by a key, fully local. Reserved flag already exits with a "planned" message | `skills/util-provenance/` | | _central-only_ | Implement `--sign` in `scripts/provenance.py`; decide signing-key model (self-managed vs CA-backed); emit a `.sig` + extend the provenance record. Must preserve the hash-only/local tenet | medium | open | victor | 2026-08-31 | _TBD_ |
 | OI-0024 | execution-item | `util-provenance` `--c2pa` step — embed a signed C2PA Content Credentials manifest (author + edit history). Reserved flag already exits with a "planned" message | `skills/util-provenance/` | | _central-only_ | Implement `--c2pa`; needs a `c2patool`/`c2pa-python` install; verify C2PA-for-PDF support (partial/evolving) else apply to per-page PNG renders. Best-effort companion to hash+timestamp | low | open | victor | 2026-08-31 | _TBD_ |
+| OI-0025 | execution-item | Revise `open-items-governance.md` §5–§7 to define the two-backend model and adapter boundary | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #tooling-consequences | Tooling consequences | Edit the governance rule | high | open | victor | 2026-07-01 | _TBD_ |
+| OI-0026 | execution-item | Add `backend:` setting + `github` mode (gh issue/project wrappers) to `util-open-items` | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #tooling-consequences | Tooling consequences | Update `util-open-items/SKILL.md` + references | high | open | victor | 2026-07-01 | _TBD_ |
+| OI-0027 | execution-item | Add `github`-backend check path to `util-metamodel-audit` (read Issue-Form bodies via `gh`) | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #tooling-consequences | Tooling consequences | Update audit check catalogue | medium | open | victor | 2026-07-01 | _TBD_ |
+| OI-0028 | execution-item | Author `.github/ISSUE_TEMPLATE/open-item.yml` with `id:` keys mirroring §4 columns | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #data-model--interoperability | Data model & interoperability | Write the issue form | high | open | victor | 2026-07-01 | _TBD_ |
+| OI-0029 | execution-item | Build one-way `markdown → github` migration emitting an `OI-NNNN → #N` map | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #data-model--interoperability | Data model & interoperability | Add a migration mode/script | medium | open | victor | 2026-07-01 | _TBD_ |
+| OI-0030 | decision-gap | Decide whether to generalise the `github` backend to the universal contract after dogfooding | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #context-and-problem-statement | Context and Problem Statement | Follow-up ADR superseding/extending this one | low | open | victor | 2026-09-01 | _TBD_ |
 
-All rows are kit-development items raised directly at the central plane (the kit dogfoods its
+Most rows are kit-development items raised directly at the central plane (the kit dogfoods its
 own open-items contract per `rules/open-items-governance.md` §9), so they carry `_central-only_`
 provenance — they have no source-artefact `## Open Items` section (skill folders do not carry
 one). `OI-0001`/`OI-0002` are `ops-terraform-exoscale` follow-ups; `OI-0003`–`OI-0018` are the
 former `BACKLOG.md` candidate-skill backlog (Tier 1 → `high`, Tier 2 → `medium`, Tier 3 →
 `low`) and structural-decision items, merged here so the kit has a single control plane.
+
+`OI-0025`–`OI-0030` are the first **artefact-originated** rows: they carry full provenance back
+into [`adr-0002`](../../architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md)
+(the open-items GitHub-Issues backend decision), not `_central-only_`. `OI-0025`–`OI-0029` are
+its implementation execution-items; `OI-0030` is the decision-gap on whether to generalise the
+`github` backend to the universal contract. `OI-0025` (governance §5–§7 rewrite) is the
+prerequisite for `OI-0026`/`OI-0027`.
 
 **Recommended build order** (former BACKLOG guidance, by structural impact, not strict
 priority): `OI-0003` domain-event-storming → `OI-0004` spec-test-strategy → `OI-0006`
@@ -99,7 +112,7 @@ Skills and audits MAY render summary counts here (e.g. open / in-progress / bloc
 closed / dropped totals), but the snapshot must always derive from the live table above —
 never the other way around. The live table is the source of truth.
 
-As of 2026-05-30 (22 rows): **open 17** · in-progress 0 · blocked 0 · **closed 5** (`OI-0010`, `OI-0019`, `OI-0020`, `OI-0021`, `OI-0022`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
+As of 2026-06-04 (30 rows): **open 25** · in-progress 0 · blocked 0 · **closed 5** (`OI-0010`, `OI-0019`, `OI-0020`, `OI-0021`, `OI-0022`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
 
 ---
 
