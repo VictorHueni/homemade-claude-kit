@@ -94,6 +94,31 @@ Schema enforcement moves to an Issue Form (`.github/ISSUE_TEMPLATE/open-item.yml
 - The provenance triple has no native structured field; it lives in Issue-Form fields whose `id:` keys become a load-bearing contract the audit depends on.
 - Migration is one-way and re-mints IDs; back-references must be rewritten via the emitted ID map.
 
+## Dogfood findings — Mode 7 dry-run (2026-06-04)
+
+A dry-run of `util-open-items` Mode 7 against the kit repo
+(`VictorHueni/homemade-claude-kit` — personal, 0 existing issues) confirmed the migration
+*plan* (32 issues: 20 open + 12 closed; form-structured bodies render with all canonical
+slug fields) but surfaced four portability gaps that block a faithful `--apply` on a solo /
+personal repo. These are the concrete evidence for `OI-0032`:
+
+1. **Issue Types are org-level.** `repos/.../issue-types` → 404; `gh issue create --type
+   doc-gap` cannot set a native Issue Type on a personal repo. The `type → Issue Type`
+   mapping needs a **`type:<value>` label fallback** when Issue Types are unavailable.
+2. **`owner` ≠ GitHub login.** The ledger `owner` is `victor`, but the account login is
+   `VictorHueni`; `--assignee victor` errors. Migration needs an **owner→login mapping**
+   (or to drop the assignee when unmatched).
+3. **No `open-item` label / no Project.** Both must be bootstrapped first; the token also
+   lacked the `project` scope.
+4. **Form not installed** (expected — it ships as a skill template, copied on adoption).
+
+**Conclusion (input to OI-0032):** the `github` backend as specced assumes org-grade Issue
+Types + a Project + `owner`==login — fine for an org repo, not portable to a solo personal
+repo without adaptation. Generalising it to the universal contract should be **gated on a
+portability pass** (type→label fallback, owner→login mapping, label/Project bootstrap helper)
+rather than done as-is. The kit therefore **stays on the `markdown` backend** for now; no
+issues were created.
+
 ## Open Items
 
 | OI-ID | Type | Summary | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref |
@@ -103,4 +128,4 @@ Schema enforcement moves to an Issue Form (`.github/ISSUE_TEMPLATE/open-item.yml
 | OI-0029 | execution-item | Add `github`-backend check path to `util-metamodel-audit` (read Issue-Form bodies via `gh`) | #tooling-consequences | Tooling consequences | Update audit check catalogue | medium | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
 | OI-0030 | execution-item | Author `.github/ISSUE_TEMPLATE/open-item.yml` with `id:` keys mirroring §4 columns | #data-model--interoperability | Data model & interoperability | Write the issue form | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
 | OI-0031 | execution-item | Build one-way `markdown → github` migration emitting an `OI-NNNN → #N` map | #data-model--interoperability | Data model & interoperability | Add a migration mode/script | medium | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
-| OI-0032 | decision-gap | Decide whether to generalise the `github` backend to the universal contract after dogfooding | #context-and-problem-statement | Context and Problem Statement | Follow-up ADR superseding/extending this one | low | open | victor | 2026-09-01 | _TBD_ |
+| OI-0032 | decision-gap | Decide whether to generalise the `github` backend to the universal contract after dogfooding | #context-and-problem-statement | Context and Problem Statement | Follow-up ADR superseding/extending this one; gated on a portability pass (see §Dogfood findings, 2026-06-04) | low | open | victor | 2026-09-01 | _TBD_ |
