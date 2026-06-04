@@ -1,7 +1,7 @@
 ---
 name: util-open-items
 description: "Maintain the repo-wide living ledger of unresolved governance work at `docs/project-control/open-items/open-items.md`. Use this skill to sync local `## Open Items` sections from artefacts into the central ledger, triage incoming rows, close or drop items with a tracker ref, archive terminal rows at the end of a review cycle, and produce status reports. Triggers on: sync open items, triage open items, close open item, drop open item, archive open items, open-items report, roll up open items, OI-NNNN, central ledger, docs/project-control/open-items."
-version: "1.1.0"
+version: "1.2.0"
 status: active
 last_reviewed: 2026-06-04
 review_interval: 180d
@@ -91,7 +91,8 @@ those are scaffold debt, audited by `util-metamodel-audit` Check 8, and are not 
 
 ## Modes
 
-This skill exposes five operating modes. Each mode reads or writes
+This skill exposes seven modes — six steady-state operations plus a one-time `migrate`
+cutover (Mode 7, `markdown → github`). Each mode reads or writes
 `docs/project-control/open-items/open-items.md` and respects the lifecycle in
 `rules/open-items-governance.md` §3.
 
@@ -212,6 +213,53 @@ Output sections:
   indicate stale governance).
 
 Write to `var/reports/open-items/report-YYYY-MM-DD.md`. Never mutates the ledger.
+
+### Mode 7 — `migrate` (markdown → github, one-way)
+
+One-time cutover of a project from the `markdown` backend to `github`. Enforces Invariant I2
+(governance §5.3): one-way only, emits the `OI-NNNN → #N` map, never a reverse or concurrent
+sync.
+
+**Preconditions:** the github adoption checklist (§Backends) is done — form installed, Issue
+Types created, Project exists, `gh` authenticated against the target repo. The `markdown`
+ledger `open-items.md` is the source.
+
+**Driver:** [`scripts/migrate_markdown_to_github.py`](scripts/migrate_markdown_to_github.py)
+— stdlib + `gh`, **dry-run by default**.
+
+```text
+# 1. Dry-run — prints planned issues + the OI-NNNN→#N map + ref-rewrite diff, mutates nothing
+python3 scripts/migrate_markdown_to_github.py --repo OWNER/NAME
+
+# 2. Apply — create issues, write the map, rewrite OI-NNNN back-references across docs/
+python3 scripts/migrate_markdown_to_github.py --repo OWNER/NAME --apply
+```
+
+**Per live ledger row:**
+
+1. De-dups by summary + provenance (`gh issue list --search`) — re-runs are idempotent.
+2. `gh issue create` — `summary`→title, `type`→Issue Type, provenance + `resolution_path`→
+   form-structured body, `owner`→assignee.
+3. Lifecycle: `open` stays open; `in-progress`/`blocked` stay open (set the Project Status
+   field manually — the script logs which); `closed`→close `completed`; `dropped`→close
+   `not planned` (original `tracker_ref` preserved as a comment).
+4. Records `OI-NNNN → #N`, writing the map to
+   `docs/project-control/open-items/migration-map.md` (the persisted I2 artefact).
+5. Rewrites every `OI-NNNN` back-reference under `--docs` (OI-ID cells + prose) to `#N`.
+
+**Operator finish (not automated — verify first):**
+
+1. Eyeball the issues + Project board.
+2. Set Project `Status` for any `in-progress`/`blocked` rows.
+3. Move `open-items.md` into `archive/` as a frozen, dated snapshot — never silent-delete (§6).
+4. Set `backend.yml: github`. From here `sync` / `close` / etc. operate the github backend.
+
+**Rollback** (before step 3–4): the migration is one-way, so undo = delete the created issues
+and `git checkout` the ref rewrites while the markdown ledger is still authoritative.
+
+`archive/*.md` history stays as frozen markdown (optionally backfilled as closed issues
+later). Issue Type + Project-field assignment are `gh`-version-dependent; the script logs
+anything it could not set so you can finish via the GitHub UI or GraphQL.
 
 ---
 
@@ -384,6 +432,9 @@ MUST NOT touch artefact body content outside the document-level `## Open Items` 
   invariants I1–I5.
 - [`templates/open-item.form.yml`](templates/open-item.form.yml) — the GitHub Issue Form
   (authoring surface for the `github` backend); copy to `.github/ISSUE_TEMPLATE/` on adoption.
+- [`scripts/migrate_markdown_to_github.py`](scripts/migrate_markdown_to_github.py) — the
+  one-way `markdown → github` migration driver for Mode 7 (dry-run by default; emits the
+  `OI-NNNN → #N` map and rewrites back-references).
 
 ---
 

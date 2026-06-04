@@ -67,7 +67,7 @@ rule), then move to `archive/`.
 | OI-0026 | execution-item | Add `backend:` setting + `github` mode (gh issue/project wrappers) to `util-open-items` | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #tooling-consequences | Tooling consequences | Update `util-open-items/SKILL.md` + references | high | in-progress | victor | 2026-07-01 | _TBD_ |
 | OI-0027 | execution-item | Add `github`-backend check path to `util-metamodel-audit` (read Issue-Form bodies via `gh`) | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #tooling-consequences | Tooling consequences | Update audit check catalogue | medium | in-progress | victor | 2026-07-01 | _TBD_ |
 | OI-0028 | execution-item | Author `.github/ISSUE_TEMPLATE/open-item.yml` with `id:` keys mirroring §4 columns | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #data-model--interoperability | Data model & interoperability | Write the issue form | high | in-progress | victor | 2026-07-01 | _TBD_ |
-| OI-0029 | execution-item | Build one-way `markdown → github` migration emitting an `OI-NNNN → #N` map | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #data-model--interoperability | Data model & interoperability | Add a migration mode/script | medium | open | victor | 2026-07-01 | _TBD_ |
+| OI-0029 | execution-item | Build one-way `markdown → github` migration emitting an `OI-NNNN → #N` map | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #data-model--interoperability | Data model & interoperability | Add a migration mode/script | medium | in-progress | victor | 2026-07-01 | _TBD_ |
 | OI-0030 | decision-gap | Decide whether to generalise the `github` backend to the universal contract after dogfooding | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #context-and-problem-statement | Context and Problem Statement | Follow-up ADR superseding/extending this one | low | open | victor | 2026-09-01 | _TBD_ |
 
 Most rows are kit-development items raised directly at the central plane (the kit dogfoods its
@@ -112,7 +112,7 @@ Skills and audits MAY render summary counts here (e.g. open / in-progress / bloc
 closed / dropped totals), but the snapshot must always derive from the live table above —
 never the other way around. The live table is the source of truth.
 
-As of 2026-06-04 (30 rows): **open 21** · **in-progress 4** (`OI-0025`–`OI-0028`, done on branch `feat/open-items-pluggable-backend`, awaiting merge) · blocked 0 · **closed 5** (`OI-0010`, `OI-0019`, `OI-0020`, `OI-0021`, `OI-0022`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
+As of 2026-06-04 (30 rows): **open 20** · **in-progress 5** (`OI-0025`–`OI-0029`, done on branch `feat/open-items-pluggable-backend`, awaiting merge) · blocked 0 · **closed 5** (`OI-0010`, `OI-0019`, `OI-0020`, `OI-0021`, `OI-0022`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
 
 ---
 

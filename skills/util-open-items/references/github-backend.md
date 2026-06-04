@@ -110,6 +110,11 @@ persisted `OI-NNNN → #N` map so existing back-references (artefact body text; 
 two writers over two ID spaces is the dual-source-of-truth anti-pattern. A project runs
 exactly one backend.
 
+The migration is operated by **Mode 7 (`migrate`)** in `SKILL.md`, driven by
+`scripts/migrate_markdown_to_github.py` (dry-run by default). It writes the map to
+`docs/project-control/open-items/migration-map.md` and rewrites `OI-NNNN` back-references to
+`#N` across the docs tree.
+
 ### 3c. Status decomposition (Invariant I3)
 
 | Canonical `status` | Issue state | Project Status field | Close reason |
