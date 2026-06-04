@@ -808,9 +808,34 @@ This is the only check category in the catalogue that spans both `docs/` and
 remediation is always done through `util-open-items` (sync, triage, close, archive)
 or direct artefact edits. The audit never mutates the ledger or any source artefact.
 
-The check bundles six sub-checks, each with its own detection pattern and severity.
-All six run together in Mode 1 (full audit); operators wanting only governance drift
-can invoke Mode 5 (open-items governance) when it lands.
+The check bundles the sub-checks below, each with its own detection pattern and severity.
+They run together in Mode 1 (full audit); operators wanting only governance drift can invoke
+Mode 5 (open-items governance) when it lands.
+
+### Backend awareness
+
+Per governance §5.3 the central plane has a pluggable backend. Detect it before the
+ledger-reading sub-checks:
+
+```bash
+backend_cfg="docs/project-control/open-items/backend.yml"
+backend="markdown"   # default when the file is absent
+[ -f "$backend_cfg" ] && backend=$(grep -oE '^backend:[[:space:]]*[a-z]+' "$backend_cfg" | awk '{print $2}')
+echo "open-items backend: $backend"
+```
+
+How the sub-checks split by backend:
+
+| Sub-check | `markdown` | `github` |
+| :-- | :-- | :-- |
+| 18a / 18b / 18c (local sections) | run as written | **run unchanged** — local `## Open Items` sections are always §4 markdown (Invariant I4) |
+| 18d Tracker sync coverage | ledger vs local `OI-NNNN` | **github variant** — local `#N` vs Issues |
+| 18e Closure drift | scan ledger rows | **github variant** — structurally enforced; verify the closing reference exists |
+| 18f Stale open items | local `Due / Review date` | **github variant** — open issues' Project `Review date` field |
+| 18g Form / slug integrity | — | **github only** — issue bodies carry the canonical slug fields + valid Type |
+
+The local-section sub-checks (18a–18c) never change — only the *central read-out* differs by
+backend. Everything below stays **report-only**; remediation routes through `util-open-items`.
 
 ### Sub-check 18a — Section compliance
 
@@ -960,6 +985,29 @@ done
   row with `util-open-items` and record the rationale) or the row should be marked
   `_central-only_` in `Source heading` per §5 of `rules/open-items-governance.md`."
 
+**github variant** (requires `gh` auth). Under `backend: github` there is no markdown
+ledger; the local `OI-ID` cell carries the issue number `#N` after sync. Verify each `#N`
+resolves and each open open-item issue has a local source row:
+
+```bash
+if [ "$backend" = "github" ]; then
+  repo=$(grep -oE '^repo:[[:space:]]*\S+' "$backend_cfg" | awk '{print $2}')
+  # local #N references inside ## Open Items sections
+  find docs -name "*.md" -print0 | while IFS= read -r -d '' f; do
+    awk '/^## Open Items[[:space:]]*$/{s=1;next} s&&/^## /{s=0} s&&/^\|/{if(match($0,/#[0-9]+/))print substr($0,RSTART+1,RLENGTH-1)}' "$f"
+  done | sort -u > /tmp/oi_local_gh.txt
+  while read -r n; do
+    gh issue view "$n" -R "$repo" --json number >/dev/null 2>&1 || \
+      echo "DANGLING ISSUE REF: #$n referenced locally but not found in $repo"
+  done < /tmp/oi_local_gh.txt
+  # open open-item issues with no local source row
+  gh issue list -R "$repo" --label open-item --state open --json number -q '.[].number' | while read -r n; do
+    grep -qx "$n" /tmp/oi_local_gh.txt || \
+      echo "ORPHANED ISSUE: #$n is an open open-item with no local source row"
+  done
+fi
+```
+
 ### Sub-check 18e — Closure drift
 
 **What:** rows whose `Status` is `closed` or `dropped` must carry a non-`_TBD_`
@@ -1016,6 +1064,22 @@ fi
 `util-open-items` in `close` (or `drop`) mode, or re-open the row by setting status back
 to `open` / `in-progress` / `blocked`."
 
+**github variant** (requires `gh` auth). Closure is structurally enforced (you close an
+issue *via* a reference), so this rarely fires — but a `completed` issue with no linked PR
+has no evidencing `tracker_ref`:
+
+```bash
+if [ "$backend" = "github" ]; then
+  gh issue list -R "$repo" --label open-item --state closed \
+    --json number,stateReason,closedByPullRequestsReferences \
+    -q '.[] | select(.stateReason=="COMPLETED" and (.closedByPullRequestsReferences|length==0)) | .number' \
+  | while read -r n; do
+    echo "CLOSURE EVIDENCE MISSING: #$n closed as completed with no linked PR (tracker_ref)"
+  done
+fi
+# `dropped` = closed as "not planned"; it needs a rationale comment, not a PR — review manually.
+```
+
 ### Sub-check 18f — Stale open items (overdue review)
 
 **What:** rows whose `Status` is `open`, `in-progress`, or `blocked` and whose
@@ -1059,17 +1123,70 @@ done
 `{due date}` ({overdue days}d ago). Run `util-open-items` in `triage` mode to either
 re-date, escalate priority, reassign owner, or close with a `Tracker ref`."
 
+**github variant** (requires `gh` auth). Overdue is the Project `Review date` field on open
+issues. Field name follows the project's configuration — adjust the `-q` selector to match:
+
+```bash
+if [ "$backend" = "github" ]; then
+  project=$(grep -oE '^project:[[:space:]]*[0-9]+' "$backend_cfg" | awk '{print $2}')
+  owner=$(echo "$repo" | cut -d/ -f1)
+  today=$(date +%s)
+  gh project item-list "$project" --owner "$owner" --format json \
+    -q '.items[] | select(.status!="Done") | [(.content.number|tostring), (.["reviewDate"] // "")] | @tsv' 2>/dev/null \
+  | while IFS=$'\t' read -r n due; do
+    [ -z "$due" ] && continue
+    due_ts=$(date -d "$due" +%s 2>/dev/null) || continue
+    [ "$today" -gt "$due_ts" ] && echo "OVERDUE: issue #$n review date $due has passed"
+  done
+fi
+```
+
+### Sub-check 18g — Form / slug integrity (github only)
+
+**What:** every open `open-item` issue was created from the canonical form, carries a valid
+Issue Type, and exposes the required slug fields in its body. This is the github analog of
+18b/18c — it verifies the issue conforms to the §4 slug contract (Invariant I1) so the
+read-out stays machine-parseable.
+
+**Detection** (requires `gh` auth):
+
+```bash
+if [ "$backend" = "github" ]; then
+  valid="doc-gap decision-gap execution-item tech-debt"
+  gh issue list -R "$repo" --label open-item --state open \
+    --json number,issueType,body \
+    -q '.[] | [(.number|tostring), (.issueType.name // "none"), (.body|gsub("\n";"¶"))] | @tsv' \
+  | while IFS=$'\t' read -r n itype body; do
+    echo "$valid" | grep -qw "$itype" || \
+      echo "INVALID TYPE: issue #$n has Issue Type '$itype' (expected one of: $valid)"
+    echo "$body" | grep -qi "Source heading" || \
+      echo "FORM DRIFT: issue #$n body has no Source heading field"
+    echo "$body" | grep -qi "Resolution path" || \
+      echo "FORM DRIFT: issue #$n body has no Resolution path field"
+  done
+fi
+```
+
+**Severity:** Warning
+
+**Proposed fix template:** "Issue `#{N}` is missing `{field}` / has Issue Type `{itype}`.
+Re-create it through `.github/ISSUE_TEMPLATE/open-item.yml` or edit it to restore the
+canonical slug fields. The form `id:` keys are the binding contract (Invariant I1 in
+`util-open-items/references/github-backend.md`)."
+
 ### Summary — Check 18 outputs
 
-| Sub-check | Severity | What it flags |
-| :-- | :-- | :-- |
-| 18a Section compliance | Error | Forbidden legacy headings; non-document-level `### Open Items` |
-| 18b Schema compliance | Error | Missing / reordered canonical columns in `## Open Items` tables |
-| 18c Source-location provenance | Warning | Empty / `_TBD_` `Source anchor` or `Source heading` (excludes `_central-only_`) |
-| 18d Tracker sync coverage | Warning | Canonical `OI-NNNN` IDs out of sync between local sections and the central ledger |
-| 18e Closure drift | Error | `closed` / `dropped` rows without an evidencing `Tracker ref` |
-| 18f Stale open items | Warning | `open` / `in-progress` / `blocked` rows past `Due / Review date` |
+| Sub-check | Severity | Backend | What it flags |
+| :-- | :-- | :-- | :-- |
+| 18a Section compliance | Error | both | Forbidden legacy headings; non-document-level `### Open Items` |
+| 18b Schema compliance | Error | both | Missing / reordered canonical columns in `## Open Items` tables |
+| 18c Source-location provenance | Warning | both | Empty / `_TBD_` `Source anchor` or `Source heading` (excludes `_central-only_`) |
+| 18d Tracker sync coverage | Warning | markdown: ledger ↔ local · github: Issues ↔ local | `OI-NNNN` (or `#N`) out of sync between local sections and the central read-out |
+| 18e Closure drift | Error | markdown: ledger · github: closing-ref | Terminal rows / issues without evidencing `Tracker ref` |
+| 18f Stale open items | Warning | markdown: `Due / Review date` · github: Project field | Active rows / issues past their review date |
+| 18g Form / slug integrity | Warning | **github only** | Open-item issues with invalid Type or missing canonical slug fields |
 
-All six sub-checks are read-only; none of them write to `docs/project-control/open-items/` or
-to any source artefact. Findings always route to the operator for action through
-`util-open-items`.
+All sub-checks are read-only; none write to `docs/project-control/open-items/`, to any source
+artefact, or to GitHub. Findings always route to the operator for action through
+`util-open-items`. The local-section checks (18a–18c) are backend-independent; 18d–18f have a
+markdown and a github variant; 18g runs only under the `github` backend.

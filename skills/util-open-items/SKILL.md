@@ -1,9 +1,9 @@
 ---
 name: util-open-items
 description: "Maintain the repo-wide living ledger of unresolved governance work at `docs/project-control/open-items/open-items.md`. Use this skill to sync local `## Open Items` sections from artefacts into the central ledger, triage incoming rows, close or drop items with a tracker ref, archive terminal rows at the end of a review cycle, and produce status reports. Triggers on: sync open items, triage open items, close open item, drop open item, archive open items, open-items report, roll up open items, OI-NNNN, central ledger, docs/project-control/open-items."
-version: "1.0.0"
+version: "1.1.0"
 status: active
-last_reviewed: 2026-05-25
+last_reviewed: 2026-06-04
 review_interval: 180d
 user-invocable: true
 allow_implicit_invocation: true
@@ -24,6 +24,49 @@ The canonical contract — section name, schema, taxonomy, lifecycle, central-pl
 lives in [`rules/open-items-governance.md`](../rules/open-items-governance.md). This skill
 is the operating manual that turns the contract into repeatable mechanics. When the rule
 and this file diverge, the rule wins; this skill must then be reconciled.
+
+---
+
+## Backends
+
+The central plane is a **serialization** of the §4 model (governance §5.3). This skill
+operates one of two backends:
+
+- **`markdown`** (default) — the living ledger at
+  `docs/project-control/open-items/open-items.md` plus `archive/`. Mints `OI-NNNN`.
+- **`github`** — GitHub Issues + one Project (v2) as the consolidated read-out. Identity is
+  the issue number `#N`; `OI-NNNN` is retired.
+
+**Declaration.** A project selects its backend in
+`docs/project-control/open-items/backend.yml`; absent ⇒ `markdown`:
+
+```yaml
+backend: github          # markdown (default) | github
+repo: owner/name         # github only — where the issues live
+project: 7               # github only — the Project (v2) number for the read-out
+```
+
+**What stays the same regardless of backend:** the local `## Open Items` section is always
+§4 markdown (Invariant I4) — only what `sync` *writes to* changes. The abstract model,
+taxonomy, lifecycle, and provenance composite are identical (governance §4/§5.3).
+
+**One backend per project.** Never both. Moving between them is a one-way
+`markdown → github` migration (planned — `OI-0029`), never a live two-way sync.
+
+**Operational github mapping.** Before operating the `github` backend, read
+[`references/github-backend.md`](references/github-backend.md) — the normative slug
+contract, serialization, identity translation, status decomposition, and invariants
+I1–I5. The authoring surface for a github-backend project is the issue form
+[`templates/open-item.form.yml`](templates/open-item.form.yml).
+
+**github adoption checklist** (per project, one-time):
+
+1. Copy `templates/open-item.form.yml` → `.github/ISSUE_TEMPLATE/open-item.yml`.
+2. Create the four Issue Types: `doc-gap`, `decision-gap`, `execution-item`, `tech-debt`.
+3. Create the Project (v2) with `Status` (Open / In progress / Blocked), `Priority`, and a
+   `Review date` field.
+4. Add `docs/project-control/open-items/backend.yml` with `backend: github` + `repo` +
+   `project`.
 
 ---
 
@@ -172,7 +215,31 @@ Write to `var/reports/open-items/report-YYYY-MM-DD.md`. Never mutates the ledger
 
 ---
 
+## Backend behaviour per mode (`github`)
+
+Under `backend: github`, the six modes keep their contract but retarget GitHub via `gh`. The
+local `## Open Items` section is still the input; only the central writes change. See
+[`references/github-backend.md`](references/github-backend.md) for the full field mapping.
+
+| Mode | `github` behaviour |
+| :--- | :--- |
+| `sync` | For each local row without a resolved `#N`: `gh issue create` from the form fields — `summary` → title, `type` → Issue Type + form dropdown, provenance + `resolution_path` → form body, `priority` → Project field; set assignee = `owner`, Project `Review date` = `review_date`. Write the resulting `#N` back into the local row's `OI-ID` cell. De-dup by `(source_artefact, source_anchor, summary)` via `gh issue list --search` before creating. |
+| `triage` | `gh issue list` / `gh project item-list` to cluster duplicates, flag `_TBD_` assignees and stale high-priority items. Proposal only — never mutates silently. |
+| `close` | `gh issue close --reason completed`. The closing reference (`Closes #N` / linked PR) **is** the `tracker_ref` — evidence is structurally enforced, so the §3 `_TBD_` guard cannot be violated. |
+| `drop` | `gh issue close --reason "not planned"`; record the rationale as an issue comment (the `Resolution path` analog). |
+| `archive` | No-op. Closed issues are the archive (searchable indefinitely); there is no `archive/` file. |
+| `report` | Render from the Project (v2) view / `gh` queries instead of the markdown ledger. May still emit a `var/reports/open-items/report-YYYY-MM-DD.md` snapshot. |
+
+Refusal conditions from `sync` (nested `### Open Items`, invalid `Type`, terminal status
+with `_TBD_` tracker) apply unchanged — they are validated on the **local** section before
+any `gh` call.
+
+---
+
 ## ID assignment
+
+**`markdown` backend only.** Under `github`, identity is the issue number `#N` (native,
+monotonic, never recycled) and no `OI-NNNN` is minted — skip this section.
 
 Canonical IDs are `OI-NNNN` (four-digit zero-padded, monotonic).
 
@@ -296,6 +363,10 @@ util-open-items report
 | `var/reports/open-items/report-YYYY-MM-DD.md`                 | This skill (report mode).              |
 | The source artefact's document-level `## Open Items` section. | This skill (sync writes back IDs only). |
 
+The `open-items.md` / `archive/` paths above apply to the **`markdown` backend**. Under
+**`github`**, those central writes go to GitHub Issues + the Project instead (via `gh`); the
+only repo-file this skill writes is the local `## Open Items` section (writing back `#N`).
+
 This skill MUST NOT write to any other path. In particular it MUST NOT mutate
 `util-metamodel-audit` reports (those are produced by a separate report-only skill) and
 MUST NOT touch artefact body content outside the document-level `## Open Items` table.
@@ -305,9 +376,14 @@ MUST NOT touch artefact body content outside the document-level `## Open Items` 
 ## Reference files
 
 - [`references/template.md`](references/template.md) — canonical ledger table skeleton and
-  worked sync example.
+  worked sync example (`markdown` backend).
 - [`references/triage-rules.md`](references/triage-rules.md) — operator playbook for
   triage mode (de-duplication, priority escalation, owner assignment).
+- [`references/github-backend.md`](references/github-backend.md) — normative `github`-backend
+  mapping: slug contract, serialization, identity translation, status decomposition,
+  invariants I1–I5.
+- [`templates/open-item.form.yml`](templates/open-item.form.yml) — the GitHub Issue Form
+  (authoring surface for the `github` backend); copy to `.github/ISSUE_TEMPLATE/` on adoption.
 
 ---
 
