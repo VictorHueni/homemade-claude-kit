@@ -51,7 +51,7 @@ project: 7               # github only — the Project (v2) number for the read-
 taxonomy, lifecycle, and provenance composite are identical (governance §4/§5.3).
 
 **One backend per project.** Never both. Moving between them is a one-way
-`markdown → github` migration (planned — `OI-0029`), never a live two-way sync.
+`markdown → github` migration (Mode 7, `OI-0031`), never a live two-way sync.
 
 **Operational github mapping.** Before operating the `github` backend, read
 [`references/github-backend.md`](references/github-backend.md) — the normative slug

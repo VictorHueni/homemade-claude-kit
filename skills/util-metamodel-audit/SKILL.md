@@ -99,11 +99,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** quick "where are we in the build order?" check. No link, dependency, or freshness analysis.
 
 **Process:**
-<<<<<<< HEAD
-1. For each of the 15 steps (including 2b, 2c, 7b, 7c), check whether the canonical output path exists.
-=======
 1. For each of the 16 steps (Step 0 Vision + 1, 2, 2b, 2c, 3, 4, 4.5, 5, 6, 7, 7b, 8, 9, 10, 11), check whether the canonical output path exists.
->>>>>>> origin/claude/metamodel-rules-ideas-skills-MwmUc
 2. For each existing file, retrieve last-modified date: `git log -1 --format="%ci" -- {file}`.
 3. Output a single table: `Step # | Artefact | Status | Path | Last modified | Age (days)`.
 4. Print to terminal. Save to file only if explicitly requested.

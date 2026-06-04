@@ -4,7 +4,7 @@ Internal guidance for the `design-system` skill.
 
 ## Principles
 
-1. **One design system per project.** `docs/design/` holds the single visual
+1. **One design system per project.** `docs/ux/` holds the single visual
    source of truth. Consumers theme from it; they do not each define their own
    palette. Two design systems = drift.
 
@@ -31,7 +31,7 @@ Internal guidance for the `design-system` skill.
    Anthropic's palette), the kit is user-global, so this skill ships only
    neutral defaults and a fillable template. No real brand colour, font, or
    client name appears on the skill side — only in a project's own
-   `docs/design/`.
+   `docs/ux/`.
 
 5. **No IDs, no links.** The design system mints no IDs and carries no FK
    references to other artefacts. It is a cross-cutting foundation, not a node
@@ -45,7 +45,7 @@ Internal guidance for the `design-system` skill.
 - **Not a component library.** It defines tokens (colour/type/space/shape), not
   reusable HTML/CSS components. Each consumer builds its own components *from*
   the tokens.
-- **Not per-deck or per-view.** It is project-scoped (`docs/design/`), not
+- **Not per-deck or per-view.** It is project-scoped (`docs/ux/`), not
   scoped to one deck folder. A deck may still keep deck-specific CSS, but it
   should source its base tokens here.
 
@@ -53,9 +53,9 @@ Internal guidance for the `design-system` skill.
 
 Both `com-*` skills inherit this skill's `tokens.css` directly:
 
-- **`com-artefact-viz`** auto-detects `docs/design/tokens.css` and inlines it as
+- **`com-artefact-viz`** auto-detects `docs/ux/tokens.css` and inlines it as
   the theme (override with `--design-system`).
-- **`com-slide-deck`** — `build.py` locates `docs/design/tokens.css` (config
+- **`com-slide-deck`** — `build.py` locates `docs/ux/tokens.css` (config
   `paths.design_tokens` or auto-detect by walking up) and inlines it **before**
   the deck's `styles.css`, so base palette + typography + the generic semantic
   state tokens (`--success/--warning/--danger/--info`) flow from here. The deck

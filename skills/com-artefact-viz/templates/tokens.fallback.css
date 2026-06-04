@@ -2,7 +2,7 @@
  * tokens.fallback.css — shipped neutral defaults for the generic token contract.
  *
  * Inlined FIRST so a deck/view renders correctly with ZERO project setup. When a
- * project's docs/design/tokens.css exists it is inlined AFTER this and overrides
+ * project's docs/ux/tokens.css exists it is inlined AFTER this and overrides
  * these values (project wins). Same layering in com-artefact-viz + com-slide-deck.
  *
  * Keep this :root in sync with the canonical contract,

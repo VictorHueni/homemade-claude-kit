@@ -21,7 +21,7 @@ file is authoritative only for the `github` mapping.
 ## Scope
 
 Per `adr-0002`, the `github` backend is adopted for the **kit repo only** (dogfood before
-generalising). Other projects use the default `markdown` backend. `OI-0030` decides whether
+generalising). Other projects use the default `markdown` backend. `OI-0032` decides whether
 to generalise.
 
 ---

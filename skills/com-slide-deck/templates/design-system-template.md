@@ -26,14 +26,14 @@ presentation convey? What principles guide layout and decoration choices?_
 ## 2. Color Tokens
 
 The deck uses the **project design system as its single source of truth**: the
-base palette and typography are defined once in `docs/design/tokens.css` by the
+base palette and typography are defined once in `docs/ux/tokens.css` by the
 [`design-system`](../../../../design-system/SKILL.md) skill and inlined by
 `build.py` **before** this stylesheet. **Do NOT redefine base palette values
 here** — reference them with `var()` and adopt the contract token names. Run
-`design-system scaffold` (then `generate`) if `docs/design/tokens.css` does not
+`design-system scaffold` (then `generate`) if `docs/ux/tokens.css` does not
 exist yet.
 
-### Core palette — inherited from `docs/design/tokens.css` (do not redefine)
+### Core palette — inherited from `docs/ux/tokens.css` (do not redefine)
 
 Use these contract names everywhere in the stylesheet and in slide partials:
 
@@ -48,7 +48,7 @@ Use these contract names everywhere in the stylesheet and in slide partials:
 | `--accent`     | Primary accent (CTAs, highlights, labels)      |
 | `--accent-ink` | Text on accent fills                           |
 
-### Semantic state colors — inherited from `docs/design/tokens.css`
+### Semantic state colors — inherited from `docs/ux/tokens.css`
 
 State colours are part of the shared contract — use them directly in partials,
 do not redefine:
@@ -90,7 +90,7 @@ Tokens with no contract equivalent stay deck-local. Define them in `:root`:
 
 ### Font Stack
 
-Typography tokens are inherited from `docs/design/tokens.css` — reference them,
+Typography tokens are inherited from `docs/ux/tokens.css` — reference them,
 do not redefine:
 
 | Token         | Usage                              | Source            |
@@ -101,7 +101,7 @@ do not redefine:
 If the deck needs a distinct heading face, add a **deck-only** `--font-heading`
 in this stylesheet's `:root` (defaulting to `var(--font-sans)`); otherwise use
 `--font-sans` for both headings and body. Set the actual font families and web-
-font loading in `docs/design/design-system.md` (and the `fonts:` block of
+font loading in `docs/ux/design-system.md` (and the `fonts:` block of
 `config.yaml` for the Google-Fonts `<link>`), so they flow from the one source.
 
 ### Font Loading
