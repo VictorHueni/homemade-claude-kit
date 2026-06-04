@@ -1,7 +1,7 @@
 ---
 name: util-metamodel-audit
 description: "Audit the strategic-architecture documentation stack across 18 dimensions: stack progress, folder placement, internal + external links, ID cross-references + integrity, dependency enforcement, _TODO_ density, mandatory sections, methodology pointers, confidence distribution, expiry + staleness, orphaned files, research sync, ADR supersession chains, FBS + epic delivery, frontmatter validity, and open-items governance, backend-aware (markdown ledger or GitHub Issues): section + schema compliance, source-location provenance, tracker sync coverage, closure drift, stale open items, github form/slug integrity per rules/open-items-governance.md. Report-only with a proposed fix per finding. Triggers on: metamodel audit, audit the stack, check docs health, validate dependencies, broken links, audit artefact compliance, open items governance, tracker sync, closure drift, schema compliance."
-version: "1.1.0"
+version: "1.1.1"
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"

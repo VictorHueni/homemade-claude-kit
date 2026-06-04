@@ -1000,8 +1000,11 @@ if [ "$backend" = "github" ]; then
     gh issue view "$n" -R "$repo" --json number >/dev/null 2>&1 || \
       echo "DANGLING ISSUE REF: #$n referenced locally but not found in $repo"
   done < /tmp/oi_local_gh.txt
-  # open open-item issues with no local source row
-  gh issue list -R "$repo" --label open-item --state open --json number -q '.[].number' | while read -r n; do
+  # open open-item issues with no local source row — EXCLUDING _central-only_ items
+  # (kit-dev work with no artefact home, §5.2/§9; they legitimately have no local row,
+  # exactly as the markdown 18d variant excludes _central-only_ ledger rows).
+  gh issue list -R "$repo" --label open-item --state open --json number,body \
+    -q '.[] | select((.body // "") | test("_central-only_") | not) | .number' | while read -r n; do
     grep -qx "$n" /tmp/oi_local_gh.txt || \
       echo "ORPHANED ISSUE: #$n is an open open-item with no local source row"
   done
