@@ -71,7 +71,7 @@ central read-out changes. One `OpenItem` ⇒ one **Issue**, projected into one *
 | Canonical slug | GitHub home | Mechanism |
 | :--- | :--- | :--- |
 | `oi_id` | Issue **number** `#N` | native; `OI-NNNN` retired in this backend |
-| `type` | **Issue Type** | 4 types map 1:1 to the taxonomy |
+| `type` | **Issue Type** (or `type:<value>` **label** where Issue Types are unavailable — e.g. personal repos) | 4 types map 1:1 to the taxonomy |
 | `summary` | Issue **title** | |
 | `source_artefact` | Issue Form field `source_artefact` | `input` |
 | `source_anchor` | Issue Form field `source_anchor` | `input` |

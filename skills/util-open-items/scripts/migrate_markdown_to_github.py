@@ -110,7 +110,34 @@ def find_existing(repo: str, row: dict) -> int | None:
     return None
 
 
-def create_issue(repo: str, row: dict, apply: bool) -> int | None:
+def issue_types_available(repo: str) -> bool:
+    """Native Issue Types are org-level. On a personal repo the endpoint 404s, and we fall
+    back to encoding the type as a `type:<value>` label. Always a real GET (read-only)."""
+    res = subprocess.run(["gh", "api", f"repos/{repo}/issue-types"],
+                         capture_output=True, text=True)
+    return res.returncode == 0 and '"name"' in res.stdout
+
+
+def ensure_labels(repo: str, labels: list[str], apply: bool) -> None:
+    """Idempotently create the labels the migration relies on (`open-item`, plus
+    `type:<value>` when Issue Types are unavailable)."""
+    for lbl in labels:
+        run(["gh", "label", "create", lbl, "--force"], apply)
+
+
+def resolve_assignee(owner: str, assignee_map: dict[str, str]) -> str | None:
+    """Map a ledger `owner` to a real GitHub login. `_TBD_`/empty -> no assignee; an owner
+    with no mapping is skipped (warned) rather than passed through and erroring."""
+    if not owner or owner == "_TBD_":
+        return None
+    login = assignee_map.get(owner)
+    if not login:
+        sys.stderr.write(f"  note: owner '{owner}' has no --assignee-map entry; skipping assignee\n")
+    return login
+
+
+def create_issue(repo: str, row: dict, apply: bool, use_types: bool,
+                 assignee_map: dict[str, str]) -> int | None:
     if row["type"] not in VALID_TYPES:
         sys.stderr.write(f"  SKIP {row['oi_id']}: invalid type '{row['type']}'\n")
         return None
@@ -121,10 +148,14 @@ def create_issue(repo: str, row: dict, apply: bool) -> int | None:
     cmd = ["gh", "issue", "create", "-R", repo,
            "--title", f"[OI] {row['summary']}",
            "--body", issue_body(row),
-           "--label", "open-item",
-           "--type", row["type"]]
-    if row["owner"] and row["owner"] != "_TBD_":
-        cmd += ["--assignee", row["owner"]]
+           "--label", "open-item"]
+    if use_types:
+        cmd += ["--type", row["type"]]
+    else:
+        cmd += ["--label", f"type:{row['type']}"]
+    assignee = resolve_assignee(row["owner"], assignee_map)
+    if assignee:
+        cmd += ["--assignee", assignee]
     out = run(cmd, apply, capture=True)
     if not apply:
         return None
@@ -152,6 +183,10 @@ def rewrite_refs(docs: Path, mapping: dict[str, int], apply: bool) -> None:
         return
     pattern = re.compile(r"\b(" + "|".join(re.escape(k) for k in mapping) + r")\b")
     for md in sorted(docs.rglob("*.md")):
+        # The markdown ledger + migration map are the OI-NNNN-era record (frozen on cutover);
+        # never rewrite their IDs to #N.
+        if "project-control/open-items" in md.as_posix():
+            continue
         text = md.read_text(encoding="utf-8")
         new, n = pattern.subn(lambda m: f"#{mapping[m.group(1)]}", text)
         if n:
@@ -166,6 +201,8 @@ def main() -> int:
     ap.add_argument("--ledger", default="docs/project-control/open-items/open-items.md")
     ap.add_argument("--docs", default="docs", help="tree to rewrite OI-NNNN back-references in")
     ap.add_argument("--map-out", default="docs/project-control/open-items/migration-map.md")
+    ap.add_argument("--assignee-map", action="append", default=[], metavar="OWNER=LOGIN",
+                    help="map a ledger owner to a GitHub login (repeatable), e.g. victor=VictorHueni")
     ap.add_argument("--apply", action="store_true", help="perform mutations (default: dry-run)")
     args = ap.parse_args()
 
@@ -174,13 +211,30 @@ def main() -> int:
         sys.stderr.write(f"ERROR: ledger not found: {ledger}\n")
         return 2
 
+    assignee_map: dict[str, str] = {}
+    for pair in args.assignee_map:
+        if "=" not in pair:
+            sys.stderr.write(f"ERROR: --assignee-map expects OWNER=LOGIN, got '{pair}'\n")
+            return 2
+        k, v = pair.split("=", 1)
+        assignee_map[k.strip()] = v.strip()
+
     rows = parse_ledger(ledger)
     print(f"Parsed {len(rows)} live rows from {ledger}")
-    print(f"Mode: {'APPLY' if args.apply else 'DRY-RUN (no mutations)'}\n")
+    print(f"Mode: {'APPLY' if args.apply else 'DRY-RUN (no mutations)'}")
+
+    # Issue Types are org-level; on a personal repo, fall back to a `type:<value>` label.
+    use_types = issue_types_available(args.repo)
+    print(f"Issue Types: {'available -> native --type' if use_types else 'unavailable (404) -> type:<value> labels'}")
+    print(f"Assignee map: {assignee_map or '(none — owners skipped unless mapped)'}\n")
+
+    # Make sure the labels the migration relies on exist.
+    labels = ["open-item"] + ([] if use_types else [f"type:{t}" for t in sorted(VALID_TYPES)])
+    ensure_labels(args.repo, labels, args.apply)
 
     mapping: dict[str, int] = {}
     for row in rows:
-        number = create_issue(args.repo, row, args.apply)
+        number = create_issue(args.repo, row, args.apply, use_types, assignee_map)
         if number is None:
             if args.apply:
                 sys.stderr.write(f"  WARN: no issue number for {row['oi_id']}\n")

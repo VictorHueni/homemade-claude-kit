@@ -1,7 +1,7 @@
 ---
 name: util-open-items
 description: "Maintain the repo-wide living ledger of unresolved governance work at `docs/project-control/open-items/open-items.md`. Use this skill to sync local `## Open Items` sections from artefacts into the central ledger, triage incoming rows, close or drop items with a tracker ref, archive terminal rows at the end of a review cycle, and produce status reports. Triggers on: sync open items, triage open items, close open item, drop open item, archive open items, open-items report, roll up open items, OI-NNNN, central ledger, docs/project-control/open-items."
-version: "1.2.0"
+version: "1.2.1"
 status: active
 last_reviewed: 2026-06-04
 review_interval: 180d
@@ -229,17 +229,27 @@ ledger `open-items.md` is the source.
 
 ```text
 # 1. Dry-run — prints planned issues + the OI-NNNN→#N map + ref-rewrite diff, mutates nothing
-python3 scripts/migrate_markdown_to_github.py --repo OWNER/NAME
+python3 scripts/migrate_markdown_to_github.py --repo OWNER/NAME --assignee-map victor=LOGIN
 
 # 2. Apply — create issues, write the map, rewrite OI-NNNN back-references across docs/
-python3 scripts/migrate_markdown_to_github.py --repo OWNER/NAME --apply
+python3 scripts/migrate_markdown_to_github.py --repo OWNER/NAME --assignee-map victor=LOGIN --apply
 ```
+
+**Portability (auto-detected — works on personal repos):**
+
+- **Issue Types** are org-level. The script probes `repos/OWNER/NAME/issue-types`; if absent
+  (404, e.g. a personal repo) it encodes the type as a **`type:<value>` label** instead of
+  `--type`, and bootstraps the `type:doc-gap`…`type:tech-debt` labels.
+- **`owner` → GitHub login.** Ledger owners rarely equal a GitHub login. Pass
+  `--assignee-map LEDGER_OWNER=LOGIN` (repeatable). `_TBD_` and unmapped owners get **no
+  assignee** (warned), never a failing `--assignee`.
+- The `open-item` label is created idempotently (`gh label create --force`).
 
 **Per live ledger row:**
 
 1. De-dups by summary + provenance (`gh issue list --search`) — re-runs are idempotent.
-2. `gh issue create` — `summary`→title, `type`→Issue Type, provenance + `resolution_path`→
-   form-structured body, `owner`→assignee.
+2. `gh issue create` — `summary`→title, `type`→Issue Type **or `type:` label** (per detection),
+   provenance + `resolution_path`→form-structured body, mapped `owner`→assignee.
 3. Lifecycle: `open` stays open; `in-progress`/`blocked` stay open (set the Project Status
    field manually — the script logs which); `closed`→close `completed`; `dropped`→close
    `not planned` (original `tracker_ref` preserved as a comment).
