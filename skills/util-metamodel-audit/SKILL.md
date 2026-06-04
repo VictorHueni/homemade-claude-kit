@@ -1,7 +1,7 @@
 ---
 name: util-metamodel-audit
-description: "Audit the strategic-architecture documentation stack across 18 dimensions: stack progress, folder placement, internal + external links, ID cross-references + integrity, dependency enforcement, _TODO_ density, mandatory sections, methodology pointers, confidence distribution, expiry + staleness, orphaned files, research sync, ADR supersession chains, FBS + epic delivery, frontmatter validity, and open-items governance (section + schema compliance, source-location provenance, tracker sync coverage, closure drift, stale open items per rules/open-items-governance.md). Report-only with a proposed fix per finding. Triggers on: metamodel audit, audit the stack, check docs health, validate dependencies, broken links, audit artefact compliance, open items governance, tracker sync, closure drift, schema compliance."
-version: "1.0.0"
+description: "Audit the strategic-architecture documentation stack across 18 dimensions: stack progress, folder placement, internal + external links, ID cross-references + integrity, dependency enforcement, _TODO_ density, mandatory sections, methodology pointers, confidence distribution, expiry + staleness, orphaned files, research sync, ADR supersession chains, FBS + epic delivery, frontmatter validity, and open-items governance, backend-aware (markdown ledger or GitHub Issues): section + schema compliance, source-location provenance, tracker sync coverage, closure drift, stale open items, github form/slug integrity per rules/open-items-governance.md. Report-only with a proposed fix per finding. Triggers on: metamodel audit, audit the stack, check docs health, validate dependencies, broken links, audit artefact compliance, open items governance, tracker sync, closure drift, schema compliance."
+version: "1.1.0"
 user-invocable: true
 allow_implicit_invocation: true
 impact: "low"
@@ -9,7 +9,7 @@ metadata:
   category: "utility"
   complexity: "high"
 status: active
-last_reviewed: 2026-05-29
+last_reviewed: 2026-06-04
 ---
 
 # Stack Audit
@@ -45,7 +45,7 @@ A report is good when a reader can answer, without ambiguity:
 | **Which ADR supersession chains are broken?** | §15 ADR chain findings |
 | **What is the FBS + epic delivery status?** | §16 Delivery progress table |
 | **Which artefacts have missing or invalid frontmatter?** | §17 Frontmatter validity findings |
-| **Is open-items governance healthy across artefacts and the central ledger?** | §18 Open items governance — section + schema compliance, source-location provenance, tracker sync coverage, closure drift, stale items |
+| **Is open-items governance healthy across artefacts and the central read-out?** | §18 Open items governance (backend-aware) — section + schema compliance, source-location provenance, tracker sync coverage, closure drift, stale items, github form/slug integrity |
 
 ---
 
@@ -99,11 +99,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 **When:** quick "where are we in the build order?" check. No link, dependency, or freshness analysis.
 
 **Process:**
-<<<<<<< HEAD
-1. For each of the 15 steps (including 2b, 2c, 7b, 7c), check whether the canonical output path exists.
-=======
 1. For each of the 16 steps (Step 0 Vision + 1, 2, 2b, 2c, 3, 4, 4.5, 5, 6, 7, 7b, 8, 9, 10, 11), check whether the canonical output path exists.
->>>>>>> origin/claude/metamodel-rules-ideas-skills-MwmUc
 2. For each existing file, retrieve last-modified date: `git log -1 --format="%ci" -- {file}`.
 3. Output a single table: `Step # | Artefact | Status | Path | Last modified | Age (days)`.
 4. Print to terminal. Save to file only if explicitly requested.
@@ -129,12 +125,16 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 ### Mode 5 — Open-items governance
 
 **When:** focused governance-drift check; run after a `util-open-items sync` to confirm
-the ledger and artefacts agree, or before archiving terminal rows. Runs Check 18 (all six
-sub-checks: section compliance, schema compliance, source-location provenance, tracker
-sync coverage, closure drift, stale open items) only.
+the central read-out and artefacts agree, or before archiving terminal rows. Runs Check 18
+only — backend-aware (governance §5.3): section compliance, schema compliance,
+source-location provenance, tracker sync coverage, closure drift, stale open items, plus
+the github-only form/slug integrity sub-check (18g).
 
 **Process:**
-1. Run the six sub-checks of Check 18 — see `references/check-catalogue.md`.
+1. Detect the backend (`docs/project-control/open-items/backend.yml`, default `markdown`),
+   then run the sub-checks of Check 18 — see `references/check-catalogue.md`. The
+   local-section checks (18a–18c) are backend-independent; 18d–18f have a markdown and a
+   github variant; 18g is github-only.
 2. Output findings grouped by sub-check.
 3. Save to `var/reports/metamodel-audit/open-items-governance-{YYYY-MM-DD}.md`.
 4. Never mutate `docs/project-control/open-items/open-items.md` or any artefact's local

@@ -203,6 +203,34 @@ These **central-only** rows are valid and use this provenance form:
 findings. All other §4 column rules (valid `Type`, lifecycle `Status`, `_TBD_`-until-terminal
 `Tracker ref`, ISO date) apply unchanged.
 
+### 5.3 Pluggable backend
+
+The central plane is a **serialization** of the §4 model, not the model itself. The default
+and only universally-required backend is **`markdown`** — the living ledger of §5 plus the
+archive of §6. A project MAY select an alternative backend (for example, an issue tracker)
+for the consolidated read-out. Whatever the backend, these invariants hold:
+
+- **Backend-independent model.** The §4 schema is the one logical model; each backend is a
+  serialization of it. The field **slugs** (the stable lower-snake keys behind each §4
+  column) — not column headers or UI labels — are the binding contract every backend
+  conforms to. The audit reads any backend through that single slug map.
+- **Authoring surface is backend-invariant.** The local `## Open Items` section (§1) is
+  always §4 markdown regardless of backend. Only what the sync step *writes to* changes;
+  switching backends never edits an authoring surface.
+- **One backend per project.** Backends are never run concurrently — two live writers over
+  two identity spaces reintroduce the dual-source-of-truth this contract exists to prevent.
+  Moving between backends is a **one-way migration** performed once, and MUST emit an
+  identity map so back-references survive the identifier re-mint.
+- **Evidence-gated closure holds.** A terminal `Status` still requires a non-`_TBD_`
+  `Tracker ref`, whether the backend enforces it natively or the operator validates it.
+- **Provenance is preserved.** Every backend stores the full provenance composite
+  (`Source artefact` + `Source anchor` + `Source heading`) under the canonical slugs, so
+  central-only and artefact-originated items are distinguishable in any backend.
+
+A worked two-backend mapping (the kit's own `markdown` ledger plus an issue-tracker backend)
+is maintained as the reference model that operator tooling and the audit conform to; see
+§10.
+
 ---
 
 ## 6. Archive and snapshots
@@ -224,8 +252,8 @@ The live ledger never silently deletes rows — archival is explicit and dated.
 | Tool                          | Responsibility                                                                                              |
 | :---------------------------- | :---------------------------------------------------------------------------------------------------------- |
 | `util-docs-audit`             | Generic file-level rot (stale, outdated, dead). **Not** an open-items governance tracker.                   |
-| `util-open-items`             | Maintains `docs/project-control/open-items/` — sync, triage, close, archive, report. Living ledger CRUD.         |
-| `util-metamodel-audit`        | Report-only. Verifies `## Open Items` section presence, schema compliance, source-anchor / source-heading provenance, tracker sync coverage, closure drift. Never mutates source artefacts or the ledger. |
+| `util-open-items`             | Maintains the central plane — sync, triage, close, archive, report — honouring the configured backend (§5.3). Living ledger CRUD.         |
+| `util-metamodel-audit`        | Report-only. Verifies `## Open Items` section presence, schema compliance, source-anchor / source-heading provenance, tracker sync coverage, closure drift — reading whichever backend is configured via the canonical field slugs (§5.3). Never mutates source artefacts or the ledger. |
 
 `util-metamodel-audit` is the only place that flags governance drift between artefacts and
 the central ledger. It must not mutate either side; remediation is always operator-driven
@@ -290,6 +318,7 @@ Restated:
 ## 10. See also
 
 - `rules/metamodel.md` — strategic-architecture build order; references this contract.
+- `util-open-items/references/github-backend.md` — the operator skill's worked backend-mapping reference (canonical field slugs, identity translation, status decomposition); the §5.3 worked example. Travels with the skill — never copied into a project's `docs/`.
 - `docs/project-control/open-items/open-items.md` — the kit's own ledger: kit-dev open items (per §9) **and** the merged skill backlog (candidate skills + structural decisions). Shipped history under `archive/`.
 - `util-open-items/SKILL.md` — operating manual for the living ledger.
 - `util-metamodel-audit/references/check-catalogue.md` — exact audit checks for governance
