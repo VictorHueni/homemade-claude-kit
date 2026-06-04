@@ -318,7 +318,7 @@ Restated:
 ## 10. See also
 
 - `rules/metamodel.md` — strategic-architecture build order; references this contract.
-- `docs/project-control/open-items/data-model.md` — the kit's normative two-backend data model + interoperability contract (canonical field slugs, identity translation, status decomposition); the worked example referenced by §5.3.
+- `util-open-items/references/github-backend.md` — the operator skill's worked backend-mapping reference (canonical field slugs, identity translation, status decomposition); the §5.3 worked example. Travels with the skill — never copied into a project's `docs/`.
 - `docs/project-control/open-items/open-items.md` — the kit's own ledger: kit-dev open items (per §9) **and** the merged skill backlog (candidate skills + structural decisions). Shipped history under `archive/`.
 - `util-open-items/SKILL.md` — operating manual for the living ledger.
 - `util-metamodel-audit/references/check-catalogue.md` — exact audit checks for governance
