@@ -71,6 +71,7 @@ rule), then move to `archive/`.
 | OI-0030 | execution-item | Author `.github/ISSUE_TEMPLATE/open-item.yml` with `id:` keys mirroring §4 columns | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #data-model--interoperability | Data model & interoperability | Write the issue form | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
 | OI-0031 | execution-item | Build one-way `markdown → github` migration emitting an `OI-NNNN → #N` map | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #data-model--interoperability | Data model & interoperability | Add a migration mode/script | medium | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
 | OI-0032 | decision-gap | Decide whether to generalise the `github` backend to the universal contract after dogfooding | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #context-and-problem-statement | Context and Problem Statement | Follow-up ADR superseding/extending this one; gated on a portability pass (ADR-0002 §Dogfood findings, 2026-06-04) | low | open | victor | 2026-09-01 | _TBD_ |
+| OI-0033 | execution-item | Make Mode 7 portable to personal repos — Issue-Types→`type:` label fallback + owner→login `--assignee-map` + idempotent label bootstrap | `docs/architecture/decisions/adr-0002-open-items-pluggable-backend-github-issues.md` | #dogfood-findings--mode-7-dry-run-2026-06-04 | Dogfood findings — Mode 7 dry-run (2026-06-04) | Implement in `migrate_markdown_to_github.py`; re-validate via dry-run | medium | closed | victor | 2026-06-04 | [#4](https://github.com/VictorHueni/homemade-claude-kit/pull/4) |
 
 Most rows are kit-development items raised directly at the central plane (the kit dogfoods its
 own open-items contract per `rules/open-items-governance.md` §9), so they carry `_central-only_`
@@ -94,8 +95,10 @@ back into [`adr-0002`](../../architecture/decisions/adr-0002-open-items-pluggabl
 implementation items (governance §5.3 + the two-backend `util-open-items` / `util-metamodel-audit`
 skills + the migration mode), closed by [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3);
 `OI-0032` is the deferred decision on whether to generalise the `github` backend to the
-universal contract. They were renumbered from a transient `OI-0025`–`OI-0030` block that
-collided with the UX rows above when both branches minted from `OI-0024` in parallel.
+universal contract, and `OI-0033` is the portability pass the Mode 7 dry-run revealed it
+needs (Issue-Types→`type:` label fallback + owner→login mapping). They were renumbered from a
+transient `OI-0025`–`OI-0030` block that collided with the UX rows above when both branches
+minted from `OI-0024` in parallel.
 
 **Recommended build order** (former BACKLOG guidance, by structural impact, not strict
 priority): `OI-0003` domain-event-storming → `OI-0004` spec-test-strategy → `OI-0026`
@@ -126,7 +129,7 @@ Skills and audits MAY render summary counts here (e.g. open / in-progress / bloc
 closed / dropped totals), but the snapshot must always derive from the live table above —
 never the other way around. The live table is the source of truth.
 
-As of 2026-06-04 (32 rows): **open 20** · in-progress 0 · blocked 0 · **closed 12** (`OI-0010`, `OI-0019`–`OI-0022`, `OI-0025`–`OI-0031`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
+As of 2026-06-04 (33 rows): **open 20** · in-progress 0 · blocked 0 · **closed 13** (`OI-0010`, `OI-0019`–`OI-0022`, `OI-0025`–`OI-0031`, `OI-0033`) · dropped 0. Closed rows linger on the live ledger for one review cycle (30 days) before archival per §6.
 
 ---
 

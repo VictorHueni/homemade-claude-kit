@@ -119,6 +119,15 @@ portability pass** (type→label fallback, owner→login mapping, label/Project 
 rather than done as-is. The kit therefore **stays on the `markdown` backend** for now; no
 issues were created.
 
+**Update — portability pass done (OI-0033, PR #4).** The script-side gaps (1)–(3) are now
+fixed in `migrate_markdown_to_github.py`: it auto-detects missing Issue Types and falls back
+to `type:<value>` labels, bootstraps `open-item` + `type:` labels idempotently, and takes
+`--assignee-map LEDGER_OWNER=LOGIN` (skipping `_TBD_`/unmapped owners instead of erroring). A
+re-run dry-run against the kit repo now plans all 33 issues cleanly (0 native `--type`, 33
+`type:` labels, assignees only for mapped owners). A real `--apply` is therefore viable;
+**OI-0032 (the generalise decision) stays open** pending an actual apply + an operating
+period to judge the GitHub-Issues experience.
+
 ## Open Items
 
 | OI-ID | Type | Summary | Source anchor | Source heading | Resolution path | Priority | Status | Owner | Due / Review date | Tracker ref |
@@ -129,3 +138,4 @@ issues were created.
 | OI-0030 | execution-item | Author `.github/ISSUE_TEMPLATE/open-item.yml` with `id:` keys mirroring §4 columns | #data-model--interoperability | Data model & interoperability | Write the issue form | high | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
 | OI-0031 | execution-item | Build one-way `markdown → github` migration emitting an `OI-NNNN → #N` map | #data-model--interoperability | Data model & interoperability | Add a migration mode/script | medium | closed | victor | 2026-06-04 | [#3](https://github.com/VictorHueni/homemade-claude-kit/pull/3) |
 | OI-0032 | decision-gap | Decide whether to generalise the `github` backend to the universal contract after dogfooding | #context-and-problem-statement | Context and Problem Statement | Follow-up ADR superseding/extending this one; gated on a portability pass (see §Dogfood findings, 2026-06-04) | low | open | victor | 2026-09-01 | _TBD_ |
+| OI-0033 | execution-item | Make Mode 7 portable to personal repos — Issue-Types→`type:` label fallback + owner→login `--assignee-map` + idempotent label bootstrap | #dogfood-findings--mode-7-dry-run-2026-06-04 | Dogfood findings — Mode 7 dry-run (2026-06-04) | Implement in `migrate_markdown_to_github.py`; re-validate via dry-run | medium | closed | victor | 2026-06-04 | [#4](https://github.com/VictorHueni/homemade-claude-kit/pull/4) |
