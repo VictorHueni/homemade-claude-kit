@@ -124,7 +124,7 @@ should feel. Every content decision flows from it.
 ### Step 2: Design System
 
 The base palette and typography come from the **project design system**
-(`docs/ux/tokens.css`, produced by the `design-system` skill) — the single
+(`docs/ux/tokens.css`, produced by the `ux-design-system` skill) — the single
 source of truth shared with `com-artefact-viz`. `build.py` inlines it BEFORE the
 deck's `styles.css`. The contract includes the base palette, typography, and the
 generic semantic state tokens (`--success`/`--warning`/`--danger`/`--info`). The
@@ -133,8 +133,8 @@ deck-only tokens (`--dim`, `--accent-lt`), components, and fonts — all using t
 contract token names via `var()`, never hard-coded hex.
 
 1. **Ensure the project design system exists.** If `docs/ux/tokens.css` is
-   missing, scaffold it first: `design-system scaffold` then fill
-   `docs/ux/design-system.md` and run `design-system generate`. (If the deck
+   missing, scaffold it first: `ux-design-system scaffold` then fill
+   `docs/ux/design-system.md` and run `ux-design-system generate`. (If the deck
    is intentionally standalone, skip — `build.py` falls back to deck styles only.)
 2. Read the project's `design/design-system.md` (deck-level: deck-only tokens +
    components + type scale).
@@ -310,8 +310,8 @@ shipped `tokens.fallback.css` is a harmless base layer and the deck's own
 
 `scripts/migrate.py` automates the token-name part. **Commit the deck first.**
 
-1. **Stand up the design system** (if absent): `design-system scaffold`, port the
-   deck's palette values into `docs/ux/design-system.md`, `design-system generate`.
+1. **Stand up the design system** (if absent): `ux-design-system scaffold`, port the
+   deck's palette values into `docs/ux/design-system.md`, `ux-design-system generate`.
 2. **Report** what needs changing (read-only):
    ```bash
    python scripts/migrate.py --config path/to/config.yaml
@@ -328,7 +328,7 @@ shipped `tokens.fallback.css` is a harmless base layer and the deck's own
      and every partial (whole-token match). Thorough; no shim needed afterwards.
 4. **Finish the values:** move any hard-coded base/semantic values out of
    `styles.css` into `docs/ux/design-system.md` (the report lists them), then
-   `design-system generate`. Keep deck-only tokens (`--dim`, `--accent-lt`,
+   `ux-design-system generate`. Keep deck-only tokens (`--dim`, `--accent-lt`,
    `--danger-lt`, `--font-heading`, extended palette) in `styles.css`.
 5. **Rebuild** and verify (`build.py` prints the shared `Tokens:` line).
 

@@ -80,7 +80,7 @@ worked multi-file fixture lives in `examples/service-blueprint/`.
 | Render an artefact (auto-detect kind) | `python scripts/render.py docs/business/03a-capability-map.md` |
 | Force the kind | `python scripts/render.py SRC.md --kind fbs` |
 | Compose a service blueprint | `python scripts/render.py --kind service-blueprint --proc PROC.md --value-stream VS.md --personas PERSONAS/` |
-| Theme from the shared design system | automatic — `docs/ux/tokens.css` (from the `design-system` skill) is auto-detected |
+| Theme from the shared design system | automatic — `docs/ux/tokens.css` (from the `ux-design-system` skill) is auto-detected |
 | Theme with a specific sheet | `python scripts/render.py SRC.md --design-system path/to/styles.css` |
 | Override the capability/FBS left-axis label | `python scripts/render.py SRC.md --left-axis-label "Customer Journey" --left-axis-arrow "→"` |
 | Choose the output path | `python scripts/render.py SRC.md --out docs/communication/visualisations/capability-map.html` |
@@ -99,10 +99,10 @@ Default output: `docs/communication/visualisations/<kind>.html`.
    visualises, it does not author.
 2. **Pick or confirm the design system.** Resolution order: (a) an explicit
    `--design-system PATH`; (b) the shared `docs/ux/tokens.css` produced by
-   the **`design-system`** skill, auto-detected if present (the view prints
+   the **`ux-design-system`** skill, auto-detected if present (the view prints
    "using shared design system …"); (c) the skill's shipped defaults
    (`templates/tokens.fallback.css`). The project sheet's `:root` tokens are
-   inlined over the fallback and win. Prefer the shared `design-system` skill so decks and
+   inlined over the fallback and win. Prefer the shared `ux-design-system` skill so decks and
    views theme from one source; you can still point `--design-system` at a
    `com-slide-deck` `design/styles.css`. This is the supported way to make
    every view match the project's look.
@@ -199,6 +199,6 @@ visualisations).
 
 - `references/parsing-contract.md` — exact Markdown each parser reads, field by field.
 - `references/viz-discipline.md` — design principles and boundaries (what this skill is NOT).
-- `design-system/SKILL.md` — the shared design system; its `docs/ux/tokens.css` is auto-detected as the theme.
+- `ux-design-system/SKILL.md` — the shared design system; its `docs/ux/tokens.css` is auto-detected as the theme.
 - `com-slide-deck/SKILL.md` — sibling HTML builder; share its `design/styles.css` via `--design-system`.
 - `rules/skill-creation-sync.md` · `rules/artefact-frontmatter.md` · `rules/diagramming-mermaid.md`.

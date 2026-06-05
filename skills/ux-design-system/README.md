@@ -1,4 +1,4 @@
-# design-system
+# ux-design-system
 
 The project's single visual source of truth. Author the brand once in
 `design-system.md`; generate `tokens.css`, the `:root` variable sheet every
@@ -34,7 +34,7 @@ python ../com-artefact-viz/scripts/render.py docs/business/03a-capability-map.md
 ## Layout
 
 ```
-design-system/
+ux-design-system/
   SKILL.md                       Claude-facing instructions
   README.md                      This file
   templates/
@@ -49,5 +49,5 @@ design-system/
     design-system.sample.md      A filled example
 ```
 
-Output: `docs/ux/` (the `ux-` category folder; `design-system` keeps its name, a
-prefix→folder exception like `business-vision`). Python 3.8+, stdlib only.
+Output: `docs/ux/` (the `ux-` category folder; the skill name `ux-design-system`
+follows the standard `<category>-<artefact>` convention). Python 3.8+, stdlib only.
