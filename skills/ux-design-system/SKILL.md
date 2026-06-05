@@ -1,5 +1,5 @@
 ---
-name: design-system
+name: ux-design-system
 description: "Author a project's single visual design system once and generate the canonical token sheet every com-* artefact consumes. Adapts Anthropic's brand-guidelines pattern (a design system as a shared, on-demand resource) kept domain-agnostic: scaffolds a fillable design-system.md (brand rationale + token tables for palette, typography, spacing, and semantic tokens) and generates docs/ux/tokens.css, a :root variable contract. com-slide-deck and com-artefact-viz reference these via var() and never hard-code colour/font/radius, so editing the design system re-themes every deck and view with no renderer change. Modes: scaffold, generate/refresh. Use when the user wants to define a design system, brand tokens, theme, colour palette, typography, or shared visual style for generated decks and visualisations. Triggers on: design system, design tokens, brand guidelines, theme, colour palette, typography tokens, tokens.css. Output: docs/ux/. Mints no IDs; cross-cutting foundation for the presentation layer."
 version: "1.0.0"
 status: active
@@ -13,7 +13,7 @@ metadata:
   complexity: "low"
 ---
 
-# design-system — Project Design System
+# ux-design-system — Project Design System
 
 Own the project's **single visual source of truth**. Author the brand once in a
 human-readable `design-system.md`; generate `tokens.css`, a `:root` variable
@@ -45,8 +45,8 @@ communication artefacts.
 | Regenerate tokens after editing the doc | `python scripts/generate_tokens.py generate docs/ux/design-system.md` |
 | Refresh (alias) | `python scripts/generate_tokens.py refresh docs/ux/design-system.md` |
 
-Output lives at `docs/ux/` (the `ux-` category folder; `design-system` keeps its
-name as a prefix→folder exception, like `business-vision`→`docs/VISION.md`).
+Output lives at `docs/ux/` (the `ux-` category folder — the skill name
+`ux-design-system` follows the standard `<category>-<artefact>` convention).
 
 ---
 

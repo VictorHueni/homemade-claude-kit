@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 migrate.py — com-slide-deck: migrate a pre-design-system deck onto the shared
-token contract (the `design-system` skill's docs/ux/tokens.css).
+token contract (the `ux-design-system` skill's docs/ux/tokens.css).
 
 Detects legacy token names in the deck's styles.css and slide partials, maps the
 ones that changed to the generic contract, and either:
@@ -139,7 +139,7 @@ def do_report(base, cfg, found, styles):
         print(f"[ok]   project design system found: {rel(tokens_css, base)}")
     else:
         print("[todo] no project design system (docs/ux/tokens.css) found.")
-        print("       run first:  design-system scaffold   then fill + generate")
+        print("       run first:  ux-design-system scaffold   then fill + generate")
 
     if not found:
         print("\n[ok]   no legacy token names detected — this deck already speaks the contract.")
@@ -163,7 +163,7 @@ def do_report(base, cfg, found, styles):
         print("\n  [todo] styles.css still hard-codes base/semantic values for:")
         print("         " + ", ".join(palette))
         print("         move these VALUES into docs/ux/design-system.md, then "
-              "`design-system generate`,")
+              "`ux-design-system generate`,")
         print("         and delete them from styles.css so the deck inherits them.")
 
     print("\nNext:")

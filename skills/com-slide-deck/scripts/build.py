@@ -56,7 +56,7 @@ def find_design_tokens(cfg: dict, base: Path) -> tuple:
     """Locate the shared design-system token sheet (docs/ux/tokens.css).
 
     The deck's base colour/type tokens are defined once, project-wide, by the
-    `design-system` skill. Resolution order:
+    `ux-design-system` skill. Resolution order:
       1. `paths.design_tokens` in config (relative to the config file), if set.
       2. Auto-detect: walk up from the deck dir to a `docs/ux/tokens.css`.
     Returns (css_text, source_path), or ("", None) when absent — the deck then

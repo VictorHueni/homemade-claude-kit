@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-generate_tokens.py — design-system skill.
+generate_tokens.py — ux-design-system skill.
 
 Author the project design system once; generate the machine-read token sheet
 every com-* renderer consumes.
@@ -118,7 +118,7 @@ def emit_css(groups, source_rel):
         "/*",
         " * tokens.css — canonical design-system token contract.",
         " *",
-        f" * GENERATED from {source_rel} by the design-system skill on {today}.",
+        f" * GENERATED from {source_rel} by the ux-design-system skill on {today}.",
         " * Edit the token tables in design-system.md and re-run `generate`; do not",
         " * hand-edit here (changes are overwritten on refresh).",
         " *",

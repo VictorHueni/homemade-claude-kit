@@ -37,7 +37,7 @@ paths:
   bibliography_file: "context/bibliography.yaml"
   output_dir:        "output/slide-deck"
   output_filename:   "presentation.html"
-  # Shared design-system tokens (the `design-system` skill's output). Inlined
+  # Shared design-system tokens (the `ux-design-system` skill's output). Inlined
   # before styles.css so base palette/typography flow from the project's single
   # source of truth. Omit to auto-detect docs/ux/tokens.css by walking up
   # from this deck; leave unset (and have no docs/ux/tokens.css) to build

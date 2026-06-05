@@ -1,6 +1,6 @@
 # Design-system discipline
 
-Internal guidance for the `design-system` skill.
+Internal guidance for the `ux-design-system` skill.
 
 ## Principles
 
