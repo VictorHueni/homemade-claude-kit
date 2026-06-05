@@ -17,7 +17,7 @@ token tables below, regenerate `tokens.css`, and every deck and view re-themes
 with no change to any renderer.
 
 > **Authoring contract:** the `## Tokens` tables below are machine-read by the
-> `design-system` skill to generate [`tokens.css`](./tokens.css). Keep the
+> `ux-design-system` skill to generate [`tokens.css`](./tokens.css). Keep the
 > `Token` and `Value` columns intact; the `Role` column is for humans. Token
 > *names* are the fixed contract (see the skill's `references/token-contract.md`)
 > — change values freely, but do not rename or drop a token.

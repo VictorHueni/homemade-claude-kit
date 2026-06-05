@@ -33,7 +33,7 @@ project-specific content.
 | New project from scratch     | `python scripts/init.py docs/communication/slides/{slug}` then fill brief + design system |
 | Add a slide                  | Create partial in project's `src/`, add to `config.yaml`  |
 | Edit a slide                 | Edit the partial directly, run `build.py --config`        |
-| Re-theme the brand (palette/fonts) | Edit `docs/ux/design-system.md` → `design-system generate` (shared `tokens.css` re-themes deck + viz) |
+| Re-theme the brand (palette/fonts) | Edit `docs/ux/design-system.md` → `ux-design-system generate` (shared `tokens.css` re-themes deck + viz) |
 | Restyle the deck only        | Edit project's `design/styles.css` (deck-only tokens + components) |
 | Prototype a variation        | Create file in project's `dist/prototypes/`               |
 | Build shareable HTML         | `python scripts/build.py --config path/to/config.yaml`    |
