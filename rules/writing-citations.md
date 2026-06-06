@@ -1,5 +1,6 @@
 ---
 paths:
+  - "docs/architecture/**"
   - "docs/business/**"
   - "docs/communication/**"
   - "docs/discovery/**"
