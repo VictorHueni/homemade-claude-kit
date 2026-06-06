@@ -2,12 +2,6 @@
 paths:
   - "docs/architecture/**"
   - "docs/business/**"
-  - "docs/communication/**"
-  - "docs/discovery/**"
-  - "docs/domain/**"
-  - "docs/exec-plans/**"
-  - "docs/product-specs/**"
-  - "docs/ux/**"
 ---
 
 # Mermaid diagrams (GitHub renderer)
