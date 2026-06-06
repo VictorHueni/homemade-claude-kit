@@ -395,6 +395,7 @@ The FBS sits at the **tactical product-decomposition layer**, downstream of the 
 | **Value Streams** | How value flows persona → stages → capabilities | FBS optionally links each functionality to a VS stage |
 | **Processes** | How operations happen | FBS doesn't link directly (processes operationalise capabilities, which FBS already links to) |
 | **FBS** *(this skill)* | What the product does, status-tracked | — |
+| **Use cases** | The actor↔system scenario (all paths) for a behaviour | A use case (`UC-NN`) *realises* one or more FBS functionalities — it adds the interaction the registry cannot hold; the FBS stays scenario-free |
 | **PRD** | What we will build for one functionality slice | Per-PRD soft-link to the FBS functionality IDs it delivers |
 | **Implementation plans** | How we will build it | Downstream of PRDs; no direct FBS link |
 
