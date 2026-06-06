@@ -73,36 +73,4 @@ supersedes: docs/domain/02b-bounded-contexts.md
 | `90d` | Value streams · Processes · BMC · Competitive landscape · FBS · Ideas · Runbooks · RCAs · Architecture research |
 | `180d` | Vision · Personas · Capability map · Bounded contexts · Glossary · Domain model · ADRs |
 
----
-
-## ADRs — status lives in frontmatter only
-
-The `## Status` section is **removed** from the MADR body. Frontmatter `status` is the single source of truth.
-
-Supersession follows the same conditional field rules as all other artefacts:
-
-```yaml
-# old ADR — status switches to superseded, superseded_by is added:
-status: superseded
-superseded_by: docs/architecture/decisions/adr-0003-use-cockroachdb.md
-
-# new ADR — created specifically as a replacement, so supersedes is added:
-status: active
-supersedes: docs/architecture/decisions/adr-0002-use-postgresql.md
-```
-
----
-
-## Audit enforcement (util-metamodel-audit)
-
-The audit skill checks every `docs/**/*.md` for:
-
-- Frontmatter block present
-- `status` is one of the four allowed values
-- `owner` is populated (not empty, not a placeholder)
-- `last_reviewed` + `review_interval` → flags files overdue for review
-- When `status: superseded` → `superseded_by` must be present and the target path must resolve to an existing file
-- When `supersedes` is present → target path must resolve to an existing file with `status: superseded`
-- ADR-specific: `## Status` section absent from body
-
-**Files named `README.md` are excluded from every check above** per the exemption stated at the top of this rule. If a `README.md` happens to carry frontmatter, the audit ignores it rather than validating it — the file is simply not in scope.
+**ADR note:** the `## Status` body section is removed from MADR files — frontmatter `status` is the single source of truth. Supersession fields and audit details live in `arch-adr/references/madr-templates.md`.

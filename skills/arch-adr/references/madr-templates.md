@@ -134,3 +134,21 @@ Chosen option: "<option x>", because <concise rationale>.
 - Prefer concrete titles that include the decision, not only the topic.
 - Keep filenames stable and searchable.
 - If superseding an old ADR, reference both ADR IDs explicitly.
+
+## Frontmatter Rules
+
+The `## Status` section is **removed** from the MADR body. Frontmatter `status` is the single source of truth — never duplicate it in the document body.
+
+Supersession adds conditional fields to the standard five-field block:
+
+```yaml
+# ADR being retired — status switches to superseded, superseded_by is added:
+status: superseded
+superseded_by: docs/architecture/decisions/adr-0003-use-cockroachdb.md
+
+# Replacement ADR — created specifically to replace the above, so supersedes is added:
+status: active
+supersedes: docs/architecture/decisions/adr-0002-use-postgresql.md
+```
+
+`util-metamodel-audit` enforces both: flags any ADR body that still contains a `## Status` heading, and verifies that `superseded_by` / `supersedes` paths resolve to existing files with the expected counterpart status.
