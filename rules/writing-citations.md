@@ -1,6 +1,8 @@
 ---
 paths:
-  - "docs/**"
+  - "docs/business/**"
+  - "docs/communication/**"
+  - "docs/discovery/**"
   - "**/bibliography.yaml"
 ---
 
