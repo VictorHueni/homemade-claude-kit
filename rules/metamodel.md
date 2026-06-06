@@ -1,8 +1,13 @@
 ---
 paths:
   - "docs/architecture/**"
-  - "docs/product-specs/**"
+  - "docs/business/**"
+  - "docs/communication/**"
+  - "docs/discovery/**"
   - "docs/domain/**"
+  - "docs/exec-plans/**"
+  - "docs/product-specs/**"
+  - "docs/ux/**"
   - "rules/metamodel.md"
 ---
 
