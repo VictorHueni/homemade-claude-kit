@@ -1,3 +1,9 @@
+---
+paths:
+  - "skills/**"
+  - ".claude/skills/**"
+---
+
 # Skill creation and cross-machine sync workflow
 
 How to create a new Claude skill, publish it to `homemade-claude-kit`, and make it available globally via dotfiles/chezmoi.

@@ -1,6 +1,6 @@
 ---
 paths:
-  - "**/*.md"
+  - "docs/**"
 ---
 
 # Mermaid diagrams (GitHub renderer)

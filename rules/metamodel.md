@@ -1,6 +1,8 @@
 ---
 paths:
-  - "docs/**"
+  - "docs/architecture/**"
+  - "docs/product-specs/**"
+  - "docs/domain/**"
   - "rules/metamodel.md"
 ---
 

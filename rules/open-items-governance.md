@@ -1,3 +1,8 @@
+---
+paths:
+  - "docs/**"
+---
+
 # Open Items Governance
 
 The kit captures unresolved work across many artefact types — research questions, missing
