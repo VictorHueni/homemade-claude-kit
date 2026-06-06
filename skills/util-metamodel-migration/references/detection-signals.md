@@ -13,6 +13,7 @@ A file whose name matches one of these patterns is likely the artefact type list
 | Filename pattern (glob) | Likely artefact type | Canonical skill | Canonical path |
 |---|---|---|---|
 | `*_prd_*.md` or `*-prd-*.md` | PRD | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` |
+| `uc-[0-9][0-9]-*.md` or `*use-case*.md` | Use case | `spec-use-case` | `docs/product-specs/use-cases/uc-NN-{slug}.md` |
 | `[0-9][0-9][0-9][0-9]-*.md` or `[0-9][0-9][0-9][0-9]_*.md` in a decisions-like folder | ADR | `arch-adr` | `docs/architecture/decisions/adr-NNNN-{topic}.md` |
 | `*-adr-*.md` (redundant adr in name) | ADR naming issue | `arch-adr` | Rename: remove `-adr` from filename |
 | `*runbook*.md` | Runbook | `ops-runbook` | `docs/ops/runbooks/{slug}.md` |
@@ -108,6 +109,7 @@ Read only `head -50 {file}`. Check for these high-signal headings. A content sig
 | `## The Elevator Pitch` or `## North Star Metric` heading | `business-vision` |
 | `OBJ-[0-9][0-9]` pattern or `KR-[0-9][0-9]\.[0-9]` pattern | `business-objective` |
 | `## Objective.*Epic traceability` | `business-objective` |
+| `## Main Success Scenario` with `## Extensions` nearby, or `Primary Actor` + `Level` header fields, or `UC-NN` pattern | `spec-use-case` (use case) |
 | `## §0 Traceability` with `BC-NN.CTR-NN` or `CTR-NN` pattern | `arch-service-contract` (service / interface contract) |
 | `## §2 Command catalogue` or `## §7 Error contract` with `CMD-NN` pattern | `arch-cli-contract` (CLI contract) |
 | `## Stack identity` with `verified-for:` in frontmatter | `dev-stack-guide` (stack developer guide) |

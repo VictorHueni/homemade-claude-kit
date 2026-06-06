@@ -81,6 +81,7 @@ Populate a scaffolded `docs/domain/07b-models/{bc-slug}.md` with real domain mod
 1. Read `docs/domain/02b-bounded-contexts.md` for BC-NN scope + capabilities owned.
 2. Read `docs/domain/02c-glossary.md` for the canonical term names — entity names MUST match GT-NN terms exactly.
 3. Read `docs/product-specs/07a-fbs.md` for functionalities the BC implements — each functional group is an aggregate candidate.
+3b. Read any `docs/product-specs/use-cases/uc-NN-*.md` for the BC's behaviours — each scenario step that changes state maps to a **command → domain event**; use-case scenarios are a prime driver of aggregate boundaries and event discovery (complements Event Storming).
 4. Identify aggregates: apply Vernon's rules (see `references/discipline.md`). Prefer small. Start with one entity per aggregate.
 5. For each aggregate: name the root, document invariants (≥2), list member entities and VOs, document the lifecycle state machine, and map commands to domain events.
 6. For each entity: define identity, list domain-meaningful attributes (no infrastructure), document behaviour methods.

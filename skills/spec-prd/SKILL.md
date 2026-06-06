@@ -37,8 +37,11 @@ ls docs/business/04a-value-streams.md 2>/dev/null
 
 **If artefacts exist:** extract the relevant IDs and use them to enrich the PRD
 (persona IDs `P-NN`, capability IDs `C-N.M`, FBS functionality IDs `C-N.M.FXX`,
-value-stream stage IDs `VS-N.M`). Do not ask the user to supply IDs you can read
-directly.
+value-stream stage IDs `VS-N.M`, use-case IDs `UC-NN`). Do not ask the user to
+supply IDs you can read directly. Read any `docs/product-specs/use-cases/uc-NN-*.md`
+the PRD delivers — the use case's main success scenario + extensions are the
+behavioural source for the acceptance criteria; reference them rather than
+re-deriving the scenario.
 
 **If artefacts are absent:** proceed with the generic PRD format (current
 behaviour). Use specific role descriptions in user stories rather than generic
@@ -110,6 +113,7 @@ Include an overall status at the top: `**Status:** draft | approved | in-progres
 | **Capabilities covered** | [C3.1 Schedule Generation](link) · [C3.2 Conflict Detection](link) |
 | **Primary value stream** | [VS-1.2 · Generate Schedule Draft](link) — Pain: Critical |
 | **Objective** | [OBJ-NN · Objective title](link to objectives.md) *(if objectives doc exists)* |
+| **Use cases delivered** | [UC-NN · Goal title](link to use-cases/) *(if `docs/product-specs/use-cases/` exists — the scenario grounds the acceptance criteria below)* |
 
 **FBS functionalities delivered by this PRD:**
 

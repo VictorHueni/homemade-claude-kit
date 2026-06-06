@@ -18,7 +18,7 @@ what order, and where to put it**.
 
 ---
 
-## The 18 artefacts and their skills
+## The 19 artefacts and their skills
 
 | # | Layer | Skill | Output file | Primary IDs |
 |---|---|---|---|---|
@@ -38,6 +38,7 @@ what order, and where to put it**.
 | 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
 | 8.5 | **CLI Surface Contract** (CLI command tree · flag contract · exit codes · output format — only when the product exposes a user-facing CLI) | `arch-cli-contract` | `docs/architecture/interfaces/cli-{slug}.md` (one per CLI tool) | `BC-NN.CLI-NN` / `CLI-NN` · `BC-NN.CLI-NN.CMD-NN` / `CLI-NN.CMD-NN` |
 | 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
+| 9.5 | **Use Cases** (actor↔system behavioural scenarios — all paths + guarantees) | `spec-use-case` | `docs/product-specs/use-cases/uc-NN-{slug}.md` (+ `index.md` registry) | `UC-NN` |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` | `PRD-NNNN` |
 | 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_exec_{slug}.md` | `Plan-NNNN`, `Inc-N` |
 
@@ -173,10 +174,20 @@ what order, and where to put it**.
                       │
                       ▼
    ┌──────────────────────────────────────────┐
+   │ spec-use-case (Step 9.5)                 │
+   │ (actor↔system scenarios — all paths)     │
+   │ Output: UC-NN                           │
+   │ Reads: P-NN (actor) · C-N.M.FXX (realises)│
+   │ Feeds: PRD · domain-model · test cases   │
+   └──────────────────┬───────────────────────┘
+                      │
+                      ▼
+   ┌──────────────────────────────────────────┐
    │ spec-prd (Build by Feature)              │
    │ Output: PRD-NNNN                         │
    │ One PRD per E-NN epic                    │
    │ References: E-NN · C-N.M.FXX · QA-XXNN  │
+   │   · UC-NN                               │
    └──────────────────┬───────────────────────┘
                       │
                       ▼
@@ -273,11 +284,17 @@ erDiagram
         string ADR_NNNN FK
         string P_NN FK
     }
+    USE_CASE {
+        string UC_NN PK
+        string P_NN FK
+        string C_NM_FXX FK
+    }
     PRD {
         string PRD_NNNN PK
         string E_NN FK
         string QA_XXNN FK
         string ADR_NNNN FK
+        string UC_NN FK
     }
     IMPLEMENTATION_PLAN {
         string Plan_NNNN PK
@@ -329,6 +346,9 @@ erDiagram
     ADR }o--o{ QUALITY_ATTRIBUTES : "decisions inform Security and Flexibility"
     ADR }o--o{ PRD : "decisions inform architecture"
     EPIC ||--|| PRD : "one PRD per epic"
+    PERSONA ||--o{ USE_CASE : "is primary actor of"
+    FBS ||--o{ USE_CASE : "realised by"
+    USE_CASE ||--o{ PRD : "grounds acceptance criteria"
     QUALITY_ATTRIBUTES ||--o{ PRD : "QA-XXNN in acceptance criteria"
     PRD ||--|| IMPLEMENTATION_PLAN : "one plan per PRD"
     INTERFACE_CONTRACT }o--o{ ADR : "versioning and auth decisions"
@@ -542,13 +562,25 @@ moving on.
 - Mode `fill` → one entry per sub-characteristic × product scope; measurable acceptance criterion + verification method; persona-grounded for IC and PE; reference ADR IDs for Security/Flexibility/Maintainability decisions
 **Output verification:** file exists; ≥1 entry per relevant ISO characteristic; all entries have measurable acceptance criteria; IC/PE entries reference P-NN personas; differentiator FBS features (★) have Reliability entries.
 
+### Step 9.5 — Use Cases (actor↔system behavioural scenarios)
+
+**Skill:** `spec-use-case`
+**Prerequisites:** Step 1 (Personas — `P-NN` become primary actors); Step 7 (FBS — `C-N.M.FXX` functionalities the use case *realises*). Optional: Steps 3–4 (a value-stream stage often supplies the trigger). Soft-linked, not blocking — author use cases even if the FBS is incomplete.
+**Process:**
+- Mode `scaffold` → create `docs/product-specs/use-cases/index.md` registry
+- Mode `fully-dressed` → author one use case (mint `UC-NN`); fix Scope + Level first; numbered main success scenario + per-step extensions + guarantees; `Realises: C-N.M.FXX`, `Primary Actor: P-NN`
+- Mode `casual` → lightweight prose variant for low-risk goals
+- Mode `slice` → Use-Case 2.0 — basic flow + alternative flows become backlog-ready slices (`UC-NN.S1`…), each with a test case
+- Mode `review` → quality-audit against the effective-use-case checklist (report-only)
+**Output verification:** `docs/product-specs/use-cases/index.md` + `uc-NN-*.md` exist; each states Scope + Level; main success scenario numbered/active-voice/UI-free; every step has its extensions; minimal + success guarantees present; `Realises:` links resolve to FBS IDs; user-goal level passes the coffee-break test.
+
 ### Step 10 — PRDs (Build by Feature)
 
 **Skill:** `spec-prd`
-**Prerequisites:** Step 8 (one PRD per E-NN epic — scope pre-defined); Step 9 (PRDs reference `QA-XXNN` in acceptance criteria); relevant ADRs (PRDs do not re-open decided architectural choices).
+**Prerequisites:** Step 8 (one PRD per E-NN epic — scope pre-defined); Step 9 (PRDs reference `QA-XXNN` in acceptance criteria); Step 9.5 (PRDs reference the `UC-NN` use cases they deliver — the scenario grounds the acceptance criteria); relevant ADRs (PRDs do not re-open decided architectural choices).
 **Process:**
 - One PRD per epic: `docs/product-specs/prds/prd-NNNN-{feature}.md`
-- Each PRD: §0 Architecture Traceability (E-NN, P-NN, C-N.M, QA-XXNN, FBS scope) · problem · goals · non-goals · user stories (persona-grounded, P-NN) · acceptance criteria · success metrics
+- Each PRD: §0 Architecture Traceability (E-NN, P-NN, C-N.M, QA-XXNN, UC-NN, FBS scope) · problem · goals · non-goals · user stories (persona-grounded, P-NN) · acceptance criteria · success metrics
 **Output verification:** ≥1 PRD per active epic (E-NN); each PRD references its E-NN, FBS IDs, and QA IDs; FBS functionality status promoted ⬜ → 🔄; Delivery Roadmap PRD link filled.
 
 ### Step 11 — Implementation Plans (atomic increments)
@@ -632,6 +664,7 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `RSK-NN` | Architectural risk or technical debt item — four types: `architectural`, `technical-debt`, `dependency`, `security` | `arch-arc42` (risks mode) |
 | `E-NN` | Epic + walking skeleton + phase plan (delivery roadmap) | `spec-delivery-roadmap` |
 | `QA-XXNN` | Quality attribute (characteristic prefix + counter, e.g. `QA-PE01`, `QA-SE03`) | `spec-quality-attributes` |
+| `UC-NN` | Use case (actor↔system behavioural scenario) | `spec-use-case` |
 | `PRD-NNNN` | PRD ID | `spec-prd` |
 | `Plan-NNNN` | Implementation plan | `spec-implementation-plan` |
 | `Inc-N` (within a plan) | Plan increment | `spec-implementation-plan` |
@@ -669,6 +702,7 @@ docs/
 │   └── 06a-models/                                      ← multi-file; keep subfolder
 │       └── qm-NN-{topic}.md (TAM/SAM/SOM, savings, ROI per model)
 ├── product-specs/                                       ← `spec-` skills (product delivery)
+│   ├── use-cases/                                       ← spec-use-case: index.md + uc-NN-{slug}.md (UC-NN)
 │   ├── 07a-fbs.md                                        ← spec-functional-breakdown-structure (C-N.M.FXX)
 │   ├── 08a-delivery-roadmap.md                           ← spec-delivery-roadmap (E-NN)
 │   ├── 09a-quality-attributes.md                         ← spec-quality-attributes (QA-XXNN)
@@ -836,6 +870,9 @@ Failing to update these files after a metamodel change will cause the audit and 
 > changed). Each entry logs one metamodel change and the cross-file coupling it
 > touched; the authoritative *why* for each is its row in
 > `docs/project-control/open-items/open-items.md`.
+
+**`spec-use-case` — new artefact step (Use Cases, Step 9.5, 2026-06-06):**
+New metamodel step minting `UC-NN`. Use cases are the actor↔system behavioural scenario (all paths + guarantees) that bridges the FBS/personas layer and PRDs/domain-model — synthesising Cockburn textual use cases + UML diagrams + Jacobson Use-Case 2.0. Output `docs/product-specs/use-cases/` (`index.md` + `uc-NN-{slug}.md`). All-additive coupling (no existing row changed meaning). Updated: `rules/metamodel.md` artefact count (18→19) + artefact table (row 9.5) + build order §9.5 + Step 10 prerequisites/§0-traceability (UC-NN added) + DAG (use-case node between QA and PRD) + ER diagram (USE_CASE entity + PRD.UC_NN FK + PERSONA/FBS/PRD relationships) + ID-conventions row (`UC-NN`) + canonical paths (`use-cases/`) + this entry · `README.md` artefact count + flowchart + ER + skill index · `spec-prd/SKILL.md` (§0 traceability + read-use-cases step) · `domain-model/SKILL.md` (scenarios → commands/events note) · `spec-functional-breakdown-structure/SKILL.md` (cross-ref lifecycle: use case *realises* C-N.M.FXX) · `util-metamodel-audit/references/check-catalogue.md` (Checks 1, 2, 5, 9) · `util-metamodel-migration/references/detection-signals.md` (§Filename + §Content signals). ID scheme `UC-NN` (two-digit — use cases number in the tens, like `P-NN`/`E-NN`).
 
 **`design-system` → `ux-design-system` skill rename (GitHub `open-item` [#41](https://github.com/VictorHueni/homemade-claude-kit/issues/41), 2026-06-04):**
 Reverses the OI-0026 sub-decision that kept the bare `design-system` name as a prefix→folder exception. The skill is now `ux-design-system`, following the standard `<category>-<artefact>` convention — making it the only naming exception removed (every skill name now carries its category prefix). **Skill identity only:** the `--design-system` renderer CLI flag and the `docs/ux/design-system.md` / `tokens.css` artefact filenames are unchanged (named after the design-system *concept*, not the skill). Mints no IDs, no artefact step → no ER/ID-conventions/Check-5 change. Updated: `skills/design-system/` → `skills/ux-design-system/` (`git mv`) + SKILL `name:`/title + README/discipline/generate_tokens skill-name refs · `rules/metamodel.md` supporting-skills bullet + Ongoing build-order note + canonical-paths tree comments + prefix→folder mapping (exception clause removed) + this entry · `rules/skill-creation-sync.md` (`ux-` category exception note removed) · `README.md` prefix→folder row + skill index · `skills/com-artefact-viz/**` + `skills/com-slide-deck/**` skill-name refs (not the `--design-system` flag). Tracked and closed as GitHub `open-item` [#41](https://github.com/VictorHueni/homemade-claude-kit/issues/41) (backend cut over 2026-06-04); PR #40 / merge commit `1db06c4` is the closure evidence. No `util-metamodel-audit`/`util-metamodel-scaffold`/`util-metamodel-migration` changes — output paths and detection signals are unchanged.
