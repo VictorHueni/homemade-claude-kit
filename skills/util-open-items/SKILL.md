@@ -61,7 +61,11 @@ I1–I5. The authoring surface for a github-backend project is the issue form
 
 **github adoption checklist** (per project, one-time):
 
-1. Copy `templates/open-item.form.yml` → `.github/ISSUE_TEMPLATE/open-item.yml`.
+1. The form template (`templates/open-item.form.yml`) lives in the skill and is used
+   internally by `sync` / `migrate` when constructing `gh issue create` calls — **no copy
+   to `.github/ISSUE_TEMPLATE/` is needed**. Copy it only if you want open-item issues
+   to be openable through the GitHub web UI form chooser (rare — the skill handles all
+   programmatic creation).
 2. Create the four Issue Types: `doc-gap`, `decision-gap`, `execution-item`, `tech-debt`.
 3. Create the Project (v2) with `Status` (Open / In progress / Blocked), `Priority`, and a
    `Review date` field.
