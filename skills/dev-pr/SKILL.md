@@ -1,9 +1,9 @@
 ---
 name: dev-pr
 description: "Use this skill when asked to create a pull request (PR). It ensures all PRs follow the repository's established templates and standards. Triggers on: create PR, open PR, pull request, draft PR."
-version: "1.0.0"
+version: "1.1.0"
 status: active
-last_reviewed: 2026-05-29
+last_reviewed: 2026-06-07
 user-invocable: true
 impact: "low"
 ---
@@ -15,90 +15,61 @@ repository's standards.
 
 ## Types (required)
 
-| Type       | Description                         | Changelog |
-| ---------- | ----------------------------------- | --------- |
-| `feat`     | New feature                         | Yes       |
-| `fix`      | Bug fix                             | Yes       |
-| `perf`     | Performance improvement             | Yes       |
-| `test`     | Adding/correcting tests             | No        |
-| `docs`     | Documentation only                  | No        |
-| `refactor` | Code change (no bug fix or feature) | No        |
-| `build`    | Build system or dependencies        | No        |
-| `ci`       | CI configuration                    | No        |
-| `chore`    | Routine tasks, maintenance          | No        |
+Minimal 7-type Conventional Commits set — the canonical default across all projects:
 
-## Scopes (optional but recommended)
-- `CLI` - Command Line Interface changes
-- `API` - Public API changes
-- `Ingestion` - Data ingestion components
-- `Rules Engine` - Rules engine modifications
-- `Claim Lifecycle` - Claim lifecycle management
-- `Review/Operations UI` - User interface for review and operations
-- `Data Store` - Data storage and retrieval systems
-  
+| Type       | Description                         |
+| ---------- | ----------------------------------- |
+| `feat`     | New feature                         |
+| `fix`      | Bug fix                             |
+| `docs`     | Documentation only                  |
+| `chore`    | Routine tasks, maintenance, deps     |
+| `refactor` | Code change (no bug fix or feature) |
+| `test`     | Adding or correcting tests          |
+| `perf`     | Performance improvement             |
+
+If the project's `commitlint.config.js` (or equivalent) defines a different type-enum, use that instead — read the file first and defer to it.
+
+## Scopes (optional)
+
+Infer the scope from the changed files or area of the codebase — do not use a hardcoded list. Examples: `auth`, `api`, `infra`, `deps`, `adr-0012`. Omit if the change spans multiple areas.
+
 ## Summary Rules
 
 - Use imperative present tense: "Add" not "Added"
 - Capitalize first letter
 - No period at the end
-- No ticket IDs
-- Add `(no-changelog)` suffix to exclude from changelog
+- No ticket IDs in the title (link issues in the PR body instead)
 
 ## Workflow
 
-Follow these steps to create a Pull Request:
-1. **Check current state**:
+1. **Detect base branch** — read `CONTRIBUTING.md` or `.github/` conventions to find the integration branch (commonly `staging` or `main`). Fall back to `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`.
+
+2. **Check current state**:
    ```bash
    git status
    git diff --stat
-   git log origin/master..HEAD --oneline
+   git log origin/<base-branch>..HEAD --oneline
    ```
 
-2. **Analyze changes** to determine:
-   - Type: What kind of change is this?
-   - Scope: Which package/area is affected?
-   - Summary: What does the change do?
+3. **Analyze changes** to determine type, scope, and summary.
 
-3. **Push branch if needed**:
+4. **Push branch if needed**:
    ```bash
    git push -u origin HEAD
    ```
 
-2.  **Locate Template**: Search for a pull request template in the repository.
-    - Check `.github/pull_request_template.md`
-    - Check `.github/PULL_REQUEST_TEMPLATE.md`
-    - If multiple templates exist (e.g., in `.github/PULL_REQUEST_TEMPLATE/`),
-      ask the user which one to use or select the most appropriate one based on
-      the context (e.g., `bug_fix.md` vs `feature.md`).
+5. **Read the PR template** — check `.github/PULL_REQUEST_TEMPLATE.md` (or `.github/pull_request_template.md`). If multiple templates exist under `.github/PULL_REQUEST_TEMPLATE/`, ask the user which to use.
 
-3.  **Read Template**: Read the content of the identified template file.
+6. **Draft description** that strictly follows the template structure:
+   - Keep every heading from the template
+   - Mark checklist items `[x]` only if actually completed; leave `[ ]` otherwise
+   - Fill sections with clear, concise content
 
-4.  **Draft Description**: Create a PR description that strictly follows the
-    template's structure.
-    - **Headings**: Keep all headings from the template.
-    - **Checklists**: Review each item. Mark with `[x]` if completed. If an item
-      is not applicable, leave it unchecked or mark as `[ ]` (depending on the
-      template's instructions) or remove it if the template allows flexibility
-      (but prefer keeping it unchecked for transparency).
-    - **Content**: Fill in the sections with clear, concise summaries of your
-      changes.
-    - **Related Issues**: Link any issues fixed or related to this PR (e.g.,
-      "Fixes #123").
-
-5.  **Create PR**: Use the `gh` CLI to create the PR. To avoid shell escaping
-    issues with multi-line Markdown, write the description to a temporary file
-    first.
-    ```bash
-    # 1. Write the drafted description to a temporary file
-    # 2. Create the PR using the --body-file flag
-    gh pr create --title "type(scope): succinct description" --body-file <temp_file_path>
-    # 3. Remove the temporary file
-    rm <temp_file_path>
-    ```
-    - **Title**: Ensure the title follows the
-      [Conventional Commits](https://www.conventionalcommits.org/) format if the
-      repository uses it (e.g., `feat(ui): add new button`,
-      `fix(core): resolve crash`).
+7. **Create PR** — write the body to a temp file to avoid shell escaping issues:
+   ```bash
+   gh pr create --title "type(scope): succinct description" --body-file <temp_file> --base <base-branch>
+   rm <temp_file>
+   ```
 
 ## Principles
 
@@ -106,50 +77,32 @@ Follow these steps to create a Pull Request:
 - **Completeness**: Fill out all relevant sections.
 - **Accuracy**: Don't check boxes for tasks you haven't done.
 
-
-
 ## Examples
 
-### Feature in editor
 ```
-feat(editor): Add workflow performance metrics display
-```
-
-### Bug fix in core
-```
-fix(core): Resolve memory leak in execution engine
-```
-
-### Node-specific change
-```
-fix(Slack Node): Handle rate limiting in message send
+feat(auth): Add magic-link login flow
+fix(api): Resolve tenant isolation leak in schedule query
+docs(adr-0012): Record staging environment strategy decision
+chore(deps): Bump @supabase/ssr to 0.6
+refactor(infra): Extract deploy script into reusable function
+test(rls): Add smoke test for cross-tenant data isolation
+perf(schedule): Cache tenant claim lookup per statement
 ```
 
-### Breaking change (add exclamation mark before colon)
+Breaking change (exclamation before colon):
 ```
-feat(API)!: Remove deprecated v1 endpoints
-```
-
-### No changelog entry
-```
-refactor(core): Simplify error handling (no-changelog)
-```
-
-### No scope (affects multiple areas)
-```
-chore: Update dependencies to latest versions
+feat(api)!: Remove deprecated v1 schedule endpoints
 ```
 
 ## Validation
 
 The PR title must match this pattern:
 ```
-^(feat|fix|perf|test|docs|refactor|build|ci|chore|revert)(\([a-zA-Z0-9 ]+( Node)?\))?!?: [A-Z].+[^.]$
+^(feat|fix|docs|chore|refactor|test|perf)(\([a-zA-Z0-9._-]+\))?!?: [A-Z].+[^.]$
 ```
 
 Key validation rules:
-- Type must be one of the allowed types
-- Scope is optional but must be in parentheses if present
-- Exclamation mark for breaking changes goes before the colon
-- Summary must start with capital letter
-- Summary must not end with a period
+- Type must be one of the 7 allowed types (or the project's commitlint type-enum if it differs)
+- Scope is optional; if present, use parentheses and keep it short
+- Breaking change exclamation mark goes before the colon
+- Summary starts with a capital letter and has no trailing period
