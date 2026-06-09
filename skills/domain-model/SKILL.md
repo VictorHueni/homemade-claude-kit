@@ -87,7 +87,7 @@ Populate a scaffolded `docs/domain/07b-models/{bc-slug}.md` with real domain mod
 6. For each entity: define identity, list domain-meaningful attributes (no infrastructure), document behaviour methods.
 7. For each value object: list attributes, state equality rule, document validation invariants, confirm replace-not-mutate.
 8. For each domain event: verify past tense + business meaning, document trigger, payload, consumers, and business significance.
-9. Draw Mermaid classDiagram showing aggregates, entities, VOs, and relationships.
+9. Draw Mermaid classDiagram showing aggregates, entities, VOs, and relationships. (Mermaid stays the inline default. When a diagram needs richer UML grammar Mermaid lacks — composite/nested aggregate **state machines**, full class models with multiplicities + stereotypes, or crow's-foot **ER** schemas — escalate that one diagram to **`arch-uml`** (`class` / `state` / `er` mode → PlantUML → committed SVG), carrying the `BC-NN.AGG-NN` IDs into its title. The domain-model text remains the single source of truth; the diagram is a view of it.)
 10. Run Mode 3 (Verify) discipline checks inline before delivering.
 
 ### Mode 3 — Verify
