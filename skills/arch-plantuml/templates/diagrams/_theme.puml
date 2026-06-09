@@ -1,14 +1,16 @@
 ' ─────────────────────────────────────────────────────────────────────
 ' _theme.puml — shared PlantUML theme for docs/architecture/diagrams/
 '
-' This is an INCLUDE FRAGMENT, not a diagram. It has no @startuml/@enduml
-' and is never rendered on its own (render.sh skips _*.puml).
+' This is an INCLUDE FRAGMENT, not a diagram. It has no start/end markers
+' of its own and is never rendered on its own (render.sh skips _*.puml).
 '
-' Every diagram pulls it in as its first line after @startuml:
-'     @startuml
-'     !include _theme.puml
-'     ...
-'     @enduml
+' Every diagram pulls it in via "!include _theme.puml" as the first line
+' after its opening marker. See seq-00-example.puml for the exact shape.
+'
+' NOTE: never write the literal start/end UML keywords at the head of a
+' comment line in an included fragment — the !include preprocessor strips
+' the leading comment quote and would treat them as real diagram
+' delimiters, breaking every diagram that includes this file.
 '
 ' Edit this one file to re-theme every diagram in the project — the
 ' analog of Structurizr's styles{} block.
