@@ -1,0 +1,97 @@
+' ─────────────────────────────────────────────────────────────────────
+' _theme.puml — shared PlantUML theme for docs/architecture/diagrams/
+'
+' This is an INCLUDE FRAGMENT, not a diagram. It has no start/end markers
+' of its own and is never rendered on its own (render.sh skips _*.puml).
+'
+' Every diagram pulls it in via "!include _theme.puml" as the first line
+' after its opening marker. See seq-00-example.puml for the exact shape.
+'
+' NOTE: never write the literal start/end UML keywords at the head of a
+' comment line in an included fragment — the !include preprocessor strips
+' the leading comment quote and would treat them as real diagram
+' delimiters, breaking every diagram that includes this file.
+'
+' Edit this one file to re-theme every diagram in the project — the
+' analog of Structurizr's styles{} block.
+' ─────────────────────────────────────────────────────────────────────
+
+' ── Canvas ──
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam defaultFontName "Helvetica"
+skinparam defaultFontSize 13
+skinparam dpi 150
+
+' ── Arrows / lines ──
+skinparam ArrowColor #4A4A4A
+skinparam ArrowThickness 1
+
+' ── Generic node palette (kit blue, echoing the C4 styles) ──
+skinparam roundCorner 8
+
+skinparam class {
+    BackgroundColor #438DD5
+    BorderColor #2C6FB0
+    FontColor #FFFFFF
+    AttributeFontColor #1A1A1A
+    ArrowColor #4A4A4A
+}
+
+skinparam usecase {
+    BackgroundColor #85BBF0
+    BorderColor #2C6FB0
+    FontColor #1A1A1A
+}
+
+skinparam actor {
+    BackgroundColor #08427B
+    BorderColor #062E56
+    FontColor #1A1A1A
+}
+
+skinparam state {
+    BackgroundColor #438DD5
+    BorderColor #2C6FB0
+    FontColor #FFFFFF
+    AttributeFontColor #1A1A1A
+    StartColor #08427B
+    EndColor #08427B
+}
+
+skinparam sequence {
+    ParticipantBackgroundColor #438DD5
+    ParticipantBorderColor #2C6FB0
+    ParticipantFontColor #FFFFFF
+    ActorBackgroundColor #08427B
+    ActorFontColor #1A1A1A
+    LifeLineBorderColor #B0B0B0
+    LifeLineBackgroundColor #EAF2FB
+    ArrowColor #4A4A4A
+    GroupBackgroundColor #EAF2FB
+    GroupBorderColor #2C6FB0
+}
+
+skinparam activity {
+    BackgroundColor #438DD5
+    BorderColor #2C6FB0
+    FontColor #FFFFFF
+    DiamondBackgroundColor #85BBF0
+    DiamondFontColor #1A1A1A
+    StartColor #08427B
+    EndColor #08427B
+    ArrowColor #4A4A4A
+}
+
+skinparam entity {
+    BackgroundColor #438DD5
+    BorderColor #2C6FB0
+    FontColor #FFFFFF
+}
+
+' ── Title / legend ──
+skinparam TitleFontSize 16
+skinparam TitleFontColor #08427B
+skinparam legendBackgroundColor #F4F8FC
+skinparam legendBorderColor #2C6FB0

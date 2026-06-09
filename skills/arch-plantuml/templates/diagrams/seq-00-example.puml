@@ -1,0 +1,26 @@
+@startuml
+!include _theme.puml
+title seq-00 — Pipeline smoke test (replace with real diagrams via arch-uml)
+
+' This diagram exists only to prove the render pipeline works end-to-end.
+' Once arch-uml authors real diagrams, delete this file.
+
+actor "User" as user
+participant "arch-plantuml\n(render pipeline)" as pipe
+participant "arch-uml\n(authoring)" as author
+
+user -> pipe : arch-plantuml init
+activate pipe
+pipe -> pipe : scaffold diagrams/ + render.sh + _theme.puml
+pipe --> user : pipeline ready (this SVG proves it)
+deactivate pipe
+
+user -> author : arch-uml seq | class | state | act | er | uc
+activate author
+author -> author : write <type>-NN-<slug>.puml
+author -> pipe : ./render.sh
+pipe --> author : views/<name>.svg
+author --> user : SVG embedded in the consuming markdown
+deactivate author
+
+@enduml

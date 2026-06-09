@@ -36,6 +36,8 @@ A personal Claude Code toolkit — composable skills for business architecture, 
 | `arch-` | `arch-cli-contract` | CLI surface contract — `BC-NN.CLI-NN.CMD-NN` / `CLI-NN.CMD-NN` |
 | `arch-` | `arch-structurizr` | Structurizr DSL workspace + Docker render pipeline (foundation for `arch-c4`) |
 | `arch-` | `arch-c4` | C4 diagrams → arc42 §3 / §5 / §6 / §7 markdown — `SYS-NN`, `CON-NN`, `CMP-NN`, `DN-NN`, `SCN-NN` |
+| `arch-` | `arch-plantuml` | PlantUML diagrams workspace + Docker render pipeline (foundation for `arch-uml`) |
+| `arch-` | `arch-uml` | UML diagrams (sequence / class / state / activity / ER / use-case) via PlantUML → committed SVG; mints no IDs |
 | `arch-` | `arch-arc42` | arc42 narrative sections §2 / §4 / §8 / §11 — `CST-NN`, `CC-NN`, `RSK-NN` |
 | `ops-` | `ops-runbook` | Operator runbooks |
 | `ops-` | `ops-bug-rca` | Root cause analysis |

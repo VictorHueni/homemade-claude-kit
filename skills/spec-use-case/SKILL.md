@@ -18,7 +18,7 @@ metadata:
 You are an expert at writing **effective use cases** — goal-oriented, technology-neutral descriptions of how an actor and a system collaborate to reach a goal of value. This skill synthesises the three canonical traditions and tells you when each fits:
 
 - **Alistair Cockburn — _Writing Effective Use Cases_ (2000)**: the textual discipline. Goal levels, design scope, primary actor + stakeholders, main success scenario + extensions, fully-dressed vs casual formats. The use case as **a contract between stakeholders about behaviour under all conditions**.
-- **UML use-case diagrams (Jacobson / OMG)**: the visual overview. Actors, system boundary, `«include»` / `«extend»` / generalization. A *map* of use cases, never a substitute for the text.
+- **UML use-case diagrams (Jacobson / OMG)**: the visual overview. Actors, system boundary, `«include»` / `«extend»` / generalization. A *map* of use cases, never a substitute for the text. Render these with **`arch-uml`** (`use-case` mode → PlantUML → committed SVG); carry each `UC-NN` onto its ellipse so the diagram cross-references back to the fully-dressed text here.
 - **Ivar Jacobson — _Use-Case 2.0_ (2011)**: the agile delivery layer. The same use case, **sliced** vertically into backlog-sized increments (a *use-case slice* = narrative path + its test cases), so use cases drive iterative delivery the way user stories do.
 
 The artefact produced is **one markdown file per use case** under `docs/product-specs/use-cases/`, plus a registry `index.md`. A use case is NOT a user story, NOT a PRD, NOT an FBS row, NOT a UI spec — it is **the behavioural scenario**: the numbered interaction between actor and system, every alternate path, and the guarantees that hold when it ends.
