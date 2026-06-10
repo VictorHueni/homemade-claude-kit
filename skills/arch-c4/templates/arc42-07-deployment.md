@@ -14,7 +14,9 @@ Each environment (Production / Staging / Development / …) is documented as its
 
 ## 7.1 Infrastructure overview
 
-_TODO_ — one paragraph naming each environment documented below and the primary infrastructure approach (e.g. "Single-cloud AWS with EKS for application containers, RDS for managed Postgres, MSK for Kafka. Production is multi-AZ within eu-west-1; Staging is single-AZ.").
+_(Narrative — owned by `arch-arc42`.)_ _TODO_ — one paragraph naming each environment documented below and the primary infrastructure approach (e.g. "Single-cloud AWS with EKS for application containers, RDS for managed Postgres, MSK for Kafka. Production is multi-AZ within eu-west-1; Staging is single-AZ.").
+
+Each appended §7.x environment block carries a generated block — the deployment diagram + the building-block→infrastructure mapping table — fenced by `<!-- arch-c4:start key=deployment-<env> -->` … `<!-- arch-c4:end key=deployment-<env> -->`. The Motivation and Quality/Performance narrative sit OUTSIDE the markers and are owned by `arch-arc42`. See ADR-0004.
 
 <!-- §7.x environment subsections appended below by `arch-c4 deployment <env>` runs -->
 

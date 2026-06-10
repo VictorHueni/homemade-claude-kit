@@ -10,11 +10,16 @@ review_interval: 180d
 
 > "The runtime view describes the concrete behavior and interactions of the system's building blocks in form of scenarios." — arc42 §6
 
-Each scenario below shows how containers in {{project_name}} collaborate to fulfil a specific use case. For the static structure of those containers, see [§5 Building Block View](./05-building-blocks.md). For aggregate-internal state machines, see [`docs/domain/07b-models/`](../../domain/07b-models/).
+Each scenario below shows how the system's building blocks collaborate to fulfil a specific use case. The **prose and the scenario identity (`SCN-NN`) are owned by `arch-arc42`**; the figure is *pulled* from a generator via the declared-dependency comment (see ADR-0004). For the static structure, see [§5 Building Block View](./05-building-blocks.md). For aggregate-internal state machines, see [`docs/domain/07b-models/`](../../domain/07b-models/).
+
+**Figure source — pick per the §6 boundary rule:**
+
+- **C4 dynamic view** (`arch-c4 runtime`, rendered to `../c4/views/`) — for cross-container flows tied to the C4 model.
+- **UML sequence** (`arch-uml sequence`, rendered to `../diagrams/views/`) — for intra-component / algorithmic detail richer than the C4 model carries (`alt`/`par`/`loop`).
 
 ---
 
-<!-- One §6.x block per scenario. Append via `arch-c4 runtime` mode. -->
+<!-- One §6.x block per scenario. Authored via `arch-arc42 runtime` mode. -->
 
 ## 6.1 {{scenario_title}} (`SCN-01`)
 
@@ -22,6 +27,8 @@ Each scenario below shows how containers in {{project_name}} collaborate to fulf
 
 **Participants:** _TODO_ — list `CON-NN` containers (and any `P-NN` actors or external `SYS-NN`) involved.
 
+<!-- arch-figure scenario=SCN-01 realises=UC-NN source=arch-c4 path=../c4/views/runtime-SCN-01-{{scenario_slug}}.svg -->
+<!-- UML alternative: source=arch-uml path=../diagrams/views/seq-NN-{{scenario_slug}}.svg -->
 ![{{scenario_slug}}](../c4/views/runtime-SCN-01-{{scenario_slug}}.svg)
 
 ### Step table
@@ -43,6 +50,8 @@ _TODO_ — describe what happens when step N fails. Skip if error handling is tr
 | Linked artefact | Relationship |
 |---|---|
 | [`docs/architecture/arc42/05-building-blocks.md`](./05-building-blocks.md) | Static structure of the `CON-NN` containers appearing in scenarios |
+| [`docs/architecture/c4/views/`](../c4/views/) | C4 **dynamic** view SVGs (`arch-c4 runtime`) — figure source for cross-container scenarios |
+| [`docs/architecture/diagrams/views/`](../diagrams/views/) | UML **sequence** SVGs (`arch-uml sequence`) — figure source for intra-component / algorithmic detail |
 | [`docs/domain/07b-models/`](../../domain/07b-models/) | Aggregate lifecycle state machines — do NOT duplicate here |
 | [`docs/architecture/arc42/07-deployment.md`](./07-deployment.md) | Where the containers here actually run |
 | [`docs/business/04-value-streams.md`](../../business/04-value-streams.md) | Value stream stages that motivated the scenario selection |

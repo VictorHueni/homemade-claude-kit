@@ -33,6 +33,7 @@ This is the authoring twin of `arch-c4`:
 ## What this skill is NOT
 
 - **Not for C4 diagrams.** Context / container / component / deployment / runtime are `arch-c4`'s job (via Structurizr). If the user wants "the architecture diagram," ask whether they mean C4 (→ `arch-c4`) or a UML behavioural/structural diagram (→ here). See `references/diagram-discipline.md`.
+- **arc42 §6 runtime — share the section with C4 (ADR-0004).** A `sequence` diagram is a valid arc42 §6 figure, but §6 is owned by `arch-arc42`, and the figure source is governed by a boundary rule: **C4 dynamic view** (`arch-c4 runtime`) for cross-container flows tied to the C4 model; **`arch-uml sequence`** only for intra-component / algorithmic detail needing rich `alt`/`par`/`loop`/composite logic. When `arch-arc42` selects a UML sequence for §6, produce the SVG and hand the path back — it owns the §6 embed and prose.
 - **Not a Mermaid replacement.** For a diagram that must render *inline* in GitHub markdown, use Mermaid (`rules/diagramming-mermaid.md`). PlantUML here renders to **committed SVG** — used when Mermaid's grammar is too thin (rich sequence `alt`/`par`, composite states, swimlane activities, full class/ER models).
 - **Not an ID minter.** A diagram visualises IDs that already belong to upstream artefacts (`UC-NN`, `BC-NN.AGG-NN`, `PROC-NN`, `P-NN`). Carry them into the `title` and labels; never invent a new ID scheme. The `-NN` in the filename only orders diagrams of the same type.
 - **Not a one-off renderer.** Every diagram lives as a `.puml` in the folder so it re-renders deterministically. Direct SVG hand-editing is forbidden — `arch-plantuml verify` flags drift.
@@ -73,14 +74,17 @@ Each mode follows the **same authoring workflow** below; the per-type syntax and
 5. **Validate + render.** Run `./docs/architecture/diagrams/render.sh <prefix>-NN-<slug>`. It runs `-checkonly` first; if the `.puml` doesn't parse, fix it before continuing. On success it writes `views/<prefix>-NN-<slug>.svg`.
 6. **Embed (if there's a consuming doc).** Add the SVG to the markdown that needs it, by relative path. Typical consumers:
    - use-case diagram → `docs/product-specs/use-cases/` (alongside the `spec-use-case` file or its `index.md`)
-   - class / state / ER → `docs/domain/` (the `domain-model` artefacts)
-   - sequence → the scenario's home (`docs/product-specs/use-cases/` or a `business-process` doc)
+   - class / state / ER → `docs/domain/` (the `domain-model` artefacts), **or arc42 §8** cross-cutting concepts
+   - sequence → the scenario's home (`docs/product-specs/use-cases/` or a `business-process` doc), **or arc42 §6** runtime view
    - activity → the `business-process` doc
 
    Embed syntax (path is relative to the consuming markdown):
    ```markdown
    ![seq-01 — Claim submission](../../architecture/diagrams/views/seq-01-claim-submission.svg)
    ```
+
+   **arc42 consumers are pull-side (ADR-0004).** When the consumer is an arc42 §6 or §8 section, **`arch-arc42` owns the embed** — it writes the `<!-- arch-figure … -->` declared-dependency block and the surrounding prose. In that case `arch-uml` does **not** edit the arc42 file: render the SVG, then report its path (and the `SCN-NN`/`CC-NN`/`UC-NN` it was given) back to `arch-arc42`, which wires it in.
+
    If there is no obvious consumer, leave the SVG in `views/` and report its path — the user wires it in.
 7. **Report** (see §Closing report).
 
