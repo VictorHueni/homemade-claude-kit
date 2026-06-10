@@ -197,7 +197,7 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `CON-NN` | `\bCON-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `CON_NN` in `container` block) |
 | `CMP-NN` | `\bCMP-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `CMP_NN` in `component` block) |
 | `DN-NN` | `\bDN-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `DN_NN` in `deploymentNode` block) |
-| `SCN-NN` | `\bSCN-[0-9]{2}\b` | `docs/architecture/arc42/06-runtime-view.md` (`arch-c4` runtime mode) |
+| `SCN-NN` | `\bSCN-[0-9]{2}\b` | `docs/architecture/arc42/06-runtime-view.md` (`arch-arc42` runtime mode — owns §6 + SCN-NN per ADR-0004; `arch-c4` only renders the dynamic-view SVG keyed by it) |
 | `CST-NN` | `\bCST-[0-9]{2}\b` | `docs/architecture/arc42/02-constraints.md` (`arch-arc42` constraints mode) |
 | `CC-NN` | `\bCC-[0-9]{2}\b` | `docs/architecture/arc42/08-cross-cutting-concepts.md` (`arch-arc42` cross-cutting mode) |
 | `RSK-NN` | `\bRSK-[0-9]{2}\b` | `docs/architecture/arc42/11-risks.md` (`arch-arc42` risks mode) |
@@ -313,6 +313,42 @@ done
 
 **Proposed fix template:** "Create the missing prerequisite artefact using `{skill}` before proceeding. The downstream artefact `{file}` has soft-links that will be `_TODO_` until the prerequisite exists."
 
+### Sub-check 7a — arc42 content-type ownership (ADR-0004)
+
+arc42 §3/§5/§7 are co-written: `arch-c4` owns the *generated block* (diagram + DSL-derived table) inside `<!-- arch-c4:start key=… -->` / `<!-- arch-c4:end key=… -->` markers; `arch-arc42` owns all prose outside them. §6/§8 figures are pulled via a `<!-- arch-figure … -->` declared-dependency block. Verify the joins:
+
+**Rules:**
+
+| Condition | Check |
+|---|---|
+| An `arch-c4:start key=K` marker exists | A matching `arch-c4:end key=K` exists (balanced, same key) — **Error** if unbalanced |
+| A `<!-- arch-figure … source=arch-uml path=P -->` block exists | `P` resolves to an existing SVG under `docs/architecture/diagrams/views/` (or is a `_TODO_` soft-reference) — **Warning** if missing |
+| A `<!-- arch-figure … source=arch-c4 path=P -->` block exists | `P` resolves to an existing SVG under `docs/architecture/c4/views/` (or `_TODO_`) — **Warning** if missing |
+| `source=arch-uml` but `path` is under `c4/views/` (or vice-versa) | Source/path mismatch — **Warning** |
+| An `arch-figure` block carries `scenario=SCN-NN` / `concept=CC-NN` / `realises=UC-NN` | That ID resolves in its owning artefact (Check 5 reuse) — **Warning** |
+| A rendered SVG under `c4/views/` or `diagrams/views/` is referenced by **no** arc42/doc embed | Orphaned figure (Check 13 reuse) — **Info** |
+| An `arch-figure` SVG's mtime is newer than the consuming section's `last_reviewed` | Possible prose drift — **Info** (never Error; re-render alone fires it) |
+
+**Detection:**
+```bash
+# Marker balance across arc42
+for f in docs/architecture/arc42/0{3,5,7}-*.md; do
+  [ -f "$f" ] || continue
+  s=$(grep -c 'arch-c4:start' "$f"); e=$(grep -c 'arch-c4:end' "$f")
+  [ "$s" -ne "$e" ] && echo "UNBALANCED arch-c4 markers ($s start / $e end): $f"
+done
+# Declared-figure paths resolve (skip _TODO_ soft-references)
+grep -rhoE '<!-- arch-figure[^>]*path=([^ ]+)' docs/architecture/arc42/ 2>/dev/null \
+  | grep -oE 'path=[^ ]+' | sed 's/path=//' | while read p; do
+    case "$p" in *_TODO_*) continue;; esac
+    [ -f "docs/architecture/$(echo "$p" | sed 's#^\.\./##')" ] || echo "FIGURE MISSING: $p"
+  done
+```
+
+**Severity:** Error (unbalanced markers) · Warning (missing/mismatched figure or unresolved ID) · Info (orphan, freshness)
+
+**Proposed fix template:** "arc42 figure/marker drift in `{file}`: {detail}. Re-run `arch-c4`/`arch-uml` to (re)produce the figure, or fix the `arch-figure` block / markers. Per ADR-0004, `arch-c4` owns content inside markers; `arch-arc42` owns the prose and the figure block."
+
 ---
 
 ## Check 8 — _TODO_ density
@@ -374,7 +410,7 @@ done | sort -rn
 | `docs/architecture/arc42/03-context.md` | `# 3. Context and Scope`, `## 3.1 Business Context` (with embedded `systemContext.svg`), `## 3.2 Technical Context`, `## Open Items` | `grep -q '## 3.1 Business Context\|## 3.2 Technical Context'` |
 | `docs/architecture/arc42/04-solution-strategy.md` | `# 4. Solution Strategy`, `## 4.1 Technology Decisions`, `## 4.2 Top-Level Decomposition`, `## 4.3 Quality Goal`, `## Open Items` | `grep -q '## 4.1 Technology\|## 4.3 Quality Goal'` |
 | `docs/architecture/arc42/05-building-blocks.md` | `# 5. Building Block View`, `## 5.1 Whitebox Overall System` with containers table including `Domain aggregates implemented` column, at least one `## 5.2.x` drill, `## Open Items` | `grep -q '## 5.1 Whitebox\|Domain aggregates implemented'` |
-| `docs/architecture/arc42/06-runtime-view.md` | `# 6. Runtime View`, at least one `## 6.x` scenario subsection with `SCN-NN` ID + step table, `## Open Items` | `grep -q '## 6\.\|SCN-[0-9]'` |
+| `docs/architecture/arc42/06-runtime-view.md` | `# 6. Runtime View`, at least one `## 6.x` scenario subsection with `SCN-NN` ID + step table + a `<!-- arch-figure … -->` block (figure from `arch-c4` dynamic or `arch-uml sequence`), `## Open Items`. Owned by `arch-arc42` per ADR-0004; marker/figure integrity in Check 7a. | `grep -q '## 6\.\|SCN-[0-9]'` |
 | `docs/architecture/arc42/07-deployment.md` | `# 7. Deployment View`, `## 7.1` overview, at least one per-environment `### Production` (or named env), Mapping table, `## Open Items` | `grep -q '## 7.1\|Mapping of building blocks'` |
 | `docs/architecture/arc42/08-cross-cutting-concepts.md` | `# 8. Cross-Cutting Concepts`, `## Concept catalogue` table with `CC-NN` IDs and `Applies to` column, `## Open Items` | `grep -q '## Concept catalogue\|CC-[0-9]'` |
 | `docs/architecture/arc42/11-risks.md` | `# 11. Risks and Technical Debt`, `## 11.1 Active Risks` table with `RSK-NN` IDs, `## 11.2 Technical Debt`, `## Open Items` | `grep -q '## 11.1\|RSK-[0-9]'` |

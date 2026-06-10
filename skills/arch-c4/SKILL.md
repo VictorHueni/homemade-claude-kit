@@ -1,6 +1,6 @@
 ---
 name: arch-c4
-description: "Author and refresh C4 diagrams (Levels 1–3, deployment, runtime views) via Structurizr DSL. Produces arc42 §3–§7 markdown with embedded SVGs; mints SYS-NN, CON-NN, CMP-NN, DN-NN, SCN-NN. Five modes: context (actors + external systems), container (internal tech stack), component (domain-aggregate-derived), deployment (environment nodes), runtime (sequenced scenarios). Edits docs/architecture/c4/workspace.dsl; writes arc42 under docs/architecture/arc42/. Enforces boundary discipline: BBV is technical decomposition, references domain model. Triggers on: C4 diagram, system context, container diagram, component diagram, deployment view, runtime view, architecture diagram, building block view."
+description: "Author and refresh C4 diagrams (Levels 1–3, deployment, runtime) via Structurizr DSL, and emit the DSL-derived tables for arc42 §3/§5/§7 as fenced generated blocks (arch-c4:start/end markers). The surrounding narrative is owned by arch-arc42 — arch-c4 authors no arc42 prose (see ADR-0004). Mints SYS-NN, CON-NN, CMP-NN, DN-NN; SCN-NN scenario IDs are owned by arch-arc42 §6, so runtime mode only renders the dynamic-view SVG keyed by a given SCN-NN. Five modes: context, container, component, deployment, runtime. Edits docs/architecture/c4/workspace.dsl; writes generated table blocks into docs/architecture/arc42/. Enforces boundary discipline: BBV is technical decomposition, references domain model. Triggers on: C4 diagram, system context, container diagram, component diagram, deployment view, runtime view, architecture diagram, building block view."
 version: "1.0.0"
 status: active
 last_reviewed: 2026-05-28
@@ -15,9 +15,11 @@ metadata:
   complexity: "high"
 ---
 
-# C4 model authoring → arc42 §3 / §5 / §7
+# C4 model authoring → arc42 §3 / §5 / §7 generated tables
 
-Single skill, four modes — each owns one arc42 architecture section and the corresponding C4 abstraction level. The Structurizr DSL workspace (`docs/architecture/c4/workspace.dsl`) is the single source of truth; this skill edits it, renders SVGs via `render.sh`, and writes the arc42 markdown that embeds them.
+Single skill, five modes. The Structurizr DSL workspace (`docs/architecture/c4/workspace.dsl`) is the single source of truth; this skill edits it, renders SVGs via `render.sh`, and writes **only the generated block** (the diagram embed + the DSL-derived table) into the arc42 markdown — fenced by `<!-- arch-c4:start key=… -->` / `<!-- arch-c4:end key=… -->` markers.
+
+**Ownership (ADR-0004 — ownership by content type):** `arch-c4` owns *derived* content (the C4 diagram + the table that is a projection of `workspace.dsl`). It authors **no arc42 narrative** — all prose, every section, plus the runtime scenario identity (`SCN-NN`), is owned by `arch-arc42`. The two skills co-write the §3/§5/§7 files: `arch-c4` only ever rewrites *between* its markers; everything outside them belongs to `arch-arc42`.
 
 > "The C4 model is a hierarchical way to think about the static structures of a software system in terms of containers, components, and code." — Simon Brown, [c4model.com](https://c4model.com)
 
@@ -30,20 +32,21 @@ Single skill, four modes — each owns one arc42 architecture section and the co
 - **Not a substitute for `domain-model`.** The Building Block View is technical decomposition (containers, components, modules — Spring Boot apps, Postgres databases, Kafka topics). It is **not** a re-statement of the domain model. See `references/boundary-discipline.md` for the three tests that keep them separate.
 - **Not a substitute for `domain-model` state machines.** Runtime scenarios show how containers exchange messages to fulfil a use case. They are NOT per-aggregate lifecycle diagrams (those live in `docs/domain/07b-models/`). See `references/boundary-discipline.md` for the dynamic/behavioral boundary.
 - **Not a one-off renderer.** Every edit goes through `workspace.dsl` so the model stays consistent across views. Direct SVG hand-editing is forbidden — `arch-structurizr verify` will flag drift.
+- **Not an arc42 narrative author.** Per ADR-0004, `arch-c4` writes only the *generated block* (diagram + DSL-derived table) inside its `arch-c4:start/end` markers. It never writes motivation paragraphs, cross-section prose, or §6 runtime narrative — that is `arch-arc42`. If the user asks for "the building-block prose," route the narrative to `arch-arc42` and keep your output inside the markers.
 
 ---
 
-## The four modes
+## The modes
 
-Each mode (a) edits `workspace.dsl`, (b) runs `render.sh` to produce one or more SVGs, (c) writes/updates one arc42 markdown file embedding those SVGs.
+Each *generated-table* mode (`context`, `container`, `component`, `deployment`) (a) edits `workspace.dsl`, (b) runs `render.sh` to produce SVGs, (c) writes **only the generated block** (diagram embed + table) into the arc42 file, between `<!-- arch-c4:start key=… -->` / `<!-- arch-c4:end key=… -->` markers. The `runtime` mode produces **only the dynamic-view SVG** (no §6 prose — `arch-arc42` owns §6 and the `SCN-NN` identity, and embeds the SVG via a declared-dependency block).
 
-| Mode | arc42 § | C4 level | DSL view type | View key pattern | Markdown file |
+| Mode | arc42 § | C4 level | DSL view type | View key pattern | Writes |
 |---|---|---|---|---|---|
-| `context` | §3 | Level 1 — System Context | `systemContext` | `systemContext` | `docs/architecture/arc42/03-context.md` |
-| `container` | §5.1 | Level 2 — Container | `container` | `containers` | `docs/architecture/arc42/05-building-blocks.md` (§5.1) |
-| `component` | §5.2 / §5.3 | Level 3 — Component | `component` | `components-<CON-NN>` | `docs/architecture/arc42/05-building-blocks.md` (one §5.2.x per drilled container) |
-| `deployment` | §7 | Deployment | `deployment` | `deployment-<env-slug>` | `docs/architecture/arc42/07-deployment.md` (one §7.x per environment) |
-| `runtime` | §6 | Dynamic (runtime) | `dynamic` | `runtime-<SCN-NN>-<slug>` | `docs/architecture/arc42/06-runtime-view.md` (one §6.x per scenario) |
+| `context` | §3 | Level 1 — System Context | `systemContext` | `systemContext` | generated block in `arc42/03-context.md` (keys `systemContext`, `systemContext-technical`) |
+| `container` | §5.1 | Level 2 — Container | `container` | `containers` | generated block in `arc42/05-building-blocks.md` (key `containers`) |
+| `component` | §5.2 / §5.3 | Level 3 — Component | `component` | `components-<CON-NN>` | generated block per drilled container in `arc42/05-building-blocks.md` (key `components-<CON-NN>`) |
+| `deployment` | §7 | Deployment | `deployment` | `deployment-<env-slug>` | generated block per environment in `arc42/07-deployment.md` (key `deployment-<env-slug>`) |
+| `runtime` | §6 *(figure only)* | Dynamic (runtime) | `dynamic` | `runtime-<SCN-NN>-<slug>` | **SVG only** — no markdown; `arch-arc42 runtime` owns §6 prose + `SCN-NN` and embeds the SVG |
 
 ---
 
@@ -90,7 +93,7 @@ System context: the system being documented + all communication partners (people
 4. Add relationships: typically actor → primary system, primary system ↔ external system. One direction per relationship (Structurizr renders bidirectional as two arrows).
 5. Add or update the `systemContext SYS_NN "systemContext"` view block.
 6. Run `./docs/architecture/c4/render.sh systemContext` — confirm `views/systemContext.svg` is produced.
-7. Generate `docs/architecture/arc42/03-context.md` from `templates/arc42-03-context.md` — embed the rendered SVG; fill §3.1 Business Context table (one row per communication partner) and §3.2 Technical Context table (channels + protocols).
+7. Write the **generated blocks** into `docs/architecture/arc42/03-context.md`: between `<!-- arch-c4:start key=systemContext -->`/`end` put the SVG embed + the §3.1 partners table (one row per communication partner); between `<!-- arch-c4:start key=systemContext-technical -->`/`end` put the §3.2 Technical Context table (channels + protocols). Rewrite **only** inside the markers — leave all surrounding narrative untouched (it is `arch-arc42`'s). If the file doesn't exist yet, create it from `templates/arc42-03-context.md` (shared with `arch-arc42`) and fill the marked blocks only.
 8. Run discipline checks (see `references/c4-model.md` §Quality checks).
 
 ---
@@ -133,7 +136,7 @@ Zoom inside the primary system: show its containers (deployable runtime units �
 3. Add inter-container relationships with technology labels (`"HTTPS/JSON"`, `"SQL/TCP"`, `"Kafka protocol"`, etc.).
 4. Add or update the `container SYS_NN "containers"` view block.
 5. Run `./render.sh containers`.
-6. Write/append §5.1 in `docs/architecture/arc42/05-building-blocks.md` — embed `containers.svg`; fill the containers table including the **`Domain aggregates implemented`** column. If a container implements no aggregate (e.g. an event bus), leave the cell empty. The column is mandatory — see `references/boundary-discipline.md`.
+6. Write the **generated block** in `docs/architecture/arc42/05-building-blocks.md` between `<!-- arch-c4:start key=containers -->`/`end` — embed `containers.svg`; fill the containers table including the **`Domain aggregates implemented`** column. If a container implements no aggregate (e.g. an event bus), leave the cell empty. The column is mandatory — see `references/boundary-discipline.md`. Rewrite only inside the markers; the §5.1 Motivation paragraph and §Important Interfaces prose are `arch-arc42`'s. Create the file from `templates/arc42-05-building-blocks.md` if absent.
 
 ---
 
@@ -170,7 +173,7 @@ Drill into **one container** at a time. Each invocation produces a §5.2.x subse
 2. Add intra-container component relationships.
 3. Add a `component CON_NN "components-CON-<NN>"` view block.
 4. Run `./render.sh components-CON-<NN>`.
-5. Append a §5.2.x subsection to `docs/architecture/arc42/05-building-blocks.md` — embed `components-CON-<NN>.svg`; fill the components table including `Domain aggregates implemented` (extracted from `properties.implements`) and optional `Code path` (extracted from `properties.code-path` if set).
+5. Append a §5.2.x **generated block** to `docs/architecture/arc42/05-building-blocks.md` between `<!-- arch-c4:start key=components-CON-<NN> -->`/`end` — embed `components-CON-<NN>.svg`; fill the components table including `Domain aggregates implemented` (extracted from `properties.implements`) and optional `Code path` (extracted from `properties.code-path` if set). Any "why this container was drilled" narrative around the block is `arch-arc42`'s.
 
 ---
 
@@ -213,13 +216,15 @@ Map containers onto infrastructure for one or more environments (dev / staging /
 3. Use `containerInstance CON_NN` to place container instances inside their deployment nodes. Reuse the container DSL identifier.
 4. Add a `deployment SYS_NN "<Environment>" "deployment-<env-slug>"` view block per environment.
 5. Run `./render.sh deployment-<env-slug>`.
-6. Write/append §7.x in `docs/architecture/arc42/07-deployment.md` — embed `deployment-<env-slug>.svg`; fill the per-environment table (Motivation, Quality/Performance features, Mapping of building blocks to infrastructure).
+6. Write the per-environment **generated block** in `docs/architecture/arc42/07-deployment.md` between `<!-- arch-c4:start key=deployment-<env-slug> -->`/`end` — embed `deployment-<env-slug>.svg` + the building-block→infrastructure mapping table. The Motivation and Quality/Performance narrative sit OUTSIDE the markers and are `arch-arc42`'s. Create the file from `templates/arc42-07-deployment.md` if absent.
 
 ---
 
-## Mode 5 — `runtime` (arc42 §6)
+## Mode 5 — `runtime` (arc42 §6 — **figure producer only**)
 
 Key runtime scenarios showing how containers (and optionally external systems) collaborate over time to fulfil an important use case. Uses Structurizr **dynamic views** — the same DSL elements, but ordered as a sequence with step numbers.
+
+**Ownership (ADR-0004):** `arch-arc42` owns arc42 §6 — the prose, the step table, and the scenario identity `SCN-NN`. This mode does **not** write `06-runtime-view.md`; it only edits the DSL `dynamic` block and renders the SVG keyed by a `SCN-NN` that `arch-arc42` has minted. `arch-arc42` then embeds the SVG via its §6 declared-dependency block. Use this mode only when the §6 boundary rule selects a **C4 dynamic view** (cross-container flow tied to the C4 model); for intra-component / algorithmic detail `arch-arc42` pulls an `arch-uml sequence` instead.
 
 ### Pre-flight
 
@@ -247,14 +252,11 @@ Key runtime scenarios showing how containers (and optionally external systems) c
 
 ### Fill process
 
-1. Assign the next `SCN-NN` ID to the scenario; choose a slug (e.g. `scn-01-claim-submission`).
+1. Use the `SCN-NN` supplied by `arch-arc42` (it owns §6 and mints the scenario identity). If invoked standalone, pause and have `arch-arc42 runtime` mint the `SCN-NN` first, then proceed. Choose a slug (e.g. `scn-01-claim-submission`).
 2. Inside the DSL `dynamic` block, list elements and relationships in step order: `<source> -> <target> "<message>" { properties { "step" "1" } }`.
 3. Add or update a `dynamic SYS_NN "runtime-<SCN-NN>-<slug>"` view block.
 4. Run `./docs/architecture/c4/render.sh runtime-<SCN-NN>-<slug>` — confirm `views/runtime-<SCN-NN>-<slug>.svg` is produced.
-5. Append a §6.x subsection to `docs/architecture/arc42/06-runtime-view.md` from `templates/arc42-06-runtime-view.md`:
-   - Embed the rendered SVG.
-   - Fill the step table (step number, sender, receiver, message, notes).
-   - Annotate any error flows inline or as a sub-subsection.
+5. **Report the rendered SVG path back to `arch-arc42`**, which embeds it in §6.x via its declared-dependency block (`<!-- arch-figure scenario=SCN-NN source=arch-c4 path=… -->`) and authors the step table + error flows. `arch-c4` writes no §6 markdown.
 
 ### Boundary rules — runtime vs domain-model
 
@@ -280,12 +282,13 @@ Key runtime scenarios showing how containers (and optionally external systems) c
 
 ## Closing report (every mode)
 
-- Mode executed (context / container / component / deployment)
+- Mode executed (context / container / component / deployment / runtime)
 - DSL edits made (number of elements added; new IDs assigned with their kit ID)
 - Views rendered (list of `<view-key>.svg` files produced)
-- arc42 markdown written / appended (file + section heading)
+- Generated block(s) written (file + marker key) — or, for `runtime`, the SVG path handed to `arch-arc42` (no markdown written)
 - Boundary checks: each component's `implements` field validated against `domain-model`; flag any orphan
-- Next step suggestion: typically the next mode in the order context → container → component → deployment, or `arch-runtime-view` once enough containers exist
+- Confirm: no prose written outside `arch-c4:start/end` markers (narrative is `arch-arc42`'s)
+- Next step suggestion: typically the next mode in the order context → container → component → deployment; for a runtime scenario, hand off to `arch-arc42 runtime`
 
 ---
 
@@ -295,18 +298,21 @@ Key runtime scenarios showing how containers (and optionally external systems) c
 - `references/arc42-mapping.md` — exact mapping table from C4 levels to arc42 sections; what each arc42 section requires that C4 doesn't natively cover (e.g. arc42 §3.2 Technical Context — channels + protocols, which C4 doesn't model directly)
 - `references/arc42-section-03.md` — arc42 §3 specification (embedded from arc42 v9.0 template; required reading before `context` mode)
 - `references/arc42-section-05.md` — arc42 §5 specification (embedded); §5.1 / §5.2 / §5.3 structure rules
-- `references/arc42-section-06.md` — arc42 §6 specification (embedded); runtime view purpose, content, and quality criteria
 - `references/arc42-section-07.md` — arc42 §7 specification (embedded)
+  (arc42 §6 spec moved to `arch-arc42/references/arc42-section-06.md` — `arch-arc42` owns §6 prose.)
 - `references/dsl-recipes.md` — copy-paste DSL fragments per mode
 - `references/view-styling.md` — tag-driven styling cookbook; `-mode dark` rendering note
 - `references/boundary-discipline.md` — the three tests separating BBV from `domain-model` and runtime view
 
 ## Templates
 
-- `templates/arc42-03-context.md` — §3 markdown skeleton (Business Context + Technical Context tables; SVG embed)
-- `templates/arc42-05-building-blocks.md` — §5 markdown skeleton (Level 1 whitebox + Level 2 black-box template; first-time generation only)
-- `templates/arc42-06-runtime-view.md` — §6 markdown skeleton (one §6.x per scenario; SVG embed + step table)
-- `templates/arc42-07-deployment.md` — §7 markdown skeleton (one §7.x per environment)
+These skeletons are **shared with `arch-arc42`** (it owns the narrative; `arch-c4` fills the marked generated blocks). `arch-c4` creates the file from the template only if it is absent, then writes inside the `arch-c4:start/end` markers.
+
+- `templates/arc42-03-context.md` — §3 skeleton; generated blocks keyed `systemContext` + `systemContext-technical`
+- `templates/arc42-05-building-blocks.md` — §5 skeleton; generated block keyed `containers` (§5.1) + `components-CON-NN` (§5.2.x)
+- `templates/arc42-07-deployment.md` — §7 skeleton; generated block keyed `deployment-<env-slug>` per environment
+
+(The §6 runtime template moved to `arch-arc42/templates/arc42-06-runtime-view.md` — `arch-arc42` owns §6; this skill only renders the dynamic-view SVG it embeds.)
 
 ---
 
@@ -318,8 +324,9 @@ Key runtime scenarios showing how containers (and optionally external systems) c
 - [ ] `properties.implements` set on every new `CMP-NN` (or explicitly empty with rationale)
 - [ ] View key follows the canonical pattern (see modes table above)
 - [ ] SVG rendered and committed under `docs/architecture/c4/views/`
+- [ ] Generated content written **only** inside `arch-c4:start/end` markers; no narrative authored (that is `arch-arc42`'s)
 - [ ] arc42 markdown file exists at canonical path and has standard frontmatter (see `rules/artefact-frontmatter.md`)
 - [ ] Every container/component row in arc42 §5 carries the `Domain aggregates implemented` field
 - [ ] (`runtime` mode) Every step in the `dynamic` view block has a step-number annotation; no orphan relationships
-- [ ] (`runtime` mode) Step table in §6.x matches the DSL step count exactly
+- [ ] (`runtime` mode) Used a `SCN-NN` minted by `arch-arc42`; rendered the SVG and handed the path to `arch-arc42` (wrote no §6 markdown)
 - [ ] Closing report delivered

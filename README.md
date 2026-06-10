@@ -35,10 +35,10 @@ A personal Claude Code toolkit — composable skills for business architecture, 
 | `arch-` | `arch-service-contract` | Service interface contract per BC — `BC-NN.CTR-NN` / `CTR-NN` |
 | `arch-` | `arch-cli-contract` | CLI surface contract — `BC-NN.CLI-NN.CMD-NN` / `CLI-NN.CMD-NN` |
 | `arch-` | `arch-structurizr` | Structurizr DSL workspace + Docker render pipeline (foundation for `arch-c4`) |
-| `arch-` | `arch-c4` | C4 diagrams → arc42 §3 / §5 / §6 / §7 markdown — `SYS-NN`, `CON-NN`, `CMP-NN`, `DN-NN`, `SCN-NN` |
+| `arch-` | `arch-c4` | C4 diagrams + DSL-derived table blocks for arc42 §3 / §5 / §7 (inside `arch-c4` markers; no narrative — ADR-0004) — `SYS-NN`, `CON-NN`, `CMP-NN`, `DN-NN` |
 | `arch-` | `arch-plantuml` | PlantUML diagrams workspace + Docker render pipeline (foundation for `arch-uml`) |
 | `arch-` | `arch-uml` | UML diagrams (sequence / class / state / activity / ER / use-case) via PlantUML → committed SVG; mints no IDs |
-| `arch-` | `arch-arc42` | arc42 narrative sections §2 / §4 / §8 / §11 — `CST-NN`, `CC-NN`, `RSK-NN` |
+| `arch-` | `arch-arc42` | arc42 narrative — owns ALL prose §2 / §4 / §6 / §8 / §11 (ADR-0004); §6/§8 pull figures from C4 or `arch-uml` — `CST-NN`, `SCN-NN`, `CC-NN`, `RSK-NN` |
 | `ops-` | `ops-runbook` | Operator runbooks |
 | `ops-` | `ops-bug-rca` | Root cause analysis |
 | `dev-` | `dev-stack-guide` | Per-technology developer guide + MCP discovery — `docs/dev-guides/{tech-slug}.md` |
