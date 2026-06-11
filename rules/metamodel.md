@@ -42,7 +42,7 @@ what order, and where to put it**.
 | 10 | **PRDs** (feature specs — Build by Feature) |
 | 11 | **Implementation plans** (atomic increments) |
 
-> **Per-type structural facts** — **minting skill**, id-format regex, file layout, default path, review interval, and property-schema reference — live **once** in the companion rule [`artefact-types-registry.md`](artefact-types-registry.md) (clew ADR-0006), the single structural source clew's `ARTEFACT_TYPE_CONFIGS` derives from. This table is the **build-order index** (step + artefact) only; per-step skill/path detail also appears in the build-order sections below.
+> **Per-type structural facts** — minting skill, id-format regex, file layout, default path, review interval, and property-schema reference — live in the companion rule [`artefact-types-registry.md`](artefact-types-registry.md). This table is the build-order index (step + artefact).
 
 **Supporting skills** (not in the main build order, used as needed):
 - `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
@@ -638,7 +638,7 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 
 ## Cross-doc ID conventions
 
-Artefact-type id_formats (`P-NN`, `C-N.M`, `BC-NN.AGG-NN`, `E-NN`, `PRD-NNNN`, …) are defined **once** — with their owning skill, layout, and path — in the structural registry [`artefact-types-registry.md`](artefact-types-registry.md). That registry is the single source; this section keeps only the IDs it does **not** own: diagram, C4/arc42, and sub-element identifiers that are not clew-persisted artefact types.
+Artefact-type id_formats are defined in the structural registry [`artefact-types-registry.md`](artefact-types-registry.md). This section lists the remaining IDs — diagram, C4/arc42, and sub-element identifiers — which are not artefact types.
 
 ### Diagram & sub-element IDs (not in the artefact-types registry)
 
@@ -836,7 +836,7 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 
 | What changed | Also update |
 |---|---|
-| New artefact **type**, or a change to its id_format / path / layout / skill | `rules/artefact-types-registry.md` → add or update the type's row (the single structural source clew's `ARTEFACT_TYPE_CONFIGS` derives from) |
+| New artefact **type**, or a change to its id_format / path / layout / skill | `rules/artefact-types-registry.md` → add or update the type's row |
 | New artefact step, new canonical path | `util-metamodel-audit/references/check-catalogue.md` → Check 1 (stack progress paths) |
 | New ID format (e.g. new `XX-NN` pattern) | `util-metamodel-audit/references/check-catalogue.md` → Check 5 (ID cross-reference regex patterns) |
 | New prerequisite dependency in the DAG | `util-metamodel-audit/references/check-catalogue.md` → Check 7 (dependency enforcement rules) |
