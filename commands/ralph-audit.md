@@ -16,7 +16,7 @@ Read the plan and its workspace, then verify each item. Report PASS / FAIL / WAR
 ### Workspace structure
 1. Workspace dir exists at `docs/exec-plans/active/NNNN_feature-name/`
 2. Exec plan file matches `*_exec_*.md` inside the workspace (not at the parent level)
-3. If the exec plan frontmatter contains a `prd:` field, the referenced file exists at that path (relative to git root) — FAIL if field is present but file is missing; PASS (no PRD) if field is absent
+3. If the exec plan frontmatter contains a `prd:` field, the referenced file exists at that path (relative to git root) — FAIL if field is present but file is missing; if field is absent, extract the NNNN prefix from the exec plan filename and check whether `docs/product-specs/prds/prd-NNNN-*.md` exists — WARN if a matching PRD is found but not linked ("PRD found at `<path>` but not linked via prd: frontmatter field")
 4. `progress.txt` exists in the workspace
 
 ### Plan header
