@@ -36,9 +36,7 @@ Before starting the Ralph Loop:
 Before the first iteration, prepare the workspace:
 
 1. **Create workspace directory**: `docs/exec-plans/active/NNNN_feature-name/`
-2. **Move artifacts into workspace**:
-   - Move exec plan from `docs/exec-plans/active/NNNN_exec_feature-name.md` into the workspace
-   - Optional: copy PRD from `docs/product-specs/prds/prd-NNNN-{feature}.md` into the workspace
+2. **Move exec plan into workspace**: Move `docs/exec-plans/active/NNNN_exec_feature-name.md` into the workspace directory. The exec plan's `prd:` frontmatter field (if present) points to the PRD at its canonical location — no copy needed.
 3. **Create progress log**: `docs/exec-plans/active/NNNN_feature-name/progress.txt`
 4. **Create feature branch**: `git checkout -b ralph/NNNN-feature-name`
 
@@ -46,8 +44,7 @@ Workspace structure after setup:
 
 ```text
 docs/exec-plans/active/NNNN_feature-name/
-  NNNN_exec_feature-name.md     # Execution plan (source of truth)
-  prd-NNNN-feature-name.md      # Optional PRD copy for acceptance tracking
+  NNNN_exec_feature-name.md     # Execution plan (prd: frontmatter field links to canonical PRD)
   progress.txt                  # Iteration log
 ```
 
@@ -60,11 +57,12 @@ Each iteration follows this exact sequence:
 3. **Implement**: Execute the increment's scope items. Follow the primary files list.
 4. **Run test gate**: Execute every command listed in the increment's test gate section.
 5. **Pottery wheel**: If any test gate fails, fix the issue and re-run. Maximum 3 retries per increment.
-6. **Mark done**: Change the increment's status from `in-progress` to `done`.
-7. **Update PRD if present**: Check off any acceptance criteria (`- [ ]` → `- [x]`) satisfied by this increment.
-8. **Commit**: Stage and commit with the convention below.
-9. **Log progress**: Append an entry to `progress.txt`.
-10. **Exit or continue**: If more `pending` increments remain and running interactively, continue to step 1. If running via `ralph.sh`, exit with `RALPH_COMPLETE` signal so the script can spawn a fresh agent.
+6. **Verify exit criteria**: Confirm every statement in the increment's exit criteria section holds. If a criterion is not met, treat it as a test gate failure and re-enter the pottery wheel.
+7. **Mark done**: Change the increment's status from `in-progress` to `done`.
+8. **Update PRD if present**: Check off any acceptance criteria (`- [ ]` → `- [x]`) satisfied by this increment. Update each user story's `**Status:**` (`pending` → `in-progress` if some criteria are now checked; `in-progress` → `done` if all criteria for that story are checked). After updating user stories, update the top-level PRD `**Status:**`: set to `in-progress` on the first increment that checks any criterion; set to `complete` when all user story statuses are `done`.
+9. **Commit**: Stage and commit with the convention below.
+10. **Log progress**: Append an entry to `progress.txt`.
+11. **Exit or continue**: If more `pending` increments remain and running interactively, continue to step 1. If running via `ralph.sh`, exit with `RALPH_COMPLETE` signal so the script can spawn a fresh agent.
 
 ## Marking Convention
 
@@ -134,10 +132,9 @@ The loop is complete when:
 When all increments are done:
 
 1. **Move exec plan**: Move from workspace to `docs/exec-plans/completed/`.
-2. **Move PRD if present**: Copy from workspace back to `docs/product-specs/prds/` (overwrite with updated checkboxes). Set PRD status to `complete`.
-3. **Delete progress log**: Remove `progress.txt`.
-4. **Remove workspace**: Delete the empty `NNNN_feature-name/` directory.
-5. **Optional**: Invoke `git-dev-pr` to open a pull request for the feature branch.
+2. **Delete progress log**: Remove `progress.txt`.
+3. **Remove workspace**: Delete the empty `NNNN_feature-name/` directory.
+4. **Optional**: Invoke `git-dev-pr` to open a pull request for the feature branch.
 
 ## Error Recovery
 
@@ -168,6 +165,6 @@ If the agent or script crashes mid-iteration:
 
 `ralph.sh` supports three PRD modes:
 
-- `auto` (default) — if the workspace contains `prd-*.md`, the agent reads and updates it; otherwise the loop runs plan-only.
-- `--with-prd` — require a PRD in the workspace and fail fast if it is missing.
-- `--without-prd` — ignore any PRD file and run using only the execution plan and progress log.
+- `auto` (default) — if the exec plan's frontmatter contains a `prd:` field pointing to an existing file, the agent reads and updates it; otherwise the loop runs plan-only.
+- `--with-prd` — require a `prd:` field in the exec plan frontmatter pointing to an existing file; fail fast if absent or unresolvable.
+- `--without-prd` — ignore any `prd:` field and run using only the execution plan and progress log.

@@ -127,16 +127,28 @@ if [[ -z "$EXEC_PLAN" ]]; then
   exit 1
 fi
 
-PRD_FILE=$(find "$WORKSPACE_DIR" -maxdepth 1 -name '*_prd_*.md' -type f | head -1)
+# Resolve PRD path from exec plan frontmatter (prd: field)
+GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo ".")
+PRD_FIELD=$(awk '/^---/{c++; next} c==1 && /^prd:/{sub(/^prd:[[:space:]]*/,""); gsub(/"/,""); print; exit}' "$EXEC_PLAN")
+PRD_FILE=""
+if [[ -n "$PRD_FIELD" ]]; then
+  PRD_FILE="$GIT_ROOT/$PRD_FIELD"
+  if [[ ! -f "$PRD_FILE" ]]; then
+    echo "Warning: exec plan prd: field points to non-existent file: $PRD_FILE" >&2
+    PRD_FILE=""
+  fi
+fi
+
 case "$PRD_MODE" in
   with)
     if [[ -z "$PRD_FILE" ]]; then
-      echo "Error: --with-prd requires a PRD (*_prd_*.md) in $WORKSPACE_DIR" >&2
+      echo "Error: --with-prd requires a prd: field in the exec plan frontmatter pointing to an existing file" >&2
       exit 1
     fi
     EFFECTIVE_PRD_MODE="with-prd"
     ;;
   without)
+    PRD_FILE=""
     EFFECTIVE_PRD_MODE="without-prd"
     ;;
   auto)
@@ -173,6 +185,7 @@ build_prompt() {
   sed \
     -e "s|{{WORKSPACE_DIR}}|$WORKSPACE_DIR|g" \
     -e "s|{{PRD_MODE}}|$EFFECTIVE_PRD_MODE|g" \
+    -e "s|{{PRD_PATH}}|${PRD_FILE:-none}|g" \
     "$ITERATION_PROMPT"
 }
 

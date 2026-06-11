@@ -16,7 +16,7 @@ Read the plan and its workspace, then verify each item. Report PASS / FAIL / WAR
 ### Workspace structure
 1. Workspace dir exists at `docs/exec-plans/active/NNNN_feature-name/`
 2. Exec plan file matches `*_exec_*.md` inside the workspace (not at the parent level)
-3. Optional PRD file matches `prd-*.md` inside the workspace
+3. If the exec plan frontmatter contains a `prd:` field, the referenced file exists at that path (relative to git root) — FAIL if field is present but file is missing; PASS (no PRD) if field is absent
 4. `progress.txt` exists in the workspace
 
 ### Plan header
@@ -41,7 +41,7 @@ Read the plan and its workspace, then verify each item. Report PASS / FAIL / WAR
 ### Ralph readiness
 18. At least one increment has `**Status:** pending` (otherwise the loop has nothing to do)
 19. No increment has `**Status:** blocked` (would halt the loop immediately)
-20. If a PRD is present, it has user stories with acceptance criteria that map to increments in the plan
+20. If the exec plan frontmatter has a `prd:` field, the referenced PRD has user stories with acceptance criteria that map to increments in the plan
 
 ## Output format
 
@@ -58,7 +58,7 @@ Read the plan and its workspace, then verify each item. Report PASS / FAIL / WAR
    - `<repo-root-or-worktree-path>` — resolve via `git rev-parse --show-toplevel` from the current working directory.
    - `<workspace-dir>` — path to the workspace relative to the repo root.
    - `<N>` — number of pending increments plus a buffer of 3.
-   - Add `--with-prd` if a PRD file is present in the workspace.
+   - Add `--with-prd` if the exec plan frontmatter has a `prd:` field pointing to an existing file.
    - Add `--without-prd` only if the user should explicitly skip PRD tracking (otherwise the default auto-detect is fine).
    - Do NOT add `--with-push` unless the user asked for it.
 
