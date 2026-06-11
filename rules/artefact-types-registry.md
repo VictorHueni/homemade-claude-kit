@@ -117,10 +117,11 @@ Flagged rather than silently resolved (this registry is meant to *surface* drift
    [`artefact-frontmatter.md` §Default review intervals](artefact-frontmatter.md);
    nearest-analogue values are assigned here and must be ratified by adding rows to that
    rule.
-8. **c4 / arc42 diagram-ID types deferred** — `SYS/CON/CMP/DN` (`arch-c4`) and
-   `SCN/CST/CC/RSK` (`arch-arc42`) mint IDs but are diagram/figure identifiers of a
-   different class; deferred from this first registry pass pending a decision on whether
-   they belong here or in a diagram-specific registry.
+8. **c4 / arc42 diagram-ID types stay out (decided 2026-06-11)** — `SYS/CON/CMP/DN`
+   (`arch-c4`), `SCN/CST/CC/RSK` (`arch-arc42`), and `Inc-N` (plan increment) mint IDs but
+   are diagram / figure / sub-element identifiers, **not clew-persisted artefact types**.
+   They remain defined in `metamodel.md` §Cross-doc ID conventions, not here — that section
+   was trimmed to keep only those non-artefact IDs. This registry covers artefact types only.
 9. **clew `ARTEFACT_TYPE_CONFIGS` derivation** — per ADR-0006 Phase 4, clew must derive its
    runtime config from this table and assert equality in CI. Not yet wired (clew has no
    code yet).
