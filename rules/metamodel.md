@@ -20,29 +20,29 @@ what order, and where to put it**.
 
 ## The 19 artefacts and their skills
 
-| # | Layer | Skill | Output file | Primary IDs |
-|---|---|---|---|---|
-| 0 | **Product Vision** (why — the north star) | `business-vision` | `docs/VISION.md` | *(singleton — no ID; referenced by path)* |
-| 1 | **Personas** (who) | `business-persona` | `docs/business/01a-personas.md` | `P-NN` |
-| 2 | **Business Capability Map** (what abilities) | `business-capability-map` | `docs/business/03a-capability-map.md` | `C-N.M` (e.g. `C1`, `C1.1`, `C1.1.1` at L2 rare) |
-| 2b | **Bounded Context Map** (domain boundaries + context map) | `domain-bounded-context` | `docs/domain/02b-bounded-contexts.md` + `docs/domain/02b-context-map.md` | `BC-NN` |
-| 2c | **Domain Glossary** (ubiquitous language per bounded context) | `domain-glossary` | `docs/domain/02c-glossary.md` | `BC-NN.GT-NN` |
-| 3 | **Value Streams** (how value flows) | `business-value-stream` | `docs/business/04a-value-streams.md` + `docs/business/04a-vpc-{segment}.md` (optional VPC per VS) | `VS-N`, `VS-N.M` (stages) |
-| 4.5 | **Business Objectives** (why — strategic intent) | `business-objective` | `docs/business/04b-objectives.md` | `OBJ-NN`, `KR-NN.M` |
-| 4 | **Business Processes** (operational how) | `business-process` | `docs/business/05a-processes/proc-NN-{slug}.md` (one file per process) | per-process slug |
-| 5 | **Business Model Canvas** (commercial wrapper) | `business-model-canvas` | `docs/business/02a-bmc.md` or `docs/business/02a-lean-canvas.md` + optional `docs/business/02a-vpc-{segment}.md` | block IDs (CS-N, VP-N, …) |
-| 6 | **Quantitative models** (numbers) | `business-quantitative-model` | `docs/business/06a-models/qm-NN-{topic}.md` | per-model slug |
-| 7 | **Functional Breakdown Structure** (functionality registry) | `spec-functional-breakdown-structure` | `docs/product-specs/07a-fbs.md` | `C-N.M.FXX` (capability + functionality counter) |
-| 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) | `domain-model` | `docs/domain/07b-models/{bc-slug}.md` (one per BC) | `BC-NN.AGG-NN` · `BC-NN.ENT-NN` · `BC-NN.VO-NN` · `BC-NN.EVT-NN` |
-| 7c | **Interface Contract** (external API surface — sync REST/gRPC/SDK + async events) | `arch-service-contract` | `docs/architecture/interfaces/{bc-slug}.md` (BC-scoped) or `docs/architecture/interfaces/{slug}.md` (product-level) | `BC-NN.CTR-NN` (BC-scoped) · `CTR-NN` (product-level) |
-| 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) | `spec-delivery-roadmap` | `docs/product-specs/08a-delivery-roadmap.md` | `E-NN` |
-| 8.5 | **CLI Surface Contract** (CLI command tree · flag contract · exit codes · output format — only when the product exposes a user-facing CLI) | `arch-cli-contract` | `docs/architecture/interfaces/cli-{slug}.md` (one per CLI tool) | `BC-NN.CLI-NN` / `CLI-NN` · `BC-NN.CLI-NN.CMD-NN` / `CLI-NN.CMD-NN` |
-| 9 | **Quality Attributes** (how well the system performs) | `spec-quality-attributes` | `docs/product-specs/09a-quality-attributes.md` | `QA-PE01`, `QA-SE03` … (characteristic prefix + counter) |
-| 9.5 | **Use Cases** (actor↔system behavioural scenarios — all paths + guarantees) | `spec-use-case` | `docs/product-specs/use-cases/uc-NN-{slug}.md` (+ `index.md` registry) | `UC-NN` |
-| 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `docs/product-specs/prds/prd-NNNN-{feature}.md` | `PRD-NNNN` |
-| 11 | **Implementation plans** (atomic increments) | `spec-implementation-plan` | `docs/exec-plans/active/{NNNN}_exec_{slug}.md` | `Plan-NNNN`, `Inc-N` |
+| # | Artefact |
+|---|---|
+| 0 | **Product Vision** (why — the north star) |
+| 1 | **Personas** (who) |
+| 2 | **Business Capability Map** (what abilities) |
+| 2b | **Bounded Context Map** (domain boundaries + context map) |
+| 2c | **Domain Glossary** (ubiquitous language per bounded context) |
+| 3 | **Value Streams** (how value flows) |
+| 4.5 | **Business Objectives** (why — strategic intent) |
+| 4 | **Business Processes** (operational how) |
+| 5 | **Business Model Canvas** (commercial wrapper) |
+| 6 | **Quantitative models** (numbers) |
+| 7 | **Functional Breakdown Structure** (functionality registry) |
+| 7b | **Domain Model** (entities · aggregates · value objects · domain events per BC) |
+| 7c | **Interface Contract** (external API surface — sync REST/gRPC/SDK + async events) |
+| 8 | **Delivery Roadmap** (Plan by Feature — delivery grouping) |
+| 8.5 | **CLI Surface Contract** (CLI command tree · flag contract · exit codes · output format — only when the product exposes a user-facing CLI) |
+| 9 | **Quality Attributes** (how well the system performs) |
+| 9.5 | **Use Cases** (actor↔system behavioural scenarios — all paths + guarantees) |
+| 10 | **PRDs** (feature specs — Build by Feature) |
+| 11 | **Implementation plans** (atomic increments) |
 
-> **Structural per-type facts** — id-format regex, file layout, default path, review interval, and property-schema reference for each type — live in the companion rule [`artefact-types-registry.md`](artefact-types-registry.md) (clew ADR-0006). This table stays build-order-focused; the registry is the single structural source clew's `ARTEFACT_TYPE_CONFIGS` derives from.
+> **Per-type structural facts** — **minting skill**, id-format regex, file layout, default path, review interval, and property-schema reference — live **once** in the companion rule [`artefact-types-registry.md`](artefact-types-registry.md) (clew ADR-0006), the single structural source clew's `ARTEFACT_TYPE_CONFIGS` derives from. This table is the **build-order index** (step + artefact) only; per-step skill/path detail also appears in the build-order sections below.
 
 **Supporting skills** (not in the main build order, used as needed):
 - `arch-adr` — Architecture Decision Records → `docs/architecture/decisions/adr-{NNNN}-{slug}.md`. **Sequencing rule:** ADRs governing security, flexibility, or maintainability must be written before Step 9 (Quality Attributes) so the QA doc can reference them. All ADRs must precede Step 10 (PRDs) that depend on their decisions. Invoke ADRs as soon as an architectural choice must be made — they are not a post-hoc documentation exercise.
@@ -638,26 +638,12 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 
 ## Cross-doc ID conventions
 
+Artefact-type id_formats (`P-NN`, `C-N.M`, `BC-NN.AGG-NN`, `E-NN`, `PRD-NNNN`, …) are defined **once** — with their owning skill, layout, and path — in the structural registry [`artefact-types-registry.md`](artefact-types-registry.md). That registry is the single source; this section keeps only the IDs it does **not** own: diagram, C4/arc42, and sub-element identifiers that are not clew-persisted artefact types.
+
+### Diagram & sub-element IDs (not in the artefact-types registry)
+
 | ID format | Meaning | Owned by |
 |---|---|---|
-| `P-NN` | Persona | `business-persona` |
-| `C-N.M` (e.g. `C1`, `C1.1`, `C1.1.1`) | Capability (L0 / L1 / L2) | `business-capability-map` |
-| `VS-N` | Value stream | `business-value-stream` |
-| `VS-N.M` | Value-stream stage | `business-value-stream` |
-| `OBJ-NN` | Business Objective | `business-objective` |
-| `KR-NN.M` | Key Result (M under Objective N) | `business-objective` |
-| `C-N.M.FXX` | Functionality (capability + counter) | `spec-functional-breakdown-structure` |
-| `BC-NN` | Bounded Context | `domain-bounded-context` |
-| `BC-NN.GT-NN` | Glossary Term (scoped to bounded context) | `domain-glossary` |
-| `BC-NN.AGG-NN` | Aggregate root (scoped to bounded context) | `domain-model` |
-| `BC-NN.ENT-NN` | Entity (scoped to bounded context) | `domain-model` |
-| `BC-NN.VO-NN` | Value Object (scoped to bounded context) | `domain-model` |
-| `BC-NN.EVT-NN` | Domain Event (scoped to bounded context) | `domain-model` |
-| `BC-NN.CTR-NN` | Interface Contract element, **BC-scoped** — API is the direct surface of one BC (microservices, per-service APIs) | `arch-service-contract` |
-| `CTR-NN` | Interface Contract element, **product-level** — API spans multiple BCs (BFF, gateway, GraphQL schema); `Delegates to` field records the BC-NN per resource | `arch-service-contract` |
-| `BC-NN.CLI-NN` | CLI tool surface, **BC-scoped** — one CLI per BC/service | `arch-cli-contract` |
-| `CLI-NN` | CLI tool surface, **product-level** — one CLI spanning multiple BCs; BC-NN column per command records the BC it delegates to | `arch-cli-contract` |
-| `BC-NN.CLI-NN.CMD-NN` or `CLI-NN.CMD-NN` | CLI command — scoped to match the parent CLI tool's ID format | `arch-cli-contract` |
 | `SYS-NN` | Software System in the C4 model (DSL identifier `SYS_NN`) — system being documented + external systems | `arch-c4` (context mode) |
 | `CON-NN` | Container in the C4 model (DSL identifier `CON_NN`) — deployable runtime unit (app, service, database, message broker) | `arch-c4` (container mode) |
 | `CMP-NN` | Component in the C4 model (DSL identifier `CMP_NN`) — code module inside a container; carries `properties.implements "BC-NN.AGG-NN"` back-reference into `domain-model` (or `"none"` for tech-only) | `arch-c4` (component mode) |
@@ -666,17 +652,7 @@ Start at **Step 2** (BMC) for the strategic one-pager. Skip Steps 7–11 entirel
 | `CST-NN` | Architecture constraint — technical, organizational, or legal-regulatory constraint limiting the solution space | `arch-arc42` (constraints mode) |
 | `CC-NN` | Cross-cutting concept — horizontal concern applying to multiple containers (auth, logging, error-handling, persistence, caching, etc.) | `arch-arc42` (cross-cutting mode) |
 | `RSK-NN` | Architectural risk or technical debt item — four types: `architectural`, `technical-debt`, `dependency`, `security` | `arch-arc42` (risks mode) |
-| `E-NN` | Epic + walking skeleton + phase plan (delivery roadmap) | `spec-delivery-roadmap` |
-| `QA-XXNN` | Quality attribute (characteristic prefix + counter, e.g. `QA-PE01`, `QA-SE03`) | `spec-quality-attributes` |
-| `UC-NN` | Use case (actor↔system behavioural scenario) | `spec-use-case` |
-| `PRD-NNNN` | PRD ID | `spec-prd` |
-| `Plan-NNNN` | Implementation plan | `spec-implementation-plan` |
 | `Inc-N` (within a plan) | Plan increment | `spec-implementation-plan` |
-| `ADR-NNNN` | Architecture decision | `arch-adr` |
-| `Research-NNNN` | Architecture research note | `arch-research` |
-| `IDEA-NNNN` | Pre-formal idea (capture · refine · graduate) | `discovery-idea` |
-| `CO-NN` | Competitor profile (Tier-1) | `business-competitive-landscape` |
-| Block ID in BMC (e.g., `CS-1`, `VP-1`) | Canvas block | `business-model-canvas` |
 
 **BC-NN namespace rule:** All tactical DDD IDs are scoped to their bounded context. `BC-01.AGG-03` and `BC-02.AGG-03` are different aggregates. Cross-references must always include the BC prefix — bare `AGG-03` is ambiguous and invalid.
 
@@ -860,6 +836,7 @@ Every change to canonical paths, artefact steps, or ID formats in this file has 
 
 | What changed | Also update |
 |---|---|
+| New artefact **type**, or a change to its id_format / path / layout / skill | `rules/artefact-types-registry.md` → add or update the type's row (the single structural source clew's `ARTEFACT_TYPE_CONFIGS` derives from) |
 | New artefact step, new canonical path | `util-metamodel-audit/references/check-catalogue.md` → Check 1 (stack progress paths) |
 | New ID format (e.g. new `XX-NN` pattern) | `util-metamodel-audit/references/check-catalogue.md` → Check 5 (ID cross-reference regex patterns) |
 | New prerequisite dependency in the DAG | `util-metamodel-audit/references/check-catalogue.md` → Check 7 (dependency enforcement rules) |
