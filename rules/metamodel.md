@@ -666,97 +666,99 @@ so that future renames (description text) don't break the link as long as the ID
 
 ## Canonical output paths
 
+The `docs/` folder + infrastructure map. Per-type file paths are authoritative in [`artefact-types-registry.md`](artefact-types-registry.md).
+
 ```
 docs/
-├── VISION.md                                            ← business-vision (Step 0 — singleton, agent north star)
-├── business/                                            ← Business Architecture artefacts (numbered = build order)
-│   ├── 01a-personas.md                                   ← business-persona (P-NN)
-│   ├── 02a-bmc.md  (or 02a-lean-canvas.md)               ← business-model-canvas (Step 2)
-│   ├── 02a-vpc-{segment}.md  (optional per CS)          ← BMC VPC companions
-│   ├── 03a-capability-map.md                             ← business-capability-map (C-N.M)
-│   ├── 04a-value-streams.md                              ← business-value-stream (VS-N.M)
-│   ├── 04a-vpc-{segment}.md  (optional per VS)           ← VS VPC companions
-│   ├── 04b-objectives.md                                ← business-objective (OBJ-NN, KR-NN.M)
-│   ├── 05a-processes/                                   ← multi-file; keep subfolder
+├── VISION.md
+├── business/                                            ← Business Architecture
+│   ├── 01a-personas.md
+│   ├── 02a-bmc.md  (or 02a-lean-canvas.md)
+│   ├── 02a-vpc-{segment}.md  (optional per CS)
+│   ├── 03a-capability-map.md
+│   ├── 04a-value-streams.md
+│   ├── 04a-vpc-{segment}.md  (optional per VS)
+│   ├── 04b-objectives.md
+│   ├── 05a-processes/
 │   │   └── proc-NN-{slug}.md (one per process)
-│   └── 06a-models/                                      ← multi-file; keep subfolder
-│       └── qm-NN-{topic}.md (TAM/SAM/SOM, savings, ROI per model)
-├── product-specs/                                       ← `spec-` skills (product delivery)
-│   ├── use-cases/                                       ← spec-use-case: index.md + uc-NN-{slug}.md (UC-NN)
-│   ├── 07a-fbs.md                                        ← spec-functional-breakdown-structure (C-N.M.FXX)
-│   ├── 08a-delivery-roadmap.md                           ← spec-delivery-roadmap (E-NN)
-│   ├── 09a-quality-attributes.md                         ← spec-quality-attributes (QA-XXNN)
-│   └── prds/                                            ← all PRDs in dedicated subfolder
-│       └── prd-NNNN-{feature}.md (one per PRD)          ← spec-prd (PRD-NNNN)
-├── exec-plans/                                          ← `spec-` skills (implementation)
+│   └── 06a-models/
+│       └── qm-NN-{topic}.md (one per model)
+├── product-specs/                                       ← Product specs
+│   ├── use-cases/                                       ← index.md + uc-NN-{slug}.md
+│   ├── 07a-fbs.md
+│   ├── 08a-delivery-roadmap.md
+│   ├── 09a-quality-attributes.md
+│   └── prds/
+│       └── prd-NNNN-{feature}.md (one per PRD)
+├── exec-plans/                                          ← Implementation plans
 │   └── active/
-│       └── {NNNN}_exec_{slug}.md  (one file per plan)
-├── architecture/                                        ← `arch-` skills
-│   ├── decisions/                                       ← arch-adr writes here
+│       └── {NNNN}_exec_{slug}.md  (one per plan)
+├── architecture/                                        ← Architecture
+│   ├── decisions/                                       ← ADRs
 │   │   └── adr-{NNNN}-{slug}.md
-│   ├── interfaces/                                      ← arch-service-contract + arch-cli-contract
-│   │   ├── {bc-slug}.md  (BC-scoped API, one per BC)    ← arch-service-contract (BC-NN.CTR-NN)
-│   │   ├── {slug}.md  (product-level API, spans BCs)    ← arch-service-contract (CTR-NN)
-│   │   └── cli-{slug}.md  (one per CLI tool)            ← arch-cli-contract (BC-NN.CLI-NN or CLI-NN)
+│   ├── interfaces/                                      ← service + CLI contracts
+│   │   ├── {bc-slug}.md  (BC-scoped API, one per BC)
+│   │   ├── {slug}.md  (product-level API, spans BCs)
+│   │   └── cli-{slug}.md  (one per CLI tool)
 │   ├── c4/                                              ← arch-structurizr foundation
-│   │   ├── workspace.dsl                                ← Structurizr DSL (single source of truth for C4 model)
-│   │   ├── render.sh                                    ← Docker render pipeline (pinned structurizr/structurizr:<pin>-playwright)
-│   │   ├── README.md                                    ← per-project render + pinning conventions
+│   │   ├── workspace.dsl                                ← Structurizr DSL
+│   │   ├── render.sh                                    ← Docker render pipeline
+│   │   ├── README.md                                    ← render + pinning conventions
 │   │   └── views/                                       ← rendered SVGs (committed)
-│   │       ├── systemContext.svg                        ← arc42 §3 visual
-│   │       ├── containers.svg                           ← arc42 §5.1 visual
-│   │       ├── components-CON-NN.svg                    ← arc42 §5.2 visuals (one per drilled container)
-│   │       └── deployment-{env}.svg                     ← arc42 §7 visuals (one per environment)
-│   ├── diagrams/                                        ← arch-plantuml foundation (UML, non-C4)
-│   │   ├── _theme.puml                                  ← shared skinparam theme (!include'd by every diagram)
-│   │   ├── render.sh                                    ← Docker render pipeline (pinned plantuml/plantuml:<pin>)
-│   │   ├── README.md                                    ← per-project render + pinning conventions
-│   │   ├── {type}-NN-{slug}.puml                        ← arch-uml diagrams (seq-/class-/state-/act-/er-/uc-)
-│   │   └── views/                                       ← rendered SVGs (committed; one per .puml)
-│   └── arc42/                                           ← ALL narrative owned by arch-arc42 (ADR-0004); arch-c4 emits only diagram+table generated blocks (arch-c4 markers) in §3/§5/§7
-│       ├── 02-constraints.md                            ← arc42 §2 (CST-NN; technical/org/legal constraints)
-│       ├── 03-context.md                                ← arc42 §3 (SYS-NN context + actors + external systems)
-│       ├── 04-solution-strategy.md                      ← arc42 §4 (ADR links + quality goal → tactic mapping; no new IDs)
-│       ├── 05-building-blocks.md                        ← arc42 §5 (containers + components; CON-NN, CMP-NN)
-│       ├── 06-runtime-view.md                           ← arc42 §6 (arch-arc42; SCN-NN scenarios; figure pulled from C4 dynamic view or arch-uml sequence)
-│       ├── 07-deployment.md                             ← arc42 §7 (per-environment deployment; DN-NN)
-│       ├── 08-cross-cutting-concepts.md                 ← arc42 §8 (CC-NN cross-cutting concept catalogue)
-│       └── 11-risks.md                                  ← arc42 §11 (RSK-NN architectural risks + tech debt register)
-├── domain/                                              ← `domain-` skills (DDD artefacts — numbered by step)
-│   ├── 02b-bounded-contexts.md                          ← domain-bounded-context (BC-NN)
-│   ├── 02b-context-map.md                               ← domain-bounded-context (context map)
-│   ├── 02c-glossary.md                                  ← domain-glossary (BC-NN.GT-NN)
-│   └── 07b-models/                                      ← domain model files per BC
-│       └── {bc-slug}.md                                 ← domain-model (one per BC)
-├── ops/                                                 ← `ops-` skills
+│   │       ├── systemContext.svg
+│   │       ├── containers.svg
+│   │       ├── components-CON-NN.svg
+│   │       └── deployment-{env}.svg
+│   ├── diagrams/                                        ← arch-plantuml foundation
+│   │   ├── _theme.puml                                  ← shared theme
+│   │   ├── render.sh                                    ← Docker render pipeline
+│   │   ├── README.md                                    ← render + pinning conventions
+│   │   ├── {type}-NN-{slug}.puml                        ← arch-uml diagram sources
+│   │   └── views/                                       ← rendered SVGs (committed)
+│   └── arc42/                                           ← arch-arc42 narrative
+│       ├── 02-constraints.md
+│       ├── 03-context.md
+│       ├── 04-solution-strategy.md
+│       ├── 05-building-blocks.md
+│       ├── 06-runtime-view.md
+│       ├── 07-deployment.md
+│       ├── 08-cross-cutting-concepts.md
+│       └── 11-risks.md
+├── domain/                                              ← Domain (DDD)
+│   ├── 02b-bounded-contexts.md
+│   ├── 02b-context-map.md
+│   ├── 02c-glossary.md
+│   └── 07b-models/                                      ← one file per BC
+│       └── {bc-slug}.md
+├── ops/                                                 ← Operations
 │   ├── runbooks/
 │   │   └── {slug}.md
 │   └── rcas/
 │       └── {YYYY-MM-DD}-{slug}.md
-├── ux/                                                  ← `ux-` category (design + experience layer; cross-cutting; mints no IDs here)
-│   ├── design-system.md                                ← ux-design-system: authored brand rationale + token tables
-│   └── tokens.css                                       ← ux-design-system: generated :root token contract (themes the `com-` layer)
-├── communication/                                       ← `com-` skills
-│   ├── visualisations/                                 ← com-artefact-viz ({kind}.html; derived read-outs)
+├── ux/                                                  ← Design system (cross-cutting; mints no IDs)
+│   ├── design-system.md                                ← authored brand + tokens
+│   └── tokens.css                                       ← generated token contract
+├── communication/                                       ← Communication artefacts
+│   ├── visualisations/                                 ← com-artefact-viz ({kind}.html)
 │   └── slides/
-│       └── {slug}/                                      ← com-slide-deck (one folder per deck)
+│       └── {slug}/                                      ← com-slide-deck (one per deck)
 │           ├── context/
 │           ├── design/
-│           ├── src/                                     ← slide partials (source of truth)
-│           ├── dist/                                    ← built HTML + prototypes/
+│           ├── src/
+│           ├── dist/
 │           └── config.yaml
-├── discovery/                                           ← `discovery-` skills (pre-formal evidence layer; cross-cutting; feeds every downstream artefact)
-│   ├── ideation/                                       ← discovery-idea (IDEA-NNNN)
+├── discovery/                                           ← Pre-formal evidence (cross-cutting)
+│   ├── ideation/                                       ← discovery-idea
 │   │   ├── INDEX.md
 │   │   └── IDEA-NNNN-{slug}.md (one per idea)
 │   ├── interviews/                                     ← discovery-research
 │   │   └── interview-{persona-id-or-slug}-{topic}.md · research-synthesis-{date}-{topic}.md · research-plan-{topic}.md
-│   └── workshops/                                      ← discovery-workshop
+│   └── workshops/                                     ← discovery-workshop
 │       └── workshop-{slug}-{date}.md · workshop-synthesis-{slug}-{date}.md
-└── dev-guides/                                         ← `dev-stack-guide` + `dev-getting-started` (developer reference; not a metamodel step)
-    ├── getting-started.md                              ← dev-getting-started (singleton — project onboarding guide)
-    ├── {tech-slug}.md (one per technology)             ← dev-stack-guide (stack guide: patterns, anti-patterns, MCP)
-    └── research/                                       ← dev-stack-guide research scratch (internal; committed for traceability)
+└── dev-guides/                                         ← Developer reference (not a metamodel step)
+    ├── getting-started.md
+    ├── {tech-slug}.md (one per technology)
+    └── research/                                       ← research scratch
         └── {tech-slug}-research.md
 ```
 
