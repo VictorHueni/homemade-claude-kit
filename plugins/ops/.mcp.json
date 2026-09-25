@@ -8,7 +8,7 @@
       ],
       "env": {
         "SONARQUBE_TOKEN": "${SONARQUBE_TOKEN}",
-        "SONARQUBE_ORGANIZATION": "victorhueni"
+        "SONARQUBE_ORGANIZATION": "${SONARQUBE_ORGANIZATION}"
       }
     }
   }
