@@ -61,11 +61,12 @@ Each iteration follows this exact sequence:
 4. **Run test gate**: Execute every command listed in the increment's test gate section.
 5. **Pottery wheel**: If any test gate fails, fix the issue and re-run. Maximum 3 retries per increment.
 6. **Verify exit criteria**: Confirm every statement in the increment's exit criteria section holds. If a criterion is not met, treat it as a test gate failure and re-enter the pottery wheel.
-7. **Mark done**: Change the increment's status from `in-progress` to `done`.
-8. **Update PRD if present**: Check off any acceptance criteria (`- [ ]` → `- [x]`) satisfied by this increment. Update each user story's `**Status:**` (`pending` → `in-progress` if some criteria are now checked; `in-progress` → `done` if all criteria for that story are checked). After updating user stories, update the top-level PRD `**Status:**`: set to `in-progress` on the first increment that checks any criterion; set to `complete` when all user story statuses are `done`.
-9. **Commit**: Stage and commit with the convention below.
-10. **Log progress**: Append an entry to `progress.txt`.
-11. **Exit or continue**: If more `pending` increments remain and running interactively, continue to step 1. If running via `ralph.sh`, exit with `RALPH_COMPLETE` signal so the script can spawn a fresh agent.
+7. **Check the Prediction**: If the increment has a `Prediction:` section, diff the produced output against it. Any changed output path or ledger class it does not name blocks the increment (see Error Recovery). The check is mechanical: an unnamed change is never explained away, however harmless it looks.
+8. **Mark done**: Change the increment's status from `in-progress` to `done`.
+9. **Update PRD if present**: Check off any acceptance criteria (`- [ ]` → `- [x]`) satisfied by this increment. Update each user story's `**Status:**` (`pending` → `in-progress` if some criteria are now checked; `in-progress` → `done` if all criteria for that story are checked). After updating user stories, update the top-level PRD `**Status:**`: set to `in-progress` on the first increment that checks any criterion; set to `complete` when all user story statuses are `done`.
+10. **Commit**: Stage and commit with the convention below.
+11. **Log progress**: Append an entry to `progress.txt`.
+12. **Exit or continue**: If more `pending` increments remain and running interactively, continue to step 1. If running via `ralph.sh`, exit with `RALPH_COMPLETE` signal so the script can spawn a fresh agent.
 
 ## Marking Convention
 
@@ -74,6 +75,7 @@ Status values for increments:
 - `**Status:** pending` — not yet started
 - `**Status:** in-progress` — currently being implemented
 - `**Status:** done` — implemented and test gate passed
+- `**Status:** blocked` — stopped by a failed pottery wheel or an unpredicted change; `ralph.sh` halts
 
 Status values for milestones (in the Milestone Chunks table):
 
@@ -155,7 +157,7 @@ When all increments are done:
 
 ### Blocked increment
 
-If an increment cannot be completed after 3 pottery-wheel retries:
+If an increment cannot be completed after 3 pottery-wheel retries, or its output changes anything its `Prediction:` does not name:
 
 1. Set its status to `**Status:** blocked`.
 2. Log the blocker in `progress.txt` with details.

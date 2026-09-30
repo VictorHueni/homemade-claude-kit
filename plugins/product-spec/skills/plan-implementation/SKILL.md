@@ -79,6 +79,10 @@ Exit criteria:
 1. [Outcome 1]
 2. [Outcome 2]
 
+Prediction: (only for an increment that changes generated output; omit otherwise)
+
+1. [Output path or ledger class that changes, and how]
+
 [Repeat for each increment...]
 
 ## Delivery Rules
@@ -100,6 +104,7 @@ Exit criteria:
 - **Atomic Changes:** An increment should be small enough to review easily but large enough to provide value or a foundation.
 - **Test-Driven Gates:** Every increment must have a `Test gate`. If no logic is added, use a `smoke test` or `import test`.
 - **Deterministic Outcomes:** Exit criteria must be objective and verifiable.
+- **Mechanical Predictions:** An increment that changes generated output (a converter run, a fixture, a report) names every output path and ledger class it changes under `Prediction:`. The iteration agent compares the diff against it, and any change it does not name blocks the increment. A stop rule the agent may adjudicate ("stop on a change the ruling did not predict") does not fire: agents explain their surprises away.
 - **Sequential Flow:** Order increments to minimize rework and respect dependencies.
 - **Ralph Loop Ready:** Status fields on every increment and milestone enable autonomous execution via the `agent-ralph-loop` skill. Use `**Status:** pending | in-progress | done` to track progress.
 
