@@ -180,6 +180,20 @@ has_in_progress_increments() {
   grep -q '\*\*Status:\*\* in-progress' "$EXEC_PLAN" 2>/dev/null
 }
 
+# A blocked increment stops the loop even when later ones are pending: the next agent would
+# otherwise start the next pending increment and skip past the blocker.
+has_blocked_increments() {
+  grep -q '\*\*Status:\*\* blocked' "$EXEC_PLAN" 2>/dev/null
+}
+
+stop_if_blocked() {
+  if has_blocked_increments; then
+    echo ""
+    echo "An increment is blocked. Ralph Loop stopped; see progress.txt in $WORKSPACE_DIR." >&2
+    exit 2
+  fi
+}
+
 is_complete() {
   if has_pending_increments || has_in_progress_increments; then
     return 1
@@ -191,6 +205,7 @@ is_complete() {
 build_prompt() {
   sed \
     -e "s|{{WORKSPACE_DIR}}|$WORKSPACE_DIR|g" \
+    -e "s|{{SKILL_DIR}}|$SKILL_DIR|g" \
     -e "s|{{PRD_MODE}}|$EFFECTIVE_PRD_MODE|g" \
     -e "s|{{PRD_PATH}}|${PRD_FILE:-none}|g" \
     "$ITERATION_PROMPT"
@@ -228,6 +243,7 @@ if is_complete; then
   echo "All increments are already done. Nothing to do."
   exit 0
 fi
+stop_if_blocked
 
 iteration=0
 while [[ $iteration -lt $MAX_ITERATIONS ]]; do
@@ -237,6 +253,8 @@ while [[ $iteration -lt $MAX_ITERATIONS ]]; do
   echo "  Iteration $iteration / $MAX_ITERATIONS"
   echo "  $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
   echo "───────────────────────────────────────────────────────────"
+
+  stop_if_blocked
 
   # Check for completion before spawning
   if is_complete; then

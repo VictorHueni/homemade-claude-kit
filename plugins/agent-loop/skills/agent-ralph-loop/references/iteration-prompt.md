@@ -14,7 +14,7 @@ You are executing one iteration of the Ralph Loop.
 
 ### Step 1: Read the protocol
 
-Read `skills/agent-ralph-loop/SKILL.md` — specifically the **Iteration Protocol** section. This is your complete reference for what to do.
+Read `{{SKILL_DIR}}/SKILL.md` — specifically the **Iteration Protocol** section. This is your complete reference for what to do.
 
 ### Step 2: Read the workspace
 
@@ -33,8 +33,9 @@ Follow the Iteration Protocol exactly:
 3. Run the test gate commands.
 4. If tests fail, fix and retry (max 3 attempts).
 5. Verify every exit criterion holds; if not, treat as test gate failure and retry.
+   If the increment has a `Prediction:` section, compare the produced change against it mechanically (see SKILL.md step 7). Any changed output path or ledger class the Prediction does not name blocks the increment: set `**Status:** blocked`, list the unnamed changes in `progress.txt`, commit only the plan status and that `progress.txt` entry (leave the implementation in the working tree for the operator), and signal `RALPH_COMPLETE`. Do not judge whether an unnamed change is acceptable; the operator decides.
 6. Mark the increment `done`.
-7. If `PRD Mode` is `with-prd`, update PRD checkboxes, user story statuses, and the top-level PRD `**Status:**` (see SKILL.md step 8 for the exact rules).
+7. If `PRD Mode` is `with-prd`, update PRD checkboxes, user story statuses, and the top-level PRD `**Status:**` (see SKILL.md step 9 for the exact rules).
 8. Commit with a conventional message whose scope is the plan's **capability/product** (declared `Commit scope:`, else derived from the PRD §0 traceability, else the plan's feature slug — **never the bare plan number**): `<type>(<scope>): <increment title>`, plus a `Refs: Plan-<NNNN> increment <XX>` trailer. See SKILL.md §Commit Convention.
 9. Append to `progress.txt`.
 
