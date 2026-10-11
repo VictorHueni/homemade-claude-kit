@@ -59,7 +59,7 @@ v0, Lovable, Bolt and Claude Design prefer a repository or npm package as the so
 
 ## What this means for the kit
 
-1. **The contract becomes modules, each a fixed role list.** Proposed modules: `core` (surfaces, ink, accent with its on-pair, status, three font families; today's 24 tokens), `type` (weights, sizes, roles), `space-shape` (spacing scale, radii, shadow), `dataviz` (named after Vega-Lite ranges: `category[n]`, `ordinal`, `sequential`, `diverging`, `remainder`, `highlight`), `document` (component stylesheet: cards, KPI tiles, tables, callouts, footer), `slide-frame` (canvas size, section label, footer row), `print` (page size and margins), `brand` (logo files and the legal line), and `guidance` (do/don't prose per module). Only `core` is required.
+1. **The contract becomes modules, each a fixed role list.** Proposed modules: `core` (surfaces, ink, accent with its on-pair, status, three font families; today's 24 tokens), `type` (weights, sizes, roles), `space-shape` (spacing scale, radii, shadow), `dataviz` (named after Vega-Lite ranges: `category[n]`, `ordinal`, `sequential`, `diverging`, `remainder`, `highlight`), `document` (component stylesheet: cards, KPI tiles, tables, callouts, footer), `slide-frame` (canvas size, section label, footer row), `print` (page size and margins), `brand` (logo files and the legal line), and `guidance` (do/don't prose per module). Proposed: only `core` required; the owner ruled `core` and `dataviz` (see below).
 2. **A manifest declares what a design system provides.** One JSON file in the package, for example `kit-manifest.json`: `contractVersion` (SemVer of the kit contract, independent of the brand's version), the modules provided with the export name of each file, and `omitted` with a reason, as DESIGN.md does. The kit validates it against a JSON Schema it owns.
 3. **Fallback is layered and explicit.** A module the package does not provide comes from the kit's own neutral base theme (Carbon's model); scales the package omits can be derived from the accent seed (Radix and M3); renderers write `var(--role, fallback)` so a palette-plus-fonts subset still renders. The renderer reports which modules came from the package and which from the base, so a reviewer knows what is on-brand.
 4. **The design system generates one adapter per generator from its DTCG source.** Module CSS for the kit, a Vega-Lite config and an ECharts theme from `dataviz`, a DESIGN.md (readable by Stitch, Bolt and DESIGN.md-aware agents) and a brand.yml (Quarto, Typst, reveal.js). The kit never parses DTCG.
@@ -68,13 +68,15 @@ v0, Lovable, Bolt and Claude Design prefer a repository or npm package as the so
 7. **Discovery through a compact index.** A project's AGENTS.md or CLAUDE.md names the pin file, the manifest and the validator in a few lines; the skills carry the detail.
 8. **Building a system or a subset.** `ux-design-system` gets two modes. *Subset*: the owner (or an agent, from a brand PDF, a website or a deck) writes a DESIGN.md-style file with the modules it can fill and an `omitted` list; the skill generates the module CSS and the manifest, so a small project gets a declared subset instead of 24 untyped values. *Full*: the reference design-system repository becomes a template (DTCG tiers, build, adapters, tests, release, agent skill) that an agent instantiates for another brand; this is a separate kit capability, not a stretch of the subset mode. Import from an existing package or code is preferred; extraction from pictures is marked approximate.
 
-## Open decisions for the owner
+## Owner decisions (2026-10-11)
 
-1. Module list and which modules are required (proposal: `core` only).
-2. Manifest format: a kit-owned JSON Schema (proposal) or DTCG resolver plus `$extensions`.
-3. Whether the kit validator runs as a hard gate (fail the render) or reports only, for subsets.
-4. Whether to emit DESIGN.md and brand.yml from the design system now or later.
-5. Whether the full-system template is in scope now, or only the subset path.
+The five open decisions of this note were settled with the owner; Plan-0005 records them with the follow-up rulings of its peer review.
+
+1. Modules: `core` and `dataviz` are required; the other seven are optional.
+2. Manifest: a kit-owned JSON file with a JSON Schema and a `contractVersion`, not the DTCG resolver.
+3. Validator: a hard gate that blocks the render, with named local exceptions.
+4. DESIGN.md: emitted by the design system now; brand.yml later.
+5. Full-system template: later, tracked in issue #114; only the subset path now.
 
 ## Caveats
 
