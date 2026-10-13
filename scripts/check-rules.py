@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 ALWAYS_ON_FILE_MAX = 3_000
-ALWAYS_ON_TOTAL_MAX = 20_000
+ALWAYS_ON_TOTAL_MAX = 6_000
 PATH_SCOPED_FILE_MAX = 4_000
 # Restructured separately; remove from this set once it fits the budget.
 SIZE_EXEMPT: set[str] = set()

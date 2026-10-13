@@ -272,6 +272,7 @@ cross-referencing PEP and Excel to produce it manually.
 
 - Known constraints or dependencies
 - Integration points with existing systems
+- Existing designs to reuse: when the feature solves a problem the codebase already solves (human overrides of machine output, audit logs, review queues, versioned reference data), name the existing design it starts from and every departure the new domain forces; prefer cutting scope to inventing a lighter mechanism.
 - Performance requirements grounded in the persona's context
   (e.g., "P-01 uses this during live phone calls — response time ≤ 2s")
 - Reference relevant ADRs if architecture decisions apply:

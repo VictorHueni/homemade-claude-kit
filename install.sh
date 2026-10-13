@@ -142,6 +142,14 @@ AGENTS_SKILLS_TARGET="$AGENTS_BASE/skills"
 COMMANDS_TARGET="$CLAUDE_BASE/commands"
 RULES_TARGET="$CLAUDE_BASE/rules"
 
+# ── Kit pre-commit gate: point this checkout at .githooks, unless the owner set
+# their own hooksPath.
+if [[ -d "$SCRIPT_DIR/.githooks" ]] && git -C "$SCRIPT_DIR" rev-parse --git-dir >/dev/null 2>&1 \
+    && [[ -z "$(git -C "$SCRIPT_DIR" config --local --get core.hooksPath)" ]]; then
+    git -C "$SCRIPT_DIR" config --local core.hooksPath .githooks
+    log "Kit pre-commit hook enabled (core.hooksPath = .githooks)"
+fi
+
 # ── Claude channel (global installs only): persisted per-machine choice.
 # "symlink" (default) serves Claude from ~/.claude/skills; "marketplace" leaves
 # Claude to /plugin and prunes kit-owned links (one channel per machine, ADR-0006 §3).

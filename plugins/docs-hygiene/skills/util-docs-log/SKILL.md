@@ -34,7 +34,7 @@ See the `metamodel` skill's `references/artefact-frontmatter.md` §Reserved file
 - **Source of truth is git.** The log is a *view* of `git log`; commit messages are the content.
   → **Write good commit messages** — they become the log entries verbatim.
 - **On-demand / at bundle-export — not a commit hook.** A git-derived log committed on every
-  commit either lags by one commit or needs `--amend` (which `rules/git-and-tools.md` forbids).
+  commit either lags by one commit or needs `--amend` (which the kit's `git` rule forbids and the kit-core hook blocks).
   For a live git repo, `git log` *is* the log; `log.md` earns its keep only when a bundle ships
   outside git. So run this skill when you want a fresh log or before shipping a bundle.
 

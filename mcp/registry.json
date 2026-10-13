@@ -76,7 +76,7 @@
     {
       "name": "sonarqube",
       "owning_set": "ops",
-      "enabled": true,
+      "enabled": false,
       "transport": {
         "type": "stdio",
         "command": "npx",
@@ -89,7 +89,7 @@
           "SONARQUBE_ORGANIZATION": "victorhueni"
         }
       },
-      "notes": "Official SonarSource server (SonarSource/sonarqube-mcp-server). Opt-in: needs a personal SonarQube Cloud user token (SONARQUBE_TOKEN) exported in the shell env — NOT the project-scoped SONAR_TOKEN CI secret used by sonar.yml analysis runs, which is the wrong token type for this server. Org key is the personal SonarCloud org (victorhueni); omit SONARQUBE_ORGANIZATION for a token scoped to exactly one org."
+      "notes": "Disabled: superseded by SonarSource's official plugin (sonarqube@claude-plugins-official, github.com/SonarSource/sonarqube-agent-plugins), whose MCP server starts through `sonar run mcp` and which `sonar integrate claude|codex|cursor` wires per harness. This entry was the community sapientpants/sonarqube-mcp-server; kept disabled so install.sh removes it from the OpenCode config."
     }
   ],
   "project_scoped_recipes": {

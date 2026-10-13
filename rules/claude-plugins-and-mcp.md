@@ -1,5 +1,9 @@
 ---
 type: rule
+paths:
+  - "**/.mcp.json"
+  - "**/.claude-plugin/plugin.json"
+  - "**/.claude-plugin/marketplace.json"
 ---
 
 # Claude Code plugins and MCP servers

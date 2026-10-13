@@ -1,7 +1,7 @@
 {
   "name": "docs-hygiene",
   "description": "Docs hygiene. Documentation freshness audit, OKF index/log generation, and the docs lint toolchain.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Victor Hueni"
   }

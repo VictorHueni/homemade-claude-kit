@@ -96,7 +96,7 @@ git add -p
 Analyze the diff to determine:
 
 - **Type**: What kind of change is this?
-- **Scope**: What does the change advance? Prefer the project's **capability / product vocabulary** (a capability-map or FBS slug) when it has one; else the changed area (`api`, `auth`, `infra`). **Never a bare work-item / plan number** — keep any plan/increment ref in a `Refs:` trailer. See [Commit & PR scope vocabulary](../../rules/git-and-tools.md).
+- **Scope**: What does the change advance? Prefer the project's **capability / product vocabulary** (a capability-map or FBS slug) when it has one; else the changed area (`api`, `auth`, `infra`). **Never a bare work-item / plan number** — keep any plan/increment ref in a `Refs:` trailer. See the kit's `git` rule (commit and PR-title scope).
 - **Description**: One-line summary of what changed (present tense, imperative mood, <72 chars)
 
 ### 4. Execute Commit
