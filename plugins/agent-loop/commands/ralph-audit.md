@@ -27,7 +27,7 @@ Read the plan and its workspace, then verify each item. Report PASS / FAIL / WAR
 
 ### Per-increment checks (for every increment in the plan)
 9. Has `**Status:**` field (pending | in-progress | done | blocked)
-10. Has a Scope section with numbered items
+10. Has a Scope section with numbered items; WARN if item 1 is not a `**Write first, expect red:**` test naming extend, adapt or new for each case, and Scope has no `Exempt from red-first:` line
 11. Has a Primary files list
 12. Has a Test gate section with runnable commands (not TBD, not pseudo, no `...`)
 13. Has Exit criteria

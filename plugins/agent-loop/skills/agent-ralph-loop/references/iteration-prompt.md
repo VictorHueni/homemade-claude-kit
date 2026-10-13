@@ -29,7 +29,7 @@ Read these files in the workspace directory:
 Follow the Iteration Protocol exactly:
 
 1. Set the increment status to `in-progress`.
-2. Implement the scope items.
+2. Implement the scope items, starting with the write-first tests as SKILL.md Iteration Protocol step 3 describes: extend existing tests covering the same unit, behaviour or fixture before adding new ones, record the red run, then implement until green. An increment whose tests followed its code is not done.
 3. Run the test gate commands.
 4. If tests fail, fix and retry (max 3 attempts).
 5. Verify every exit criterion holds; if not, treat as test gate failure and retry.

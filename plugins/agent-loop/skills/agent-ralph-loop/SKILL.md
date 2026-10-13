@@ -57,7 +57,11 @@ Each iteration follows this exact sequence:
 
 1. **Read workspace**: Load the exec plan and find the next `**Status:** pending` increment.
 2. **Set status**: Change that increment's status from `pending` to `in-progress`. Update `**Current Increment:**` in the plan header.
-3. **Implement**: Execute the increment's scope items. Follow the primary files list.
+3. **Implement**: Execute the increment's scope items. Follow the primary files list. Start with the Scope's write-first tests:
+   - Before writing a test, search for existing tests and fixtures covering the same unit, behaviour or fixture, and extend or parametrize the closest rather than adding a new test. If the plan says `new` but a fitting test exists, extend it and note the deviation in `progress.txt`.
+   - Run them and record the failing test names (red). A write-first test that already passes is wrong or redundant: fix it, or log why in `progress.txt`.
+   - Implement until they pass (green). An increment whose tests followed its code is not done.
+   - If Scope says `Exempt from red-first: <reason>`, skip the red run and record the exemption.
 4. **Run test gate**: Execute every command listed in the increment's test gate section.
 5. **Pottery wheel**: If any test gate fails, fix the issue and re-run. Maximum 3 retries per increment.
 6. **Verify exit criteria**: Confirm every statement in the increment's exit criteria section holds. If a criterion is not met, treat it as a test gate failure and re-enter the pottery wheel.
@@ -104,6 +108,8 @@ Each entry in `progress.txt` follows this format:
 - Increment: XX — [Title]
 - Status: done | blocked
 - Files changed: [list]
+- Red: [write-first tests observed failing] | n/a (exempt: <reason>)
+- Green: [same tests passing]
 - Test gate: passed | failed (retry M)
 - Learnings: [any notable observations]
 - Commit: [hash]
