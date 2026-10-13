@@ -166,8 +166,8 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/personal/claude-plugin-eval-wsl-and-graders.md` | `claude plugin eval` on WSL; `tool_used` graders |
 | `rules/personal/decisions-in-prose-not-forms.md` | Owner decisions discussed in prose |
 | `rules/personal/diagramming-layout.md` | Orthogonal edges, fewest elbows |
-| `rules/personal/preferences.md` | Naming, code language, Ralph Loop execution |
+| `rules/personal/preferences.md` | Naming, code language |
 | `rules/personal/python-docstring-policy.md` | Google §3.8 docstrings as written (path-scoped) |
-| `rules/personal/subagent-orchestration.md` | One subagent per increment, foreground gates, verify between iterations |
+| `rules/personal/subagent-orchestration.md` | Pointer to chat-driven Ralph orchestration; joining dead-code leads across audit slices |
 | `rules/personal/ui-copy-no-em-dash.md` | No em dash in user-facing copy (path-scoped) |
 | `rules/personal/wsl-test-resource-budget.md` | Memory budget for test runs on the WSL machine |
