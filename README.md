@@ -151,7 +151,7 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/open-items-governance.md` | **Pointer stub** → the `metamodel` skill's `references/open-items-governance.md` |
 | `rules/osv-scanner-dot-directory-worktrees.md` | osv-scanner finding nothing in some worktrees |
 | `rules/postgres-schema-gotchas.md` | PostgreSQL NULL, jsonb and planner traps (path-scoped) |
-| `rules/python-extras.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
+| `rules/python-gotchas.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
 | `rules/session-handoff.md` | Pointer to the `agent-handoff` skill |
 | `rules/skill-creation-sync.md` | Skill naming (incl. registered exceptions), set placement, reference convention, blast-radius procedure |
 | `rules/sonarcloud-silent-analysis-failure.md` | SonarCloud analysis failing server-side behind a green CI |
