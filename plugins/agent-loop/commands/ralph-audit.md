@@ -34,7 +34,7 @@ Read the plan and its workspace, then verify each item. Report PASS / FAIL / WAR
 14. Test gate commands reference real files/tools — spot-check: do the paths exist under the primary files list?
 
 ### Git state
-15. Current branch is `ralph/NNNN-feature-name` (or warn if on another branch)
+15. Current branch is the plan's feature branch `<type>/<feature-slug>` (warn if on `main` or a branch named only after the plan number)
 16. Working tree is clean (or warn with a short summary of dirty files)
 17. Feature branch exists and is checked out
 

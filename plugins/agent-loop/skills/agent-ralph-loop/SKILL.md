@@ -25,6 +25,8 @@ The loop follows the principle: **Perceive → Implement → Validate → Commit
 
 A fresh agent instance handles each iteration, ensuring clean context and preventing drift. The loop terminates when all increments reach `**Status:** done`.
 
+**Execution modes:** in a terminal, run `ralph.sh`. Without one (mobile, remote, cloud), spawn one subagent per increment, never several, following `references/chat-orchestration.md`.
+
 ## Prerequisites
 
 Before starting the Ralph Loop:
@@ -41,7 +43,7 @@ Before the first iteration, prepare the workspace:
 1. **Create workspace directory**: `docs/plans/active/NNNN_feature-name/`
 2. **Move exec plan into workspace**: Move `docs/plans/active/NNNN_exec_feature-name.md` into the workspace directory. The exec plan's `prd:` frontmatter field (if present) points to the PRD at its canonical location — no copy needed.
 3. **Create progress log**: `docs/plans/active/NNNN_feature-name/progress.txt`
-4. **Create feature branch**: `git checkout -b ralph/NNNN-feature-name`
+4. **Create feature branch**: `git checkout -b <type>/<feature-slug>` (a descriptive slug, never only the plan number)
 
 Workspace structure after setup:
 
@@ -157,7 +159,7 @@ When all increments are done:
 1. **Move exec plan**: Move from workspace to `docs/plans/completed/`.
 2. **Delete progress log**: Remove `progress.txt`.
 3. **Remove workspace**: Delete the empty `NNNN_feature-name/` directory.
-4. **Optional**: Invoke `git-dev-pr` to open a pull request for the feature branch.
+4. **Optional**: Invoke `dev-pr` to open a pull request for the feature branch.
 
 ## Error Recovery
 

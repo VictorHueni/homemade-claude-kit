@@ -1,7 +1,7 @@
 ---
 name: dev-git-worktree
 license: MIT
-description: "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification"
+description: "Use when isolation is explicitly requested or another branch must stay checked out at the same time - creates isolated git worktrees with smart directory selection and safety verification"
 user-invocable: true
 metadata:
   category: "utility"
@@ -229,11 +229,6 @@ Ready to implement auth feature
 
 ## Integration
 
-**Called by:**
-- **brainstorming** (Phase 4) - REQUIRED when design is approved and implementation follows
-- **subagent-driven-development** - REQUIRED before executing any tasks
-- **executing-plans** - REQUIRED before executing any tasks
-- Any skill needing isolated workspace
+**Use when:** the owner asks for isolation, or another branch must stay checked out at the same time. Otherwise work in the current checkout: executing a plan (including the `agent-ralph-loop` skill) does not by itself call for a worktree.
 
-**Pairs with:**
-- **finishing-a-development-branch** - REQUIRED for cleanup after work complete
+**Pairs with:** the `branch-cleanup-audit` command, to remove merged worktrees and branches after the work is done.
