@@ -31,6 +31,7 @@ The script is read-only. It checks:
 - **Chezmoi deployed-vs-source drift**: `chezmoi status` output
 - **Kit repo** (`~/projects/homemade-claude-kit`): same checks as dotfiles
 - **Symlink health**: every entry under `~/.claude/skills/` and `~/.claude/commands/` must be a symlink resolving into `~/projects/homemade-claude-kit/`
+- **Rules authorship**: every `~/.claude/rules/*.md` must be a link into the kit; a plain file there is a rule written on this machine only
 
 ## Step 2 — Detect mode
 
@@ -85,6 +86,7 @@ After any auto-fix, re-run the diagnostic and confirm the issue is gone before r
 | **Local commits ahead of origin** in either repo | Propose `git push`. Don't push without confirmation — pushing is a shared-state action. |
 | **Diverged branches** (both ahead and behind) | Propose `git pull --rebase` (preferred) or merge. Ask which. Never force-push. |
 | **Dual-channel conflict** (marketplace + kit symlinks both serving Claude) | See Step 2b check 5 — name both channels, ask which to remove. Never delete either without confirmation. |
+| **Rule authored outside the kit** (plain file in `~/.claude/rules/`) | Do not run `install.sh` first: it replaces a same-named file with the kit's link. Propose copying it into the kit's `rules/` (shared) or `rules/personal/` (owner preference or this machine), committing on a branch, then running `install.sh`. |
 | **Missing prerequisites** (`chezmoi`, `git`, `gh`) | Tell the user how to install on their platform. Do not attempt to install yourself. |
 | **SSH to github.com fails** | Tell the user to run `gh auth login` or set up an SSH key. Do not generate keys yourself. |
 

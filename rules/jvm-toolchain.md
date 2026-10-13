@@ -1,3 +1,7 @@
+---
+type: rule
+---
+
 # JVM toolchain preferences
 
 Stated preferences (2026-09-01, while bootstrapping a greenfield JVM service):

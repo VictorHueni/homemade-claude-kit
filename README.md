@@ -66,7 +66,7 @@ cd ~/projects/homemade-claude-kit && ./install.sh
 A global run:
 
 - symlinks all skills (flat) into `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills` (OpenCode discovers the latter two natively) and commands into `~/.claude/commands`;
-- symlinks the Claude rules into `~/.claude/rules`;
+- symlinks the Claude rules into `~/.claude/rules` (the personal layer only after `--personal-rules on`, see [Rules](#rules));
 - renders the **AGENTS.md adapter** (metamodel routing + behavioural rules, marker-delimited) into `~/.codex/AGENTS.md` and `~/.config/opencode/AGENTS.md`;
 - projects **`mcp/registry.json`** into `~/.codex/config.toml` (`[mcp_servers.*]` marker block) and `opencode.json`'s `mcp` key.
 
@@ -120,18 +120,60 @@ Open items live as GitHub Issues labelled `open-item` —
 
 ## Rules
 
-Claude-side conventions in `rules/` (symlinked to `~/.claude/rules`); the behavioural ones
-also feed the generated AGENTS.md adapter for Codex/OpenCode:
+Every Claude rule is authored here, never directly in `~/.claude/rules/` (kit ADR-0011). `install.sh` links each file flat into `~/.claude/rules/`, replacing a same-named plain file, and prunes links whose source is gone. Two layers:
+
+- **`rules/`**: shared engineering rules, installed for everyone.
+- **`rules/personal/`**: the owner's preferences and this machine's setup. Installed only after `./install.sh --personal-rules on`, which is remembered in `var/personal-rules`, so a teammate's install gets the shared layer alone. A file name may exist in one layer only.
+
+The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md adapter for Codex/OpenCode. `scripts/test-install-rules.sh` checks the installer's rule handling against a throwaway kit.
+
+### Shared (`rules/`)
 
 | Rule file | Covers |
 |---|---|
 | `rules/artefact-frontmatter.md` | **Pointer stub** → the `metamodel` skill's `references/artefact-frontmatter.md` (kit ADR-0007) |
-| `rules/skill-creation-sync.md` | Skill naming (incl. registered exceptions), set placement, reference convention, blast-radius procedure |
-| `rules/metamodel.md` | **Pointer stub** → the `metamodel` skill (spine, variants, references) |
 | `rules/artefact-types-registry.md` | **Pointer stub** → the `metamodel` skill's `references/artefact-types-registry.yaml` (clew-owned projection, clew ADR-0008) |
-| `rules/open-items-governance.md` | **Pointer stub** → the `metamodel` skill's `references/open-items-governance.md` |
-| `rules/git-and-tools.md` | Git discipline, Edit tool usage *(→ AGENTS.md adapter)* |
-| `rules/working-style.md` | Sequential plans, trust-but-verify *(→ AGENTS.md adapter)* |
+| `rules/ci-local-parity.md` | Ship a local Makefile mirror with every new CI tool |
+| `rules/claude-code-plugin-marketplace-refresh.md` | Marketplace update vs plugin update, version bump, new session |
+| `rules/consistency-over-lean-variants.md` | Reuse the codebase's existing pattern before a leaner bespoke one |
 | `rules/diagramming-mermaid.md` | Mermaid diagram pitfalls *(→ AGENTS.md adapter)* |
+| `rules/diagramming-plantuml.md` | PlantUML creole markup eating CLI flags |
 | `rules/frontend-nuxt.md` | Nuxt UI v4 / Vue 3.5 / Reka UI *(→ AGENTS.md adapter)* |
+| `rules/git-and-tools.md` | Git discipline, Edit tool usage *(→ AGENTS.md adapter)* |
+| `rules/github-actions-token-triggered-chains.md` | `GITHUB_TOKEN`-started runs and `workflow_run`; `GH_REPO` without a checkout |
+| `rules/github-issue-transfer.md` | Bulk issue transfer and lost sub-issue parent links |
+| `rules/github-projects-single-select-field.md` | Adding a single-select option clears item values |
+| `rules/jvm-toolchain.md` | Maven, Temurin, current LTS |
+| `rules/mcp-server-pins-and-schema-drift.md` | MCP version pins, schema drift, OAuth client reset |
+| `rules/memory-hygiene.md` | Where a lesson belongs: kit rule, project AGENTS.md, or auto-memory |
+| `rules/metamodel.md` | **Pointer stub** → the `metamodel` skill (spine, variants, references) |
+| `rules/module-graph-reachability.md` | A direct-importer grep is not a reachability proof |
+| `rules/open-items-governance.md` | **Pointer stub** → the `metamodel` skill's `references/open-items-governance.md` |
+| `rules/osv-scanner-dot-directory-worktrees.md` | osv-scanner finding nothing in some worktrees |
+| `rules/postgres-schema-gotchas.md` | PostgreSQL NULL, jsonb and planner traps (path-scoped) |
+| `rules/python-extras.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
+| `rules/session-handoff.md` | Pointer to the `agent-handoff` skill |
+| `rules/skill-creation-sync.md` | Skill naming (incl. registered exceptions), set placement, reference convention, blast-radius procedure |
+| `rules/sonarcloud-silent-analysis-failure.md` | SonarCloud analysis failing server-side behind a green CI |
+| `rules/structurizr-render-single-view-wipes-others.md` | Single-view `render.sh` deleting the other SVGs |
+| `rules/supabase-config-push-scope.md` | `supabase config push` pushing the whole local config (path-scoped) |
+| `rules/testcontainers-wsl-docker-context.md` | Docker context on WSL breaking docker-py and Testcontainers |
+| `rules/toolchain-version-managed-globals.md` | Version-manager globals vanishing on a runtime bump |
+| `rules/working-style.md` | Sequential plans, trust-but-verify *(→ AGENTS.md adapter)* |
 | `rules/writing-citations.md` | Citation discipline *(→ AGENTS.md adapter)* |
+
+### Personal (`rules/personal/`)
+
+| Rule file | Covers |
+|---|---|
+| `rules/personal/bang-prefix-is-for-the-claude-prompt.md` | Say that a `! command` goes in the Claude prompt |
+| `rules/personal/browser-automation.md` | Prefer Playwright |
+| `rules/personal/claude-plugin-eval-wsl-and-graders.md` | `claude plugin eval` on WSL; `tool_used` graders |
+| `rules/personal/decisions-in-prose-not-forms.md` | Owner decisions discussed in prose |
+| `rules/personal/diagramming-layout.md` | Orthogonal edges, fewest elbows |
+| `rules/personal/plans-are-tdd.md` | Plans order tests before code |
+| `rules/personal/preferences.md` | Naming, code language, Ralph Loop execution |
+| `rules/personal/python-docstring-policy.md` | Google §3.8 docstrings as written (path-scoped) |
+| `rules/personal/subagent-orchestration.md` | One subagent per increment, foreground gates, verify between iterations |
+| `rules/personal/ui-copy-no-em-dash.md` | No em dash in user-facing copy |
+| `rules/personal/wsl-test-resource-budget.md` | Memory budget for test runs on the WSL machine |

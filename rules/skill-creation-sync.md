@@ -427,6 +427,8 @@ No new build order step. Run only the checks that apply:
 1. Commit + push in `$KIT_DIR` — convention: `feat(<skill-name>): <title>` or `chore(<skill-name>): <title>`
 2. `$KIT_DIR/install.sh` — symlinks all skills into `~/.claude/skills/`
 
+Rules follow the same path: author them in `$KIT_DIR/rules/` (shared) or `$KIT_DIR/rules/personal/` (owner preference or machine setup), never as a plain file in `~/.claude/rules/`, which holds only installer-managed links (kit ADR-0011).
+
 ## Cross-machine sync via chezmoi
 
 Dotfiles hook `run_onchange_install-claude-kit.sh.tmpl` re-runs on every `chezmoi apply` *only when its rendered content changes*. The hash comment uses:
