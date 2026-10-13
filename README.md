@@ -125,7 +125,7 @@ Every Claude rule is authored here, never directly in `~/.claude/rules/` (kit AD
 - **`rules/`**: shared engineering rules, installed for everyone.
 - **`rules/personal/`**: the owner's preferences and this machine's setup. Installed only after `./install.sh --personal-rules on`, which is remembered in `var/personal-rules`, so a teammate's install gets the shared layer alone. A file name may exist in one layer only.
 
-The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md adapter for Codex/OpenCode. `scripts/test-install-rules.sh` checks the installer's rule handling against a throwaway kit.
+The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md adapter for Codex/OpenCode. `scripts/test-install-rules.sh` checks the installer's rule handling against a throwaway kit. `scripts/check-rules.py` checks every rule against the budget: 3k per always-on rule, 15k always-on in total, 4k per path-scoped rule, and no dated history, incident narrative or wiki-links.
 
 ### Shared (`rules/`)
 
