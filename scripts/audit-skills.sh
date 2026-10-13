@@ -77,7 +77,7 @@ while IFS= read -r skill_dir; do
   # 4. Check required frontmatter fields
   # Top-level: fields Claude Code / the Agent Skills standard reads directly.
   # metadata.*: kit-internal governance fields, nested under metadata: so they
-  # can never collide with a real skill-loader field (see rules/skill-creation-sync.md).
+  # can never collide with a real skill-loader field (see .claude/skills/util-skill-authoring/SKILL.md).
   top_level_fields=("name" "description" "license" "user-invocable")
   metadata_fields=("version" "status" "last_reviewed" "impact" "category" "complexity")
   missing_fields=()

@@ -56,7 +56,7 @@ python3 scripts/gen-mcp.py plugins .
 # Validate a single skill/workflow YAML file
 python3 -c "import yaml,sys; yaml.safe_load(open('<file>'))"
 
-# Skill folder name / frontmatter name: consistency check (rules/skill-creation-sync.md)
+# Skill folder name / frontmatter name: consistency check (.claude/skills/util-skill-authoring/references/naming.md)
 for skill in plugins/*/skills/*/; do
   skill_name="$(basename "${skill%/}")"
   name=$(grep -m1 "^name:" "$skill/SKILL.md" | sed -E 's/name: *//; s/^"//; s/"$//')
