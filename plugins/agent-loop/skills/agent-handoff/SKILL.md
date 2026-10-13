@@ -1,7 +1,7 @@
 ---
 name: agent-handoff
 license: MIT
-description: "Hand off an overloaded interactive session's context to a fresh session via a validated markdown handoff document. Two modes: create (write the handoff at var/handoffs/, end with a paste-ready resume prompt) and resume (load a handoff in a fresh session, check repo drift, re-verify inherited claims, continue the work). Triggers on: handoff, hand off context, context handoff, pass context to a new session, continue in fresh session, resume handoff."
+description: "Hand off an overloaded interactive session's context to a fresh session via a validated markdown handoff document. Two modes: create (write the handoff at var/handoffs/, end with a paste-ready resume prompt) and resume (load a handoff in a fresh session, check repo drift, re-verify inherited claims, continue the work). Triggers on: handoff, hand off context, context handoff, pass context to a new session, continue in fresh session, resume handoff. Also suggest it proactively when an interactive session passes 40–60% context at a semantic boundary."
 allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/validate-handoff.py *)
 user-invocable: true
 metadata:
@@ -131,7 +131,7 @@ This skill deliberately does not:
 3. **Auto-continue work.** `resume` mode re-verifies before acting; it never blindly
    replays the prior session's plan.
 4. **Edit a project's `AGENTS.md`.** Passive routing knowledge (that handoffs exist and
-   live under `var/handoffs/`) is carried by a kit rule file, not written per-project by
-   this skill.
+   live under `var/handoffs/`) is carried by this skill's description and the kit's
+   AGENTS.md adapter (`templates/agents-adapter.md`), not written per-project by this skill.
 5. **Clear or restart the running session.** Only the operator can do that; `create` mode's
    job ends at printing the resume prompt.

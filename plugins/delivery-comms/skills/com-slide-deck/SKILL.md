@@ -50,8 +50,10 @@ project-specific content.
 | Split an existing deck       | `python scripts/split.py <file> --config path/to/config.yaml` |
 | Migrate an old deck to the design system | `python scripts/migrate.py --config path/to/config.yaml` (report) · `--apply` (alias shim) · `--rename` (rewrite names) |
 | Cite a source on a slide     | Add `data-sources="key1,key2"` to the `.slide` div; add entries to `context/bibliography.yaml` |
-| Add a new source             | Add a keyed entry to `context/bibliography.yaml` |
+| Add a new source             | Add a keyed entry to `context/bibliography.yaml` once a slide cites it |
 | Add custom `<head>` meta tags | Add a `meta:` list to `config.yaml` (`- {name: …, content: …}`) — injected into the built `<head>`. Use for rights/author/licence provenance (content is HTML-escaped) |
+
+Add a `bibliography.yaml` entry only for a source a slide cites (`data-sources`); never pre-populate it, and remove existing entries only on request. Keep the inline links in the markdown research docs: the two channels do not substitute for each other.
 
 ---
 

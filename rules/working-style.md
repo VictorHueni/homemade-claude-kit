@@ -10,3 +10,4 @@ type: rule
 - **Asynchronous systems** (DNS, CDN, certificates, queues): a write reported as successful but not yet visible is usually still propagating. Poll the downstream source for several minutes (`dig` the authoritative server; an unbumped SOA serial means not yet published) and read the stored value back; delete and recreate only when the readback proves it wrong, never to hurry propagation.
 - **Comments explain why, sparingly,** at the density of the surrounding file. No narration of what the code does and no history in code (`was:`, "previously", dated notes, tombstones); delete a replaced code's comment with it.
 - **Never hard-wrap markdown prose:** one line per paragraph or list item (tables and code blocks keep their own lines).
+- **Sources in answers:** every figure or factual claim in a reply names its source, with an inline link when public and the arXiv or canonical ID for a paper.
