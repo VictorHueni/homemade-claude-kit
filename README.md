@@ -25,7 +25,7 @@ Three design pillars (kit [ADR-0006](docs/architecture/decisions/adr-0006-plugin
 | `dev-flow` | Developer workflow (+ `branch-cleanup-audit` command) | `dev-git-init` · `dev-git-commit` · `dev-pr` · `dev-git-worktree` · `dev-release-init` · `dev-stack-guide` · `dev-getting-started` |
 | `agent-loop` | Guide → Verify → Solve agent cycle (+ `ralph-audit` command) | `agent-config` · `agent-grill-me` · `agent-peer-review` · `agent-ralph-loop` |
 | `delivery-comms` | Presentation layer | `com-slide-deck` · `com-artefact-viz` · `com-release-note` · `ux-design-system` |
-| `ops` | Post-ship operations | `ops-runbook` · `ops-bug-rca` · `ops-terraform-exoscale` |
+| `ops` | Post-ship operations | `ops-runbook` · `ops-bug-rca` · `ops-sonarcloud-audit` · `ops-terraform-exoscale` |
 | `docs-hygiene` | Documentation housekeeping | `util-docs-audit` · `util-docs-index` · `util-docs-lint` · `util-docs-log` |
 
 Per-skill purpose lives in each `plugins/<set>/skills/<name>/SKILL.md` frontmatter description.
@@ -122,7 +122,8 @@ Open items live as GitHub Issues labelled `open-item` —
 
 `kit-core` ships Claude Code hooks in `plugins/kit-core/hooks/hooks.json`; they run whenever the plugin is enabled. They replace always-on rules that only mattered for one command.
 
-- **`tripwires.py`** (PreToolUse, Bash) checks each command against a table. `deny` blocks it outright with what to do instead (`git commit --amend`, `pgrep -f` in a wait loop). `ack` blocks a one-shot, hard-to-undo call with its checklist until the command is rerun with a trailing `# tripwire-ack` (`gh issue transfer`, an `updateProjectV2Field` GraphQL call). `note` lets it run and adds the explanation to the model's context with the result (`osv-scanner`; a test run while Docker Desktop's `desktop-linux` context is active on WSL). Commands are matched in command position, after quoted text, heredoc bodies and comments are removed, so a commit message or a grep naming a command does not trip it; `sh -c` and `eval` payloads are still checked.
+- **`tripwires.py`** (PreToolUse, Bash) checks each command against a table. `deny` blocks it outright with what to do instead (`git commit --amend`, `pgrep -f` in a wait loop). `ack` blocks a one-shot, hard-to-undo call with its checklist until the command is rerun with a trailing `# tripwire-ack` (`gh issue transfer`, an `updateProjectV2Field` GraphQL call). `note` lets it run and adds the explanation to the model's context with the result (`osv-scanner`; `claude plugin update`/`install`, `claude mcp`; `dig`/`nslookup`/`host`; a test run while Docker Desktop's `desktop-linux` context is active on WSL). Commands are matched in command position, after quoted text, heredoc bodies and comments are removed, so a commit message or a grep naming a command does not trip it; `sh -c` and `eval` payloads are still checked.
+- **`memory_write_check.py`** (PreToolUse, Write/Edit) denies the first write to each auto-memory file in a session with the "kit rule, AGENTS.md, or memory?" checklist; the retry goes through. `MEMORY.md` itself is exempt.
 - **`docker_context_check.py`** (SessionStart) prints the same Docker warning when a session opens with that context active. Silent everywhere else, macOS included.
 
 Add a tripwire as one row in `TRIPWIRES` plus its cases in `scripts/test-hooks.py`, then bump `kit-core`'s version. Run the tests with `python3 scripts/test-hooks.py`.
@@ -134,29 +135,26 @@ Every Claude rule is authored here, never directly in `~/.claude/rules/` (kit AD
 - **`rules/`**: shared engineering rules, installed for everyone.
 - **`rules/personal/`**: the owner's preferences and this machine's setup. Installed only after `./install.sh --personal-rules on`, which is remembered in `var/personal-rules`, so a teammate's install gets the shared layer alone. A file name may exist in one layer only.
 
-The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md adapter for Codex/OpenCode. `scripts/test-install-rules.sh` checks the installer's rule handling against a throwaway kit. `scripts/check-rules.py` checks every rule against the budget: 3k per always-on rule, 20k always-on in total, 4k per path-scoped rule, and no dated history, incident narrative or wiki-links.
+The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md adapter for Codex/OpenCode. `scripts/test-install-rules.sh` checks the installer's rule handling against a throwaway kit. `scripts/check-rules.py` checks every rule against the budget: 3k per always-on rule, 6k always-on in total, 4k per path-scoped rule, and no dated history, incident narrative or wiki-links. A pre-commit hook in `.githooks/` runs it, along with `test-hooks.py`, `audit-skills.sh` and `test-install-rules.sh`, each only when the commit touches files that check covers; `install.sh` enables it by setting `core.hooksPath` unless the checkout already has one.
 
 ### Shared (`rules/`)
 
 | Rule file | Covers |
 |---|---|
 | `rules/ci-workflows.md` | Local mirror for every CI tool; `GITHUB_TOKEN` chains and `workflow_run`; `GH_REPO` without a checkout (path-scoped) |
-| `rules/claude-plugins-and-mcp.md` | Plugin refresh, MCP version pins, OAuth client reset |
-| `rules/consistency-over-lean-variants.md` | Reuse the codebase's existing pattern before a leaner bespoke one |
+| `rules/claude-plugins-and-mcp.md` | Plugin refresh, MCP version pins, OAuth client reset (path-scoped) |
 | `rules/diagramming-mermaid.md` | Diagram tool split (C4, UML, Mermaid) and Mermaid pitfalls on GitHub (path-scoped) *(→ AGENTS.md adapter)* |
 | `rules/diagramming-plantuml.md` | PlantUML creole markup eating CLI flags (path-scoped) |
 | `rules/frontend-nuxt.md` | Nuxt UI 4 / Vue 3.5 / Reka UI (path-scoped) *(→ AGENTS.md adapter)* |
-| `rules/git-and-tools.md` | Git discipline, Edit tool usage *(→ AGENTS.md adapter)* |
+| `rules/git.md` | No amend, commit and PR-title scope, branch names *(→ AGENTS.md adapter)* |
 | `rules/jvm-toolchain.md` | Maven, Temurin, current LTS (path-scoped) |
 | `rules/kit-docs-stack.md` | **Pointer stub** → the `metamodel` skill: spine, artefact registry, frontmatter, open-items contract (kit ADR-0007; path-scoped) |
-| `rules/memory-hygiene.md` | Where a lesson belongs: kit rule, project AGENTS.md, or auto-memory |
-| `rules/module-graph-reachability.md` | A direct-importer grep is not a reachability proof |
 | `rules/postgres-schema-gotchas.md` | PostgreSQL NULL, jsonb and planner traps (path-scoped) |
 | `rules/python-gotchas.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
+| `rules/shell-verdicts.md` | `PIPESTATUS`, truncated output, `pgrep -f` waits *(→ AGENTS.md adapter)* |
 | `rules/skill-creation-sync.md` | Skill-edit checklist; points to the kit-local `util-skill-authoring` skill (path-scoped) |
-| `rules/sonarcloud-silent-analysis-failure.md` | SonarCloud analysis failing server-side behind a green CI |
+| `rules/sonarcloud-silent-analysis-failure.md` | **Pointer stub** → the `ops-sonarcloud-audit` skill (path-scoped) |
 | `rules/supabase-config-push-scope.md` | `supabase config push` pushing the whole local config (path-scoped) |
-| `rules/toolchain-version-managed-globals.md` | Version-manager globals vanishing on a runtime bump |
 | `rules/working-style.md` | Sequential plans, trust-but-verify *(→ AGENTS.md adapter)* |
 | `rules/writing-citations.md` | Inline source links in markdown docs (path-scoped) *(→ AGENTS.md adapter)* |
 
@@ -165,12 +163,9 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | Rule file | Covers |
 |---|---|
 | `rules/personal/bang-prefix-is-for-the-claude-prompt.md` | Say that a `! command` goes in the Claude prompt |
-| `rules/personal/browser-automation.md` | Prefer Playwright |
-| `rules/personal/claude-plugin-eval-wsl-and-graders.md` | `claude plugin eval` on WSL; `tool_used` graders |
 | `rules/personal/decisions-in-prose-not-forms.md` | Owner decisions discussed in prose |
 | `rules/personal/diagramming-layout.md` | Orthogonal edges, fewest elbows (path-scoped) |
 | `rules/personal/preferences.md` | Naming, code language |
 | `rules/personal/python-docstring-policy.md` | Google §3.8 docstrings as written (path-scoped) |
-| `rules/personal/subagent-orchestration.md` | Pointer to chat-driven Ralph orchestration; joining dead-code leads across audit slices |
+| `rules/personal/subagent-orchestration.md` | Pointer to chat-driven Ralph orchestration |
 | `rules/personal/ui-copy-no-em-dash.md` | No em dash in user-facing copy (path-scoped) |
-| `rules/personal/wsl-test-resource-budget.md` | Memory budget for test runs on the WSL machine |

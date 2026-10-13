@@ -19,7 +19,8 @@ END = "<!-- END homemade-claude-kit adapter -->"
 # template covers other harnesses (kit ADR-0006 §4, ADR-0007 §6).
 BEHAVIOURAL_RULES = [
     "working-style.md",
-    "git-and-tools.md",
+    "git.md",
+    "shell-verdicts.md",
     "writing-citations.md",
     "diagramming-mermaid.md",
     "frontend-nuxt.md",

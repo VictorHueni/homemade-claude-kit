@@ -37,7 +37,7 @@ If the project's `commitlint.config.js` (or equivalent) defines a different type
 
 ## Scopes (optional)
 
-Infer the scope from the change — do not use a hardcoded list. **Prefer the project's capability / product vocabulary** (a capability-map or FBS slug) when it has one; else the changed area (`auth`, `api`, `infra`, `deps`). **Never a bare work-item / plan number** — keep any plan/increment ref in the PR body, not the title. Omit the scope if the change genuinely spans multiple areas. Because a squash-merge makes the **PR title** the commit subject the automated changelog groups by, this scope is the one that flows into the changelog and the curated release note — see [Commit & PR scope vocabulary](../../rules/git-and-tools.md).
+Infer the scope from the change — do not use a hardcoded list. **Prefer the project's capability / product vocabulary** (a capability-map or FBS slug) when it has one; else the changed area (`auth`, `api`, `infra`, `deps`). **Never a bare work-item / plan number** — keep any plan/increment ref in the PR body, not the title. Omit the scope if the change genuinely spans multiple areas. Because a squash-merge makes the **PR title** the commit subject the automated changelog groups by, this scope is the one that flows into the changelog and the curated release note — see the kit's `git` rule (commit and PR-title scope).
 
 ## Summary Rules
 

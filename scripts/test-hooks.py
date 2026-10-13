@@ -15,6 +15,7 @@ from unittest import mock
 HOOKS = Path(__file__).resolve().parent.parent / "plugins" / "kit-core" / "hooks"
 sys.path.insert(0, str(HOOKS))
 
+import memory_write_check  # noqa: E402  # pyright: ignore[reportMissingImports]
 import tripwires  # noqa: E402  # pyright: ignore[reportMissingImports]
 
 
@@ -99,6 +100,22 @@ class TripwireTest(unittest.TestCase):
         self.assertIn("--no-ignore", out["additionalContext"])
         self.assertDecisions(None, ["cat osv-scanner.toml", "rg osv-scanner docs/"])
 
+    def test_plugin_mcp_and_dns_commands_get_notes(self):
+        self.assertDecisions("note", [
+            "claude plugin update kit-core@homemade-claude-kit",
+            "claude plugin marketplace update homemade-claude-kit",
+            "claude mcp list",
+            "dig @ns1.example.net example.com SOA +short",
+            "nslookup example.com",
+            "echo example.com | xargs dig",
+        ])
+        self.assertDecisions(None, [
+            "claude plugin list",
+            "git commit -m 'run claude mcp list'",
+            "grep -rn dig src/",
+            "host=db ./run.sh",
+        ])
+
     def test_cli_ignores_other_tools_and_bad_input(self):
         for stdin in (
             json.dumps({"tool_name": "Edit", "tool_input": {"command": "git commit --amend"}}),
@@ -113,6 +130,41 @@ class TripwireTest(unittest.TestCase):
         stdin = json.dumps({"tool_name": "Bash", "tool_input": {"command": "git commit --amend"}})
         out = json.loads(_run("tripwires.py", stdin).stdout)["hookSpecificOutput"]
         self.assertEqual(out["permissionDecision"], "deny")
+
+
+class MemoryWriteTest(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.mkdtemp()
+        patcher = mock.patch.object(memory_write_check.tempfile, "gettempdir", return_value=tmp)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _write(self, path: str, session: str = "s1") -> dict | None:
+        return memory_write_check.evaluate({"session_id": session, "tool_input": {"file_path": path}})
+
+    def test_first_write_per_file_and_session_is_denied_once(self):
+        path = "/home/u/.claude/projects/-home-u-repo/memory/feedback_x.md"
+        self.assertEqual(self._write(path)["hookSpecificOutput"]["permissionDecision"], "deny")
+        self.assertIsNone(self._write(path))
+        self.assertIsNotNone(self._write(path, session="s2"))
+        self.assertIsNotNone(self._write(path.replace("feedback_x", "feedback_y")))
+
+    def test_no_session_id_is_not_scoped_to_the_path_forever(self):
+        path = "/home/u/.claude/projects/-home-u-repo/memory/feedback_x.md"
+        self.assertIsNone(memory_write_check.evaluate({"tool_input": {"file_path": path}}))
+
+    def test_other_paths_and_the_index_pass(self):
+        for path in (
+            "/home/u/.claude/projects/-home-u-repo/memory/MEMORY.md",
+            "/home/u/repo/docs/memory/notes.md",
+            "/home/u/repo/src/app.py",
+        ):
+            self.assertIsNone(self._write(path), path)
+
+    def test_cli_ignores_bash_and_bad_input(self):
+        for stdin in (json.dumps({"tool_name": "Bash", "tool_input": {"command": "ls"}}), "[]", "not json"):
+            run = _run("memory_write_check.py", stdin)
+            self.assertEqual((run.returncode, run.stdout, run.stderr), (0, "", ""), stdin)
 
 
 class DockerContextTest(unittest.TestCase):

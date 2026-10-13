@@ -142,7 +142,7 @@ Examples (scopes are illustrative — use your project's real capability/product
 - `fix(search): correct ranking at the tie-break` + trailer `Refs: Plan-0042 increment 05`
 - `refactor(platform): extract shared retry helper` + trailer `Refs: Plan-0042 increment 07`
 
-> **Why:** the scope drives the automated changelog and the stakeholder release note (`com-release-note`). A capability/product scope makes both legible to a non-technical reader and near-mechanical to curate; a bare plan number makes them opaque. This mirrors the canonical [Commit & PR scope vocabulary](../../rules/git-and-tools.md) convention that `dev-git-commit`, `dev-pr`, and `plan-implementation` also follow. Mechanical enforcement is tracked in kit issue #64.
+> **Why:** the scope drives the automated changelog and the stakeholder release note (`com-release-note`). A capability/product scope makes both legible to a non-technical reader and near-mechanical to curate; a bare plan number makes them opaque. This mirrors the kit's `git` rule (commit and PR-title scope) convention that `dev-git-commit`, `dev-pr`, and `plan-implementation` also follow. Mechanical enforcement is tracked in kit issue #64.
 
 ## Completion Detection
 

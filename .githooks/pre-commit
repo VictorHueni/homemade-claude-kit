@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Kit pre-commit gate: run each check only when the commit touches what it covers.
+# Enabled by install.sh (core.hooksPath = .githooks). The checks read the working
+# tree, so stage everything you mean to commit before relying on a green result.
+set -uo pipefail
+
+kit="$(git rev-parse --show-toplevel)"
+staged="$(git diff --cached --name-only --diff-filter=ACMRD)"
+failed=0
+
+run_if() {
+    local pattern="$1"; shift
+    grep -qE "$pattern" <<<"$staged" || return 0
+    echo "pre-commit: $*" >&2
+    (cd "$kit" && "$@") || failed=1
+}
+
+run_if '^(rules/|scripts/check-rules\.py$)' python3 scripts/check-rules.py
+run_if '^(plugins/kit-core/hooks/|scripts/test-hooks\.py$)' python3 -B scripts/test-hooks.py
+run_if '^(plugins/[^/]+/skills/|\.claude/skills/|scripts/audit-skills\.sh$)' bash scripts/audit-skills.sh
+run_if '^(rules/|install\.sh$|scripts/test-install-rules\.sh$)' bash scripts/test-install-rules.sh
+
+if [[ $failed -ne 0 ]]; then
+    echo "pre-commit: a kit check failed; fix it, or bypass once with --no-verify." >&2
+fi
+exit $failed

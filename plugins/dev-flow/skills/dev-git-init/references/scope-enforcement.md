@@ -1,6 +1,6 @@
 # PR-title lint + squash-title + capability scope-enum — enforcement guidance
 
-Loaded on demand by `dev-git-init` when the branching strategy squash-merges and/or a capability map / FBS is present. This is the mechanical enforcement backstop under the authoring convention in `rules/git-and-tools.md` §"Commit & PR scope vocabulary" — that rule is the source of truth for *why* a scope names a capability and never a work-item number. Do **not** restate it here; this file covers only the *how*.
+Loaded on demand by `dev-git-init` when the branching strategy squash-merges and/or a capability map / FBS is present. This is the mechanical enforcement backstop under the authoring convention in the kit's `git` rule (commit and PR-title scope) — that rule is the source of truth for *why* a scope names a capability and never a work-item number. Do **not** restate it here; this file covers only the *how*.
 
 ## Why PR-title lint is not optional on a squash-merge repo
 

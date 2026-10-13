@@ -42,12 +42,12 @@
     {
       "name": "kit-core",
       "source": "./plugins/kit-core",
-      "description": "Kit core \u2014 always enabled. The metamodel keystone skill (spine, YAML type registry, frontmatter schema, open-items contract, Audit/Scaffold/Migrate modes) plus the cross-cutting operators: open-items ledger, provenance, toolkit doctor; and the tripwire hooks (commands with a known trap are blocked or annotated)."
+      "description": "Kit core \u2014 always enabled. The metamodel keystone skill (spine, YAML type registry, frontmatter schema, open-items contract, Audit/Scaffold/Migrate modes) plus the cross-cutting operators: open-items ledger, provenance, toolkit doctor; and the tripwire hooks (commands with a known trap are blocked or annotated; a first write to auto-memory shows the where-does-this-belong checklist)."
     },
     {
       "name": "ops",
       "source": "./plugins/ops",
-      "description": "Operations. Runbooks, bug RCAs, and Exoscale Terraform automation."
+      "description": "Operations. Runbooks, bug RCAs, SonarCloud diagnosis, and Exoscale Terraform automation."
     },
     {
       "name": "product-spec",

@@ -1,7 +1,7 @@
 {
   "name": "ops",
-  "description": "Operations. Runbooks, bug RCAs, and Exoscale Terraform automation.",
-  "version": "1.0.3",
+  "description": "Operations. Runbooks, bug RCAs, SonarCloud diagnosis, and Exoscale Terraform automation.",
+  "version": "1.1.0",
   "author": {
     "name": "Victor Hueni"
   }

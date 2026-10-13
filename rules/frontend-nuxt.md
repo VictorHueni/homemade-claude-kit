@@ -16,6 +16,8 @@ paths:
 
 **Events.** `UInput @focus` / `@blur` are unreliable during hydration and Playwright `fill()`. Use `@focusin` / `@focusout` on a wrapper and check `relatedTarget` with `contains()`.
 
+**Routes.** A localised URL goes on an English-named page file: `definePageMeta({ path: '/localised-route' })`.
+
 **Error pages.** `clearError({ redirect })` does not navigate in dev while the DevTools overlay is active: E2E tests assert the button there, and navigation only against a production build (`npm run build && npm run preview`).
 
 **SSR-safe formatting.** No `toLocaleString()` or `Intl` formatters in SSR-rendered templates: Node and browser ICU data differ (a `U+2019` versus `U+0027` thousands separator, a silent fallback to `en`) and cause hydration mismatches. Use a deterministic formatter for one locale (insert `U+2019` directly), `@nuxtjs/i18n`'s `useI18n().n()` for several; `data-allow-mismatch="text"` silences the warning but still flashes.

@@ -45,6 +45,9 @@ _PGREP_FULL = re.compile(r"\bpgrep\b[^;&|\n]*\s(?:-[A-Za-z]*f|--full)\b")
 _GH_TRANSFER = _at_start(r"gh\s+issue\s+transfer\b")
 _GRAPHQL_CALL = _at_start(r"(?:gh\s+api\s+graphql|curl)\b")
 _OSV = _at_start(r"osv-scanner\b(?!\.)")
+_PLUGIN_REFRESH = _at_start(r"claude\s+plugin\s+(?:update|install|marketplace\s+update)\b")
+_MCP = _at_start(r"claude\s+mcp\b")
+_DNS_LOOKUP = _at_start(r"(?:dig|nslookup|host)(?:\s|$)")
 
 
 def _pgrep_wait(command: str, stripped: str) -> bool:
@@ -144,6 +147,34 @@ TRIPWIRES = [
         "parent repo's ignored folder scans nothing and fails with `No package sources found` (exit 128). "
         "It is not a lockfile problem. Tell: `git -C <parent> check-ignore -q <path>` succeeds. Pass "
         "`--no-ignore`, or keep worktrees outside the parent repository.",
+    ),
+    (
+        "claude-plugin-refresh",
+        "note",
+        lambda command, stripped: bool(_PLUGIN_REFRESH.search(stripped)),
+        "`claude plugin marketplace update <marketplace>` refreshes the catalog only; `claude plugin update "
+        "<plugin>@<marketplace>` pulls new content into the version-keyed cache (the bare name fails with "
+        "`not found`). It only moves when the plugin's `plugin.json` version was bumped, otherwise it says "
+        "\"already up to date\". Check `ls ~/.claude/plugins/cache/<marketplace>/<plugin>/`, then start a new "
+        "session: a running one keeps what it loaded, MCP servers included.",
+    ),
+    (
+        "claude-mcp-auth",
+        "note",
+        lambda command, stripped: bool(_MCP.search(stripped)),
+        "A remote MCP server answering `Unrecognized client_id` (`Needs authentication` in `claude mcp list`) "
+        "dropped its cached OAuth registration: `claude mcp logout <server>`, then reconnect through `/mcp` in "
+        "an interactive session (`claude mcp login` fails without a terminal). If it persists the fault is "
+        "server-side; use the provider's CLI or API meanwhile.",
+    ),
+    (
+        "dns-propagation",
+        "note",
+        lambda command, stripped: bool(_DNS_LOOKUP.search(stripped)),
+        "A DNS (or CDN, certificate, queue) write reported successful but not yet visible is usually still "
+        "propagating. Poll the authoritative server for several minutes (`dig @<ns> <name>`; an unbumped SOA "
+        "serial means not yet published) and read the stored value back from the provider. Delete and recreate "
+        "only when the readback proves it wrong, never to hurry propagation.",
     ),
     (
         "docker-desktop-context",
