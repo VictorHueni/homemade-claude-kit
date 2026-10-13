@@ -256,3 +256,8 @@ Notes:
 - **Direction:** `left to right direction` (use-case, some activity) vs the top-down default.
 - **Never** put a name after `@startuml` — the filename owns the output name (see `puml-conventions.md`).
 - **Always** `!include _theme.puml` as the first line after `@startuml`.
+
+## Pitfalls
+
+- **Message text is creole.** Two `--` on one line render as strikethrough between them, and `-checkonly` still passes; `__x__`, `**x**` and `~~x~~` underline, bold and strike. Describe a command line in words, or escape with `~`. After rendering, `grep -c line-through views/*.svg` must be 0.
+- **Angle brackets** in messages (`<type>.csv`) are read as tags; use a plain word.

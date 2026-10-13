@@ -90,35 +90,44 @@ fi
 
 # ─── 2. Render directly to SVG ────────────────────────────────────────
 mkdir -p "${SCRIPT_DIR}/views"
+# Export into a scratch folder inside the mount, then copy: a single-view call must never touch other views' SVGs.
+RENDER_TMP_REL=".render-tmp"
+RENDER_TMP="${SCRIPT_DIR}/views/${RENDER_TMP_REL}"
+rm -rf "${RENDER_TMP}"
+mkdir -p "${RENDER_TMP}"
+trap 'rm -rf "${RENDER_TMP}"' EXIT
 
 echo "→ Rendering views to SVG (first run downloads Chromium inside the container; subsequent runs are fast)"
 if ! docker run --rm --user "${DOCKER_USER}" -v "${REPO_ROOT}:/work" "${IMAGE}" \
         export \
             -workspace "${DSL_PATH}" \
             -format svg \
-            -output "${VIEWS_DIR}"; then
+            -output "${VIEWS_DIR}/${RENDER_TMP_REL}"; then
     echo "ERROR: export failed." >&2
     exit 3
 fi
 
-# ─── 3. Optional single-view filter ───────────────────────────────────
-# (The export command renders every view in the DSL; if a single view
-# was requested, delete the others. Cheaper than per-view docker runs
-# because Chromium starts once.)
-if [[ -n "${VIEW_KEY}" ]]; then
-    KEEP="${SCRIPT_DIR}/views/${VIEW_KEY}.svg"
-    if [[ ! -f "${KEEP}" ]]; then
-        echo "ERROR: view key '${VIEW_KEY}' not found in render output. Available:" >&2
-        find "${SCRIPT_DIR}/views" -maxdepth 1 -name '*.svg' -printf '  %f\n' | sed 's/\.svg$//' >&2
-        exit 4
-    fi
-    find "${SCRIPT_DIR}/views" -maxdepth 1 -type f -name '*.svg' ! -name "${VIEW_KEY}.svg" -delete
-fi
-
-# ─── 4. Detect zero-view DSL ──────────────────────────────────────────
-if ! compgen -G "${SCRIPT_DIR}/views/*.svg" > /dev/null; then
+# ─── 3. Detect zero-view DSL ──────────────────────────────────────────
+# Checked on this run's export, not views/, which still holds earlier SVGs.
+if ! compgen -G "${RENDER_TMP}/*.svg" > /dev/null; then
     echo "ERROR: no views rendered. workspace.dsl has no \`views { ... }\` block or all views are empty." >&2
     exit 4
+fi
+
+# ─── 4. Copy into views/ (all, or only the requested view) ────────────
+# The export renders every view (Chromium starts once); a single-view call copies only its SVG.
+if [[ -n "${VIEW_KEY}" ]]; then
+    if [[ ! -f "${RENDER_TMP}/${VIEW_KEY}.svg" ]]; then
+        echo "ERROR: view key '${VIEW_KEY}' not found in render output. Available:" >&2
+        find "${RENDER_TMP}" -maxdepth 1 -name '*.svg' -printf '  %f\n' | sed 's/\.svg$//' >&2
+        exit 4
+    fi
+    cp "${RENDER_TMP}/${VIEW_KEY}.svg" "${SCRIPT_DIR}/views/"
+    if [[ -f "${RENDER_TMP}/${VIEW_KEY}-key.svg" ]]; then
+        cp "${RENDER_TMP}/${VIEW_KEY}-key.svg" "${SCRIPT_DIR}/views/"
+    fi
+else
+    cp "${RENDER_TMP}"/*.svg "${SCRIPT_DIR}/views/"
 fi
 
 # ─── 5. Report ────────────────────────────────────────────────────────

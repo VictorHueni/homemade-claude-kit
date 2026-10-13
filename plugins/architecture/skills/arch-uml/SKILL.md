@@ -131,6 +131,7 @@ After authoring a diagram, deliver:
 - [ ] No name written after `@startuml` (filename drives the output)
 - [ ] One concern per diagram; layout discipline applied (see `diagram-discipline.md`)
 - [ ] `render.sh <name>` validated (`-checkonly`) and produced the SVG
+- [ ] `grep -c line-through views/*.svg` is 0 (no creole strikethrough in message text)
 - [ ] SVG embedded into the consuming markdown by relative path (or its path reported)
 - [ ] No new ID scheme invented; upstream IDs carried verbatim
 - [ ] Closing report delivered

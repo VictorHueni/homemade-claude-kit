@@ -29,6 +29,13 @@ The single biggest readability lever. A `.puml` should cover **one** scenario, *
 - Sequence diagrams have a fixed left-to-right participant axis — order participants by who initiates (leftmost) to reduce arrow length.
 - For class/ER, let Graphviz decide; only nudge with relationship ordering if crossings are bad.
 
+### Edge routing
+
+- Orthogonal edges only, never diagonals. Prefer, in order: a straight segment (reposition boxes so they align, placing each next to its strongest connections), one elbow, two elbows, an outside detour. A turn is cheaper than a crossing, but prefer fewer of both.
+- Treat layout as a joint problem: swapping two boxes' rows or columns often removes several elbows at once.
+- Box text never overflows: wrap it and grow the box (SVG `<text>` neither wraps nor clips).
+- Audit hand-laid SVG by script, not by eye: zero diagonals, elbow and crossing counts, no segment through a box, no label on a box or line.
+
 ### Labels and legends
 
 - Every relationship/transition carries a label (the verb, event, or multiplicity). An unlabelled arrow is a question for the reader.
