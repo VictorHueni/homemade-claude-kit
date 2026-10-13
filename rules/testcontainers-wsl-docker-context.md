@@ -1,3 +1,7 @@
+---
+type: rule
+---
+
 # Docker on WSL: a poisoned context breaks docker-py and Testcontainers in two different ways
 
 ## The root cause is one line in `~/.docker/config.json`

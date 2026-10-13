@@ -18,6 +18,8 @@ QUIET=0
 TARGET_ROOT=""
 CLAUDE_CHANNEL_FLAG=""
 CLAUDE_CHANNEL_FILE="$SCRIPT_DIR/var/claude-channel"
+PERSONAL_RULES_FLAG=""
+PERSONAL_RULES_FILE="$SCRIPT_DIR/var/personal-rules"
 
 usage() {
     cat <<'EOF'
@@ -38,6 +40,12 @@ Options:
                  main (one channel per machine, kit ADR-0006 §3).
                  "symlink" (default): current behaviour. Codex/OpenCode targets,
                  rules, adapters, and MCP generation are unaffected either way.
+  --personal-rules <on|off>
+                 Record whether THIS machine also installs the owner's personal
+                 rule layer (rules/personal/*.md), persisted in var/personal-rules
+                 and read by every later run. Default off, so a teammate's install
+                 gets only the shared rules/. Personal rules are linked flat into
+                 the same rules target; a name used in both layers is an error.
   -h, --help     Show this help.
 EOF
 }
@@ -74,6 +82,20 @@ while [[ $# -gt 0 ]]; do
             case "${1#*=}" in
                 marketplace|symlink) CLAUDE_CHANNEL_FLAG="${1#*=}" ;;
                 *) echo "error: invalid --claude-channel value: ${1#*=} (want marketplace|symlink)" >&2; exit 1 ;;
+            esac
+            ;;
+        --personal-rules)
+            shift
+            [[ $# -gt 0 ]] || { echo "error: --personal-rules requires a value (on|off)" >&2; exit 1; }
+            case "$1" in
+                on|off) PERSONAL_RULES_FLAG="$1" ;;
+                *) echo "error: invalid --personal-rules value: $1 (want on|off)" >&2; exit 1 ;;
+            esac
+            ;;
+        --personal-rules=*)
+            case "${1#*=}" in
+                on|off) PERSONAL_RULES_FLAG="${1#*=}" ;;
+                *) echo "error: invalid --personal-rules value: ${1#*=} (want on|off)" >&2; exit 1 ;;
             esac
             ;;
         -h|--help)
@@ -133,6 +155,27 @@ if [[ -z "$TARGET_ROOT" && -f "$CLAUDE_CHANNEL_FILE" ]]; then
     CLAUDE_CHANNEL="$(cat "$CLAUDE_CHANNEL_FILE")"
 fi
 
+if [[ -n "$PERSONAL_RULES_FLAG" ]]; then
+    mkdir -p "$(dirname "$PERSONAL_RULES_FILE")"
+    printf '%s\n' "$PERSONAL_RULES_FLAG" > "$PERSONAL_RULES_FILE"
+    log "Personal rules recorded: $PERSONAL_RULES_FLAG"
+fi
+PERSONAL_RULES="off"
+if [[ -f "$PERSONAL_RULES_FILE" ]]; then
+    PERSONAL_RULES="$(cat "$PERSONAL_RULES_FILE")"
+fi
+
+# Both layers link flat into one target, so a shared name would make the two
+# layers overwrite each other's link on every run.
+if [[ "$PERSONAL_RULES" == "on" ]]; then
+    for personal_rule in "$SCRIPT_DIR"/rules/personal/*.md; do
+        if [[ -f "$SCRIPT_DIR/rules/$(basename "$personal_rule")" ]]; then
+            echo "error: rule name in both rules/ and rules/personal/: $(basename "$personal_rule")" >&2
+            exit 1
+        fi
+    done
+fi
+
 mkdir -p "$COMMANDS_TARGET" "$RULES_TARGET"
 for skills_target in "$CLAUDE_SKILLS_TARGET" "$CODEX_SKILLS_TARGET" "$AGENTS_SKILLS_TARGET"; do
     mkdir -p "$skills_target"
@@ -169,14 +212,28 @@ sync_files() {
         _chg=$(( _chg + 1 ))
     done
 
+    prune_files "$src" "$target" "$label" "$5" keep-present
+}
+
+# Remove links in target that resolve to a file directly inside src (exact
+# directory match, so links into a subfolder such as rules/personal/ are left
+# alone). keep-present: only links whose source file is gone; all: every one.
+# Usage: prune_files <src_subdir> <target_dir> <label> <pruned_var> <keep-present|all>
+prune_files() {
+    local src="$1" target="$2" label="$3" mode="$5"
+    local -n _pruned="$4"
+    local link name resolved src_real
+    src_real="$(realpath "$src" 2>/dev/null || echo "$src")"
+
     for link in "$target"/*.md; do
-        local name resolved
+        [[ -L "$link" ]] || continue
         name="$(basename "$link")"
-        resolved="$(realpath "$link" 2>/dev/null || true)"
-        if [[ -L "$link" ]] && [[ "$resolved" == "$src/"* ]] && [[ ! -f "$src/$name" ]]; then
+        resolved="$(realpath -m "$link" 2>/dev/null || true)"
+        [[ "$(dirname "$resolved")" == "$src_real" ]] || continue
+        if [[ "$mode" == "all" ]] || [[ ! -f "$src/$name" ]]; then
             rm "$link"
             log_verbose "  ✗ pruned $label: $name"
-            _prun=$(( _prun + 1 ))
+            _pruned=$(( _pruned + 1 ))
         fi
     done
 }
@@ -387,6 +444,11 @@ else
     done
 fi
 sync_files "$SCRIPT_DIR/rules"    "$RULES_TARGET"    "rule"    changed_rules    pruned_rules    unchanged_rules
+if [[ "$PERSONAL_RULES" == "on" ]]; then
+    sync_files "$SCRIPT_DIR/rules/personal" "$RULES_TARGET" "personal rule" changed_rules pruned_rules unchanged_rules
+else
+    prune_files "$SCRIPT_DIR/rules/personal" "$RULES_TARGET" "personal rule" pruned_rules all
+fi
 
 # ── Official plugins (global installs only): see ensure_official_plugins above.
 if [[ -z "$TARGET_ROOT" ]]; then

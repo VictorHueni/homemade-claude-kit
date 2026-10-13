@@ -1,3 +1,7 @@
+---
+type: rule
+---
+
 # Version-manager globals vanish on a runtime bump
 
 ## A declared CLI tool that is "definitely installed" but not on PATH

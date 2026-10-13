@@ -8,6 +8,7 @@
 #   - chezmoi deployed-vs-source drift
 #   - kit repo state (~/projects/homemade-claude-kit)
 #   - ~/.claude/skills/ and ~/.claude/commands/ symlink health
+#   - ~/.claude/rules/ authored outside the kit (plain files)
 #
 # Exits 0 always. The output is structured for the model to parse.
 # ─────────────────────────────────────────────
@@ -118,6 +119,37 @@ check_symlinks_in() {
     info "$label totals: total=$total ok=$good broken=$broken not_link=$not_link wrong_target=$wrong_target"
 }
 
+# A plain file in ~/.claude/rules exists on this machine only; install.sh would
+# overwrite it if the kit ships the same name, so it is blocking, not drift.
+check_rules_dir() {
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
+        warn "rules: directory does not exist"
+        return
+    fi
+    local total=0 local_only=0 broken=0 entry name
+    for entry in "$dir"/*.md; do
+        [ -e "$entry" ] || [ -L "$entry" ] || continue
+        total=$((total + 1))
+        name="$(basename "$entry")"
+        if [ -L "$entry" ]; then
+            if [ ! -e "$entry" ]; then
+                broken=$((broken + 1))
+                fail "rules/$name → BROKEN symlink ($(readlink "$entry"))"
+            elif [[ "$(readlink -f "$entry")" != "$KIT_DIR/"* ]]; then
+                warn "rules/$name → wrong target ($(readlink "$entry"))"
+            fi
+        else
+            local_only=$((local_only + 1))
+            fail "rules/$name → RULE AUTHORED OUTSIDE THE KIT (BLOCKING; move it into the kit's rules/ first)"
+        fi
+    done
+    if [ "$total" -gt 0 ] && [ "$local_only" = "0" ] && [ "$broken" = "0" ]; then
+        ok "rules: $total entries, none authored outside the kit"
+    fi
+    info "rules totals: total=$total local_only=$local_only broken=$broken"
+}
+
 # ── header
 echo "# util-toolkit-doctor report"
 echo "Generated: $(date 2>/dev/null || echo unknown)"
@@ -171,6 +203,7 @@ repo_status "$KIT_DIR" "kit" "$KIT_REMOTE"
 section "Symlink health (~/.claude/)"
 check_symlinks_in "$CLAUDE_DIR/skills"   "skills"
 check_symlinks_in "$CLAUDE_DIR/commands" "commands"
+check_rules_dir   "$CLAUDE_DIR/rules"
 
 # ── footer
 section "Legend"
