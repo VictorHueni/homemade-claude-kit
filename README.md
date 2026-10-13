@@ -118,6 +118,15 @@ Open items live as GitHub Issues labelled `open-item` —
 (authored via the Open Item form; contract: the `metamodel` skill's
 `references/open-items-governance.md`).
 
+## Hooks
+
+`kit-core` ships Claude Code hooks in `plugins/kit-core/hooks/hooks.json`; they run whenever the plugin is enabled. They replace always-on rules that only mattered for one command.
+
+- **`tripwires.py`** (PreToolUse, Bash) checks each command against a table. `deny` blocks it outright with what to do instead (`git commit --amend`, `pgrep -f` in a wait loop). `ack` blocks a one-shot, hard-to-undo call with its checklist until the command is rerun with a trailing `# tripwire-ack` (`gh issue transfer`, an `updateProjectV2Field` GraphQL call). `note` lets it run and adds the explanation to the model's context with the result (`osv-scanner`; a test run while Docker Desktop's `desktop-linux` context is active on WSL). Commands are matched in command position, after quoted text, heredoc bodies and comments are removed, so a commit message or a grep naming a command does not trip it; `sh -c` and `eval` payloads are still checked.
+- **`docker_context_check.py`** (SessionStart) prints the same Docker warning when a session opens with that context active. Silent everywhere else, macOS included.
+
+Add a tripwire as one row in `TRIPWIRES` plus its cases in `scripts/test-hooks.py`, then bump `kit-core`'s version. Run the tests with `python3 scripts/test-hooks.py`.
+
 ## Rules
 
 Every Claude rule is authored here, never directly in `~/.claude/rules/` (kit ADR-0011). `install.sh` links each file flat into `~/.claude/rules/`, replacing a same-named plain file, and prunes links whose source is gone. Two layers:
@@ -138,19 +147,15 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/diagramming-plantuml.md` | PlantUML creole markup eating CLI flags (path-scoped) |
 | `rules/frontend-nuxt.md` | Nuxt UI 4 / Vue 3.5 / Reka UI (path-scoped) *(→ AGENTS.md adapter)* |
 | `rules/git-and-tools.md` | Git discipline, Edit tool usage *(→ AGENTS.md adapter)* |
-| `rules/github-issue-transfer.md` | Bulk issue transfer and lost sub-issue parent links |
-| `rules/github-projects-single-select-field.md` | Adding a single-select option clears item values |
 | `rules/jvm-toolchain.md` | Maven, Temurin, current LTS (path-scoped) |
 | `rules/kit-docs-stack.md` | **Pointer stub** → the `metamodel` skill: spine, artefact registry, frontmatter, open-items contract (kit ADR-0007; path-scoped) |
 | `rules/memory-hygiene.md` | Where a lesson belongs: kit rule, project AGENTS.md, or auto-memory |
 | `rules/module-graph-reachability.md` | A direct-importer grep is not a reachability proof |
-| `rules/osv-scanner-gitignored-worktrees.md` | osv-scanner finding nothing inside a gitignored checkout |
 | `rules/postgres-schema-gotchas.md` | PostgreSQL NULL, jsonb and planner traps (path-scoped) |
 | `rules/python-gotchas.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
 | `rules/skill-creation-sync.md` | Skill-edit checklist; points to the kit-local `util-skill-authoring` skill (path-scoped) |
 | `rules/sonarcloud-silent-analysis-failure.md` | SonarCloud analysis failing server-side behind a green CI |
 | `rules/supabase-config-push-scope.md` | `supabase config push` pushing the whole local config (path-scoped) |
-| `rules/testcontainers-wsl-docker-context.md` | Docker context on WSL breaking docker-py and Testcontainers |
 | `rules/toolchain-version-managed-globals.md` | Version-manager globals vanishing on a runtime bump |
 | `rules/working-style.md` | Sequential plans, trust-but-verify *(→ AGENTS.md adapter)* |
 | `rules/writing-citations.md` | Inline source links in markdown docs (path-scoped) *(→ AGENTS.md adapter)* |
