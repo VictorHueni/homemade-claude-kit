@@ -4,7 +4,7 @@ type: rule
 
 # Git and tool discipline
 
-**Never `git commit --amend`** unless asked in the same conversation; always make a new commit. A failed pre-commit hook means no commit happened: fix, re-stage, commit again.
+**Never `git commit --amend`** (the kit-core tripwire hook blocks it); make a new commit.
 
 **Commit and PR-title scope names a capability, not a work item.** Use the plan's declared `Commit scope:` if any, else a product or capability slug from the project's capability map, else the area or module (`auth`, `api`, `deps`). Never a bare plan or ticket number (`feat(0121): …`); put it in a `Refs:` trailer. A squash merge uses the PR title as the commit subject, so the PR title follows the same rule.
 
@@ -16,7 +16,7 @@ type: rule
 
 **LSP `findReferences` on a cold server returns a partial answer.** Confirm the server exists (`command -v <server>`), then compare its file count with `git grep -lw <identifier> | wc -l`; if they differ, query once from a module that imports the symbol, then repeat. There is no rename operation, and no language server sees names inside strings (SQL, template keys, DI tokens): grep those and run the tests that execute them, since a missed string fails only at runtime.
 
-**Never wait on a job with `pgrep -f <pattern>`:** the waiting shell matches its own pattern and the loop never ends. Wait on an artefact the job writes on completion (`echo "EXIT=$?" >> log`, then `until grep -q '^EXIT=' log`) or on a PID with `kill -0`; record the exit code at launch. To inspect the process table use `ps -C <exe>` or `pgrep -x`. Tell: a job "running" far too long while its log stops changing. `pkill -f` can kill its own shell the same way.
+**Never wait on a job with `pgrep -f`** (the tripwire hook blocks it in a wait loop, with the alternative); `pkill -f` can kill its own shell the same way. Tell: a job "running" far too long while its log stops changing. Use `ps -C <exe>` or `pgrep -x` to inspect the process table.
 
 **Shell output can lie about success.** `$?` after a pipe is the last command's status; use `${PIPESTATUS[0]}`. Never conclude that a list is complete or all green from output piped through `tail` or `head`.
 
