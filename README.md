@@ -133,23 +133,21 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 |---|---|
 | `rules/artefact-frontmatter.md` | **Pointer stub** → the `metamodel` skill's `references/artefact-frontmatter.md` (kit ADR-0007) |
 | `rules/artefact-types-registry.md` | **Pointer stub** → the `metamodel` skill's `references/artefact-types-registry.yaml` (clew-owned projection, clew ADR-0008) |
-| `rules/ci-local-parity.md` | Ship a local Makefile mirror with every new CI tool |
-| `rules/claude-code-plugin-marketplace-refresh.md` | Marketplace update vs plugin update, version bump, new session |
+| `rules/ci-workflows.md` | Local mirror for every CI tool; `GITHUB_TOKEN` chains and `workflow_run`; `GH_REPO` without a checkout (path-scoped) |
+| `rules/claude-plugins-and-mcp.md` | Plugin refresh, MCP version pins, OAuth client reset |
 | `rules/consistency-over-lean-variants.md` | Reuse the codebase's existing pattern before a leaner bespoke one |
 | `rules/diagramming-mermaid.md` | Mermaid diagram pitfalls *(→ AGENTS.md adapter)* |
 | `rules/diagramming-plantuml.md` | PlantUML creole markup eating CLI flags |
 | `rules/frontend-nuxt.md` | Nuxt UI v4 / Vue 3.5 / Reka UI *(→ AGENTS.md adapter)* |
 | `rules/git-and-tools.md` | Git discipline, Edit tool usage *(→ AGENTS.md adapter)* |
-| `rules/github-actions-token-triggered-chains.md` | `GITHUB_TOKEN`-started runs and `workflow_run`; `GH_REPO` without a checkout |
 | `rules/github-issue-transfer.md` | Bulk issue transfer and lost sub-issue parent links |
 | `rules/github-projects-single-select-field.md` | Adding a single-select option clears item values |
 | `rules/jvm-toolchain.md` | Maven, Temurin, current LTS |
-| `rules/mcp-server-pins-and-schema-drift.md` | MCP version pins, schema drift, OAuth client reset |
 | `rules/memory-hygiene.md` | Where a lesson belongs: kit rule, project AGENTS.md, or auto-memory |
 | `rules/metamodel.md` | **Pointer stub** → the `metamodel` skill (spine, variants, references) |
 | `rules/module-graph-reachability.md` | A direct-importer grep is not a reachability proof |
 | `rules/open-items-governance.md` | **Pointer stub** → the `metamodel` skill's `references/open-items-governance.md` |
-| `rules/osv-scanner-dot-directory-worktrees.md` | osv-scanner finding nothing in some worktrees |
+| `rules/osv-scanner-gitignored-worktrees.md` | osv-scanner finding nothing inside a gitignored checkout |
 | `rules/postgres-schema-gotchas.md` | PostgreSQL NULL, jsonb and planner traps (path-scoped) |
 | `rules/python-gotchas.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
 | `rules/session-handoff.md` | Pointer to the `agent-handoff` skill |

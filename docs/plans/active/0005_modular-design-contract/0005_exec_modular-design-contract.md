@@ -372,7 +372,7 @@ Scope:
 
 1. **Exempt from red (documentation):** the four SKILL.md files describe the resolution order, the validator, the provenance report and the legacy migration; `contract/README.md` is linked from each; a five-line block for a project's `AGENTS.md` (pin file, manifest, validator command, Dependabot entry) goes in `ux-design-system/references/`.
 2. Plugin version per Q-2 in `plugin.json` and the marketplace; skill `metadata.version` bumped where the skill changed.
-3. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-code-plugin-marketplace-refresh.md`).
+3. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-plugins-and-mcp.md`).
 
 Primary files:
 
