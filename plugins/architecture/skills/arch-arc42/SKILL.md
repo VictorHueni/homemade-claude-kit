@@ -1,7 +1,7 @@
 ---
 name: arch-arc42
 license: MIT
-description: "Author and refresh the arc42 sections arc42 owns as prose (per ADR-0004 — arc42 owns ALL narrative; arch-c4 only emits diagram + DSL-derived table blocks in §3/§5/§7). Five modes: §2 Constraints (mints CST-NN), §4 Solution Strategy (links ADRs, no new IDs), §6 Runtime View (mints SCN-NN; embeds a C4 dynamic view OR an arch-uml sequence via a declared-figure dependency), §8 Cross-Cutting Concepts (mints CC-NN; may pull an arch-uml class/state/ER figure), §11 Risks and Technical Debt (mints RSK-NN). Reads upstream artefacts (ADRs, quality attributes, bounded contexts, FBS, personas, use cases) to fill content — never invents decisions. Output: docs/architecture/arc42/{02,04,06,08,11}-*.md. Triggers on: arc42 constraints, architecture constraints, solution strategy, runtime view, runtime scenario, cross-cutting concepts, logging strategy, error handling strategy, security concepts, risks, risk register, technical debt register, arc42 §2, arc42 §4, arc42 §6, arc42 §8, arc42 §11."
+description: "Author and refresh the arc42 sections arc42 owns as prose (per ADR-0004 — arc42 owns ALL narrative; arch-c4 only emits diagram + DSL-derived table blocks in §3/§5/§7). Five modes: §2 Constraints (mints CST-NN), §4 Solution Strategy (links ADRs, no new IDs), §6 Runtime View (mints SCN-NN; embeds an arch-uml sequence via a declared-figure dependency), §8 Cross-Cutting Concepts (mints CC-NN; may pull an arch-uml class/state/ER figure), §11 Risks and Technical Debt (mints RSK-NN). Reads upstream artefacts (ADRs, quality attributes, bounded contexts, FBS, personas, use cases) to fill content — never invents decisions. Output: docs/architecture/arc42/{02,04,06,08,11}-*.md. Triggers on: arc42 constraints, architecture constraints, solution strategy, runtime view, runtime scenario, cross-cutting concepts, logging strategy, error handling strategy, security concepts, risks, risk register, technical debt register, arc42 §2, arc42 §4, arc42 §6, arc42 §8, arc42 §11."
 user-invocable: true
 metadata:
   category: "architecture"
@@ -22,7 +22,7 @@ Five modes covering the arc42 sections **arc42 owns as prose**. They are read-he
 > "Architecture documentation that is divorced from the real decisions and constraints of the project becomes fiction." — arc42 authors
 
 **Companion skills:**
-- `arch-c4` — emits the diagram + DSL-derived table blocks for §3 / §5 / §7 (inside `arch-c4` markers); authors no narrative. For §6 it renders the C4 *dynamic-view* SVG keyed by a `SCN-NN` this skill mints.
+- `arch-c4` — emits the diagram + DSL-derived table blocks for §3 / §5 / §7 (inside `arch-c4` markers); authors no narrative.
 - `arch-uml` — UML figure producer; §6 *sequence* and §8 *class/state/ER* figures are pulled via a declared-dependency block.
 - `arch-structurizr` — Structurizr workspace foundation (not required for this skill)
 - `arch-adr` — the ADR lifecycle; §4 Solution Strategy links to ADR numbers rather than re-stating rationale
@@ -35,7 +35,7 @@ Five modes covering the arc42 sections **arc42 owns as prose**. They are read-he
 |---|---|---|---|---|
 | `constraints` | §2 — Architecture Constraints | `docs/architecture/arc42/02-constraints.md` | `CST-NN` | none |
 | `solution-strategy` | §4 — Solution Strategy | `docs/architecture/arc42/04-solution-strategy.md` | none (links to `ADR-NNNN`) | none |
-| `runtime` | §6 — Runtime View | `docs/architecture/arc42/06-runtime-view.md` | `SCN-NN` | **pulled**: C4 dynamic (`arch-c4`) or `arch-uml sequence` |
+| `runtime` | §6 — Runtime View | `docs/architecture/arc42/06-runtime-view.md` | `SCN-NN` | **pulled**: `arch-uml sequence` |
 | `cross-cutting` | §8 — Cross-Cutting Concepts | `docs/architecture/arc42/08-cross-cutting-concepts.md` | `CC-NN` | optional: `arch-uml` class/state/ER |
 | `risks` | §11 — Risks and Technical Debt | `docs/architecture/arc42/11-risks.md` | `RSK-NN` | none |
 
@@ -50,10 +50,10 @@ Five modes covering the arc42 sections **arc42 owns as prose**. They are read-he
 ![SCN-01 — Checkout](../diagrams/views/seq-03-checkout.svg)
 ```
 
-- `source` is `arch-c4` (path under `../c4/views/`) **or** `arch-uml` (path under `../diagrams/views/`).
+- `source` is `arch-uml` (path under `../diagrams/views/`).
 - §6 uses `scenario=SCN-NN` (+ optional `realises=UC-NN`); §8 uses `concept=CC-NN`.
 - **Soft-reference:** the figure need not exist yet — scaffold the block with a `_TODO_` path; the `metamodel` skill's Audit mode *warns* on a missing/orphaned figure or an unresolved upstream ID, it does not block (per ADR-0004).
-- `arch-arc42` never renders a diagram itself — it requests `arch-c4 runtime` (dynamic view) or `arch-uml sequence|class|state|er` to produce the SVG, then embeds it.
+- `arch-arc42` never renders a diagram itself — it requests `arch-uml sequence|class|state|er` to produce the SVG, then embeds it.
 
 ---
 
@@ -152,19 +152,14 @@ Key runtime scenarios — how the system's building blocks collaborate over time
 3. Read `docs/domain/07b-models/{bc-slug}.md` if present — commands/events map to the messages in the scenario.
 4. Read `docs/business/04a-value-streams.md` if present — stage pain points indicate which scenarios matter most.
 
-### Figure boundary rule (decide before requesting the diagram)
+### Figure
 
-| The scenario is… | Figure source | Skill to request |
-|---|---|---|
-| A cross-container flow tied to the C4 model (containers exchanging messages) | C4 **dynamic** view | `arch-c4 runtime` (rendered to `../c4/views/`) |
-| Intra-component / algorithmic detail needing rich `alt`/`par`/`loop`/composite logic the C4 model doesn't carry | UML **sequence** | `arch-uml sequence` (rendered to `../diagrams/views/`) |
-
-Never show intra-aggregate state machines in §6 — those are §8 (via `arch-uml state`) or the domain model.
+Every §6 figure is an `arch-uml sequence` (rendered to `../diagrams/views/`), whether its lifelines are `CON-NN` containers or code-level participants; name container lifelines with their `CON-NN`. Never show intra-aggregate state machines in §6 — those are §8 (via `arch-uml state`) or the domain model.
 
 ### Fill process
 
 1. Assign the next `SCN-NN` ID to the scenario (monotonic, never reuse). **`arch-arc42` owns `SCN-NN`** (ADR-0004).
-2. Apply the boundary rule; request the figure from `arch-c4 runtime` (passing the `SCN-NN`) or `arch-uml sequence`. Confirm the SVG rendered.
+2. Request the figure from `arch-uml sequence`, passing the `SCN-NN` for its title. Confirm the SVG rendered.
 3. Write/append the §6.x subsection in `docs/architecture/arc42/06-runtime-view.md` from `templates/arc42-06-runtime-view.md`: the Motivation + Participants prose, the **declared-figure dependency block** + embed, and the step table (step number, sender, receiver, message, notes) matching the diagram's steps. Annotate error/alternative flows.
 4. On refresh: if the figure was re-rendered, re-check the step table still matches; update `realises=` if the use case changed.
 
@@ -269,7 +264,7 @@ Known risks and technical debt items that have not yet been addressed. Each risk
 
 - Mode executed + arc42 section written/updated
 - IDs assigned (list `CST-NN` / `SCN-NN` / `CC-NN` / `RSK-NN` ranges; or "none" for §4)
-- Figure pulled (`runtime`/`cross-cutting`): source (`arch-c4` / `arch-uml`) + SVG path embedded via the declared-figure block; or "none"
+- Figure pulled (`runtime`/`cross-cutting`): source (`arch-uml`) + SVG path embedded via the declared-figure block; or "none"
 - Upstream artefacts read (list files)
 - ADR cross-references linked (list `ADR-NNNN`)
 - Open items flagged (any gaps filed against this artefact via `util-open-items`)
@@ -290,7 +285,7 @@ Known risks and technical debt items that have not yet been addressed. Each risk
 
 - `templates/arc42-02-constraints.md` — §2 skeleton (three-category table; CST-NN IDs)
 - `templates/arc42-04-solution-strategy.md` — §4 skeleton (technology table + quality goal → tactic mapping)
-- `templates/arc42-06-runtime-view.md` — §6 skeleton (one §6.x per scenario; declared-figure dependency block + step table; figure from `arch-c4` dynamic or `arch-uml sequence`)
+- `templates/arc42-06-runtime-view.md` — §6 skeleton (one §6.x per scenario; declared-figure dependency block + step table; figure from `arch-uml sequence`)
 - `templates/arc42-08-cross-cutting.md` — §8 skeleton (CC-NN concept catalogue; optional `arch-uml` figure per concept)
 - `templates/arc42-11-risks.md` — §11 skeleton (risk register table + tech-debt register)
 
@@ -302,7 +297,7 @@ Known risks and technical debt items that have not yet been addressed. Each risk
 - [ ] IDs assigned monotonically; no duplicates with existing file (`CST-NN` / `SCN-NN` / `CC-NN` / `RSK-NN`)
 - [ ] Every `CST-NN` / `CC-NN` / `RSK-NN` has a cross-reference to at least one ADR or QA-XXNN (or `_TBD_` if genuinely not yet linked)
 - [ ] §4 does NOT re-state ADR rationale — links only
-- [ ] (`runtime`) `SCN-NN` minted here; figure pulled via a declared-figure dependency block (source `arch-c4` or `arch-uml`), not hand-drawn; step table matches the diagram steps
+- [ ] (`runtime`) `SCN-NN` minted here; figure pulled via a declared-figure dependency block (source `arch-uml`), not hand-drawn; step table matches the diagram steps
 - [ ] (`runtime`/`cross-cutting`) any embedded figure uses the `<!-- arch-figure … -->` block; figure path resolves or is a `_TODO_` soft-reference
 - [ ] §11 distinguishes `architectural` risk from `technical-debt`; does NOT attempt to be an exhaustive debt ledger
 - [ ] Output file has standard frontmatter (see the `metamodel` skill's `references/artefact-frontmatter.md`)

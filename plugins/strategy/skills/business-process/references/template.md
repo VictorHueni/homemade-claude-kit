@@ -120,25 +120,11 @@ Conflating these is a common source of analysis errors.
 
 ## 6. Activities — step-by-step walkthrough
 
-Each actor's flow gets its own subsection with a Mermaid sequence diagram + numbered steps.
+Each actor's flow gets its own subsection with a sequence diagram + numbered steps. Draw each with `arch-uml sequence` (actors as participants, `alt` for branches) and embed the SVG by a path relative to this file.
 
 ### 6.1 {Actor A}'s flow
 
-```mermaid
-sequenceDiagram
-  participant A as Actor A
-  participant SysA as System A
-  participant B as Actor B
-
-  A->>SysA: 1. Look up X
-  SysA-->>A: result
-  A->>A: 2. Decide whether to proceed
-  alt Proceed
-    A->>B: 3. Send object Y
-  else Abandon
-    A->>A: log and stop
-  end
-```
+![seq-NN — {Actor A}'s flow](../../architecture/diagrams/views/seq-NN-{process-slug}-{actor-a}.svg)
 
 1. **{Step name}** — {what happens, with which data store, what's the outcome}
 2. **{Step name}** — {…}
@@ -148,18 +134,7 @@ sequenceDiagram
 
 ### 6.2 {Actor B}'s flow
 
-```mermaid
-sequenceDiagram
-  participant B as Actor B
-  participant C as Actor C
-  participant SysB as System B
-
-  B->>SysB: 1. Receive object Y
-  SysB-->>B: stored
-  B->>C: 2. Route for review
-  C-->>B: 3. Decision
-  B->>B: 4. Log + issue response
-```
+![seq-NN — {Actor B}'s flow](../../architecture/diagrams/views/seq-NN-{process-slug}-{actor-b}.svg)
 
 1. **{Step name}** — {what happens}
 2. {…}

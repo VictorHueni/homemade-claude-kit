@@ -200,9 +200,9 @@ Strong signals that a concept is an entity (not a value object):
 
 ---
 
-## Mermaid class diagram conventions
+## Class diagram conventions (`arch-uml class`)
 
-Use `classDiagram` for the domain model diagram.
+Draw the domain model in `docs/architecture/diagrams/class-NN-<bc-slug>.puml`.
 
 Relationship notation:
 - `*--` (composition): aggregate root to member entities and value objects
@@ -210,11 +210,15 @@ Relationship notation:
 - `-->` (reference by ID): from one aggregate root to another aggregate root (label with "by ID")
 - `..>` (dependency): aggregate raising a domain event
 
-Aggregate boundary: surround all members of an aggregate with a `note` or visually group by naming convention (prefix with aggregate name).
+Aggregate boundary: group each aggregate's members in a `package "BC-NN.AGG-NN <Name>" <<Rectangle>> { … }`.
 
 Example skeleton:
-```mermaid
-classDiagram
+```plantuml
+@startuml
+!include _theme.puml
+title class-01 — Ordering domain model (BC-01)
+
+package "BC-01.AGG-01 Order" <<Rectangle>> {
     class OrderRoot {
         +OrderId id
         +OrderStatus status
@@ -234,15 +238,17 @@ classDiagram
     class TrackingNumber {
         +value: String
     }
-    class CustomerId {
-        +value: UUID
-    }
+}
+class CustomerRoot
+class OrderPlaced <<event>>
 
-    OrderRoot "1" *-- "1..*" OrderLine : contains
-    OrderRoot "1" *-- "1" Money : totalAmount
-    OrderLine "1" *-- "1" Money : lineTotal
-    OrderRoot "1" *-- "1" TrackingNumber : has
-    OrderRoot --> CustomerId : references by ID
+OrderRoot "1" *-- "1..*" OrderLine : contains
+OrderRoot "1" *-- "1" Money : totalAmount
+OrderLine "1" *-- "1" Money : lineTotal
+OrderRoot "1" *-- "1" TrackingNumber : has
+OrderRoot --> CustomerRoot : by ID
+OrderRoot ..> OrderPlaced : raises
+@enduml
 ```
 
-Always check that the diagram renders before delivering — the most common failure is using reserved Mermaid keywords as class names.
+Render it with `render.sh` before delivering; its `-checkonly` pass catches parse errors.

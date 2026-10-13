@@ -87,7 +87,7 @@ Populate a scaffolded `docs/domain/07b-models/{bc-slug}.md` with real domain mod
 6. For each entity: define identity, list domain-meaningful attributes (no infrastructure), document behaviour methods.
 7. For each value object: list attributes, state equality rule, document validation invariants, confirm replace-not-mutate.
 8. For each domain event: verify past tense + business meaning, document trigger, payload, consumers, and business significance.
-9. Draw Mermaid classDiagram showing aggregates, entities, VOs, and relationships. (Mermaid stays the inline default. When a diagram needs richer UML grammar Mermaid lacks — composite/nested aggregate **state machines**, full class models with multiplicities + stereotypes, or crow's-foot **ER** schemas — escalate that one diagram to **`arch-uml`** (`class` / `state` / `er` mode → PlantUML → committed SVG), carrying the `BC-NN.AGG-NN` IDs into its title. The domain-model text remains the single source of truth; the diagram is a view of it.)
+9. Draw the class diagram (aggregates, entities, VOs, relationships) with **`arch-uml class`** and each aggregate's lifecycle with **`arch-uml state`** (prerequisite: `arch-plantuml init`), carrying the `BC-NN.AGG-NN` IDs into their titles, and embed the SVGs. The domain-model text remains the single source of truth; the diagram is a view of it.
 10. Run Mode 3 (Verify) discipline checks inline before delivering.
 
 ### Mode 3 — Verify
@@ -229,7 +229,7 @@ After each mode, deliver a report covering:
 - [ ] All value objects are immutable with equality rule stated
 - [ ] All domain events are past tense + carry business significance + have payload documented
 - [ ] Cross-aggregate references use IDs only (not object references)
-- [ ] Mermaid classDiagram present and renders correctly
+- [ ] Class diagram and each aggregate's state diagram rendered via `arch-uml` and embedded
 - [ ] Sizing heuristics checked (aggregates 3–7 per BC, entities 1–5 per aggregate)
 - [ ] Open every generated file with the standard artefact frontmatter (OKF-superset block — set `type` to this artefact's `okf_type` display name from the `metamodel` skill's `references/artefact-types-registry.yaml`, plus `title`, `description`, `tags`, `timestamp`, `status`, `owner`, `last_reviewed`, `review_interval`). Run `git config user.name` for `owner`. Set `status: draft` on initial scaffold. Default `review_interval: 180d`. Full schema: the `metamodel` skill's `references/artefact-frontmatter.md`.
 - [ ] Closing report delivered

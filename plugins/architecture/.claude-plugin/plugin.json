@@ -1,7 +1,7 @@
 {
   "name": "architecture",
   "description": "Architecture. ADRs, research notes, service/CLI contracts, Structurizr/C4, PlantUML/UML, and arc42 narrative.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": {
     "name": "Victor Hueni"
   }

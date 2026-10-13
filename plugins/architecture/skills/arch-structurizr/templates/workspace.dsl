@@ -47,7 +47,6 @@ workspace "{{project_name}}" "{{project_description}}" {
     //   • containers              → arc42 §5.1
     //   • components-<CON-NN>     → arc42 §5.2/§5.3
     //   • deployment-<env>        → arc42 §7
-    //   • dynamic-<RV-NN>         → arc42 §6 (arch-runtime-view)
     // ─────────────────────────────────────────────────────────────────
 
     views {

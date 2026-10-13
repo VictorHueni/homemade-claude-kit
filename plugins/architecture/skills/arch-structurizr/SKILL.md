@@ -1,7 +1,7 @@
 ---
 name: arch-structurizr
 license: MIT
-description: "Initialise and maintain the Structurizr DSL workspace + Docker-based render pipeline that powers C4 diagrams for arc42 §3 (Context), §5 (Building Blocks), and §7 (Deployment). One-time setup skill: scaffolds docs/architecture/c4/{workspace.dsl, render.sh, README.md, views/}, pins official Structurizr CLI + PlantUML Docker image versions, and provides a validate→export→render pipeline (workspace.dsl → C4-PlantUML → SVG). Companion to arch-c4, which edits the DSL going forward. Triggers on: scaffold structurizr, init structurizr, structurizr workspace, c4 workspace, set up structurizr, structurizr DSL setup, structurizr render pipeline, structurizr docker, c4 render pipeline, structurizr foundation. NOT for creating C4 model elements (that is arch-c4)."
+description: "Initialise and maintain the Structurizr DSL workspace + Docker-based render pipeline that powers C4 diagrams for arc42 §3 (Context), §5 (Building Blocks), and §7 (Deployment). One-time setup skill: scaffolds docs/architecture/c4/{workspace.dsl, render.sh, README.md, views/}, pins the official Structurizr vNext `-playwright` Docker image, and provides a validate→export pipeline (workspace.dsl → SVG, exported directly by its bundled headless Chromium). Companion to arch-c4, which edits the DSL going forward. Triggers on: scaffold structurizr, init structurizr, structurizr workspace, c4 workspace, set up structurizr, structurizr DSL setup, structurizr render pipeline, structurizr docker, c4 render pipeline, structurizr foundation. NOT for creating C4 model elements (that is arch-c4)."
 user-invocable: true
 metadata:
   category: "architecture"

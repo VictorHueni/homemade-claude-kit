@@ -62,6 +62,8 @@ Resulting ownership:
 
 **§6 figure boundary rule:** use a **C4 dynamic view** for cross-container flows tied to the C4 model; use an **`arch-uml` sequence** for intra-component / algorithmic detail the C4 model does not carry. Intra-aggregate state machines never appear in §6 (they are §8, via `arch-uml state`).
 
+> **Superseded by [ADR-0012](adr-0012-diagram-tool-split.md):** every §6 figure is an `arch-uml` sequence; `arch-c4` no longer draws dynamic views. The ownership rule above stands.
+
 ### Positive Consequences
 
 - Clean separation: `arch-c4` = pure generator, `arch-arc42` = sole narrative author. One voice across the whole document; cross-section references managed by one owner.

@@ -9,7 +9,7 @@ This folder is the **single source of truth** for every PlantUML (UML) diagram i
 | `render.sh` | Single-image Docker render pipeline (`plantuml/plantuml` — `-checkonly` validate + `-tsvg` render). |
 | `views/*.svg` | Rendered diagrams. **Committed.** Embedded by the consuming markdown. |
 
-This is the foundation scaffolded by **`arch-plantuml`**. Diagrams are authored by the **`arch-uml`** skill. For C4 architecture diagrams use `arch-c4` instead; for GitHub-inline diagrams use Mermaid.
+This is the foundation scaffolded by **`arch-plantuml`**. Diagrams are authored by the **`arch-uml`** skill. For C4 architecture diagrams use `arch-c4` instead; for non-UML diagrams such as flowcharts use Mermaid.
 
 ---
 

@@ -45,11 +45,6 @@ Files at `use-cases/` root; re-file under a capability once `Realises:` is set.
 
 ## Actor / use-case overview (optional)
 
-_Optional UML-style overview — an at-a-glance map of actors → goals. Keep it small (≤ ~20 use cases); the text files are the contract, this is only a map. Mermaid example:_
+_Optional UML use-case diagram — an at-a-glance map of actors → goals, drawn with `arch-uml use-case`. Keep it small (≤ ~20 use cases); the text files are the contract, this is only a map._
 
-```mermaid
-flowchart LR
-  actor1["{{Primary actor P-NN}}"]
-  uc1(["UC-01 {{Goal}}"])
-  actor1 --> uc1
-```
+![uc-NN — {{Product}} use cases](../../architecture/diagrams/views/uc-NN-{{slug}}.svg)

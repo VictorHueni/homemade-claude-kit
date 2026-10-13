@@ -1,7 +1,7 @@
 ---
 name: arch-uml
 license: MIT
-description: "Author and refresh UML diagrams with PlantUML — sequence, class, state-machine, activity, entity-relationship, and use-case — rendered to committed SVG via the arch-plantuml Docker pipeline. Writes one docs/architecture/diagrams/<type>-NN-<slug>.puml per diagram (each !includes the shared _theme.puml and titles the upstream ID it visualises), runs render.sh, and embeds the SVG into the consuming markdown. Six modes, one per diagram type. Prerequisite: arch-plantuml init. Mints no IDs — diagrams visualise IDs owned by spec-use-case (UC-NN), domain-model (BC-NN.AGG-NN), business-process (PROC-NN). Triggers on: sequence diagram, class diagram, state machine diagram, activity diagram, ER diagram, use case diagram, UML diagram, plantuml diagram, draw sequence, draw class diagram. NOT for C4 (arch-c4) nor GitHub-inline diagrams (Mermaid)."
+description: "The kit's tool for every UML diagram, arc42 §6 runtime sequences included. Author and refresh UML diagrams with PlantUML — sequence, class, state-machine, activity, entity-relationship, and use-case — rendered to committed SVG via the arch-plantuml Docker pipeline. Writes one docs/architecture/diagrams/<type>-NN-<slug>.puml per diagram (each !includes the shared _theme.puml and titles the upstream ID it visualises), runs render.sh, and embeds the SVG into the consuming markdown. Six modes, one per diagram type. Prerequisite: arch-plantuml init. Mints no IDs — diagrams visualise IDs owned by spec-use-case (UC-NN), domain-model (BC-NN.AGG-NN), business-process (PROC-NN). Triggers on: sequence diagram, class diagram, state machine diagram, activity diagram, ER diagram, use case diagram, UML diagram, plantuml diagram, draw sequence, draw class diagram. NOT for C4 (arch-c4) nor non-UML diagrams such as flowcharts (Mermaid)."
 user-invocable: true
 metadata:
   category: "architecture"
@@ -30,9 +30,9 @@ This is the authoring twin of `arch-c4`:
 
 ## What this skill is NOT
 
-- **Not for C4 diagrams.** Context / container / component / deployment / runtime are `arch-c4`'s job (via Structurizr). If the user wants "the architecture diagram," ask whether they mean C4 (→ `arch-c4`) or a UML behavioural/structural diagram (→ here). See `references/diagram-discipline.md`.
-- **arc42 §6 runtime — share the section with C4 (ADR-0004).** A `sequence` diagram is a valid arc42 §6 figure, but §6 is owned by `arch-arc42`, and the figure source is governed by a boundary rule: **C4 dynamic view** (`arch-c4 runtime`) for cross-container flows tied to the C4 model; **`arch-uml sequence`** only for intra-component / algorithmic detail needing rich `alt`/`par`/`loop`/composite logic. When `arch-arc42` selects a UML sequence for §6, produce the SVG and hand the path back — it owns the §6 embed and prose.
-- **Not a Mermaid replacement.** For a diagram that must render *inline* in GitHub markdown, use Mermaid (`rules/diagramming-mermaid.md`). PlantUML here renders to **committed SVG** — used when Mermaid's grammar is too thin (rich sequence `alt`/`par`, composite states, swimlane activities, full class/ER models).
+- **Not for C4 diagrams.** Context / container / component / deployment are `arch-c4`'s job (via Structurizr). If the user wants "the architecture diagram," ask whether they mean C4 (→ `arch-c4`) or a UML behavioural/structural diagram (→ here). See `references/diagram-discipline.md`.
+- **Not the arc42 §6 author (ADR-0004).** Every §6 runtime figure is an `arch-uml sequence`, whether its lifelines are C4 containers or code-level participants, but `arch-arc42` owns §6 and the `SCN-NN` identity: title the diagram with the given `SCN-NN`, render it and hand the path back for the embed and prose.
+- **Not for non-UML diagrams.** Flowcharts, mind maps, timelines and Gantt charts stay in Mermaid (`rules/diagramming-mermaid.md`).
 - **Not an ID minter.** A diagram visualises IDs that already belong to upstream artefacts (`UC-NN`, `BC-NN.AGG-NN`, `PROC-NN`, `P-NN`). Carry them into the `title` and labels; never invent a new ID scheme. The `-NN` in the filename only orders diagrams of the same type.
 - **Not a one-off renderer.** Every diagram lives as a `.puml` in the folder so it re-renders deterministically. Direct SVG hand-editing is forbidden — `arch-plantuml verify` flags drift.
 
@@ -42,7 +42,7 @@ This is the authoring twin of `arch-c4`:
 
 | Mode | Draws | Filename prefix | Reads upstream | PlantUML element |
 |---|---|---|---|---|
-| `sequence` | An interaction over time between actors/participants | `seq-` | `spec-use-case` scenario, `business-process` | `participant`, `->`, `alt`/`par`/`loop` |
+| `sequence` | An interaction over time between actors/participants | `seq-` | `spec-use-case` scenario, `business-process`, arc42 §5 `CON-NN` (for §6) | `participant`, `->`, `alt`/`par`/`loop` |
 | `class` | Static structure: classes, attributes, associations | `class-` | `domain-model` aggregates/entities | `class`, `-->`, `--\|>`, multiplicities |
 | `state` | An aggregate's lifecycle: states + transitions | `state-` | `domain-model` aggregate lifecycle | `state`, `[*] -->`, composite states |
 | `activity` | A process/algorithm flow with branches + swimlanes | `act-` | `business-process` | `start`/`stop`, `if/else`, `\|swimlane\|` |
@@ -92,12 +92,11 @@ Each mode follows the **same authoring workflow** below; the per-type syntax and
 
 | The diagram is… | Tool | Why |
 |---|---|---|
-| C4 context/container/component/deployment/runtime | `arch-c4` | Structurizr owns the C4 model + views |
-| Must render inline in a GitHub `.md` | Mermaid | GitHub-native, no pre-render step |
-| A rich UML diagram (composite states, `alt`/`par` sequences, swimlane activities, full class/ER models) | **`arch-uml`** | Mermaid's grammar is too thin; render to SVG |
-| A simple flow/sequence that Mermaid handles fine | Mermaid | Keep it inline + diff-friendly |
+| C4 context/container/component/deployment | `arch-c4` | Structurizr owns the C4 model + views |
+| Any UML diagram (sequence, class, state, activity, ER, use-case), arc42 §6 runtime scenarios included | **`arch-uml`** | One UML toolchain, rendered to committed SVG |
+| Neither (flowchart, mind map, timeline, Gantt) | Mermaid | Renders inline on GitHub |
 
-The deciding question: *does this need PlantUML's richer grammar, and is a committed SVG acceptable?* If no to either, prefer Mermaid. Full rationale: `references/diagram-discipline.md`.
+Full rationale: `references/diagram-discipline.md`.
 
 ---
 

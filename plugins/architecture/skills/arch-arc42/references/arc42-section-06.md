@@ -35,33 +35,11 @@ Upstream: [docs.arc42.org/section-6](https://docs.arc42.org/section-6/).
 
 ---
 
-## Kit application: Structurizr dynamic views
+## Kit application: UML sequence diagrams
 
-The kit uses Structurizr **dynamic views** (`dynamic` DSL keyword). They reuse the elements already defined in the model — no re-declaration needed — and impose an explicit step order on relationships.
+Each scenario's figure is an `arch-uml sequence` diagram (`docs/architecture/diagrams/seq-NN-<slug>.puml`, rendered to `views/`). Lifelines are the C4 elements the scenario crosses, named with their IDs (`CON-NN`, `SYS-NN`, `P-NN`), or code-level participants when the scenario needs that detail; `alt`/`par`/`loop` carry the error and alternative flows. The title carries the `SCN-NN`.
 
-```
-dynamic SYS_NN "runtime-SCN-01-claim-submission" {
-    include *
-    autoLayout
-}
-```
-
-Inside the view block, relationships are annotated with step numbers:
-
-```
-views {
-    dynamic SYS_NN "runtime-SCN-01-claim-submission" {
-        user -> SYS_NN "Submit claim" {
-            properties { "step" "1" }
-        }
-        SYS_NN -> external_system "Forward to insurer" {
-            properties { "step" "2" }
-        }
-    }
-}
-```
-
-The Structurizr vNext renderer renders dynamic views as numbered sequence-style SVGs (arrows labelled with step numbers). This integrates naturally with the static container and component views in the same workspace.
+Messages are wire-level (HTTP calls, broker events, gRPC), not domain commands; the timeline is the call chain across deployment units, not an aggregate's lifecycle. Lifelines default to containers (C4 Level 2); use components (`CMP-NN`) only for a container already drilled in §5.
 
 ---
 
@@ -82,7 +60,7 @@ The Structurizr vNext renderer renders dynamic views as numbered sequence-style 
 | Intra-aggregate lifecycle (state machine) | `docs/domain/07b-models/{bc-slug}.md` — per-aggregate state machines |
 | Infrastructure allocation | arc42 §7 (`arch-c4 deployment` mode) |
 | Static decomposition | arc42 §5 (`arch-c4 container` / `component` modes) |
-| Business process steps (human + system) | `docs/business/business-processes/` (`business-process` skill) |
+| Business process steps (human + system) | `docs/business/05a-processes/` (`business-process` skill) |
 
 ---
 
@@ -91,6 +69,6 @@ The Structurizr vNext renderer renders dynamic views as numbered sequence-style 
 - [ ] `docs/architecture/arc42/06-runtime-view.md` exists with standard frontmatter (see the `metamodel` skill's `references/artefact-frontmatter.md`)
 - [ ] At least 2 scenarios are documented (happy path + one non-trivial error or cross-cutting path)
 - [ ] Each scenario has: title, `SCN-NN` ID, brief motivation, rendered SVG, step table
-- [ ] Step table row count matches the number of annotated steps in the DSL dynamic view
+- [ ] Step table row count matches the number of messages in the sequence diagram
 - [ ] No intra-aggregate state transitions appear (those belong to domain model)
-- [ ] SVG committed under `docs/architecture/c4/views/runtime-<SCN-NN>-<slug>.svg`
+- [ ] SVG committed under `docs/architecture/diagrams/views/seq-NN-<slug>.svg`

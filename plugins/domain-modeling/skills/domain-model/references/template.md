@@ -31,15 +31,11 @@
 
 **Lifecycle states:**
 
-```mermaid
-stateDiagram-v2
-    [*] --> Draft
-    Draft --> Submitted : submit()
-    Submitted --> Approved : approve()
-    Submitted --> Rejected : reject()
-    Approved --> [*]
-    Rejected --> [*]
-```
+| From | Command | To |
+|---|---|---|
+| _TODO_ (initial) | _TODO_ | _TODO_ |
+
+![state-NN — {AggregateName} lifecycle](../../architecture/diagrams/views/state-NN-{aggregate-slug}.svg)
 
 **Commands → Events:**
 
@@ -130,27 +126,7 @@ stateDiagram-v2
 
 ## Class diagram
 
-```mermaid
-classDiagram
-    class {AggregateName}Root {
-        +{RootId} id
-        +{State} status
-        +submit()
-        +approve()
-    }
-    class {MemberEntity} {
-        +{EntityId} id
-        +{attribute} value
-        +{behaviourMethod}()
-    }
-    class {ValueObject} {
-        +{attribute1} : Type
-        +{attribute2} : Type
-    }
-
-    {AggregateName}Root "1" *-- "0..*" {MemberEntity} : contains
-    {AggregateName}Root "1" *-- "1" {ValueObject} : has
-```
+![class-NN — {BC name} domain model](../../architecture/diagrams/views/class-NN-{bc-slug}.svg)
 
 ---
 

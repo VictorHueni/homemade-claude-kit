@@ -134,7 +134,7 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/ci-workflows.md` | Local mirror for every CI tool; `GITHUB_TOKEN` chains and `workflow_run`; `GH_REPO` without a checkout (path-scoped) |
 | `rules/claude-plugins-and-mcp.md` | Plugin refresh, MCP version pins, OAuth client reset |
 | `rules/consistency-over-lean-variants.md` | Reuse the codebase's existing pattern before a leaner bespoke one |
-| `rules/diagramming-mermaid.md` | Mermaid diagram pitfalls on GitHub (path-scoped) *(→ AGENTS.md adapter)* |
+| `rules/diagramming-mermaid.md` | Diagram tool split (C4, UML, Mermaid) and Mermaid pitfalls on GitHub (path-scoped) *(→ AGENTS.md adapter)* |
 | `rules/diagramming-plantuml.md` | PlantUML creole markup eating CLI flags (path-scoped) |
 | `rules/frontend-nuxt.md` | Nuxt UI 4 / Vue 3.5 / Reka UI (path-scoped) *(→ AGENTS.md adapter)* |
 | `rules/git-and-tools.md` | Git discipline, Edit tool usage *(→ AGENTS.md adapter)* |

@@ -60,13 +60,13 @@ Exact correspondence between C4 abstractions and arc42 sections, plus the gaps t
 | arc42 § | Owning skill (current or planned) |
 |---|---|
 | §1 Introduction and Goals | `business-vision` + `business-objective` |
-| §2 Architecture Constraints | `arch-constraints` (Milestone 2) |
-| §4 Solution Strategy | `arch-solution-strategy` (Milestone 2) |
-| §6 Runtime View | `arch-runtime-view` (Milestone 2) — uses **dynamic** C4 views, not static |
-| §8 Cross-cutting Concepts | `arch-cross-cutting` (Milestone 2) |
+| §2 Architecture Constraints | `arch-arc42 constraints` |
+| §4 Solution Strategy | `arch-arc42 solution-strategy` |
+| §6 Runtime View | `arch-arc42 runtime`, figures by `arch-uml sequence` |
+| §8 Cross-cutting Concepts | `arch-arc42 cross-cutting` |
 | §9 Architecture Decisions | `arch-adr` (existing) |
 | §10 Quality Requirements | `spec-quality-attributes` (existing) + `qa-test-strategy` (planned; mints `TS-NN`) |
-| §11 Risks and Technical Debt | `arch-risks` (Milestone 2) + `dev-tech-debt` (user's separate workstream) |
+| §11 Risks and Technical Debt | `arch-arc42 risks` |
 | §12 Glossary | `domain-glossary` (existing) |
 
 ---

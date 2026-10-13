@@ -12,7 +12,7 @@ When the user (or future-you) is about to write content into a BBV component car
 |---|---|---|---|---|
 | **Domain model** (Step 7b) | Aggregates, entities, value objects, invariants, per-aggregate lifecycle state machine, commands accepted, events emitted | `BC-NN.AGG-NN`, `BC-NN.ENT-NN`, `BC-NN.VO-NN`, `BC-NN.EVT-NN`, command names | One bounded context, business-conceptual | `domain-model` |
 | **Building Block View** (arc42 §5) | Containers (deployable runtime units), components (code modules within a container), static "uses" relationships | `SYS-NN`, `CON-NN`, `CMP-NN` | Whole system, technical decomposition | `arch-c4` (this skill) |
-| **Runtime View** (arc42 §6) | Architecturally-relevant scenarios that **span multiple containers or aggregates** | `RV-NN`, referencing `CON-NN` / `CMP-NN` / `BC-NN.EVT-NN` / commands | Cross-component, end-to-end | `arch-runtime-view` (Milestone 2) |
+| **Runtime View** (arc42 §6) | Architecturally-relevant scenarios that **span multiple containers or aggregates** | `SCN-NN`, referencing `CON-NN` / `CMP-NN` / `BC-NN.EVT-NN` / commands | Cross-component, end-to-end | `arch-arc42 runtime` + `arch-uml sequence` |
 
 ---
 
@@ -28,7 +28,7 @@ Component cards in §5 should describe **responsibility** (what the component is
 
 ## Test 2 — Inside one aggregate or across multiple?
 
-> "If a state machine fits inside one aggregate's lifecycle → `domain-model`. If the scenario crosses aggregates / containers / BCs → `arch-runtime-view`."
+> "If a state machine fits inside one aggregate's lifecycle → `domain-model`. If the scenario crosses aggregates / containers / BCs → arc42 §6 (`arch-arc42 runtime`)."
 
 The `Claim` aggregate's lifecycle (`submitted → triaged → assessed → approved/rejected → paid`) belongs in `docs/domain/07b-models/claims.md`. **It must not be re-stated** in §5 or §6.
 
@@ -71,14 +71,14 @@ A BBV component card might say "Claim Command Handler — Fastify route that tra
 
 ❌ **Wrong (state-machine-only scenario):**
 
-> **RV-01 Claim approval state transitions**
+> **SCN-01 Claim approval state transitions**
 > The Claim aggregate transitions from `triaged` to `assessed` when ClaimAssessed is emitted, and from `assessed` to `approved` when ClaimApproved is emitted.
 
 ❌ Why it's wrong: this is the aggregate's internal lifecycle. It belongs to the domain model section's "Lifecycle" subsection. A runtime view that adds no cross-component information adds no value.
 
 ✅ **Right (cross-component choreography):**
 
-> **RV-01 — Customer submits a claim, payment authorisation initiated**
+> **SCN-01 — Customer submits a claim, payment authorisation initiated**
 > 1. P-02 Customer submits claim via CON-01 Customer Portal.
 > 2. CON-01 calls CON-02 Claims API (POST /claims).
 > 3. CON-02 invokes CMP-03 Claim Command Handler → CMP-04 Claim Aggregate Repository persists the aggregate (BC-01.AGG-02 Claim).
