@@ -135,7 +135,7 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/claude-plugins-and-mcp.md` | Plugin refresh, MCP version pins, OAuth client reset |
 | `rules/consistency-over-lean-variants.md` | Reuse the codebase's existing pattern before a leaner bespoke one |
 | `rules/diagramming-mermaid.md` | Mermaid diagram pitfalls on GitHub (path-scoped) *(→ AGENTS.md adapter)* |
-| `rules/diagramming-plantuml.md` | PlantUML creole markup eating CLI flags |
+| `rules/diagramming-plantuml.md` | PlantUML creole markup eating CLI flags (path-scoped) |
 | `rules/frontend-nuxt.md` | Nuxt UI 4 / Vue 3.5 / Reka UI (path-scoped) *(→ AGENTS.md adapter)* |
 | `rules/git-and-tools.md` | Git discipline, Edit tool usage *(→ AGENTS.md adapter)* |
 | `rules/github-issue-transfer.md` | Bulk issue transfer and lost sub-issue parent links |
@@ -150,7 +150,6 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/session-handoff.md` | Pointer to the `agent-handoff` skill |
 | `rules/skill-creation-sync.md` | Skill naming (incl. registered exceptions), set placement, reference convention, blast-radius procedure |
 | `rules/sonarcloud-silent-analysis-failure.md` | SonarCloud analysis failing server-side behind a green CI |
-| `rules/structurizr-render-single-view-wipes-others.md` | Single-view `render.sh` deleting the other SVGs |
 | `rules/supabase-config-push-scope.md` | `supabase config push` pushing the whole local config (path-scoped) |
 | `rules/testcontainers-wsl-docker-context.md` | Docker context on WSL breaking docker-py and Testcontainers |
 | `rules/toolchain-version-managed-globals.md` | Version-manager globals vanishing on a runtime bump |
@@ -165,7 +164,7 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/personal/browser-automation.md` | Prefer Playwright |
 | `rules/personal/claude-plugin-eval-wsl-and-graders.md` | `claude plugin eval` on WSL; `tool_used` graders |
 | `rules/personal/decisions-in-prose-not-forms.md` | Owner decisions discussed in prose |
-| `rules/personal/diagramming-layout.md` | Orthogonal edges, fewest elbows |
+| `rules/personal/diagramming-layout.md` | Orthogonal edges, fewest elbows (path-scoped) |
 | `rules/personal/preferences.md` | Naming, code language |
 | `rules/personal/python-docstring-policy.md` | Google §3.8 docstrings as written (path-scoped) |
 | `rules/personal/subagent-orchestration.md` | Pointer to chat-driven Ralph orchestration; joining dead-code leads across audit slices |

@@ -18,7 +18,7 @@ The pipeline uses the consolidated **Structurizr vNext** tool (announced [here](
 # Render every view from workspace.dsl
 ./render.sh
 
-# Render a single view (renders all then keeps only the matching one)
+# Render a single view (renders all, updates only that view's SVG)
 ./render.sh systemContext
 
 # Validate DSL + Docker availability without rendering
@@ -71,7 +71,7 @@ component CON_02 "components-CON-02" {
 }
 ```
 
-Then run `./render.sh components-CON-02` to keep only that view, or `./render.sh` to render everything.
+Then run `./render.sh components-CON-02` to update only that view, or `./render.sh` to render everything. Neither removes the SVG of a view deleted or renamed in the DSL: delete it by hand, and before committing check that the SVGs in `views/` match the view keys in `workspace.dsl`.
 
 Prefer using the **`arch-c4`** skill — it handles DSL editing, ID assignment, validation, and arc42 markdown embedding in one pass.
 

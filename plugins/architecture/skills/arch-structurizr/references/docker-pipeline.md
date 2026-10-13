@@ -41,14 +41,15 @@ The script is small and deliberately simple so the same flow works in dev + CI +
 ./docs/architecture/c4/render.sh [view-key]
 ```
 
-Without `view-key`, all views render. With it, all views still render in the same docker run (cheaper because Chromium starts once) and non-matching SVGs are then deleted.
+Without `view-key`, all views render. With it, all views still render in the same docker run (cheaper because Chromium starts once), and only that view's SVG (plus its `-key.svg` legend) is copied into `views/`; the other views' SVGs are left untouched.
 
 ### Steps (in order)
 
 1. **Validate the DSL** — `docker run structurizr/structurizr validate -workspace c4/workspace.dsl`. Exit non-zero if validation fails. Print the error.
-2. **Export views to SVG** — `docker run structurizr/structurizr export -workspace c4/workspace.dsl -format svg -output c4/views/`. One `.svg` per view defined in the DSL.
-3. **Optional filter** — if a single `view-key` was requested, delete non-matching SVGs.
-4. **List rendered views** — show the user what was produced.
+2. **Export views to SVG** — `docker run structurizr/structurizr export -workspace c4/workspace.dsl -format svg -output c4/views/.render-tmp/`. One `.svg` per view defined in the DSL, into a scratch folder removed on exit.
+3. **Zero-view check** — fail (exit 4) if the export produced no SVG.
+4. **Copy** — every SVG into `c4/views/`, or only the requested view's SVG and its `-key.svg`.
+5. **List rendered views** — show the user what was produced.
 
 ### Volume mounts
 

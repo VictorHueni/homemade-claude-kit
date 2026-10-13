@@ -50,7 +50,8 @@ workspace.dsl
    │  docker run structurizr/structurizr:<pin>-playwright
    │      export -workspace c4/workspace.dsl
    │             -format svg
-   │             -output c4/views/
+   │             -output c4/views/.render-tmp/
+   │  copy all SVGs (or only the requested view + its -key.svg) into c4/views/
    ▼
 c4/views/*.svg         ← committed; embedded in arc42 markdown
 ```
@@ -104,7 +105,8 @@ Bump the pinned Docker image version in `render.sh`, re-render all existing view
 4. Edit `render.sh` to update the pin (preserve the `-playwright` suffix).
 5. Run Mode 2 (`verify`) with the new pin.
 6. Run `./render.sh` to re-render all views; report any view that produced different SVG output (`git diff --stat docs/architecture/c4/views/`).
-7. Recommend committing the render-script bump + any re-rendered SVGs together so reviewers can correlate.
+7. If the project's `render.sh` predates kit architecture 1.1.0 (its single-view call deletes the other views' SVGs: look for `-delete` in step 3), re-copy `templates/render.sh` and re-apply the pin before re-rendering.
+8. Recommend committing the render-script bump + any re-rendered SVGs together so reviewers can correlate.
 
 ## Cross-references
 
