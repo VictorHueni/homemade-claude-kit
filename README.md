@@ -125,28 +125,25 @@ Every Claude rule is authored here, never directly in `~/.claude/rules/` (kit AD
 - **`rules/`**: shared engineering rules, installed for everyone.
 - **`rules/personal/`**: the owner's preferences and this machine's setup. Installed only after `./install.sh --personal-rules on`, which is remembered in `var/personal-rules`, so a teammate's install gets the shared layer alone. A file name may exist in one layer only.
 
-The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md adapter for Codex/OpenCode. `scripts/test-install-rules.sh` checks the installer's rule handling against a throwaway kit. `scripts/check-rules.py` checks every rule against the budget: 3k per always-on rule, 15k always-on in total, 4k per path-scoped rule, and no dated history, incident narrative or wiki-links.
+The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md adapter for Codex/OpenCode. `scripts/test-install-rules.sh` checks the installer's rule handling against a throwaway kit. `scripts/check-rules.py` checks every rule against the budget: 3k per always-on rule, 20k always-on in total, 4k per path-scoped rule, and no dated history, incident narrative or wiki-links.
 
 ### Shared (`rules/`)
 
 | Rule file | Covers |
 |---|---|
-| `rules/artefact-frontmatter.md` | **Pointer stub** → the `metamodel` skill's `references/artefact-frontmatter.md` (kit ADR-0007) |
-| `rules/artefact-types-registry.md` | **Pointer stub** → the `metamodel` skill's `references/artefact-types-registry.yaml` (clew-owned projection, clew ADR-0008) |
 | `rules/ci-workflows.md` | Local mirror for every CI tool; `GITHUB_TOKEN` chains and `workflow_run`; `GH_REPO` without a checkout (path-scoped) |
 | `rules/claude-plugins-and-mcp.md` | Plugin refresh, MCP version pins, OAuth client reset |
 | `rules/consistency-over-lean-variants.md` | Reuse the codebase's existing pattern before a leaner bespoke one |
-| `rules/diagramming-mermaid.md` | Mermaid diagram pitfalls *(→ AGENTS.md adapter)* |
+| `rules/diagramming-mermaid.md` | Mermaid diagram pitfalls on GitHub (path-scoped) *(→ AGENTS.md adapter)* |
 | `rules/diagramming-plantuml.md` | PlantUML creole markup eating CLI flags |
-| `rules/frontend-nuxt.md` | Nuxt UI v4 / Vue 3.5 / Reka UI *(→ AGENTS.md adapter)* |
+| `rules/frontend-nuxt.md` | Nuxt UI 4 / Vue 3.5 / Reka UI (path-scoped) *(→ AGENTS.md adapter)* |
 | `rules/git-and-tools.md` | Git discipline, Edit tool usage *(→ AGENTS.md adapter)* |
 | `rules/github-issue-transfer.md` | Bulk issue transfer and lost sub-issue parent links |
 | `rules/github-projects-single-select-field.md` | Adding a single-select option clears item values |
-| `rules/jvm-toolchain.md` | Maven, Temurin, current LTS |
+| `rules/jvm-toolchain.md` | Maven, Temurin, current LTS (path-scoped) |
+| `rules/kit-docs-stack.md` | **Pointer stub** → the `metamodel` skill: spine, artefact registry, frontmatter, open-items contract (kit ADR-0007; path-scoped) |
 | `rules/memory-hygiene.md` | Where a lesson belongs: kit rule, project AGENTS.md, or auto-memory |
-| `rules/metamodel.md` | **Pointer stub** → the `metamodel` skill (spine, variants, references) |
 | `rules/module-graph-reachability.md` | A direct-importer grep is not a reachability proof |
-| `rules/open-items-governance.md` | **Pointer stub** → the `metamodel` skill's `references/open-items-governance.md` |
 | `rules/osv-scanner-gitignored-worktrees.md` | osv-scanner finding nothing inside a gitignored checkout |
 | `rules/postgres-schema-gotchas.md` | PostgreSQL NULL, jsonb and planner traps (path-scoped) |
 | `rules/python-gotchas.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
@@ -173,5 +170,5 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/personal/preferences.md` | Naming, code language, Ralph Loop execution |
 | `rules/personal/python-docstring-policy.md` | Google §3.8 docstrings as written (path-scoped) |
 | `rules/personal/subagent-orchestration.md` | One subagent per increment, foreground gates, verify between iterations |
-| `rules/personal/ui-copy-no-em-dash.md` | No em dash in user-facing copy |
+| `rules/personal/ui-copy-no-em-dash.md` | No em dash in user-facing copy (path-scoped) |
 | `rules/personal/wsl-test-resource-budget.md` | Memory budget for test runs on the WSL machine |

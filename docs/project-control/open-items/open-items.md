@@ -2,7 +2,7 @@
 
 > **This markdown ledger is retired.** As of **2026-06-04** this repo runs the **`github`**
 > open-items backend (see [`backend.yml`](./backend.yml) and
-> [`rules/open-items-governance.md`](../../../rules/open-items-governance.md) §5.3). Open
+> [the `metamodel` skill's `references/open-items-governance.md`](../../../plugins/kit-core/skills/metamodel/references/open-items-governance.md) §5.3). Open
 > items now live as **GitHub Issues** — there is no longer a live markdown ledger here
 > (one backend per project; never both). Since **2026-07-20** (kit ADR-0009) the whole
 > tracker is the ledger: the former `open-item` marker label is retired and issues use

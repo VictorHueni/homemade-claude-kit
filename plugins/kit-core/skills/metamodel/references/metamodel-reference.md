@@ -782,7 +782,7 @@ Every change to canonical paths, artefact steps, or ID formats in the metamodel 
 
 | What changed | Also update |
 |---|---|
-| New artefact **type**, or a change to its id_format / path / layout / skill | `rules/artefact-types-registry.md` → add or update the type's row |
+| New artefact **type**, or a change to its id_format / path / layout / skill | `references/artefact-types-registry.yaml` → add or update the type's entry (clew-side first) |
 | New artefact step, new canonical path | `the `metamodel` skill's `references/modes/audit-check-catalogue.md`` → Check 1 (stack progress paths) |
 | New ID format (e.g. new `XX-NN` pattern) | `the `metamodel` skill's `references/modes/audit-check-catalogue.md`` → Check 5 (ID cross-reference regex patterns) |
 | New prerequisite dependency in the DAG | `the `metamodel` skill's `references/modes/audit-check-catalogue.md`` → Check 7 (dependency enforcement rules) |
