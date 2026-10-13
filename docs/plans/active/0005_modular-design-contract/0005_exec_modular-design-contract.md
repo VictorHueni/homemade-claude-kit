@@ -21,7 +21,7 @@ This plan makes the contract modular, so a renderer consumes a complete design s
 Principles:
 
 1. One increment equals one coherent change set and one commit.
-2. Every increment has an executable test gate, and its tests are written first and observed red (`~/.claude/rules/plans-are-tdd.md`); the iteration's `progress.txt` entry records the red run and the green run. Exemptions are named in Scope.
+2. Every increment has an executable test gate, and its tests are written first and observed red (the `plan-implementation` skill's red-before-green rule); the iteration's `progress.txt` entry records the red run and the green run. Exemptions are named in Scope.
 3. Python 3.12 or later, standard library plus PyYAML, which com-slide-deck already imports (`build.py`, `render.py`, `migrate.py`, `split.py`, `dev_server.py`). The PDF step keeps Playwright as its optional dependency. No JSON Schema library: the resolver checks a manifest with a small checker for the schema keywords the contract uses (Increment 02). Tests run with `python3 -m unittest`.
 4. One implementation of each shared concern. Resolution, the base theme and the validator exist once, in `plugins/delivery-comms/shared/`, and `scripts/sync-shared.py` copies them into each skill so every skill stays self-contained; a test fails if a copy differs.
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.

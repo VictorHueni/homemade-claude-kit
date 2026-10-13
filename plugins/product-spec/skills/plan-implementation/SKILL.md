@@ -48,7 +48,7 @@ Use the following Markdown structure exactly:
 Principles:
 
 1. One increment equals one coherent change set.
-2. Every increment has an explicit test gate.
+2. Every increment is test-driven: write-first tests observed red, then a green test gate.
 3. [Project-specific principle]
 
 **Overall Status:** pending
@@ -62,7 +62,7 @@ Principles:
 
 Scope:
 
-1. [Actionable item]
+1. **Write first, expect red:** [test case]: extend <file::test> | adapt <file::test> | new <file> (why no existing test fits)
 2. [Actionable item]
 
 Primary files:
@@ -90,7 +90,8 @@ Prediction: (only for an increment that changes generated output; omit otherwise
 1. One increment per commit.
 2. **Commit scope:** `[capability/product slug]` — the scope every increment's commit uses, derived from the PRD's product/capability (`P-NN` → product slug, or `C-N.M` → capability slug). The ralph loop and `dev-git-commit` read this; the plan + increment ref goes in a `Refs: Plan-NNNN increment XX` trailer, **never** the scope. See [Commit & PR scope vocabulary](../../rules/git-and-tools.md).
 3. Each increment must be independently runnable and reversible.
-4. [Other standard rules...]
+4. Tests named in Scope are written or extended first and observed failing before the implementation lands; `progress.txt` records the red run (failing test names) and the green run. A write-first test that already passes is wrong or redundant: fix it, or log why. An increment whose tests were written after its code is not done. Exempt increments (pure layout or styling; browser/e2e checks written alongside the code) say `Exempt from red-first: <reason>` in Scope.
+5. [Other standard rules...]
 
 ## Milestone Chunks (Standalone Delivery Groups)
 
@@ -102,7 +103,8 @@ Prediction: (only for an increment that changes generated output; omit otherwise
 ## Guiding Principles for Planning
 
 - **Atomic Changes:** An increment should be small enough to review easily but large enough to provide value or a foundation.
-- **Test-Driven Gates:** Every increment must have a `Test gate`. If no logic is added, use a `smoke test` or `import test`.
+- **Red before green:** Each increment's Scope lists its tests as item 1, prefixed `**Write first, expect red:**`, naming the concrete cases; implementation items follow. Tests are written and observed failing before the implementation lands; the iteration records the red run (failing test names) and the green run in `progress.txt`. Exemptions are explicit in Scope (`Exempt from red-first: <reason>`): pure layout or styling, and browser/e2e acceptance checks written alongside the code. Every increment still has an executable `Test gate`; with no logic, use a smoke or import test.
+- **Extend before adding tests:** Before naming a test case, search the test tree for tests that already cover the same unit, behaviour or fixture: grep the symbol under change, the module's test file and the shared fixtures. For each case, Scope says where it goes: `extend <test file::test>` (a new assertion or parametrize row), `adapt <test>` (the behaviour changed), or `new` with a one-line reason no existing test fits. Reuse existing fixtures and builders rather than defining parallel ones. A plan that adds a test duplicating an existing one is not ready. An extended test still goes red first: the added assertion or row fails before the implementation lands.
 - **Deterministic Outcomes:** Exit criteria must be objective and verifiable.
 - **Mechanical Predictions:** An increment that changes generated output (a converter run, a fixture, a report) names every output path and ledger class it changes under `Prediction:`. The iteration agent compares the diff against it, and any change it does not name blocks the increment. A stop rule the agent may adjudicate ("stop on a change the ruling did not predict") does not fire: agents explain their surprises away.
 - **Sequential Flow:** Order increments to minimize rework and respect dependencies.

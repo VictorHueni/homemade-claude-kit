@@ -166,7 +166,6 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/personal/claude-plugin-eval-wsl-and-graders.md` | `claude plugin eval` on WSL; `tool_used` graders |
 | `rules/personal/decisions-in-prose-not-forms.md` | Owner decisions discussed in prose |
 | `rules/personal/diagramming-layout.md` | Orthogonal edges, fewest elbows |
-| `rules/personal/plans-are-tdd.md` | Plans order tests before code |
 | `rules/personal/preferences.md` | Naming, code language, Ralph Loop execution |
 | `rules/personal/python-docstring-policy.md` | Google §3.8 docstrings as written (path-scoped) |
 | `rules/personal/subagent-orchestration.md` | One subagent per increment, foreground gates, verify between iterations |
