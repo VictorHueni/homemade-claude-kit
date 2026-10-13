@@ -106,7 +106,7 @@ is deliberately absent: harness-native search is relied on.
 
 ## Adding a skill
 
-1. Create `plugins/<set>/skills/<skill-name>/SKILL.md` — naming + set placement per [`rules/skill-creation-sync.md`](./rules/skill-creation-sync.md); reference the metamodel **name-first** ("the `metamodel` skill's `references/<file>`").
+1. Create `plugins/<set>/skills/<skill-name>/SKILL.md` — naming + set placement per the kit-local [`util-skill-authoring`](./.claude/skills/util-skill-authoring/SKILL.md) skill; reference the metamodel **name-first** ("the `metamodel` skill's `references/<file>`").
 2. Structural metamodel changes (new artefact type, ID, path) are authored **clew-side first** (clew ADR-0008), then synced into the `metamodel` skill's registry YAML.
 3. Run `./install.sh` and `bash scripts/audit-skills.sh`.
 4. Commit and push.
@@ -147,7 +147,7 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/osv-scanner-gitignored-worktrees.md` | osv-scanner finding nothing inside a gitignored checkout |
 | `rules/postgres-schema-gotchas.md` | PostgreSQL NULL, jsonb and planner traps (path-scoped) |
 | `rules/python-gotchas.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
-| `rules/skill-creation-sync.md` | Skill naming (incl. registered exceptions), set placement, reference convention, blast-radius procedure |
+| `rules/skill-creation-sync.md` | Skill-edit checklist; points to the kit-local `util-skill-authoring` skill (path-scoped) |
 | `rules/sonarcloud-silent-analysis-failure.md` | SonarCloud analysis failing server-side behind a green CI |
 | `rules/supabase-config-push-scope.md` | `supabase config push` pushing the whole local config (path-scoped) |
 | `rules/testcontainers-wsl-docker-context.md` | Docker context on WSL breaking docker-py and Testcontainers |

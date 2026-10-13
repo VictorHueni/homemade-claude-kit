@@ -159,7 +159,7 @@ When asked *"build the documentation plan"* without further context, default to:
 When new skills join the kit or a step / path / ID format changes: **structural facts**
 (types, IDs, paths, relationships) are authored in the clew repo first (see Provenance above)
 and synced into `references/artefact-types-registry.yaml` and the spine here; the two-stage
-blast-radius procedure lives in the kit's `skill-creation-sync` rule. Failing to keep the
+blast-radius procedure lives in the kit repo's `util-skill-authoring` skill (`references/metamodel-impact.md`). Failing to keep the
 coupled files in sync causes the Audit and Migrate modes to silently miss artefacts — the
 most dangerous kind of drift.
 

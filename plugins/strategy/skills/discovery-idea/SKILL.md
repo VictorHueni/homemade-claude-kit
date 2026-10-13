@@ -175,7 +175,7 @@ section is empty.
 
 - **Upstream sources:** interviews, workshops, audits, customer messages, competitive intel
 - **Related ideas:** other `IDEA-NNNN` files
-- **External:** URLs (with `Last verified: YYYY-MM-DD` per `rules/writing-citations.md`)
+- **External:** inline-linked URLs, each followed by `Last verified: YYYY-MM-DD`
 
 ## Changelog
 
