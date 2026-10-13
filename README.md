@@ -147,14 +147,13 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/osv-scanner-gitignored-worktrees.md` | osv-scanner finding nothing inside a gitignored checkout |
 | `rules/postgres-schema-gotchas.md` | PostgreSQL NULL, jsonb and planner traps (path-scoped) |
 | `rules/python-gotchas.md` | pydantic-settings, radon/xenon, venv and uv, mypy/Pyright (path-scoped) |
-| `rules/session-handoff.md` | Pointer to the `agent-handoff` skill |
 | `rules/skill-creation-sync.md` | Skill naming (incl. registered exceptions), set placement, reference convention, blast-radius procedure |
 | `rules/sonarcloud-silent-analysis-failure.md` | SonarCloud analysis failing server-side behind a green CI |
 | `rules/supabase-config-push-scope.md` | `supabase config push` pushing the whole local config (path-scoped) |
 | `rules/testcontainers-wsl-docker-context.md` | Docker context on WSL breaking docker-py and Testcontainers |
 | `rules/toolchain-version-managed-globals.md` | Version-manager globals vanishing on a runtime bump |
 | `rules/working-style.md` | Sequential plans, trust-but-verify *(→ AGENTS.md adapter)* |
-| `rules/writing-citations.md` | Citation discipline *(→ AGENTS.md adapter)* |
+| `rules/writing-citations.md` | Inline source links in markdown docs (path-scoped) *(→ AGENTS.md adapter)* |
 
 ### Personal (`rules/personal/`)
 
