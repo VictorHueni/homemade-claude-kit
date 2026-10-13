@@ -13,7 +13,7 @@ Every markdown file produced by a kit skill under `docs/` must open with this YA
 
 ```yaml
 ---
-type: <canonical OKF display name — the artefact's okf_type from rules/artefact-types-registry.md>
+type: <canonical OKF display name — the artefact's okf_type from references/artefact-types-registry.yaml>
 title: <human-readable title of this specific document instance>
 description: <one-sentence summary of what this document instance is>
 resource: <URI of the underlying asset this documents — omit the line when there is none>

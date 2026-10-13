@@ -2,22 +2,8 @@
 type: rule
 ---
 
-# Heavy test runs on the WSL machine: budget memory, never assume you are alone
+# Heavy test runs on this WSL machine
 
-This machine's WSL VM has about 10 GB, shared by every worktree's dev stack, Docker Desktop's containers and any test suite another session is running. A full suite with `pytest -n auto` starts one worker per core (8 here), and each worker holds a few hundred MB plus its own Testcontainers database. Two such suites at once, or one beside several dev stacks, is enough to exhaust the VM. Stated preference (2026-10-07): run local CI gates in the background, but watch the WSL resources.
+The VM has about 10 GB, shared by every dev stack, Docker container and running suite. Before a full suite or aggregate gate, look for a concurrent run (`ps -eo pid,etime,args | grep "[p]ytest-xdist running"`) and check `free -m`; wait on its PID with `kill -0`, never with `pgrep -f` or `pkill -f`, which match your own shell. Cap workers with `PYTEST_XDIST_AUTO_NUM_WORKERS=3` (pytest-xdist 3+), or `-n 3` when invoking pytest directly. Log `free -m` every 30 s next to the run log, stop if `available` drops under about 600 MB, and end the log with `EXIT=<code>`. Subagents get the same cap and check, and leave the aggregate gate to the orchestrator. No dependency installs or branch switches under a running suite. Put multi-step background runs in a script file.
 
-**How to apply, before starting any full suite or aggregate CI gate:**
-
-1. **Look for a concurrent run first.** `ps -eo pid,etime,args | grep "pytest-xdist running" | grep -v grep` and `free -m` (column "available"). If another worktree's suite is running, wait for it by its PID (`while kill -0 <pid>; do sleep 10; done`), not by a `pgrep -f` pattern, which matches the waiting shell itself.
-2. **Cap the workers without editing the recipe.** `PYTEST_XDIST_AUTO_NUM_WORKERS=3` makes `-n auto` resolve to 3 (pytest-xdist ≥ 3). Prefix the make target with it; at most `-n 3` for explicit invocations. With 3 workers a full integration suite kept at least 2 GB free here.
-3. **Watch memory while it runs.** Have the background runner append `free -m` every 30 s to a log next to the run's own log, and alert below about 600 MB available. Finish the run log with an `EXIT=<code>` sentinel so the verdict is read, not inferred.
-4. **Subagents get the same budget in their brief:** at most 3 workers, check for a concurrent suite first, and leave the aggregate gate to the orchestrator so two never overlap.
-5. **Don't change the environment under a running suite.** Dependency installs (`uv sync`, lockfile regeneration) and branch switches wait until the suite has finished.
-
-**Reading a failed run:** hundreds of setup errors that all say `connection refused` on a **single** port mean one Testcontainers database died mid-run, not that the code broke. Check with `grep -oE "port [0-9]+ failed" <log> | sort | uniq -c`, look at `docker events --filter event=die --filter event=oom` for the window, then re-run only the test step before debugging anything.
-
-**Shell traps met while doing this:**
-- `a && b && ( loop ) & S=$!; cd dir && cmd` backgrounds the whole `a && b && (loop)` list, so later steps run in the wrong directory. Put multi-step background runs in a small script file instead.
-- `pkill -f <pattern>` kills the shell running it when the pattern appears in its own command line. Kill by PID.
-
-**Why:** the failure is either a frozen VM (all sessions lost) or a red gate that looks like a code regression. Both cost far more than one `ps` and one environment variable.
+Hundreds of setup errors with `connection refused` on one port mean a Testcontainers database died, not a code regression: count with `grep -oE "port [0-9]+ failed" <log> | sort | uniq -c`, check `docker events --filter event=die --filter event=oom`, and re-run the test step before debugging.

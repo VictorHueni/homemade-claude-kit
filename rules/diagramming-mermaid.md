@@ -1,56 +1,22 @@
 ---
 type: rule
 paths:
-  - "docs/architecture/**"
-  - "docs/business/**"
+  - "**/*.md"
 ---
 
-# Mermaid diagrams (GitHub renderer)
+# Mermaid diagrams on GitHub
 
-GitHub's embedded Mermaid parser is stricter than the standalone Mermaid CLI. Diagrams that render locally can fail on GitHub with "Unable to render rich display / Parse error on line N."
+Mermaid is the default for diagrams inline in GitHub markdown; use PlantUML (the `arch-uml` skill) only for what Mermaid cannot express, and Structurizr for C4.
 
-## Flowcharts (`flowchart TD`, `flowchart LR`)
+GitHub's Mermaid parser is stricter than the CLI: a diagram that renders locally can fail with "Unable to render rich display / Parse error on line N".
 
-Quote any label containing `<br/>`, apostrophes, parens, colons, commas, or non-alphanumeric punctuation:
+**Flowcharts:** quote any label containing `<br/>`, apostrophes, parentheses, colons, commas or other punctuation: `Node["Foo<br/>Bar"]`, `Diamond{"Foo?"}`, edge labels `|"line1<br/>line2"|`. Error tell: "got NEWLINE" or "got STR".
 
-| Risky pattern | Fix |
-|---|---|
-| `Node[Foo<br/>Bar]` | `Node["Foo<br/>Bar"]` |
-| `Diamond{Foo<br/>Bar?}` | `Diamond{"Foo<br/>Bar?"}` |
-| `\|line1<br/>line2\|` (edge label) | `\|"line1<br/>line2"\|` |
-| `Node[insurer's text]` (apostrophe) | `Node["insurer's text"]` |
-| Labels with parens, colons, commas, special chars | `Node["text (etc)"]` |
+**Sequence diagrams:** quoting does not help; rephrase the message. No semicolons (use `and` or `+`), no leading parentheses, no curly braces. `<br/>` works unquoted in `Note` blocks. Error tell: "Expecting SOLID_OPEN_ARROW / DOTTED_OPEN_ARROW".
 
-## Sequence diagrams (`sequenceDiagram`)
-
-Different grammar — quote-wrapping does not help. Rephrase the message text:
-
-| Risky pattern in message | Fix |
-|---|---|
-| `A->>B: text1; text2` (semicolons) | Replace `;` with `+`, `and`, or `—` |
-| `A->>B: (informal) text...` (leading parens) | Move qualifier inside the sentence |
-| Curly braces `{...}` in message text | Replace with brackets or rephrase |
-
-`Note over` / `Note left of` / `Note right of` blocks: `<br/>` works without quotes.
-
-## Library choice
-
-Stay with Mermaid (GitHub-native). PlantUML / D2 / GraphViz require pre-generated SVG/PNG and lose the diff-friendly text-source advantage.
-
-## Mobile rendering
-
-The GitHub mobile app (iOS + Android) does NOT render Mermaid — it shows source as a code block. Use a mobile browser instead.
-
-## Diagnostic shortcuts
-
-- "Parse error … Expecting SOLID_OPEN_ARROW / DOTTED_OPEN_ARROW" → sequence-diagram message-text issue (semicolon or leading paren).
-- "got NEWLINE" / "got STR" → flowchart label-quoting issue.
-
-## Pre-commit audit
+Pre-commit audit:
 
 ```bash
-# Flowcharts: any unquoted <br/> in node labels, edge labels, diamonds?
 grep -nE '\|[^"|]*<br/?>[^"|]*\||\[[^"][^]]*<br/?>[^]]*\]|\{[^"{}]*<br/?>[^"{}]*\}' file.md
-# Sequence diagrams: any semicolons or leading parens in messages?
-grep -nE '->>|-->>' file.md | grep -E ': .*;|: \('
+grep -nE -e '->>|-->>' file.md | grep -E ': .*;|: \('
 ```
