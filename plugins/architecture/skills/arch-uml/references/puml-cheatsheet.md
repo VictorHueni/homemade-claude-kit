@@ -8,7 +8,7 @@ Authoritative reference: [plantuml.com](https://plantuml.com). This file is the 
 
 ## 1. Sequence (`seq-NN-<slug>.puml`)
 
-Interaction over time. Use `alt`/`par`/`loop`/`opt` for branches — this richness is the main reason to pick PlantUML over Mermaid for sequences.
+Interaction over time. Use `alt`/`par`/`loop`/`opt` for branches.
 
 ```plantuml
 @startuml
@@ -16,10 +16,10 @@ Interaction over time. Use `alt`/`par`/`loop`/`opt` for branches — this richne
 title seq-01 — Customer submits a claim (realises UC-01)
 
 actor "P-02 — Customer" as customer
-participant "Customer Portal" as portal
-participant "Claims API" as api
-database "Claims DB" as db
-queue "Event Bus" as bus
+participant "CON-01 — Customer Portal" as portal
+participant "CON-02 — Claims API" as api
+database "CON-03 — Claims DB" as db
+queue "CON-04 — Event Bus" as bus
 
 customer -> portal : Submit claim
 activate portal
@@ -124,7 +124,7 @@ state UnderReview {
 
 Notes:
 - `[*]` is the initial/final pseudo-state.
-- Composite (nested) states: `state Name { ... }` — a key reason to use PlantUML over Mermaid here.
+- Composite (nested) states: `state Name { ... }`.
 - Transition labels are the events/commands (`event() [guard] / action`).
 
 ---

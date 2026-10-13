@@ -170,7 +170,7 @@ grep -rn 'https\?://' docs/ --include="*.md" | grep -v 'Last verified'
 | `CON-NN` | `\bCON-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `CON_NN` in `container` block) |
 | `CMP-NN` | `\bCMP-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `CMP_NN` in `component` block) |
 | `DN-NN` | `\bDN-[0-9]{2}\b` | `docs/architecture/c4/workspace.dsl` (DSL identifier `DN_NN` in `deploymentNode` block) |
-| `SCN-NN` | `\bSCN-[0-9]{2}\b` | `docs/architecture/arc42/06-runtime-view.md` (`arch-arc42` runtime mode — owns §6 + SCN-NN per ADR-0004; `arch-c4` only renders the dynamic-view SVG keyed by it) |
+| `SCN-NN` | `\bSCN-[0-9]{2}\b` | `docs/architecture/arc42/06-runtime-view.md` (`arch-arc42` runtime mode — owns §6 + SCN-NN per ADR-0004; figure is an `arch-uml sequence`) |
 | `CST-NN` | `\bCST-[0-9]{2}\b` | `docs/architecture/arc42/02-constraints.md` (`arch-arc42` constraints mode) |
 | `CC-NN` | `\bCC-[0-9]{2}\b` | `docs/architecture/arc42/08-cross-cutting-concepts.md` (`arch-arc42` cross-cutting mode) |
 | `RSK-NN` | `\bRSK-[0-9]{2}\b` | `docs/architecture/arc42/11-risks.md` (`arch-arc42` risks mode) |
@@ -395,7 +395,7 @@ done | sort -rn
 | `VISION.md` | `## The Elevator Pitch`, `## What We Are NOT`, `## North Star Metric`, `## Changelog` | `grep -q 'Elevator Pitch\|North Star'` |
 | `02b-bounded-contexts.md` | `## Subdomain catalogue`, at least one `BC-NN` entry | `grep -q 'BC-[0-9][0-9]'` |
 | `02c-glossary.md` | At least one BC section, `## Changelog` | `grep -q '## Changelog'` |
-| `docs/domain/07b-models/{bc-slug}.md` | `## Aggregate catalogue`, `## Domain event catalogue`, Mermaid `classDiagram` | `grep -q 'Aggregate catalogue\|classDiagram'` |
+| `docs/domain/07b-models/{bc-slug}.md` | `## Aggregate catalogue`, `## Domain event catalogue`, embedded `arch-uml` class diagram | `grep -q 'Aggregate catalogue\|views/class-'` |
 | `docs/architecture/research/*.md` | `## Questions`, `## Findings`, `## Changelog` | `grep -q '## Questions\|## Findings'` |
 | `docs/business/01b-competitive-landscape/*.md` | `## Porter Five Forces`, `## Competitor Profiles` or `## CO-` heading | `grep -q 'Five Forces\|CO-[0-9]'` |
 | `docs/architecture/interfaces/*.md` (not `cli-*.md`) | `## §0 Traceability`, `## §3 Error contract`, `## §4 Versioning & deprecation policy`, `## §5 Security surface`, `## Changelog` | `grep -q '§0 Traceability\|§3 Error contract'` |
@@ -407,7 +407,7 @@ done | sort -rn
 | `docs/architecture/arc42/03-context.md` | `# 3. Context and Scope`, `## 3.1 Business Context` (with embedded `systemContext.svg`), `## 3.2 Technical Context` | `grep -q '## 3.1 Business Context\|## 3.2 Technical Context'` |
 | `docs/architecture/arc42/04-solution-strategy.md` | `# 4. Solution Strategy`, `## 4.1 Technology Decisions`, `## 4.2 Top-Level Decomposition`, `## 4.3 Quality Goal` | `grep -q '## 4.1 Technology\|## 4.3 Quality Goal'` |
 | `docs/architecture/arc42/05-building-blocks.md` | `# 5. Building Block View`, `## 5.1 Whitebox Overall System` with containers table including `Domain aggregates implemented` column, at least one `## 5.2.x` drill | `grep -q '## 5.1 Whitebox\|Domain aggregates implemented'` |
-| `docs/architecture/arc42/06-runtime-view.md` | `# 6. Runtime View`, at least one `## 6.x` scenario subsection with `SCN-NN` ID + step table + a `<!-- arch-figure … -->` block (figure from `arch-c4` dynamic or `arch-uml sequence`). Owned by `arch-arc42` per ADR-0004; marker/figure integrity in Check 7a. | `grep -q '## 6\.\|SCN-[0-9]'` |
+| `docs/architecture/arc42/06-runtime-view.md` | `# 6. Runtime View`, at least one `## 6.x` scenario subsection with `SCN-NN` ID + step table + a `<!-- arch-figure … -->` block (figure from `arch-uml sequence`). Owned by `arch-arc42` per ADR-0004; marker/figure integrity in Check 7a. | `grep -q '## 6\.\|SCN-[0-9]'` |
 | `docs/architecture/arc42/07-deployment.md` | `# 7. Deployment View`, `## 7.1` overview, at least one per-environment `### Production` (or named env), Mapping table | `grep -q '## 7.1\|Mapping of building blocks'` |
 | `docs/architecture/arc42/08-cross-cutting-concepts.md` | `# 8. Cross-Cutting Concepts`, `## Concept catalogue` table with `CC-NN` IDs and `Applies to` column | `grep -q '## Concept catalogue\|CC-[0-9]'` |
 | `docs/architecture/arc42/11-risks.md` | `# 11. Risks and Technical Debt`, `## 11.1 Active Risks` table with `RSK-NN` IDs, `## 11.2 Technical Debt` | `grep -q '## 11.1\|RSK-[0-9]'` |

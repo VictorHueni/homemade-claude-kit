@@ -1,7 +1,7 @@
 {
   "name": "domain-modeling",
   "description": "Domain-driven design. Bounded contexts, ubiquitous-language glossary, and tactical domain models.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Victor Hueni"
   }

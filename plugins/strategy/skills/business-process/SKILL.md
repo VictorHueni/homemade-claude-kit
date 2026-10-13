@@ -1,7 +1,7 @@
 ---
 name: business-process
 license: MIT
-description: "Create a BPMN-ready business process document. Use when the user asks to document a process, model a workflow, write a process spec, capture an as-is process, or anything BPMN-flavoured. Triggers on: create a process doc, document this process, model this workflow, BPMN, process model, business process for {X}, capture this workflow, write an as-is process, document the {Y} flow. Encodes a fixed template: Master diagram (Mermaid) → Triggers → Actors → Activities → Data Stores → Data Objects → Decisions → KPIs → Pain Points → Sources → TODOs. Domain-agnostic; works for any industry."
+description: "Create a BPMN-ready business process document. Use when the user asks to document a process, model a workflow, write a process spec, capture an as-is process, or anything BPMN-flavoured. Triggers on: create a process doc, document this process, model this workflow, BPMN, process model, business process for {X}, capture this workflow, write an as-is process, document the {Y} flow. Encodes a fixed template: Master diagram (Mermaid flowchart) → Triggers → Actors → Activities → Data Stores → Data Objects → Decisions → KPIs → Pain Points → Sources → TODOs. Domain-agnostic; works for any industry."
 user-invocable: true
 metadata:
   category: "specification"
@@ -112,7 +112,7 @@ If the user gives "Other" or pushes back, ask one follow-up to clarify, then pro
 - Conflate descriptive content with strategic argument — this doc says **what is**, not what should change.
 - Produce a BPMN XML file — this skill produces the markdown source-of-truth.
 - Skip §8 KPIs because the user "doesn't have any yet" — seed candidate rows with `_TODO_` values regardless. (These are scaffold placeholders; do NOT file them as open items.)
-- Leave Mermaid diagrams empty — at minimum produce a master flow (§0) and one sequence diagram per actor or phase in §6.
+- Leave diagrams empty — at minimum produce a master flow (§0, Mermaid flowchart) and one sequence diagram per actor or phase in §6 (`arch-uml sequence`).
 
 ### Mode 3 — Update
 
@@ -161,8 +161,8 @@ Frontmatter blockquote:
   Table: Object | Created by | Consumed by | Format | Required fields | Standards reference if any
 
 §6 Activities — step-by-step walkthrough
-  §6.1 Actor A's flow (Mermaid sequence diagram + numbered steps)
-  §6.2 Actor B's flow (Mermaid sequence diagram + numbered steps)
+  §6.1 Actor A's flow (`arch-uml sequence` SVG + numbered steps)
+  §6.2 Actor B's flow (`arch-uml sequence` SVG + numbered steps)
   ... per actor or per phase
 
 §7 Decision points + business rules
@@ -304,7 +304,7 @@ When the user asks you to produce a process doc but the conversation has been ab
 
 ## Common patterns to apply
 
-1. **Actor swim-lanes** — every Mermaid sequence diagram in §6 should put actors as named participants at the top. This makes the BPMN-pool mapping trivial.
+1. **Actor swim-lanes** — every §6 sequence diagram is drawn with `arch-uml sequence` (prerequisite: `arch-plantuml init`) and puts actors as named participants at the top. This makes the BPMN-pool mapping trivial.
 
 2. **Cite the legal article for every regulatory claim.** Telegraphic style: don't paraphrase the law — link to fedlex.admin.ch (CH) or equivalent and quote when the wording matters.
 
@@ -420,6 +420,7 @@ Before declaring the work done:
 - [ ] Process file exists at the correct path (scaffold / fill mode).
 - [ ] §6 decomposition axis chosen and documented if non-default (fill mode).
 - [ ] §0 Master flow Mermaid diagram present (not empty).
+- [ ] Each §6 flow embeds a rendered `arch-uml sequence` SVG.
 - [ ] §2 Triggers table has at least one row.
 - [ ] §3 Actors table populated (or honest `_TODO_`).
 - [ ] §8 KPIs table has ≥3 starter rows (even if values are `_TODO_`).

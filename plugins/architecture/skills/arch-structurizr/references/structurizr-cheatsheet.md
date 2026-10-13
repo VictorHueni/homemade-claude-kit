@@ -16,7 +16,7 @@ workspace "Project Name" "Project description" {
     }
 
     views {
-        // systemContext, container, component, deployment, dynamic — plus styles
+        // systemContext, container, component, deployment — plus styles
         theme default
     }
 }
@@ -207,19 +207,6 @@ component CON_02 "components-CON-02" {
 ```
 deployment SYS_01 "Production" "deployment-production" {
     include *
-    autolayout lr
-}
-```
-
-### Dynamic (arc42 §6 — runtime scenarios; produced by `arch-runtime-view`, not `arch-c4`)
-
-```
-dynamic SYS_01 "dynamic-RV-01" {
-    title "RV-01 — Customer submits a claim"
-    P_02 -> CON_01 "Submits claim"
-    CON_01 -> CON_02 "POST /claims"
-    CON_02 -> CON_03 "Persists Claim aggregate"
-    CON_02 -> CON_04 "Publishes ClaimSubmitted"
     autolayout lr
 }
 ```

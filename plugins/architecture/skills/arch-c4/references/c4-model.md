@@ -81,10 +81,10 @@ Heuristics:
 | §5 Building Block View Level 1 | ✅ Yes — C4 Container view | arc42 wants a "Motivation" sentence and a "Contained Building Blocks" table; C4 only renders the diagram |
 | §5 Building Block View Level 2/3 | ✅ Yes — C4 Component view | arc42 black-box template adds "Quality characteristics", "Open issues" — C4 doesn't natively model these |
 | §7 Deployment View | ✅ Yes — C4 Deployment view | arc42 wants per-environment "Quality and/or Performance Features" + "Motivation" — C4 doesn't natively model these |
-| §6 Runtime View | ❌ No — C4 is static | C4 has *dynamic views* but the kit treats arc42 §6 as `arch-runtime-view`'s domain |
-| §2 Constraints | ❌ No | `arch-constraints` (Milestone 2) |
-| §4 Solution Strategy | ❌ No | `arch-solution-strategy` (Milestone 2) |
-| §8 Cross-cutting Concepts | ❌ No | `arch-cross-cutting` (Milestone 2) |
+| §6 Runtime View | ❌ No — C4 is static | C4 has *dynamic views*, but the kit draws §6 scenarios as `arch-uml sequence` diagrams (`arch-arc42 runtime`) |
+| §2 Constraints | ❌ No | `arch-arc42 constraints` |
+| §4 Solution Strategy | ❌ No | `arch-arc42 solution-strategy` |
+| §8 Cross-cutting Concepts | ❌ No | `arch-arc42 cross-cutting` |
 
 The arc42 markdown templates this skill writes fill the gaps that C4 doesn't natively cover — tables for motivation, quality characteristics, and per-environment performance features.
 

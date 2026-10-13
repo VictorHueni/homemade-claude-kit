@@ -1,6 +1,6 @@
 # Structurizr DSL conventions
 
-The DSL is the **single source of truth** for every C4 view in the project. These conventions exist to keep multi-skill authoring (`arch-c4` writes; `arch-runtime-view` reads) consistent and grep-friendly.
+The DSL is the **single source of truth** for every C4 view in the project. These conventions exist to keep multi-skill authoring (`arch-c4` writes; `arch-arc42` embeds) consistent and grep-friendly.
 
 Authoritative grammar: [docs.structurizr.com/dsl](https://docs.structurizr.com/dsl). This file lists the **kit-specific rules** layered on top of the official grammar.
 
@@ -87,7 +87,6 @@ Structurizr writes one file per view. The file name is the view *key* (the secon
 | `containers` | §5.1 Building Block Level 1 | `container` |
 | `components-<CON-NN>` | §5.2 Building Block Level 2 (one per drilled container) | `component` |
 | `deployment-<env>` | §7 Deployment View (one per environment) | `deployment` |
-| `dynamic-<RV-NN>` | §6 Runtime View (one per scenario) | `dynamic` |
 
 The renders end up at `c4/views/<view-key>.svg`. The arc42 markdown embeds them by relative path.
 

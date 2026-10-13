@@ -55,7 +55,6 @@ The file name of every rendered SVG is the **view key** declared in `workspace.d
 | `containers` | §5.1 Building Block Level 1 |
 | `components-<CON-NN>` | §5.2 / §5.3 Building Block Level 2 (one per drilled container) |
 | `deployment-<env>` | §7 Deployment View (one per environment) |
-| `dynamic-<RV-NN>` | §6 Runtime View (one per scenario, produced by `arch-runtime-view`) |
 
 ---
 

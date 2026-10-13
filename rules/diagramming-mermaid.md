@@ -6,7 +6,7 @@ paths:
 
 # Mermaid diagrams on GitHub
 
-Mermaid is the default for diagrams inline in GitHub markdown; use PlantUML (the `arch-uml` skill) only for what Mermaid cannot express, and Structurizr for C4.
+C4 views (context, container, component, deployment) use Structurizr (`arch-c4`); every UML diagram (sequence, class, state, activity, ER, use-case, arc42 §6 runtime scenarios included) uses PlantUML (`arch-uml`); Mermaid is only for diagrams that are neither, such as flowcharts, mind maps, timelines and Gantt charts.
 
 GitHub's Mermaid parser is stricter than the CLI: a diagram that renders locally can fail with "Unable to render rich display / Parse error on line N".
 

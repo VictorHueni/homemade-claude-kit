@@ -1,7 +1,7 @@
 ---
 name: arch-plantuml
 license: MIT
-description: "Initialise and maintain the PlantUML diagrams workspace + Docker-based render pipeline that powers UML diagrams (sequence, class, state-machine, activity, ER, use-case) — the diagram types Mermaid renders poorly and Structurizr does not cover. One-time setup skill: scaffolds docs/architecture/diagrams/{*.puml, _theme.puml, render.sh, README.md, views/}, pins the official plantuml/plantuml Docker image, and provides a validate→render pipeline (.puml → SVG). Companion to arch-uml, which authors the diagrams going forward. Triggers on: scaffold plantuml, init plantuml, plantuml workspace, set up plantuml, plantuml render pipeline, plantuml docker, uml render pipeline, plantuml foundation, diagrams folder. NOT for C4 architecture diagrams (arch-c4 / arch-structurizr) nor GitHub-inline diagrams (Mermaid)."
+description: "Initialise and maintain the PlantUML diagrams workspace + Docker-based render pipeline that powers UML diagrams (sequence, class, state-machine, activity, ER, use-case) — the kit renders every UML diagram, arc42 §6 runtime sequences included, through it. One-time setup skill: scaffolds docs/architecture/diagrams/{*.puml, _theme.puml, render.sh, README.md, views/}, pins the official plantuml/plantuml Docker image, and provides a validate→render pipeline (.puml → SVG). Companion to arch-uml, which authors the diagrams going forward. Triggers on: scaffold plantuml, init plantuml, plantuml workspace, set up plantuml, plantuml render pipeline, plantuml docker, uml render pipeline, plantuml foundation, diagrams folder. NOT for C4 architecture diagrams (arch-c4 / arch-structurizr) nor non-UML diagrams such as flowcharts (Mermaid)."
 user-invocable: true
 metadata:
   category: "architecture"
@@ -24,23 +24,23 @@ It is the structural twin of `arch-structurizr`:
 | `arch-structurizr` | **`arch-plantuml`** *(this skill)* | One-time scaffold: filesystem layout, pinned Docker version, render script, shared theme, conventions. |
 | `arch-c4` | `arch-uml` | Per-diagram authoring: writes `.puml` files, runs `render.sh`, embeds SVGs into markdown. |
 
-## Why PlantUML at all (the kit is Mermaid-first)
+## Which diagram goes where
 
-`rules/diagramming-mermaid.md` makes Mermaid the default for GitHub-inline diagrams — it renders natively on GitHub and stays diff-friendly. PlantUML earns its place **only** for the diagram types Mermaid renders poorly and Structurizr does not cover, rendered to **committed SVG** (the same pre-render trade-off `arch-structurizr` already legitimises):
+`rules/diagramming-mermaid.md` sets the split: C4 views go to Structurizr, every UML diagram goes to PlantUML rendered to **committed SVG**, and Mermaid covers only diagrams that are neither. This pipeline renders:
 
-- **Sequence** diagrams with rich activation/grouping/`alt`/`par` semantics
+- **Sequence** diagrams, arc42 §6 runtime scenarios included
 - **Class** diagrams (associations, generalization, multiplicities)
 - **State-machine** diagrams (composite/nested states, history)
 - **Activity** diagrams (swimlanes, fork/join)
 - **Entity-Relationship** diagrams
-- **Use-case** diagrams (actors, `«include»`/`«extend»`) — this finally gives `spec-use-case` a way to render the UML use-case diagrams it already references.
+- **Use-case** diagrams (actors, `«include»`/`«extend»`), for `spec-use-case`
 
 **Out of scope (do not duplicate existing tooling):**
 
 | Want | Use instead |
 |---|---|
-| C4 context / container / component / deployment / runtime | `arch-c4` (+ `arch-structurizr` pipeline) |
-| A GitHub-inline diagram that renders in the markdown itself | Mermaid (`rules/diagramming-mermaid.md`) |
+| C4 context / container / component / deployment | `arch-c4` (+ `arch-structurizr` pipeline) |
+| A non-UML, non-C4 diagram (flowchart, mind map, timeline, Gantt) | Mermaid (`rules/diagramming-mermaid.md`) |
 | Interactive HTML board / canvas / timeline | `com-artefact-viz` |
 
 ## Why two skills instead of one
@@ -144,7 +144,7 @@ Bump the pinned Docker image version in `render.sh`, then re-render all diagrams
 - `arch-structurizr` / `arch-c4` — the C4 toolchain. PlantUML does **not** draw C4 here; defer to those.
 - `spec-use-case` — its UML use-case diagrams are rendered by `arch-uml` through this pipeline.
 - `domain-model` — class / state-machine / ER diagrams for the domain are rendered here.
-- `rules/diagramming-mermaid.md` — the Mermaid-first policy; this skill is the sanctioned exception for rich UML rendered to SVG.
+- `rules/diagramming-mermaid.md` — the three-way diagram split (C4, UML, everything else).
 - the `metamodel` skill — supporting-skills list entry + canonical path `docs/architecture/diagrams/`.
 
 ## Optional — PlantUML MCP server

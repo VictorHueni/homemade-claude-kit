@@ -54,7 +54,7 @@ Never hard-code colours/fonts in a diagram — they belong in `_theme.puml` so r
 
 ### vs `arch-c4` / `arch-structurizr` — the C4 boundary
 
-**Do not draw C4 diagrams in PlantUML.** Context, container, component, deployment, and runtime views are the Structurizr toolchain's job — it owns the single C4 model and renders all five view types from it. If asked for "the architecture diagram," disambiguate:
+**Do not draw C4 diagrams in PlantUML.** Context, container, component and deployment views are the Structurizr toolchain's job — it owns the single C4 model and renders all four view types from it. If asked for "the architecture diagram," disambiguate:
 
 | The user wants… | Send to |
 |---|---|
@@ -62,19 +62,12 @@ Never hard-code colours/fonts in a diagram — they belong in `_theme.puml` so r
 | The containers/tech stack inside the system | `arch-c4 container` |
 | Components inside a container | `arch-c4 component` |
 | Where it deploys | `arch-c4 deployment` |
-| How containers collaborate at runtime | `arch-c4 runtime` (Structurizr dynamic view) |
-| A **behavioural** UML view (sequence between code-level objects, an aggregate's state machine, a class model) | **`arch-uml`** |
+| How containers collaborate at runtime (arc42 §6) | **`arch-uml sequence`**, lifelines named with their `CON-NN` |
+| A **behavioural** or structural UML view (an aggregate's state machine, a class model) | **`arch-uml`** |
 
-The overlap is sharpest for **sequence diagrams**: a C4 *runtime view* shows containers exchanging messages (→ `arch-c4`); an `arch-uml` *sequence diagram* shows finer-grained participants (objects, endpoints, services) inside or across containers. Rule of thumb: **if the lifelines are C4 containers, it's `arch-c4`; if they're code-level participants, it's `arch-uml`.**
+### vs Mermaid — the non-UML boundary
 
-### vs Mermaid — the inline boundary
-
-The kit is Mermaid-first (`rules/diagramming-mermaid.md`) because Mermaid renders inline on GitHub and stays diff-friendly. Choose `arch-uml` (PlantUML → committed SVG) **only** when:
-
-1. The diagram needs grammar Mermaid lacks or does poorly — composite/nested states, rich `alt`/`par`/`opt` sequences, swimlane activities with fork/join, full class diagrams with multiplicities + stereotypes, crow's-foot ER; **and**
-2. A pre-rendered, committed SVG is acceptable (it won't live-render in the markdown).
-
-If a simple flowchart or short sequence would do, **use Mermaid** — don't manufacture a PlantUML SVG for it.
+`rules/diagramming-mermaid.md` sends every UML diagram here, however simple. Mermaid keeps only diagrams that are neither UML nor C4: flowcharts, mind maps, timelines, Gantt charts.
 
 ### vs `domain-model` — the ownership boundary
 
@@ -93,4 +86,4 @@ If a simple flowchart or short sequence would do, **use Mermaid** — don't manu
 - [ ] Every arrow/transition labelled
 - [ ] Upstream ID in the title + on key elements
 - [ ] Styling comes from `_theme.puml`, not inline
-- [ ] Correct tool chosen (not a C4 view, not something Mermaid should do inline)
+- [ ] Correct tool chosen (UML, not a C4 view, not a flowchart or other non-UML diagram)
