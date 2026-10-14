@@ -16,3 +16,14 @@ Owner request after reviewing how the kit change will be tested:
 - Increment 01: a second CI job, `test-pdf`, installs Playwright and Chromium and runs the PDF tests; in CI a missing browser fails the job instead of skipping it.
 - New Increment 12: `claude plugin eval` suite for delivery-comms (five cases: deck in a pinned project, viz from a subfolder, release note, legacy tokens.css, bespoke generator), graded on files the run leaves (provenance, `check_render.py --record` verdict), never on tool-use records; runs only with owner approval. The SKILL.md rewrite moves from the release increment into 12 so the evals check it.
 - The release increment becomes 13; release/2.0 now carries 03 to 13.
+
+## Iteration 1
+- Increment: 01 — Test lane for delivery-comms
+- Status: done
+- Files changed: plugins/delivery-comms/Makefile, plugins/delivery-comms/tests/{helpers,pdf_helpers,test_characterisation,test_pdf}.py, .github/workflows/delivery-comms.yml, plan status
+- Red: n/a (exempt: characterisation tests pin today's behaviour and pass on first run by design). Sensitivity checked instead: breaking the fallback marker/accent line in the release-note, slide-deck and artefact-viz tokens.fallback.css turned the matching test red; restored after.
+- Green: make test (3 tests) and make test-pdf (2 tests) pass locally.
+- Test gate: passed (make -C plugins/delivery-comms test; ./scripts/audit-skills.sh). CI=true with no browser makes test-pdf fail (2 failures); without CI it skips.
+- Learnings: the viz "domain tokens" layer marker comes from render.py, not tokens.domain.css, so the test is sensitive to the fallback template only. The release-note accent appears in 9 places of the HTML, so the marker (not the accent) is what catches a broken fallback there. The two CI jobs themselves have not run yet; they run on the PR.
+- Commit: see git log (test(delivery-comms): test lane for delivery-comms)
+- Timestamp: 2026-10-14
