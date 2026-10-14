@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** 11
+**Current Increment:** 12
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -338,7 +338,7 @@ Exit criteria:
 
 ### Increment 11: ux-design-system `point` and `subset`
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -441,5 +441,5 @@ Exit criteria:
 | M2: Resolve and check | 03-04 | done | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M3: Renderers moved | 05-09 | done | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M4: Reproducible | 10 | done | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
-| M5: Authoring | 11 | pending | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
+| M5: Authoring | 11 | done | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
 | M6: Agents follow the skills, release | 12-13 | pending | Agents using the rewritten skills render on-brand and migrate legacy projects; 2.0.0 released | `make -C plugins/delivery-comms test`, `make -C plugins/delivery-comms skill-evals` (owner-approved run), `./scripts/audit-skills.sh` | Every eval case passes its graders; 2.0.0 in the marketplace cache | `test(delivery-comms)`, `docs(delivery-comms)` |
