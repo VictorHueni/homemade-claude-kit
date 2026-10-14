@@ -1,0 +1,6 @@
+/* print.css — neutral defaults for the `print` module (printed pages). */
+:root {
+  --print-bg: #ffffff;
+  --print-margin: 14mm 16mm 18mm;
+  --print-page-size: A4;
+}

@@ -1,8 +1,12 @@
-# delivery-comms test lane. Needs Python 3.12+ and PyYAML; test-pdf also needs Playwright and Chromium.
+# delivery-comms test lane. Needs Python 3.12+ and PyYAML; test-pdf also needs Playwright and Chromium;
+# test-design-md also needs Node.js 18+ (npx) and the network.
 PYTHON ?= python3
 UNITTEST = cd tests && PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -B -m unittest
 
-.PHONY: test test-pdf check-python
+# Google's DESIGN.md linter, pinned at an exact version (published 2026-07-27).
+DESIGN_MD_LINTER ?= @google/design.md@0.4.0
+
+.PHONY: test test-pdf test-design-md check-python
 
 check-python:
 	@$(PYTHON) -c 'import sys; sys.exit(0 if sys.version_info >= (3, 12) else "delivery-comms tests need Python 3.12 or later")'
@@ -10,8 +14,13 @@ check-python:
 
 # Unit tests, no browser.
 test: check-python
-	$(UNITTEST) -v test_characterisation test_contract test_resolver test_validator test_slide_deck test_artefact_viz test_release_note test_reproducible
+	$(UNITTEST) -v test_characterisation test_contract test_resolver test_validator test_slide_deck test_artefact_viz test_release_note test_reproducible test_ux_design_system
 
 # PDF renders. A missing browser skips locally and fails when CI=true.
 test-pdf: check-python
 	$(UNITTEST) -v test_pdf
+
+# Google's DESIGN.md linter on every DESIGN.md ux-design-system writes (template, sample, scaffold, proposal,
+# --from-legacy draft): exit 0, no error, no warning. Not in `test`: it fetches the linter with npx.
+test-design-md: check-python
+	cd tests && PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -B lint_design_md.py $(DESIGN_MD_LINTER)

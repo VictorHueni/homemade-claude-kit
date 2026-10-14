@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** 11
+**Current Increment:** 12
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -338,18 +338,18 @@ Exit criteria:
 
 ### Increment 11: ux-design-system `point` and `subset`
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
 1. **Write first, expect red:**
    - `point @scope/name@x.y.z` writes `docs/ux/package.json` with the exact version, validates the package's manifest through the resolver, and prints the `.github/dependabot.yml` entry (`npm`, `directory: /docs/ux`) to add;
-   - `subset docs/ux/DESIGN.md` reads YAML front matter (colours, typography, rounded, spacing) and prose sections, writes `docs/ux/design-system/` with one CSS file per filled module and `kit-manifest.json` with `omitted` taken from the file;
-   - a source without dataviz gets a proposed palette (four steps from the accent towards the neutral, a remainder fill, an axis colour) written into the source as a block marked `proposed`, and generation refuses until the owner removes the mark;
+   - `subset docs/ux/DESIGN.md` reads a Google DESIGN.md (YAML front matter: colours, typography, rounded, spacing, plus the `kit` extension key; prose sections), writes `docs/ux/design-system/` with one CSS file per filled module and `kit-manifest.json` with `omitted` taken from the file (`kit.omitted`);
+   - a source without chart colours gets a proposed palette (four steps from the accent towards the neutral, a remainder fill, an axis colour) written into the source's `colors` with a top-level `proposed` mark listing them, and generation refuses until the owner removes the mark;
    - contrast pairs below AA are refused;
-   - `subset --from-legacy docs/ux/tokens.css` writes a draft `docs/ux/DESIGN.md` with `core` filled from the legacy file and a `proposed` dataviz block, and accepts `docs/design/tokens.css` the same way;
+   - `subset --from-legacy docs/ux/tokens.css` writes a draft `docs/ux/DESIGN.md` with `core` filled from the legacy file and proposed chart colours under the `proposed` mark, and accepts `docs/design/tokens.css` the same way;
    - `scaffold` writes to `docs/ux/` (its documented path; today it writes `docs/design/`).
-2. YAML front matter is parsed with PyYAML's safe loader; a key outside the subset DESIGN.md uses is an explicit error.
+2. YAML front matter is parsed with PyYAML's safe loader; a Google DESIGN.md key or token the kit does not use is skipped with one printed note, and a typo of a key the kit uses is an explicit error.
 3. The old `generate` mode and its `refresh` alias are removed; running either prints the `subset` command that replaces it.
 
 Primary files:
@@ -377,7 +377,7 @@ Scope:
    - `deck-pinned`: "a three-slide deck on X" in a project pinned to the `full` fixture (local folder pin). Graders: a deck HTML exists; `<output>.provenance.json` lists the design system as the source of `core`, `dataviz`, `slide-frame` and `brand`; the verdict file reads PASS; no literal colour in the deck outside the inlined design layers.
    - `viz-from-subfolder`: "a capability map of this map" asked from `docs/strategy/` in a pinned project. Graders: the view HTML exists; its provenance names the pinned design, not the base; the verdict file reads PASS.
    - `release-note`: "a release note for v0.3.0" from a small changelog in a pinned project. Graders: the note and its provenance exist; the verdict file reads PASS.
-   - `legacy-tokens`: "make a deck" in a project that only has `docs/ux/tokens.css`. Graders: `docs/ux/DESIGN.md` exists (from `subset --from-legacy`) with a `proposed` dataviz block left for the owner, or the run stops and asks; `docs/ux/tokens.css` is not edited; no hand-written CSS replaces the refused design.
+   - `legacy-tokens`: "make a deck" in a project that only has `docs/ux/tokens.css`. Graders: `docs/ux/DESIGN.md` exists (from `subset --from-legacy`) with proposed chart colours under the `proposed` mark left for the owner, or the run stops and asks; `docs/ux/tokens.css` is not edited; no hand-written CSS replaces the refused design.
    - `bespoke-generator`: "write a script that builds an HTML table of these figures in our brand". Graders: the script's output passes `check_render.py`; the script obtains its CSS from `design_source.py css` (its source contains the call) and holds no literal colour.
 2. `check_render.py --record <file>` writes the verdict file the graders read (`PASS: …` or the findings), added to the shared validator with a unit test.
 3. `plugins/delivery-comms/Makefile` target `skill-evals`, copied from the reference design system's: `SKILL_EVAL_MODELS` (default `sonnet`), `SKILL_EVAL_JUDGE`, `SKILL_EVAL_MAX_COST`, each case three times with the plugin and three times without it, results in `plugins/delivery-comms/var/skill-evals/<model>/` (gitignored), `--allow-tools` limited to `Write`, `Edit` and `Bash(python3 *)`, `Bash(mkdir *)`, `Bash(cp *)`. The four SKILL.md files tell the agent to use one plain command per Bash call and write files with the Write tool, since restricted sessions deny compound commands.
@@ -441,5 +441,5 @@ Exit criteria:
 | M2: Resolve and check | 03-04 | done | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M3: Renderers moved | 05-09 | done | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M4: Reproducible | 10 | done | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
-| M5: Authoring | 11 | pending | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
+| M5: Authoring | 11 | done | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
 | M6: Agents follow the skills, release | 12-13 | pending | Agents using the rewritten skills render on-brand and migrate legacy projects; 2.0.0 released | `make -C plugins/delivery-comms test`, `make -C plugins/delivery-comms skill-evals` (owner-approved run), `./scripts/audit-skills.sh` | Every eval case passes its graders; 2.0.0 in the marketplace cache | `test(delivery-comms)`, `docs(delivery-comms)` |

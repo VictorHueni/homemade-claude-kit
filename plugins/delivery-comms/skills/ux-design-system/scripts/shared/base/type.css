@@ -1,0 +1,12 @@
+/* type.css — neutral defaults for the `type` module (type scale). */
+:root {
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 2rem;
+  --line-height-body: 1.5;
+  --line-height-tight: 1.2;
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+}

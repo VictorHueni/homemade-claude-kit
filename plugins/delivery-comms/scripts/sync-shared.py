@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Copy the canonical shared/ files into each renderer skill (scripts/shared/).
+"""Copy the canonical shared/ files into each skill (scripts/shared/).
 
 Each skill stays self-contained once installed, so the one implementation of the
 base theme, the manifest checker and the contract is copied, never imported across
@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 PLUGIN = Path(__file__).resolve().parent.parent
-SKILLS = ("com-slide-deck", "com-artefact-viz", "com-release-note")
+SKILLS = ("com-slide-deck", "com-artefact-viz", "com-release-note", "ux-design-system")
 EXTRA = ("contract/modules.json", "contract/kit-manifest.schema.json")
 
 
