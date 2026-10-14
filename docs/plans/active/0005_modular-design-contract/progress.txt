@@ -86,4 +86,5 @@ Owner request after reviewing how the kit change will be tested:
 - Owner decision needed: config.yaml `canvas:` is kept as a per-deck override of the design's canvas (smallest change; existing decks keep their size). The alternative, in line with the dropped `fonts:` opt-in, is to ignore `canvas:` with a warning so the canvas comes only from the design.
 - Owner decision needed: document mode (`mode: document`) carries no logo or legal line; adding the legal line to its Chromium footer would need the same inlining as `--muted` and `--font-mono` (Increment 05), the logo a data URI in the footer template.
 - Commit: see git log (feat(delivery-comms): com-slide-deck slide frame and brand)
+- Owner decisions (2026-10-14) on the two open points: (1) config.yaml `canvas:` stays a per-deck override of the design's canvas; new decks do not set it. (2) Document-mode branding is not added here: Increment 09 builds the print chrome (logo as a data URI and the legal line in the Chromium page margin) in shared/ and the deck's `mode: document` reuses it; Increment 09 scope amended.
 - Timestamp: 2026-10-14

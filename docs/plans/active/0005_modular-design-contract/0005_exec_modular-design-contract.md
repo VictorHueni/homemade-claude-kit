@@ -297,6 +297,7 @@ Scope:
 
 1. **Write first, expect red:** fonts come from the resolved design (no hard-coded `docs/ux/fonts/fonts.css`); with `full`, the PDF uses the `print` module (page size, margins), the logo and the legal line; `_resolve_token` reads the resolved values, so a `var()` token no longer falls back silently to defaults; `--font-report` is honoured only as a declared exception; the template has no `var()` fallback; the validator runs; `<output>.provenance.json` is written next to the HTML.
 2. `render_pdf.py` uses the resolver and the validator.
+3. The print chrome (logo as a data URI and the legal line in the Chromium page margin, with the resolved values inlined as Increment 05 does for `--muted` and `--font-mono`) lives in `shared/`, and com-slide-deck's `mode: document` uses it too, so a document deck from `full` carries the logo and the legal line (owner 2026-10-14).
 
 Primary files:
 
