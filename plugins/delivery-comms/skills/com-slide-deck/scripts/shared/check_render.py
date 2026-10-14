@@ -7,7 +7,8 @@ Rules (Plan-0005 constraint 5):
                     renderer inlined), elements marked data-brand-asset, url() contents, declared exceptions.
   unknown-property  a custom property outside the contract's roles, the reserved --kit-* prefix and the
                     names of declared exceptions.
-  contrast          a contract text pair that an exception brings below WCAG AA.
+  contrast          a contract text pair that an exception brings below WCAG AA; a pair whose text is a
+                    list of roles fails only when no role in it reaches AA.
 A `var(--role, fallback)` is read as `var(--role)`: the fallback neither passes nor fails a page.
 
 An exception is NAME=VALUE: it allows the literal VALUE. When NAME is a custom property (`--font-report=Lora,
@@ -186,18 +187,19 @@ def check(html, design, exceptions=None, name=None):
     scanner.close()
     findings = list(scanner.findings)
 
+    # the design's values with each role-named exception standing in for its role, hex colours normalised
+    standing = {**values, **{n: v for n, v in exceptions.items() if n.startswith("--")}}
+    hexed = {r: _hex(v) if parse_colour(v) else v for r, v in standing.items()}
     for pair in contract["pairs"]:
-        touched = [r for r in (pair["fg"], pair["bg"]) if r in exceptions]
+        touched = [r for r in (*design_source.text_roles(pair), pair["bg"]) if r in exceptions]
         if not touched:
             continue
-        fg, bg = (exceptions.get(pair[k]) or values.get(pair[k], "") for k in ("fg", "bg"))
-        if parse_colour(fg) and parse_colour(bg):
-            ratio = design_source.contrast(_hex(fg), _hex(bg))
-            if ratio < design_source.AA:
-                findings.append({"kind": "contrast", "value": ", ".join(f"{r}={exceptions[r]}" for r in touched),
-                                 "line": None, "where": "exception",
-                                 "message": f"exception brings {pair['fg']} on {pair['bg']} ({pair['use']}) to "
-                                            f"{ratio:.2f}:1, below WCAG AA {design_source.AA}"})
+        tried = design_source.pair_ratios(hexed, pair)
+        if tried and all(ratio < design_source.AA for _, ratio in tried):
+            findings.append({"kind": "contrast", "value": ", ".join(f"{r}={exceptions[r]}" for r in touched),
+                             "line": None, "where": "exception",
+                             "message": "exception brings " + design_source.describe_failure(tried, pair["bg"],
+                                                                                              pair["use"])})
     report = {"ok": not findings, "findings": findings,
               "exceptions": [{"name": n, "value": v, "known": n in design.exceptions} for n, v in exceptions.items()]}
     design.provenance["exceptions"] = [e["name"] for e in report["exceptions"]]

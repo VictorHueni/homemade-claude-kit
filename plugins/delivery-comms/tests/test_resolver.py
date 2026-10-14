@@ -5,6 +5,7 @@ import http.server
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -299,10 +300,97 @@ class ManifestTest(ResolverCase):
         self.assertIn("--surface", message)
         self.assertRegex(message, r"\d+\.\d+")
 
+    def test_fill_that_no_text_role_passes_is_refused_at_resolve_time(self):
+        # a mid grey: white and --ink both fall below AA on it, so neither role can carry text
+        for role in ("--success", "--chart-2"):
+            with self.subTest(fill=role):
+                def mutate(folder, role=role):
+                    for css in (folder / "css").glob("*.css"):
+                        css.write_text(re.sub(re.escape(role) + r":\s*#[0-9a-fA-F]+", f"{role}: #777777", css.read_text()))
+                shutil.rmtree(self.tmp / "ds", ignore_errors=True)
+                with self.assertRaises(design_source.DesignError) as cm:
+                    self.resolve_copy("full", mutate)()
+                line = next(l for l in str(cm.exception).splitlines() if f"on {role}" in l)
+                self.assertRegex(line, r"--accent-ink \(contrast \d+\.\d+\)")
+                self.assertRegex(line, r"--ink \(contrast \d+\.\d+\)")
+
     def test_base_theme_passes_its_own_pairs(self):
         contract = design_source._contract()
         css = "".join(design_source._base_css(module) for module in contract["modules"])
         self.assertEqual(design_source.failing_pairs(css, contract["pairs"]), [])
+
+
+KIT_ON = re.compile(r"(--kit-on-[\w-]+)\s*:\s*var\((--[\w-]+)\)")
+STATE_FILLS = ("success", "info", "warning", "danger", "muted")
+CHART_FILLS = ("chart-1", "chart-2", "chart-3")
+
+
+class FillTextTest(ResolverCase):
+    """List pairs: text on a fill takes whichever text role reaches AA; the resolver writes --kit-on-<fill>."""
+    resolve_copy = ManifestTest.resolve_copy
+
+    def choices(self, design):
+        """{fill: (module that declares --kit-on-<fill>, the role it reads)}."""
+        found = {}
+        for module, css in design.css.items():
+            for prop, role in KIT_ON.findall(css):
+                self.assertNotIn(prop, found, f"{prop} declared twice")
+                found[prop[len("--kit-on-"):]] = (module, role)
+        return found
+
+    def test_dark_state_fills_meant_for_white_text(self):
+        values = {"--ink": "#1a1a1a", "--accent-ink": "#ffffff", "--success": "#2e7d32", "--warning": "#a06400",
+                  "--danger": "#d8232a", "--info": "#1565c0", "--muted": "#555555"}
+
+        def mutate(folder):
+            core = folder / "css" / "core.css"
+            text = core.read_text()
+            for role, value in values.items():
+                text = re.sub(re.escape(role) + r":\s*#[0-9a-fA-F]+", f"{role}: {value}", text)
+            core.write_text(text)
+        design = self.resolve_copy("subset", mutate)()
+        choices = self.choices(design)
+        for fill in STATE_FILLS:
+            self.assertEqual(choices[fill], ("core", "--accent-ink"), fill)
+        self.assertEqual({f: choices[f] for f in CHART_FILLS},
+                         {"chart-1": ("dataviz", "--accent-ink"), "chart-2": ("dataviz", "--accent-ink"),
+                          "chart-3": ("dataviz", "--ink")})
+
+    def test_base_theme_picks_the_role_that_passes_on_each_fill(self):
+        choices = self.choices(design_source.resolve(self.project))
+        self.assertEqual(choices, {
+            "success": ("core", "--ink"),          # white 3.41, ink 4.84
+            "info": ("core", "--accent-ink"),      # white 4.53
+            "warning": ("core", "--ink"),          # white 1.95, ink 8.49
+            "danger": ("core", "--accent-ink"),    # white 4.51
+            "muted": ("core", "--accent-ink"),     # white 4.83
+            "chart-1": ("dataviz", "--accent-ink"),
+            "chart-2": ("dataviz", "--accent-ink"),
+            "chart-3": ("dataviz", "--ink"),       # white 2.52, ink 6.56
+        })
+
+    def test_fixtures_with_dark_state_fills_take_white_text(self):
+        for fixture in ("full", "subset"):
+            with self.subTest(fixture=fixture):
+                choices = self.choices(design_source.resolve(self.project, explicit=FIXTURES / fixture))
+                self.assertEqual({f: role for f, (_, role) in choices.items()},
+                                 {**{f: "--accent-ink" for f in STATE_FILLS},
+                                  "chart-1": "--accent-ink", "chart-2": "--accent-ink", "chart-3": "--ink"})
+
+    def test_a_fill_that_is_not_a_hex_colour_takes_the_first_role(self):
+        # contrast cannot be computed on var(--info), so --chart-3 takes the first role of its list
+        def mutate(folder):
+            viz = folder / "css" / "dataviz.css"
+            viz.write_text(re.sub(r"--chart-3:\s*#[0-9a-fA-F]+", "--chart-3: var(--info)", viz.read_text()))
+        choices = self.choices(self.resolve_copy("subset", mutate)())
+        self.assertEqual(choices["chart-3"], ("dataviz", "--accent-ink"))
+
+    def test_css_command_prints_the_fill_text_properties(self):
+        proc = subprocess.run([sys.executable, "-I", str(SHARED / "design_source.py"), "css", "--module", "core",
+                               "--design-system", str(FIXTURES / "full")], capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertIn("--kit-on-success: var(--accent-ink)", proc.stdout)
+        self.assertNotIn("--kit-on-chart-1", proc.stdout)
 
 
 class AssemblyTest(ResolverCase):

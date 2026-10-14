@@ -48,6 +48,9 @@ sys.path.insert(0, HERE)
 import parsers  # noqa: E402
 import renderers  # noqa: E402
 
+sys.path.insert(0, os.path.join(HERE, "shared"))
+import design_source  # noqa: E402  (the synced copy; picks the text role on each fill)
+
 SKILL_DIR = os.path.dirname(HERE)
 TEMPLATE_DIR = os.path.join(SKILL_DIR, "templates")
 
@@ -134,11 +137,13 @@ def _emit(model, rendered, kind, args, source_label):
     # Design system: defaults first, then the project sheet (project tokens win).
     # Resolution order for the project sheet:
     # Token layering (same model as com-slide-deck):
-    #   1. shared/base/core.css  — shipped neutral generic contract (zero-config)
+    #   1. shared/base/core.css + dataviz.css — shipped neutral base (zero-config);
+    #      dataviz carries the --chart-* roles the importance and confidence
+    #      scales read (until Increment 08 resolves every module)
     #   2. docs/ux/tokens.css — project override (explicit --design-system, or
     #                                auto-detected; project values win)
-    #   3. tokens.domain.css     — viz domain tokens derived from the generics
-    ds = _read(os.path.join(HERE, "shared", "base", "core.css"))
+    #   3. tokens.domain.css     — viz domain colours, --kit-* on contract roles
+    ds = "\n\n".join(_read(os.path.join(HERE, "shared", "base", f"{module}.css")) for module in ("core", "dataviz"))
     project_sheet = args.design_system
     if not project_sheet:
         shared = os.path.join("docs", "ux", "tokens.css")
@@ -149,7 +154,11 @@ def _emit(model, rendered, kind, args, source_label):
             print("[HINT] Legacy docs/design/tokens.css found but no docs/ux/tokens.css — design tokens moved to docs/ux/; rename the folder.")
     if project_sheet:
         ds += "\n\n/* ---- project design system (overrides) ---- */\n" + _read(project_sheet)
-    ds += "\n\n/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))
+    # Text on a fill reads --kit-on-<fill>, the text role that reaches AA on that fill. Until Increment 08
+    # resolves the design (which declares these itself), they are computed here from the assembled sheet.
+    ds += "\n\n/* ---- text on fills (resolved) ---- */\n" + design_source.fill_text_css(
+        design_source.fill_text(ds, design_source._contract()["pairs"]))
+    ds +="\n\n/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))
 
     runtime = _read(os.path.join(TEMPLATE_DIR, "runtime.js"))
     title = args.title or model["title"]

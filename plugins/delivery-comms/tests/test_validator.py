@@ -151,6 +151,19 @@ class ExceptionTest(ValidatorCase):
     def test_exception_that_keeps_the_pair_passes(self):
         self.assertTrue(self.check(PAGE, exceptions={"--muted": "#4b5563"})["ok"])
 
+    def test_exception_on_a_fill_passes_when_either_text_role_reaches_aa(self):
+        # --success is a list pair (--accent-ink or --ink): a dark green keeps white text above AA
+        self.assertTrue(self.check(PAGE, exceptions={"--success": "#1b5e20"})["ok"])
+        self.assertTrue(self.check(PAGE, exceptions={"--success": "#8fd19e"})["ok"])   # light: --ink carries it
+
+    def test_exception_on_a_fill_fails_when_no_text_role_reaches_aa(self):
+        report = self.check(PAGE, exceptions={"--success": "#777777"})   # white 4.48, --ink 3.8
+        self.assertEqual(self.kinds(report), ["contrast"])
+        message = report["findings"][0]["message"]
+        self.assertIn("on --success", message)
+        self.assertRegex(message, r"--accent-ink \(contrast \d+\.\d+\)")
+        self.assertRegex(message, r"--ink \(contrast \d+\.\d+\)")
+
     def test_exception_named_as_a_property_allows_that_property(self):
         # a project re-faces the release note alone with --font-report (com-release-note SKILL.md)
         html = page(":root { --font-report: Lora, serif; } body { font-family: var(--font-report); }")
@@ -178,11 +191,11 @@ class ResolvedDesignTest(ValidatorCase):
 class TemplateDryRunTest(ValidatorCase):
     """What Increments 05 to 09 will do: drop var() fallbacks, rename renderer-internal properties to --kit-*."""
     TEMPLATES = {
-        "com-artefact-viz": ("templates/base.html.tmpl", "templates/tokens.domain.css"),
         "com-release-note": ("templates/report.html.tmpl",),
     }
     MIGRATED = {
         "com-slide-deck": ("templates/doc.baseline.css",),   # Increment 05
+        "com-artefact-viz": ("templates/base.html.tmpl", "templates/tokens.domain.css"),   # Increment 07
     }
 
     @staticmethod
@@ -205,7 +218,8 @@ class TemplateDryRunTest(ValidatorCase):
             for rel in files:
                 with self.subTest(template=f"{skill}/{rel}"):
                     text = (PLUGIN / "skills" / skill / rel).read_text(encoding="utf-8")
-                    self.assertEqual(self.check(f"<style>{text}</style>")["findings"], [])
+                    wrap = (lambda c: c) if rel.endswith(".tmpl") else (lambda c: f"<style>{c}</style>")
+                    self.assertEqual(self.check(wrap(text))["findings"], [])
                     self.assertEqual(check_render.strip_fallbacks(text), text, "a var() fallback is left")
 
 

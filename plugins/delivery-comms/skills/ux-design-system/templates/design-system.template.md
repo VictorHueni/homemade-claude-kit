@@ -61,8 +61,10 @@ onto these in its own stylesheet), so a project only ever themes these four.
 |---|---|---|
 | `--success` | `#2e9e5b` | Positive / done / validated |
 | `--warning` | `#f0ad4e` | Caution / in-progress / tested |
-| `--danger` | `#d9534f` | Negative / error / critical |
+| `--danger` | `#d5413d` | Negative / error / critical |
 | `--info` | `#396cf5` | Informational / planned / neutral-active |
+
+Text on a state fill (a shipped badge, a high-pain badge) takes whichever of `--accent-ink` or `--ink` reaches WCAG AA on that fill; the kit checks both and picks one, so dark fills with white text and light fills with dark text are both valid. A fill on which neither reaches AA is refused.
 
 ### Typography
 

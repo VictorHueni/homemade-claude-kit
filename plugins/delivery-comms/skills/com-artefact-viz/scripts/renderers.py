@@ -9,8 +9,9 @@ Each renderer returns a dict with:
   content    : the main HTML fragment
 
 render.py drops these into templates/base.html.tmpl. All visual styling flows
-through CSS custom properties defined in shared/base/core.css (or a
-project sheet), so renderers reference var(--token) and never literal colours.
+through CSS custom properties: contract roles (contract/modules.json)
+and the renderer's own --kit-* properties (templates/tokens.domain.css maps
+each domain colour to one role). Renderers never write a literal colour.
 """
 
 import html
@@ -114,11 +115,11 @@ def render_capability_map(model, options):
 .cap-children { margin-top: 0.35rem; padding-left: 0.5rem; border-left: 2px solid var(--surface-2);
   display: flex; flex-direction: column; gap: 0.3rem; }
 .cap-imp { position: absolute; right: 0.3rem; bottom: 0.28rem; font-family: var(--font-heading); font-size: 0.44rem; text-transform: uppercase;
-  letter-spacing: 0.04em; padding: 0.03rem 0.3rem; border-radius: 999px; color: var(--accent-ink); font-weight: 600;
+  letter-spacing: 0.04em; padding: 0.03rem 0.3rem; border-radius: 999px; font-weight: 600;
   min-width: 5.1rem; text-align: center; box-sizing: border-box; }
-.cap-imp--differentiator { background: var(--differentiator); }
-.cap-imp--necessary { background: var(--necessary); }
-.cap-imp--commodity { background: var(--commodity); }
+.cap-imp--differentiator { background: var(--kit-differentiator); color: var(--kit-on-chart-1); }
+.cap-imp--necessary { background: var(--kit-necessary); color: var(--kit-on-chart-2); }
+.cap-imp--commodity { background: var(--kit-commodity); color: var(--kit-on-chart-3); }
 """
     toolbar = (
         '<button class="viz-btn" type="button" data-action="expand-all">Expand all</button>'
@@ -199,9 +200,9 @@ def render_fbs(model, options):
 .count-chip { display: inline-flex; gap: 0.3rem; align-items: center; font-size: 0.72rem; color: var(--muted); }
 .count-chip .st-dot { width: 0.6rem; height: 0.6rem; }
 .st-dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; flex: 0 0 auto; }
-.st--shipped { background: var(--status-shipped); }
-.st--planned { background: var(--status-planned); }
-.st--backlog { background: var(--status-backlog); }
+.st--shipped { background: var(--kit-status-shipped); }
+.st--planned { background: var(--kit-status-planned); }
+.st--backlog { background: var(--kit-status-backlog); }
 .fbs-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: 700; }
 .fbs-label { font-family: var(--font-heading); font-size: 0.9rem; font-weight: 600; }
 .fbs-count { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted);
@@ -324,8 +325,8 @@ def render_roadmap(model, options):
 .ws-col { flex: 1 1 240px; }
 .ws-col ul { margin: 0.3rem 0 0; padding-left: 1.1rem; font-size: 0.82rem; }
 .ws-h { margin: 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.ws-h--can { color: var(--status-shipped); }
-.ws-h--cannot { color: var(--pain-high); }
+.ws-h--can { color: var(--kit-status-shipped); }
+.ws-h--cannot { color: var(--kit-pain-high); }
 
 .timeline { display: flex; gap: var(--space-md); overflow-x: auto; padding-bottom: 0.5rem;
   position: relative; }
@@ -342,10 +343,10 @@ def render_roadmap(model, options):
 .phase-empty { color: var(--muted); }
 .epic-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--border);
   border-radius: var(--node-radius); padding: 0.6rem 0.7rem; box-shadow: var(--shadow); }
-.epic-card.epic--critical { border-left-color: var(--pain-critical); }
-.epic-card.epic--high { border-left-color: var(--pain-high); }
-.epic-card.epic--medium { border-left-color: var(--pain-medium); }
-.epic-card.epic--low { border-left-color: var(--pain-low); }
+.epic-card.epic--critical { border-left-color: var(--kit-pain-critical); }
+.epic-card.epic--high { border-left-color: var(--kit-pain-high); }
+.epic-card.epic--medium { border-left-color: var(--kit-pain-medium); }
+.epic-card.epic--low { border-left-color: var(--kit-pain-low); }
 .epic-head { display: flex; gap: 0.4rem; align-items: baseline; }
 .epic-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: 700; }
 .epic-name { font-family: var(--font-heading); font-size: 0.9rem; font-weight: 600; }
@@ -353,9 +354,9 @@ def render_roadmap(model, options):
 .epic-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .epic-chip { font-size: 0.66rem; font-family: var(--font-mono); background: var(--surface-2);
   color: var(--ink); border-radius: 999px; padding: 0.05rem 0.45rem; }
-.epic-chip.st--shipped { background: var(--status-shipped); color: var(--accent-ink); }
-.epic-chip.st--planned { background: var(--status-planned); color: var(--accent-ink); }
-.epic-chip.st--backlog { background: var(--status-backlog); color: var(--accent-ink); }
+.epic-chip.st--shipped { background: var(--kit-status-shipped); color: var(--kit-on-success); }
+.epic-chip.st--planned { background: var(--kit-status-planned); color: var(--kit-on-info); }
+.epic-chip.st--backlog { background: var(--kit-status-backlog); color: var(--kit-on-muted); }
 .epic-disclose { margin-top: 0.45rem; font: inherit; font-size: 0.72rem; cursor: pointer;
   background: transparent; border: none; color: var(--accent); padding: 0; }
 .epic-scope { display: none; list-style: none; margin: 0.4rem 0 0; padding: 0;
@@ -363,8 +364,8 @@ def render_roadmap(model, options):
 .epic-scope li { display: flex; align-items: center; gap: 0.35rem; }
 .epic-card.is-open .epic-scope { display: flex; }
 .st-dot { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 50%; flex: 0 0 auto; }
-.st--shipped { background: var(--status-shipped); } .st--planned { background: var(--status-planned); }
-.st--backlog { background: var(--status-backlog); }
+.st--shipped { background: var(--kit-status-shipped); } .st--planned { background: var(--kit-status-planned); }
+.st--backlog { background: var(--kit-status-backlog); }
 .fbs-id { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); }
 """
     return {
@@ -416,10 +417,10 @@ def render_bmc(model, options):
 .bmc-key { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); font-weight: 700; }
 .bmc-name { font-family: var(--font-heading); font-size: 0.82rem; font-weight: 700; }
 .bmc-conf { margin-left: auto; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em;
-  padding: 0.05rem 0.4rem; border-radius: 999px; color: var(--accent-ink); }
-.bmc-conf--assumed { background: var(--conf-assumed); }
-.bmc-conf--tested { background: var(--conf-tested); }
-.bmc-conf--validated { background: var(--conf-validated); }
+  padding: 0.05rem 0.4rem; border-radius: 999px; }
+.bmc-conf--assumed { background: var(--kit-conf-assumed); color: var(--kit-on-chart-3); }
+.bmc-conf--tested { background: var(--kit-conf-tested); color: var(--kit-on-chart-2); }
+.bmc-conf--validated { background: var(--kit-conf-validated); color: var(--kit-on-chart-1); }
 .bmc-bullets { margin: 0; padding-left: 1rem; font-size: 0.78rem; display: flex; flex-direction: column; gap: 0.2rem; }
 .bmc-empty { list-style: none; margin-left: -1rem; color: var(--muted); }
 @media (max-width: 900px) {
@@ -534,7 +535,7 @@ def render_service_blueprint(model, options):
         grid = '<p class="viz-empty">No actors found in the source process docs.</p>'
     else:
         grid = (
-            f'<div class="sb-grid" style="grid-template-columns: var(--sb-lane-w) repeat({nph}, minmax(120px, 1fr));">'
+            f'<div class="sb-grid" style="grid-template-columns: var(--kit-sb-lane-w) repeat({nph}, minmax(120px, 1fr));">'
             + "".join(rows) + "</div>"
         )
     content = grid + spine
@@ -547,7 +548,7 @@ def render_service_blueprint(model, options):
         )
 
     view_css = """
-:root { --sb-lane-w: 190px; }
+:root { --kit-sb-lane-w: 190px; }
 .sb-grid { display: grid; gap: 2px; background: var(--border); border: 1px solid var(--border);
   border-radius: var(--card-radius); overflow: hidden; }
 .sb-row { display: contents; }
@@ -555,10 +556,10 @@ def render_service_blueprint(model, options):
 .sb-ph { background: var(--surface-2); padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.1rem; }
 .sb-ph-id { font-family: var(--font-mono); font-size: 0.62rem; color: var(--accent); font-weight: 700; }
 .sb-ph-name { font-size: 0.82rem; font-weight: 700; }
-.sb-ph--critical { box-shadow: inset 0 -3px 0 var(--pain-critical); }
-.sb-ph--high { box-shadow: inset 0 -3px 0 var(--pain-high); }
-.sb-ph--medium { box-shadow: inset 0 -3px 0 var(--pain-medium); }
-.sb-ph--low { box-shadow: inset 0 -3px 0 var(--pain-low); }
+.sb-ph--critical { box-shadow: inset 0 -3px 0 var(--kit-pain-critical); }
+.sb-ph--high { box-shadow: inset 0 -3px 0 var(--kit-pain-high); }
+.sb-ph--medium { box-shadow: inset 0 -3px 0 var(--kit-pain-medium); }
+.sb-ph--low { box-shadow: inset 0 -3px 0 var(--kit-pain-low); }
 .sb-band-tag { grid-column: 1 / -1; background: var(--surface-2); color: var(--muted);
   font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
   padding: 0.25rem 0.6rem; }
@@ -571,7 +572,7 @@ def render_service_blueprint(model, options):
 .sb-cell--span { align-items: center; }
 .sb-step { font-size: 0.72rem; background: var(--surface-2); border: 1px solid var(--border);
   border-radius: var(--node-radius); padding: 0.15rem 0.45rem; }
-.sb-step--fail { border-color: var(--pain-high); box-shadow: inset 3px 0 0 var(--pain-high); }
+.sb-step--fail { border-color: var(--kit-pain-high); box-shadow: inset 3px 0 0 var(--kit-pain-high); }
 .sb-evidence { font-size: 0.72rem; background: var(--surface); border: 1px dashed var(--accent);
   border-radius: 999px; padding: 0.15rem 0.55rem; color: var(--ink); }
 .sb-line { background: var(--canvas-bg); border-top: 2px dashed var(--muted); height: 1.4rem;
@@ -580,8 +581,8 @@ def render_service_blueprint(model, options):
   color: var(--muted); font-weight: 700; padding: 0 0.6rem; }
 .sb-badge { font-family: var(--font-heading); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
   border-radius: 999px; padding: 0.05rem 0.4rem; width: fit-content; }
-.sb-badge--warn { background: var(--pain-medium); color: var(--accent-ink); }
-.sb-badge--fail { background: var(--pain-high); color: var(--accent-ink); }
+.sb-badge--warn { background: var(--kit-pain-medium); color: var(--kit-on-info); }
+.sb-badge--fail { background: var(--kit-pain-high); color: var(--kit-on-warning); }
 .sb-spine { margin-top: var(--space-lg); background: var(--surface-2); border-radius: var(--card-radius);
   padding: var(--space-md); border-left: 4px solid var(--accent); }
 .sb-spine-title { margin: 0 0 0.5rem; font-size: 0.95rem; }
