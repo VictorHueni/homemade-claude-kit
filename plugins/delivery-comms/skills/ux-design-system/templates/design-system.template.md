@@ -61,7 +61,7 @@ onto these in its own stylesheet), so a project only ever themes these four.
 |---|---|---|
 | `--success` | `#2e9e5b` | Positive / done / validated |
 | `--warning` | `#f0ad4e` | Caution / in-progress / tested |
-| `--danger` | `#d9534f` | Negative / error / critical |
+| `--danger` | `#d5413d` | Negative / error / critical |
 | `--info` | `#396cf5` | Informational / planned / neutral-active |
 
 ### Typography

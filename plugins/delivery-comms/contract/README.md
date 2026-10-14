@@ -33,7 +33,7 @@ Unknown keys and unknown module names are errors. The kit addresses files by the
 
 - **Fonts** are the `@font-face` rules of any provided module, with `url()` relative to that module's file.
 - **Guidance** is informational: the kit lists it in the provenance report and does nothing else with it; agents may read it from the package.
-- **Contrast**: `pairs` in `modules.json` lists the foreground and background roles whose WCAG AA contrast is checked.
+- **Contrast**: `pairs` in `modules.json` lists the foreground and background roles whose WCAG AA contrast is checked. Text on a fill is a pair too: every fill a renderer paints text on (`--success`, `--info`, `--warning`, `--danger`, `--muted`, `--chart-1` to `--chart-3`) names the one text role used on it, `--ink` on `--success`, `--warning` and `--chart-3`, `--accent-ink` on the others, so a design whose fill fails its text role at AA is refused at resolve time.
 
 ## Shared files
 

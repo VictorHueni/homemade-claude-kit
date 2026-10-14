@@ -5,6 +5,7 @@ import http.server
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -298,6 +299,20 @@ class ManifestTest(ResolverCase):
         self.assertIn("--muted", message)
         self.assertIn("--surface", message)
         self.assertRegex(message, r"\d+\.\d+")
+
+    def test_failing_fill_pair_is_refused_at_resolve_time(self):
+        # --ink on a dark --success, and --accent-ink on a light --chart-2
+        for role, value in (("--success", "#05603a"), ("--chart-2", "#b7dbe6")):
+            with self.subTest(fill=role):
+                def mutate(folder, role=role, value=value):
+                    for css in (folder / "css").glob("*.css"):
+                        css.write_text(re.sub(re.escape(role) + r":\s*#[0-9a-fA-F]+", f"{role}: {value}", css.read_text()))
+                shutil.rmtree(self.tmp / "ds", ignore_errors=True)
+                with self.assertRaises(design_source.DesignError) as cm:
+                    self.resolve_copy("full", mutate)()
+                message = str(cm.exception)
+                self.assertIn(f"on {role}", message)
+                self.assertRegex(message, r"\d+\.\d+")
 
     def test_base_theme_passes_its_own_pairs(self):
         contract = design_source._contract()

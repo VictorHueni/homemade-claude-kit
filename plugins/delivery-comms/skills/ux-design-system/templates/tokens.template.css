@@ -27,7 +27,7 @@
   /* ---- Semantic state (generic; portable across projects + tools) ---- */
   --success: #2e9e5b;   /* positive / done / validated */
   --warning: #f0ad4e;   /* caution / in-progress / tested */
-  --danger:  #d9534f;   /* negative / error / critical */
+  --danger:  #d5413d;   /* negative / error / critical */
   --info:    #396cf5;   /* informational / planned / neutral-active */
 
   /* ---- Typography ---- */

@@ -61,6 +61,7 @@ PAINTS = {
 
 DECLARATION = re.compile(r"(--[\w-]+)\s*:\s*([^;{}]+?)\s*;")
 VAR = re.compile(r"var\(\s*(--[\w-]+)\s*\)")
+RULE = re.compile(r"([^{}]+)\{([^{}]*)\}")
 PROPERTY = re.compile(r"(?<![\w-])--[a-zA-Z][\w-]*")  # not a comment rule such as # -----
 
 
@@ -143,11 +144,38 @@ class RenderedViewsTest(RenderCase):
                 report = check_render.check(marked, base)
                 self.assertEqual(report["findings"], [])
 
-    def test_text_on_the_lightest_scale_step_is_ink(self):
-        # --chart-3 is the lightest of the three steps; --accent-ink on it fails AA on the base theme
-        self.assertRegex(self.render("capability-map"), r"\.cap-imp--commodity\s*\{[^}]*color:\s*var\(--ink\)")
-        self.assertRegex(self.render("bmc"), r"\.bmc-conf--assumed\s*\{[^}]*color:\s*var\(--ink\)")
-
+    def test_text_on_every_filled_badge_is_the_role_its_pair_names(self):
+        # owner 2026-10-14: text on every fill is a contract pair (modules.json "pairs")
+        pairs = design_source._contract()["pairs"]
+        allowed = {}
+        for pair in pairs:
+            allowed.setdefault(pair["bg"], set()).add(pair["fg"])
+        fills = {bg for bg in allowed if bg.startswith(("--chart-", "--success", "--info", "--warning", "--danger",
+                                                        "--muted", "--accent"))}
+        checked = set()
+        for kind in PAINTS:
+            with self.subTest(kind=kind):
+                _, rest = self.split(self.render(kind))
+                rules = [(sel.strip(), dict((p, v.strip()) for p, v in check_render.DECL.findall(body)))
+                         for sel, body in RULE.findall(check_render.clean(rest))]
+                by_selector = {sel: decls for sel, decls in rules}
+                for sel, decls in rules:
+                    used = VAR.fullmatch(decls.get("background", ""))
+                    if not used:
+                        continue
+                    fill = EXPECTED.get(used.group(1), used.group(1))
+                    if fill not in fills:
+                        continue
+                    block = re.sub(r"--[\w-]+$", "", sel.split(".")[1]) if sel.startswith(".") else sel
+                    colour = decls.get("color") or by_selector.get("." + block, {}).get("color")
+                    if colour is None:
+                        continue   # a fill with no text (status dots)
+                    checked.add(sel)
+                    self.assertIn(VAR.fullmatch(colour).group(1), allowed[fill], f"{sel}: {colour} on {fill}")
+        self.assertLessEqual({".cap-imp--differentiator", ".cap-imp--necessary", ".cap-imp--commodity",
+                              ".bmc-conf--validated", ".bmc-conf--tested", ".bmc-conf--assumed",
+                              ".epic-chip.st--shipped", ".epic-chip.st--planned", ".epic-chip.st--backlog",
+                              ".sb-badge--warn", ".sb-badge--fail"}, checked)
 
 if __name__ == "__main__":
     unittest.main()

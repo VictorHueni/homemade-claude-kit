@@ -50,6 +50,18 @@ class ModulesTest(unittest.TestCase):
         self.assertEqual(roles, {"--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-rest",
                                  "--chart-axis", "--chart-grid", "--chart-highlight"})
 
+    def test_every_filled_badge_has_a_text_pair(self):
+        # owner 2026-10-14: text on every fill the renderers paint text on is a checked pair
+        fills = {"--success": "--ink", "--info": "--accent-ink", "--warning": "--ink", "--danger": "--accent-ink",
+                 "--muted": "--accent-ink", "--chart-1": "--accent-ink", "--chart-2": "--accent-ink",
+                 "--chart-3": "--ink"}
+        pairs = modules()["pairs"]
+        for bg, fg in fills.items():
+            with self.subTest(fill=bg):
+                named = [p for p in pairs if p["bg"] == bg]
+                self.assertEqual([p["fg"] for p in named], [fg])
+                self.assertTrue(named[0]["use"].strip())
+
     def test_class_vocabularies_cover_what_the_renderers_emit(self):
         mods = modules()["modules"]
         doc = css_classes((SKILLS / "com-slide-deck/templates/doc.baseline.css").read_text(encoding="utf-8"))

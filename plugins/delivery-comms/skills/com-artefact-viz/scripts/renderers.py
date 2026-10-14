@@ -354,7 +354,7 @@ def render_roadmap(model, options):
 .epic-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .epic-chip { font-size: 0.66rem; font-family: var(--font-mono); background: var(--surface-2);
   color: var(--ink); border-radius: 999px; padding: 0.05rem 0.45rem; }
-.epic-chip.st--shipped { background: var(--kit-status-shipped); color: var(--accent-ink); }
+.epic-chip.st--shipped { background: var(--kit-status-shipped); color: var(--ink); }
 .epic-chip.st--planned { background: var(--kit-status-planned); color: var(--accent-ink); }
 .epic-chip.st--backlog { background: var(--kit-status-backlog); color: var(--accent-ink); }
 .epic-disclose { margin-top: 0.45rem; font: inherit; font-size: 0.72rem; cursor: pointer;
@@ -582,7 +582,7 @@ def render_service_blueprint(model, options):
 .sb-badge { font-family: var(--font-heading); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
   border-radius: 999px; padding: 0.05rem 0.4rem; width: fit-content; }
 .sb-badge--warn { background: var(--kit-pain-medium); color: var(--accent-ink); }
-.sb-badge--fail { background: var(--kit-pain-high); color: var(--accent-ink); }
+.sb-badge--fail { background: var(--kit-pain-high); color: var(--ink); }
 .sb-spine { margin-top: var(--space-lg); background: var(--surface-2); border-radius: var(--card-radius);
   padding: var(--space-md); border-left: 4px solid var(--accent); }
 .sb-spine-title { margin: 0 0 0.5rem; font-size: 0.95rem; }
