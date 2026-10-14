@@ -102,12 +102,12 @@ do not redefine:
 If the deck needs a distinct heading face, add a **deck-only** `--font-heading`
 in this stylesheet's `:root` (defaulting to `var(--font-body)`); otherwise the
 contract's `--font-heading` covers headings and `--font-body` covers body. Set the actual font families and web-
-font loading in `docs/ux/design-system.md` (and the `fonts:` block of
-`config.yaml` for the Google-Fonts `<link>`), so they flow from the one source.
+font loading in the project's design system (its `@font-face` rules, inlined by
+`build.py`), so they flow from the one source.
 
 ### Font Loading
 
-_Specify how fonts are loaded (Google Fonts CDN, self-hosted, system fonts).
+_Specify how fonts are loaded (the design system's `@font-face` rules, or system fonts).
 Include the exact URL or @font-face declarations needed._
 
 ```

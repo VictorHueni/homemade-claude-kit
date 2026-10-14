@@ -171,17 +171,6 @@ def write_provenance(output: Path, design) -> Path:
     return target
 
 
-def build_font_url(fonts: list) -> str:
-    if not fonts:
-        return ""
-    families = []
-    for font in fonts:
-        family = font["family"].replace(" ", "+")
-        weights = ";".join(str(w) for w in font.get("weights", [400]))
-        families.append(f"family={family}:wght@{weights}")
-    return f"https://fonts.googleapis.com/css2?{'&'.join(families)}&display=swap"
-
-
 def load_bibliography(config: dict, base: Path) -> dict:
     """Load context/bibliography.yaml if configured. Returns {key: source_dict}.
 
@@ -332,21 +321,12 @@ def make_baseline_js(canvas_w: int) -> str:
 """
 
 
-def build_head(cfg: dict, design_fonts: bool = False) -> str:
-    """The document head. Fonts come from the design (inlined @font-face rules); the
-    config's `fonts:` Google Fonts link is used only when the design provides none."""
-    configured = cfg.get("fonts") or []
-    if configured and design_fonts:
-        print("  [WARN] config.yaml fonts: is ignored: the design system provides the fonts (inlined, no network)")
-        configured = []
-    font_url = build_font_url(configured)
-    font_tags = ""
-    if font_url:
-        font_tags = textwrap.dedent(f"""\
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="{font_url}" rel="stylesheet">
-        """)
+def build_head(cfg: dict) -> str:
+    """The document head. Fonts come only from the design's @font-face rules, inlined in
+    the design layer; the 1.x `fonts:` key (a Google Fonts link) is read only to warn."""
+    if cfg.get("fonts"):
+        print("  [WARN] config.yaml fonts: is no longer used and loads nothing: fonts come from the design's "
+              "@font-face rules. For a Google face, declare it in the project's design subset `type` module.")
     scripts = "\n".join(
         f'<script src="{url}"></script>'
         for url in cfg.get("external_scripts", [])
@@ -369,7 +349,7 @@ def build_head(cfg: dict, design_fonts: bool = False) -> str:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{cfg.get("title", "Presentation")}</title>
-    {meta_tags}{font_tags}{scripts}
+    {meta_tags}{scripts}
     """)
 
 
@@ -417,7 +397,7 @@ def build(config_path: Path, output_override: str = None):
     design = resolve_design(cfg, base)
 
     # Head
-    parts = [build_head(cfg, design_fonts=bool(design.fonts))]
+    parts = [build_head(cfg)]
 
     # Canvas dimensions (used by baseline CSS/JS)
     canvas = cfg.get("canvas", {})

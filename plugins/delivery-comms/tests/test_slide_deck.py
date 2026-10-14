@@ -93,12 +93,29 @@ class FontsTest(DeckCase):
                 self.assertIn("system-ui", html)
                 self.assertIsNone(re.search(r"https?://", html), "the deck must not reference the network")
 
-    def test_config_fonts_are_ignored_with_a_warning_when_the_design_provides_fonts(self):
-        self.pin("full")
-        self.scaffold(fonts=[{"family": "Inter", "weights": [400, 700]}])
+    def test_config_fonts_never_produce_a_network_font_url(self):
+        # owner 2026-10-14: the Google Fonts opt-in is dropped in 2.0.0, whatever the design provides
+        for name in ("full", "subset", "base"):
+            with self.subTest(design=name):
+                self.setUp()
+                if name != "base":
+                    self.pin(name)
+                self.scaffold(fonts=[{"family": "Inter", "weights": [400, 700]}])
+                result = self.assertBuilds()
+                self.assertRegex(result.stdout, r"\[WARN\].*fonts:.*no longer used")
+                self.assertIn("@font-face", result.stdout)
+                self.assertIn("type", result.stdout)
+                html = self.html()
+                self.assertNotIn("fonts.googleapis.com", html)
+                self.assertNotIn("fonts.gstatic.com", html)
+                self.assertNotRegex(html, r"<link[^>]+https?://")
+
+    def test_new_config_has_no_fonts_key(self):
+        self.scaffold()
+        cfg = yaml.safe_load((self.deck / "config.yaml").read_text(encoding="utf-8"))
+        self.assertNotIn("fonts", cfg)
         result = self.assertBuilds()
-        self.assertRegex(result.stdout, r"\[WARN\].*fonts:.*ignored")
-        self.assertNotIn("fonts.googleapis.com", self.html())
+        self.assertNotIn("fonts:", result.stdout)
 
 
 class ValidatorTest(DeckCase):

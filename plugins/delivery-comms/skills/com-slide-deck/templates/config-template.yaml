@@ -31,13 +31,6 @@ canvas:
 #   footer_left: "{author} · {date_label}"
 #   numbering: true             # "n / total" in the footer, from Chromium
 
-# Fonts come from the design system (its @font-face rules are inlined, no network).
-# This Google Fonts list is used only when the design provides no fonts, and is
-# ignored with a warning when it does.
-fonts: []
-#  - family: "Inter"
-#    weights: [400, 600, 700]
-
 # Design checks. build.py refuses a literal colour or a custom property outside the
 # contract; a deliberate local value is declared here as NAME: VALUE and listed in
 # the provenance report. A NAME that is a custom property may also be declared and
