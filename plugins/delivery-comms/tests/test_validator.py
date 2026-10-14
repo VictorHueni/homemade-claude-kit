@@ -206,13 +206,15 @@ class TemplateDryRunTest(ValidatorCase):
                     self.assertEqual(check_render.strip_fallbacks(text), text, "a var() fallback is left")
 
 
-class CommandLineTest(ValidatorCase):
+class CliCase(ValidatorCase):
     def run_cli(self, html, *args):
         path = self.tmp / "out.html"
         path.write_text(html, encoding="utf-8")
         return subprocess.run([sys.executable, "-I", str(SHARED / "check_render.py"), str(path), *args],
                               capture_output=True, text=True)
 
+
+class CommandLineTest(CliCase):
     def test_exit_codes_and_json(self):
         ok = self.run_cli(PAGE)
         self.assertEqual(ok.returncode, 0, ok.stderr)
@@ -231,6 +233,52 @@ class CommandLineTest(ValidatorCase):
     def test_refused_design_exits_2(self):
         bad = self.run_cli(PAGE, "--design-system", str(DESIGNS / "minimal-invalid"))
         self.assertEqual(bad.returncode, 2)
+
+
+class RecordTest(CliCase):
+    """--record FILE writes the verdict the skill evals grade (Plan-0005 increment 12); the exit code is unchanged."""
+
+    def record(self, html, *args):
+        verdict = self.tmp / "out.html.verdict.txt"
+        result = self.run_cli(html, "--record", str(verdict), *args)
+        return result, verdict.read_text(encoding="utf-8").splitlines()
+
+    def test_a_clean_page_records_pass_the_file_and_the_design(self):
+        result, lines = self.record(PAGE, "--design-system", str(DESIGNS / "full"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(lines[0], "PASS: no findings")
+        self.assertEqual(lines[1], f"file: {self.tmp / 'out.html'}")
+        self.assertEqual(lines[2], "design: @acme-test/design-system@1.0.0")
+
+    def test_the_base_theme_is_named(self):
+        result, lines = self.record(PAGE)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(lines[2], "design: base")
+
+    def test_findings_are_recorded_with_a_fail_line(self):
+        result, lines = self.record(page(".x { color: #123456; } .y { color: #654321; }"))
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(lines[0], "FAIL: 2 finding(s)")
+        self.assertTrue(lines[1].startswith("file: "), lines)
+        self.assertTrue(any("#123456" in line for line in lines[3:]), lines)
+        self.assertIn("#123456", result.stdout, "the findings are still printed")
+
+    def test_declared_exceptions_are_recorded(self):
+        result, lines = self.record(page(".x { color: #123456; }"), "--exception", "mine=#123456")
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertEqual(lines[0], "PASS: no findings")
+        self.assertIn("exception mine=#123456 (not in the design's vocabulary)", lines)
+
+    def test_a_refused_design_is_recorded_as_a_fail(self):
+        result, lines = self.record(PAGE, "--design-system", str(DESIGNS / "minimal-invalid"))
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(lines[0], "FAIL: the design was refused")
+        self.assertTrue(lines[1].startswith("file: "), lines)
+        self.assertTrue(any("dataviz" in line for line in lines[2:]), lines)
+
+    def test_without_record_no_verdict_file_is_written(self):
+        self.run_cli(PAGE)
+        self.assertEqual(sorted(p.name for p in self.tmp.iterdir()), ["out.html"])
 
 
 if __name__ == "__main__":

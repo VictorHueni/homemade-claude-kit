@@ -1,8 +1,8 @@
 ---
 name: ux-design-system
 license: MIT
-description: "Point a project at the design system its decks, views and release notes render with, or author a declared subset of one. Modes: point (pin a published design-system package at an exact version in docs/ux/package.json, validate its kit manifest through the kit resolver, print the Dependabot entry), subset (read a DESIGN.md in Google's DESIGN.md format, write docs/ux/design-system/ with one CSS file per filled module and kit-manifest.json; propose a contrast-checked chart palette from the accent for the owner to confirm), subset --from-legacy (draft that DESIGN.md from a legacy docs/ux/tokens.css, which the 2.0 renderers refuse), scaffold (a DESIGN.md template). Use when the user wants a design system, brand tokens, theme, colour or chart palette, or typography for generated decks and views, or when a render refuses a legacy tokens.css. Triggers on: design system, design tokens, DESIGN.md, theme, colour palette, pin design system, migrate tokens.css. Output: docs/ux/. Mints no IDs."
-allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/design_system.py *)
+description: "Point a project at the design system its decks, views and release notes render with, or author a declared subset of one. Modes: point (pin a published design-system package at an exact version in docs/ux/package.json, validate its kit manifest through the kit resolver, print the Dependabot entry), subset (build docs/ux/design-system/, module CSS and kit-manifest.json, from a Google-format DESIGN.md; propose a contrast-checked chart palette for the owner to confirm), subset --from-legacy (draft that DESIGN.md from a legacy docs/ux/tokens.css, which the 2.0 renderers refuse), scaffold (a DESIGN.md template). Use when the user wants a design system, brand tokens, theme, colour or chart palette, or typography for generated decks and views, when a render refuses a legacy tokens.css, or when a bespoke script or page must be in the project's brand. Triggers on: design system, design tokens, DESIGN.md, theme, colour palette, in our brand, pin design system, migrate tokens.css. Output: docs/ux/. Mints no IDs."
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/design_system.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/shared/design_source.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/shared/check_render.py *)
 user-invocable: true
 metadata:
   category: "ux"
@@ -29,15 +29,18 @@ It mints no IDs and links to no other artefact. A complete design system from a 
 
 | Task | Command |
 |---|---|
-| Use a published design system | `python3 scripts/design_system.py point @scope/name@1.2.3` |
-| Preview an unreleased design-system folder | `python3 scripts/design_system.py point ../design-system` |
-| Start a DESIGN.md | `python3 scripts/design_system.py scaffold` (writes `docs/ux/DESIGN.md`) |
-| Build the subset from a DESIGN.md | `python3 scripts/design_system.py subset docs/ux/DESIGN.md` |
-| Migrate a refused legacy token file | `python3 scripts/design_system.py subset --from-legacy docs/ux/tokens.css` |
+| Use a published design system | `python3 <skill-dir>/scripts/design_system.py point @scope/name@1.2.3` |
+| Preview an unreleased design-system folder | `python3 <skill-dir>/scripts/design_system.py point ../design-system` |
+| Start a DESIGN.md | `python3 <skill-dir>/scripts/design_system.py scaffold` (writes `docs/ux/DESIGN.md`) |
+| Build the subset from a DESIGN.md | `python3 <skill-dir>/scripts/design_system.py subset docs/ux/DESIGN.md` |
+| Migrate a refused legacy token file | `python3 <skill-dir>/scripts/design_system.py subset --from-legacy docs/ux/tokens.css` |
+| See which design renders will use | `python3 <skill-dir>/scripts/shared/design_source.py provenance` |
+| The design's CSS for a bespoke generator | `python3 <skill-dir>/scripts/shared/design_source.py css` (see **Bespoke generators**) |
+| Record the verdict on any built HTML | `python3 <skill-dir>/scripts/shared/check_render.py --record OUT.html.verdict.txt OUT.html` |
 
 Every refusal exits 2 with a message naming what to change. `generate` and its `refresh` alias were removed in 2.0.0: running either exits 2 and prints the `subset` commands above.
 
-Restricted sessions deny compound commands: run one plain command per Bash call and write files with the Write tool.
+`<skill-dir>` is the absolute path on the "Base directory for this skill" line at the top of this skill; write it out in full, with no shell variable and no `cd`. Run **one plain command per Bash call**, starting with `python3` (no `&&`, `;`, pipes or redirections): restricted sessions allow only `python3`, `mkdir` and `cp` and deny compound commands. Look at files with Read, Glob and Grep, and write files with the Write tool. If a command is denied or a run refuses, stop and report the message and what the owner must do.
 
 ## Modes
 
@@ -97,7 +100,9 @@ The generated CSS is a machine artefact: change the DESIGN.md and run `subset` a
 - each `core` role the file lacks taken from the kit base theme, and named by its DESIGN.md path in the output and in a comment;
 - `primary: "{colors.accent}"`, proposed chart colours under the `proposed` mark (see `subset`), and `guidance` in `kit.omitted`.
 
-It prints what it could not map: properties that are not contract roles (deck-only names such as `--dim`, domain names such as `--status-shipped`), colours that are not hex (subset refuses them until changed), and `@font-face` or `@import` rules (fonts move to `kit.fonts` with a local file). It leaves `TOKENS` unedited; delete it once the subset renders, since a render with both a pin and a legacy file prints a warning.
+Then **stop**: show the owner the draft, the proposed chart colours and what the run could not map, and leave the next steps to them (review the palette and remove the `proposed:` line, darken a colour the resolver refuses for contrast, run `subset`). Do not remove the mark, do not run `subset` to get past it, and do not write `docs/ux/design-system/` yourself. If a deck, view or note was asked for, it is not delivered in this run: no hand-written CSS replaces the refused design.
+
+It prints what it could not map: properties that are not contract roles (deck-only names such as `--dim`, domain names such as `--status-shipped`), colours that are not hex (subset refuses them until changed), and `@font-face` or `@import` rules (fonts move to `kit.fonts` with a local file). It leaves `TOKENS` unedited, and so do you: the owner deletes it once the subset renders (a render with both a pin and a legacy file prints a warning).
 
 ### `scaffold [DOCS]`
 
@@ -107,9 +112,17 @@ Creates `DOCS/ux/DESIGN.md` (default `docs/ux/DESIGN.md`) from `templates/DESIGN
 
 1. **A published design system exists**: `point` it, add the printed Dependabot entry, done.
 2. **No design system**: `scaffold` (or `subset --from-legacy` when a refused `tokens.css` exists), fill the values and the prose with the owner, run `subset`, show the proposed chart palette to the owner, and run `subset` again once the owner has removed the `proposed:` line.
-3. Render with any of the three skills. Each prints and writes `<output>.provenance.json` naming which modules came from the design and which from the base, and validates the output before writing it.
+3. Render with any of the three skills. Each validates the output before writing it (exit 1 on findings, 2 on a refused design), prints and writes `<output>.provenance.json` naming which modules came from the design and which from the base, and is done only when `check_render.py --record <output>.verdict.txt <output>` reads `PASS: no findings`.
 
 Do not hand-write CSS to get around a refusal, and do not edit `design-system/` by hand.
+
+## Bespoke generators
+
+A script or page outside the three renderers (a table, a dashboard, an email) that must be in the project's brand takes its CSS from the kit resolver, never from colours copied into the script:
+
+1. In the script, run `<skill-dir>/scripts/shared/design_source.py` with the same Python, once with `fonts` and once with `css` (`subprocess.run([sys.executable, DESIGN_SOURCE, "css"], capture_output=True, text=True, check=True)`, `DESIGN_SOURCE` the absolute path written out), and read their standard output: the design's `@font-face` rules (fonts inlined as data URIs), then its CSS, every module in contract order, including the `--kit-on-<fill>` text roles. It resolves the design like a render (the `docs/ux/package.json` pin found by walking up from the working directory, else the base theme) and exits 2 when the design is refused; let that error stop the script.
+2. Put the two outputs, unchanged and fonts first, in one `<style data-design-layer>` block, then the page's own rules in a plain `<style>` that uses contract roles only (`var(--ink)`, `var(--surface)`, `var(--border)`, `var(--accent)`, `var(--font-body)`; text on `--accent` with `var(--accent-ink)`, text on a state or chart fill with `var(--kit-on-<fill>)`). No literal colour (hex, `rgb()`, `hsl()`, a named colour) anywhere in the script or its output, and no custom property outside the contract.
+3. Run the script, then `python3 <skill-dir>/scripts/shared/check_render.py --record <output>.verdict.txt <output>`, and report the verdict's first line. On a `FAIL`, fix the script to use the role each finding names and run both again.
 
 ## Verification checklist
 

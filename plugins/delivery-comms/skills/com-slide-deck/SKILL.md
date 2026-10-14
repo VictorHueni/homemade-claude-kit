@@ -1,59 +1,73 @@
 ---
 name: com-slide-deck
 license: MIT
-description: >
-  Build single-file HTML slide presentations from modular partials, a shared
-  design system, and a Python build pipeline. Use this skill any time the user
-  wants to create, edit, split, stitch, prototype, or migrate HTML slide decks.
-  Triggers include: any mention of "slides", "presentation", "deck", "slide
-  builder", requesting a new slide, editing an existing slide, prototyping visual
-  variations, migrating an old deck onto the design system, or working with the
-  slide-builder folder. Also use when the user asks to define or update a design
-  system for a presentation, and for paginated A4/Letter documents built from the
-  same partials pipeline (`mode: document`: user guides, forms, handouts,
-  one-pagers rendered to a print PDF with running header and page numbers). Do NOT use for
-  PowerPoint (.pptx) files or Google Slides (this skill exports its own decks to PDF via render.py).
-allowed-tools: Bash(python ${CLAUDE_SKILL_DIR}/scripts/init.py *) Bash(python ${CLAUDE_SKILL_DIR}/scripts/build.py *) Bash(python ${CLAUDE_SKILL_DIR}/scripts/split.py *) Bash(python ${CLAUDE_SKILL_DIR}/scripts/migrate.py *) Bash(python ${CLAUDE_SKILL_DIR}/scripts/dev_server.py *) Bash(python ${CLAUDE_SKILL_DIR}/scripts/render.py *)
+description: "Build single-file HTML slide presentations from modular partials and a Python build pipeline, themed by the project's design system (the docs/ux/package.json pin, else the kit base theme) and checked by a blocking validator before anything is written. Use this skill any time the user wants to create, edit, split, stitch, prototype, or migrate HTML slide decks. Triggers include: any mention of \"slides\", \"presentation\", \"deck\", \"slide builder\", requesting a new slide, editing an existing slide, prototyping visual variations, migrating an old deck onto the design system, or working with the slide-builder folder. Also use for paginated A4/Letter documents built from the same partials pipeline (`mode: document`: user guides, forms, handouts, one-pagers rendered to a print PDF with running header and page numbers). Do NOT use for PowerPoint (.pptx) files or Google Slides (this skill exports its own decks to PDF via render.py)."
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/init.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/build.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/split.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/migrate.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/dev_server.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/render.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/shared/design_source.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/shared/check_render.py *)
 user-invocable: true
 metadata:
   category: "communication"
   complexity: "high"
   version: "1.3.0"
   status: active
-  last_reviewed: 2026-09-02
+  last_reviewed: 2026-10-14
   impact: "low"
 ---
 
 # Slide Builder
 
-Build modular HTML slide presentations driven by a presentation brief and a
-design system, stitched into a single shareable file via Python.
+Build modular HTML slide presentations driven by a presentation brief and the project's design system, stitched into a single shareable file via Python.
 
-This skill is a **portable toolkit**. It lives in its own versioned folder
-(or Git repo) and generates projects elsewhere. The skill never contains
-project-specific content.
+This skill is a **portable toolkit**. It lives in its own versioned folder and generates projects elsewhere. The skill never contains project-specific content.
+
+## Running the scripts
+
+- `<skill-dir>` in every command below is the absolute path on the "Base directory for this skill" line at the top of this skill. Write it out in full: no shell variable, no `cd`.
+- **One plain command per Bash call**, starting with `python3`. No `&&`, `;`, pipes, redirections or `$VAR`: restricted sessions (only `python3`, `mkdir` and `cp` allowed) deny compound commands. Paths are relative to the working directory.
+- Look at files with Read, Glob and Grep, never `ls`, `cat` or `head`. Create and change files (brief, config, partials, styles) with the Write and Edit tools.
+- **If a command is denied, or a script refuses** (exit 1 or 2): stop and report the command, its message, and what the owner must do. Never hand-write the deck's HTML or CSS instead: no hand-written CSS replaces a refused design.
 
 ## Quick Reference
 
-| Task                         | What to do                                                |
-|------------------------------|-----------------------------------------------------------|
-| New project from scratch     | `python scripts/init.py docs/communication/slides/{slug}` then fill brief + design system |
-| New A4 document (guide, form, handout) | `python scripts/init.py docs/communication/documents/{slug} --mode document`, then fill brief + design system; see **Document mode** |
-| Add a slide                  | Create partial in project's `src/`, add to `config.yaml`  |
-| Edit a slide                 | Edit the partial directly, run `build.py --config`        |
-| Re-theme the brand (palette/fonts) | Edit `docs/ux/design-system.md` → `ux-design-system generate` (shared `tokens.css` re-themes deck + viz) |
-| Restyle the deck only        | Edit project's `design/styles.css` (deck-only tokens + components) |
-| Prototype a variation        | Create file in project's `dist/prototypes/`               |
-| Build shareable HTML         | `python scripts/build.py --config path/to/config.yaml`    |
-| Export deck to PDF           | `python scripts/render.py --config path/to/config.yaml [--recipient NAME]` (optional Playwright) |
-| Export document to PDF       | same `render.py` call; `mode: document` in config.yaml selects the paginated A4 path |
-| Split an existing deck       | `python scripts/split.py <file> --config path/to/config.yaml` |
-| Migrate an old deck to the design system | `python scripts/migrate.py --config path/to/config.yaml` (report) · `--apply` (alias shim) · `--rename` (rewrite names) |
-| Cite a source on a slide     | Add `data-sources="key1,key2"` to the `.slide` div; add entries to `context/bibliography.yaml` |
-| Add a new source             | Add a keyed entry to `context/bibliography.yaml` once a slide cites it |
-| Add custom `<head>` meta tags | Add a `meta:` list to `config.yaml` (`- {name: …, content: …}`) — injected into the built `<head>`. Use for rights/author/licence provenance (content is HTML-escaped) |
+| Task | What to do |
+|---|---|
+| Check which design a build will use | `python3 <skill-dir>/scripts/shared/design_source.py provenance` |
+| New deck | `python3 <skill-dir>/scripts/init.py docs/communication/slides/{slug} --name "Title" --author "Name"`, then write the brief and the partials |
+| New A4 document (guide, form, handout) | `python3 <skill-dir>/scripts/init.py docs/communication/documents/{slug} --mode document`; see **Document mode** |
+| Add or edit a slide | Write the partial in the project's `output/slides/`, list it in `config.yaml` |
+| Build shareable HTML | `python3 <skill-dir>/scripts/build.py --config {deck}/config.yaml [--output out/deck.html]` |
+| Record the verdict (after every build) | `python3 <skill-dir>/scripts/shared/check_render.py --record {output}.verdict.txt {output}` |
+| Export to PDF | `python3 <skill-dir>/scripts/render.py --config {deck}/config.yaml [--recipient NAME] [--date YYYY-MM-DD]` (optional Playwright) |
+| Re-theme the brand (palette, fonts, logo) | Change the project design, never the deck: `ux-design-system` (`point` a package, or edit `docs/ux/DESIGN.md` and run `subset`) |
+| Restyle this deck only | Edit the project's `design/styles.css` (components, contract roles only) |
+| Live preview while editing | `python3 <skill-dir>/scripts/dev_server.py --config {deck}/config.yaml --port 3000` |
+| Split an existing deck | `python3 <skill-dir>/scripts/split.py <file> --config {deck}/config.yaml` |
+| Migrate an old deck | `python3 <skill-dir>/scripts/migrate.py --config {deck}/config.yaml` (report) · `--apply` (alias shim) · `--rename` (rewrite names) |
+| Cite a source on a slide | `data-sources="key1,key2"` on the `.slide` div; entries in `context/bibliography.yaml` |
+| Add `<head>` meta tags | A `meta:` list in `config.yaml` (`- {name: …, content: …}`), HTML-escaped |
 
 Add a `bibliography.yaml` entry only for a source a slide cites (`data-sources`); never pre-populate it, and remove existing entries only on request. Keep the inline links in the markdown research docs: the two channels do not substitute for each other.
+
+---
+
+## Design, validator, provenance and verdict
+
+The design contract (modules, manifest, contrast pairs, fonts) is [`contract/README.md`](../../contract/README.md). What a deck needs from it:
+
+1. **Resolution order**, once per build: `paths.design_tokens` in `config.yaml` (a design-system folder with a `kit-manifest.json`, for previewing an unreleased design), else the `docs/ux/package.json` pin found by walking up from the deck, else the kit's neutral base theme. A pin names a package at an exact version (downloaded once, integrity-checked, cached per machine) or a local folder (`file:design-system`). Modules the design omits come from the base theme.
+2. **What the design gives the deck**: the palette, type, spacing, the slide canvas (`--slide-width`, `--slide-height`), the frame (`.slide`, `.slide-label`, and the footer row with the brand logo, the legal line and the slide number) and the font faces. `build.py` inlines them in one `<style data-design-layer>`; the deck's `design/styles.css` comes after and holds deck components only.
+3. **Blocking validator**: the build checks the HTML before writing it. Refused: a literal colour (hex, `rgb()`, `hsl()`, a named colour) outside the design layer, a custom property outside the contract's roles and the reserved `--kit-*` prefix, a contrast pair an exception brings below WCAG AA. Exit `0` written; `1` findings, nothing written, each finding naming the value, its location and the role to use: fix the CSS or the partial to use that role and build again; `2` the design was refused (a legacy file, a broken manifest, a pair below AA): see **Legacy design file**.
+4. **Exceptions**: a deliberate local value the owner asked for is declared in `config.yaml` under `design.exceptions` (`NAME: VALUE`) and listed in the provenance report. Never add one to get past a finding.
+5. **Provenance**: every build prints and writes `<output>.provenance.json` next to the HTML: the design's name, version and repo-relative path, the source (`design-system` or `base`) of every module, the exceptions and warnings. `render.py` writes one next to the PDF too.
+6. **Verdict**: after the build, run `python3 <skill-dir>/scripts/shared/check_render.py --record <output>.verdict.txt <output>` on the delivered HTML and report its first line. It writes `PASS: no findings` or `FAIL: …`, the file, the design and the findings. The deck is not done without `PASS`.
+7. **Reproducible output**: the same sources and the same design give byte-identical HTML and PDF. Dates come from the sources (`config.yaml`, partials, styles, script, bibliography), never the clock: `SOURCE_DATE_EPOCH` when set, else the sources' last commit, else their newest modification time. `--date` overrides only the recipient stamp and footer label. Printed paths are repo-relative.
+
+### Legacy design file
+
+A project whose only design source is a `docs/ux/tokens.css` (or `docs/design/tokens.css`) is refused with exit 2 and a message naming `ux-design-system point`, `subset` and `subset --from-legacy`. Then:
+
+1. Invoke the `ux-design-system` skill and run its `subset --from-legacy docs/ux/tokens.css`. It drafts `docs/ux/DESIGN.md` with the legacy colours and a proposed chart palette under a `proposed:` mark.
+2. **Stop.** Show the owner the drafted `DESIGN.md`, the proposed chart colours and anything the run could not map, and say what remains: the owner reviews the palette and removes the `proposed:` line, `subset` generates the design, then the deck builds.
+3. Never edit or delete the legacy file, never remove the `proposed:` line yourself, never write `docs/ux/design-system/` by hand, and never deliver a deck on hand-written colours.
 
 ---
 
@@ -62,132 +76,78 @@ Add a `bibliography.yaml` entry only for a source a slide cites (`data-sources`)
 This skill contains only reusable, versionable assets:
 
 ```
-com-slide-deck/           <-- VERSION THIS (Git repo or .claude/skills/)
+com-slide-deck/
   SKILL.md                     This file
   README.md                    Human-readable docs
   templates/
     brief-template.md          Blank presentation brief
-    design-system-template.md  Blank design system definition
+    design-system-template.md  Deck component notes (colours and type come from the project design)
     bibliography-template.yaml Blank source registry
     config-template.yaml       Blank build configuration
+    doc.baseline.css           Document-mode break rules
   scripts/
     init.py                    Scaffolds a new project
-    build.py                   Stitches partials into one HTML
+    build.py                   Stitches partials into one HTML, validates, writes provenance
+    render.py                  PDF export (optional Playwright)
     split.py                   Splits a single-file deck into partials
+    migrate.py                 Moves an old deck's token names onto the contract
     dev_server.py              Auto-rebuild + local HTTP server
+    shared/                    The kit resolver and validator (design_source.py, check_render.py, base theme)
 ```
 
 A project is generated by `init.py` and lives in your working repo:
 
 ```
-my-repo/
-  docs/communication/slides/
-    {slug}/                      <-- PROJECT — named after the deck (e.g. investor-pitch)
-      context/
-        brief-template.md        Reference copy of the template
-        brief.md                 Completed brief (you fill this)
-        bibliography-template.yaml  Reference copy of the template
-        bibliography.yaml        Source registry (you fill this)
-      design/
-        design-system-template.md  Reference copy of the template
-        design-system.md         Completed design system (you fill this)
-        styles.css               CSS implementing the design system
-        script.js                JS for presentation mode and helpers
-      src/                       One file per slide (source of truth)
-      dist/                      Final stitched HTML (generated)
-        prototypes/              Experimental variations
-      config.yaml                Build configuration
+docs/communication/slides/{slug}/   PROJECT, named after the deck (e.g. investor-pitch)
+  context/
+    brief.md                 The brief (you fill this)
+    bibliography.yaml        Source registry
+  design/
+    design-system.md         Deck component notes (optional until the deck adds components)
+    styles.css               Deck components, contract roles only
+    script.js                Presentation mode and helpers
+  output/
+    slides/                  One file per slide (source of truth)
+    prototypes/              Experimental variations
+    slide-deck/              Built HTML (default output)
+  config.yaml                Build configuration
 ```
 
 ---
 
-## Mandatory Startup Sequence
+## Startup sequence
 
-**CRITICAL: You MUST execute steps 0 through 2 in order before writing any
-slide HTML, CSS, or JS. There are no exceptions. If a user asks you to
-"just add a quick slide", you still run the startup sequence first. If a
-prerequisite is missing, you stop and fix it before proceeding.**
+Run these steps in order before writing slide HTML, CSS or JS.
 
-### Step 0: Locate the Project
+### Step 0: Locate the project
 
-1. Identify the project directory (the folder containing `config.yaml`).
-2. If no project exists yet, ask for the deck name, derive a kebab-case slug, then scaffold:
-   ```bash
-   python path/to/com-slide-deck/scripts/init.py docs/communication/slides/{slug} --name "Title" --author "Name"
-   ```
-3. Confirm the project has `context/`, `design/`, `src/`, `dist/`, and `config.yaml`.
+1. Find the deck's folder (the one holding `config.yaml`) with Glob.
+2. If none exists, derive a kebab-case slug from the deck's subject and scaffold it with `init.py` (one command, see Quick Reference).
 
-### Step 1: Presentation Brief
-
-The brief defines what the presentation says, who it's for, and how it
-should feel. Every content decision flows from it.
+### Step 1: Brief
 
 1. Read the project's `context/brief.md`.
-2. **If the file contains placeholder text ("..."):**
-   - STOP. Do not proceed to Step 2.
-   - Read `context/brief-template.md` for the expected structure.
-   - Walk the user through every section: summary, goal, audience, tone,
-     key messages, outline, sources, and constraints.
-   - Save the completed version as `context/brief.md`.
-   - Verify the checklist at the bottom is fully checked.
-3. **If the file is complete:** proceed to Step 2.
+2. **If it still holds placeholders ("..."):** when the user's request already gives the subject, audience, tone and the content of each slide, write `context/brief.md` from it with the Write tool (follow `context/brief-template.md`'s sections, mark a section the request does not cover as "not specified") and go on. Otherwise ask for what is missing, one point at a time, before writing slides.
 
-### Step 2: Design System
+### Step 2: Design
 
-The base palette and typography come from the **project design system**
-(`docs/ux/tokens.css`, produced by the `ux-design-system` skill) — the single
-source of truth shared with `com-artefact-viz`. `build.py` inlines it BEFORE the
-deck's `styles.css`. The contract includes the base palette, typography, and the
-generic semantic state tokens (`--success`/`--warning`/`--danger`/`--info`). The
-deck's `styles.css` therefore does **not** redefine any of those; it adds only
-deck-only tokens (`--dim`, `--accent-lt`), components, and fonts — all using the
-contract token names via `var()`, never hard-coded hex.
+1. Check the design: `python3 <skill-dir>/scripts/shared/design_source.py provenance`. Exit 0 prints the design and the source of each module; exit 2 is a refusal: follow **Legacy design file** (a legacy token file) or report the message (anything else) and stop.
+2. The palette, type, canvas and frame come from that design. `design/styles.css` holds only the deck's components, written with contract roles (`var(--accent)`, `var(--font-mono)`), never a literal colour.
+3. `design/design-system.md` records the deck's own components and layout rules (template: `design/design-system-template.md`). A deck that uses only the frame and plain text needs nothing in it; fill a section when the deck adds a component.
 
-1. **Ensure the project design system exists.** If `docs/ux/tokens.css` is
-   missing, scaffold it first: `ux-design-system scaffold` then fill
-   `docs/ux/design-system.md` and run `ux-design-system generate`. (If the deck
-   is intentionally standalone, skip — `build.py` falls back to deck styles only.)
-2. Read the project's `design/design-system.md` (deck-level: deck-only tokens +
-   components + type scale).
-3. **If it contains placeholder text:**
-   - STOP. Read `design/design-system-template.md` for the expected structure
-     (note its §2 token tables use the contract vocabulary + a migration map).
-   - Walk the user through philosophy, deck-only tokens, fonts, spacing, icon
-     library, atoms, components.
-   - Save the completed version as `design/design-system.md`.
-   - Generate `design/styles.css` implementing the deck-only tokens + atoms +
-     components, referencing the contract tokens via `var()`.
-   - Verify the checklist at the bottom is fully checked.
-4. **If it is complete:** load it into context.
+### Step 3: Load context
 
-### Step 3: Load Context
-
-Read these three files into your working context. Do not skip any:
-
-1. Project's `context/brief.md` - content decisions (what, who, why, tone)
-2. Project's `design/design-system.md` - visual decisions (how it looks)
-3. Project's `config.yaml` - build config (slide order, paths, metadata)
-
-Only after all three are loaded do you proceed to any slide work.
+Read `context/brief.md`, `design/design-system.md` (if filled) and `config.yaml` before any slide work.
 
 ---
 
 ## Bibliography & Source Citations
 
-Every external figure (statistic, count, date, published claim) that appears on a
-slide **must** be backed by a source entry in `context/bibliography.yaml`. This file
-is auto-scaffolded by `init.py` from `bibliography-template.yaml`.
+Every external figure (statistic, count, date, published claim) on a slide **must** be backed by a source entry in `context/bibliography.yaml`, scaffolded by `init.py`.
 
-### Rule: cite or qualify
-
-- **External fact with a public URL** → add an entry to `bibliography.yaml`, reference
-  it on the slide with `data-sources`.
-- **Internal estimate (no public source)** → add an entry with `org: "Internal estimate"`
-  and no `url` field. This makes the assumption explicit rather than invisible.
-- **Unsourced figure** → do not include it. A wrong number in a pitch deck is more
-  damaging than a missing one.
-
-### Adding a source
+- **External fact with a public URL**: add an entry and reference it on the slide with `data-sources`.
+- **Internal estimate (no public source)**: add an entry with `org: "Internal estimate"` and no `url`, so the assumption is explicit.
+- **Unsourced figure**: leave it out. A figure the user gives in the request as fictitious or internal is an internal estimate.
 
 ```yaml
 # context/bibliography.yaml
@@ -200,40 +160,11 @@ sources:
     accessed: 2026-05-14
 ```
 
-Fields: `org`, `title`, `url`, `year`, `accessed`. All are optional except the key
-itself; recommended minimum is `org + title + url + year`.
-
-### Referencing on a slide
-
-Add `data-sources="key1,key2"` to the **root `.slide` div** — `build.py` resolves
-the keys and injects a `.slide-source-bar` automatically before the closing tag:
-
-```html
-<div class="slide s-context" data-sources="priminfo-kostengruppen,interpharma-preismodelle">
-  <!-- slide content -->
-  <div class="slide-number"></div>
-</div>
-<!-- build.py injects:
-  <div class="slide-source-bar">
-    Priminfo / BAG · Kostengruppen (2024) — priminfo.admin.ch
-    &nbsp;|&nbsp;
-    Interpharma · Preismodelle bei Medikamenten (2023) — interpharma.ch
-  </div>
--->
-```
-
-The source bar is styled by the baseline CSS (Geist Mono 10px, bottom-left,
-ellipsis overflow). No manual HTML needed — the attribute is enough.
-
-### Build behaviour
-
-- Bibliography absent or empty → source bars silently skipped. Existing slides unaffected.
-- Unknown key in `data-sources` → build warning printed, key skipped, build continues.
-- Multiple keys → rendered left-to-right, separated by `|`.
+Fields: `org`, `title`, `url`, `year`, `accessed`, all optional except the key; recommended minimum `org + title + url + year`. Add `data-sources="key1,key2"` to the **root `.slide` div**; `build.py` resolves the keys and injects a `.slide-source-bar` above the footer row. An absent or empty bibliography skips the bars; an unknown key prints a warning and is skipped; several keys render left to right, separated by `|`.
 
 ---
 
-## Creating a Slide
+## Creating a slide
 
 ### Partial format
 
@@ -241,207 +172,93 @@ Every slide is a standalone HTML fragment:
 
 ```html
 <div class="slide s-example">
-  <div class="section-label">SECTION NAME</div>
+  <div class="slide-label">SECTION NAME</div>
   <h2 class="slide-title">Slide Title Here</h2>
   <!-- content using components from design/styles.css -->
-  <div class="slide-number"></div>
 </div>
 ```
 
 Rules:
-- Wrap in `<div class="slide {slide-class}">`.
-- Always include `<div class="slide-number"></div>` (build.py injects the number).
-- Use only CSS classes from the project's `design/styles.css`.
-- Reference design tokens (`var(--accent)`, `var(--font-mono)`), never raw hex.
-- Position content absolutely within the canvas dimensions from the design system.
+- Wrap in `<div class="slide {slide-class}">`; one root `.slide` per partial.
+- The section label is `<div class="slide-label">`, styled by the design's frame. Do not write a slide number, logo or legal line: `build.py` adds the footer row to every slide (a legacy `<div class="slide-number">` is removed with a note).
+- Use the frame's classes and the classes in `design/styles.css`; colours, fonts and spacing through contract roles (`var(--accent)`, `var(--font-mono)`), never a literal value.
+- Lay content out within the design's canvas (`--slide-width` by `--slide-height`; `canvas:` in `config.yaml` overrides it for one deck).
 
 ### Adding it to the deck
 
-1. Save the file in the project's `output/slides/` with a numbered prefix: `NN-slug.html`.
-2. If new CSS is needed, add it to the project's `design/styles.css` scoped as
-   `.s-example .my-element { ... }`.
-3. Add the entry to the project's `config.yaml`:
+1. Write the file in the project's `output/slides/` with a numbered prefix: `NN-slug.html`.
+2. If new CSS is needed, add it to `design/styles.css` scoped as `.s-example .my-element { ... }`.
+3. List it in `config.yaml`:
    ```yaml
-   - file: "NN-slug.html"
-     class: "s-example"
-     label: "Human-readable name"
+   slides:
+     - file: "NN-slug.html"
+       class: "s-example"
+       label: "Human-readable name"
    ```
-4. Build and verify:
-   ```bash
-   python path/to/com-slide-deck/scripts/build.py --config path/to/config.yaml
-   ```
+4. Build, then record the verdict (Quick Reference). A delivery path the user names goes in `--output` (for example `--output out/deck.html`); the provenance file follows it.
 
 ### CSS conventions
 
-- Scope all slide-specific styles: `.{slide-class} .{element} { ... }`.
-- Follow the type scale from the design system.
-- Content area starts below section label + title (exact position from the design system).
-- Check existing components before creating new ones.
+- Scope slide-specific styles: `.{slide-class} .{element} { ... }`.
+- Check the frame's classes and existing components before creating new ones.
 
 ---
 
-## Editing a Slide
+## Editing and prototyping
 
-1. Open the partial in the project's `output/slides/`.
-2. Make changes using existing components and tokens.
-3. Build: `python scripts/build.py --config path/to/config.yaml`
-4. Verify the output HTML in a browser.
+- **Edit**: change the partial in `output/slides/` with the Edit tool, build, record the verdict.
+- **Prototype**: write variations in `output/prototypes/` as `{slide-number}-{concept}-v{version}.html` (same partial format); once approved, move to `output/slides/` and update `config.yaml`.
 
----
+## Splitting an existing deck
 
-## Prototyping Variations
+One-time migration from a single-file HTML presentation: `python3 <skill-dir>/scripts/split.py path/to/deck.html --config path/to/config.yaml`. Rename the generated files to match `config.yaml`, then build.
 
-1. Create prototypes in the project's `output/prototypes/`.
-2. Name them: `{slide-number}-{concept}-v{version}.html`
-3. Each prototype is a standalone partial following the same format.
-4. Once approved, move to `output/slides/` and update `config.yaml`.
+## Migrating an old deck onto the design contract
 
----
+A deck written before 2.0.0 usually carries literal colours and legacy token names, which the validator refuses. **Commit the deck first.**
 
-## Splitting an Existing Deck
+1. **Give the project a design** if it has none: `ux-design-system` (`point` a published design, or `subset` from a DESIGN.md; a legacy `docs/ux/tokens.css` goes through `subset --from-legacy`, see **Legacy design file**).
+2. **Report**: `python3 <skill-dir>/scripts/migrate.py --config path/to/config.yaml` lists every literal colour in `styles.css` and the partials with the closest resolved role, the legacy token names in use (file and count) and the rename map.
+3. **Pick a path**: `--apply` adds an alias shim to `styles.css` (`--bg: var(--canvas-bg)`, …); the aliased names are not contract roles, so the build then needs them under `design.exceptions` (the report says which). `--rename` rewrites the changed names to contract names across `styles.css` and every partial; no shim or exception needed. Prefer `--rename`.
+4. **Replace the literal colours** the report lists with the roles it names. A brand value the design lacks belongs in the project design (`ux-design-system`), not in the deck.
+5. **Build** until the validator passes, then record the verdict.
 
-One-time migration from a single-file HTML presentation:
+`migrate.py` changes token names only; it never moves values or edits component rules.
 
-```bash
-python scripts/split.py path/to/deck.html --config path/to/config.yaml
-```
+## PDF export (leave-behind)
 
-After splitting, rename the generated files to match `config.yaml` entries
-and run a build to verify.
+`render.py` reads the deck `build.py` wrote to its default output (`output/slide-deck/`), so build without `--output` first. It validates the HTML (exit 1 on findings, 2 on a refused design, no PDF either way), then renders it with headless Chromium through Playwright: one slide per page at the canvas size, backgrounds kept, an optional recipient stamp (`--recipient "Name"` prints "Prepared for Name · <date>"). It writes `output/pdf/<name>[--recipient].pdf` (override with `--output`) and `<pdf>.provenance.json`. Playwright is optional and never auto-installed: without it `render.py` fails with an explicit message.
 
----
-
-## Migrating an Existing Deck onto the Design System
-
-A deck built before the shared design system keeps building unchanged — the
-shipped `scripts/shared/base/core.css` is a harmless base layer and the deck's own
-`styles.css` (inlined after it) overrides any overlapping tokens. Migration is
-**optional**, and only needed to make the deck theme from the project's
-`docs/ux/tokens.css` (so deck + artefact views share one source).
-
-`scripts/migrate.py` automates the token-name part. **Commit the deck first.**
-
-1. **Stand up the design system** (if absent): `ux-design-system scaffold`, port the
-   deck's palette values into `docs/ux/design-system.md`, `ux-design-system generate`.
-2. **Report** what needs changing (read-only):
-   ```bash
-   python scripts/migrate.py --config path/to/config.yaml
-   ```
-   It flags the project design system, the legacy token names in use
-   (with file + count), the rename mapping, deck-only tokens to keep, and any
-   base palette still hard-coded in `styles.css`.
-3. **Pick a path:**
-   - `--apply` — adds a backwards-compatible alias `:root` shim to `styles.css`
-     (`--bg: var(--canvas-bg)`, `--text: var(--ink)`, `--card-bg: var(--surface)`,
-     `--font-sans: var(--font-body)`). **No partial edits** — old `var(--bg)` keeps
-     working, now resolving to the contract value. Low-risk, reversible.
-   - `--rename` — rewrites the changed names → contract names across `styles.css`
-     and every partial (whole-token match). Thorough; no shim needed afterwards.
-4. **Finish the values:** move any hard-coded base/semantic values out of
-   `styles.css` into `docs/ux/design-system.md` (the report lists them), then
-   `ux-design-system generate`. Keep deck-only tokens (`--dim`, `--accent-lt`,
-   `--danger-lt`, `--font-heading`, extended palette) in `styles.css`.
-5. **Rebuild** and verify (`build.py` prints the shared `Tokens:` line).
-
-`migrate.py` only touches token **names** — it never relocates values or edits
-component rules. Hard-coded hex in partials is reported context but not changed.
-
----
-
-## Build Commands
-
-All scripts require `--config` pointing to the project's config.yaml:
-
-```bash
-# Scaffold a new project
-python scripts/init.py ./my-deck --name "My Talk" --author "Jane"
-
-# Build
-python scripts/build.py --config ./my-deck/config.yaml
-
-# Build to a specific output path
-python scripts/build.py --config ./my-deck/config.yaml --output ./dist/deck.html
-
-# Split an existing deck into a project
-python scripts/split.py existing.html --config ./my-deck/config.yaml
-
-# Migrate a pre-design-system deck onto the shared token contract
-python scripts/migrate.py --config ./my-deck/config.yaml            # report (read-only)
-python scripts/migrate.py --config ./my-deck/config.yaml --apply    # add alias shim to styles.css
-python scripts/migrate.py --config ./my-deck/config.yaml --rename   # rewrite legacy names in place
-
-# Dev server with file watching
-python scripts/dev_server.py --config ./my-deck/config.yaml --port 3000
-
-# Export to PDF (optional Playwright dependency; one slide per page)
-python scripts/render.py --config ./my-deck/config.yaml
-python scripts/render.py --config ./my-deck/config.yaml --recipient "Acme Corp"
-```
-
----
-
-## Verification Checklist
-
-Run through this before every build. Items 1-5 are startup gates.
-
-1. [ ] Project directory exists with `config.yaml`
-2. [ ] `context/brief.md` exists, fully completed, no placeholders
-3. [ ] `docs/ux/tokens.css` exists (shared design system) — or the deck is intentionally standalone
-4. [ ] `design/design-system.md` exists, fully completed, no placeholders
-5. [ ] `design/styles.css` defines only deck-only tokens + components (does NOT redefine the inherited base palette or semantic state tokens)
-6. [ ] Slide class name does not conflict with existing slides
-7. [ ] All colors, fonts, spacing use `var(--token)` (contract names), no raw hex; build log shows the shared `Tokens:` line
-8. [ ] `<div class="slide-number"></div>` present in every partial (slides mode; document partials carry none)
-9. [ ] Slide added to `config.yaml` in the correct position
-10. [ ] Content aligns with the brief (tone, audience, key messages)
-11. [ ] Build runs without errors
-12. [ ] Output file opens correctly in a browser
-13. [ ] Slides scale correctly on mobile viewports (baseline responsive is auto-injected by build.py) — slides mode only
-14. [ ] Every external figure on a slide has a matching key in `context/bibliography.yaml`
-
----
-
-## PDF Export (leave-behind)
-
-`render.py` renders the built single-file deck to a PDF — one slide per page at the canvas
-size, backgrounds preserved, with an optional per-recipient footer stamp
-(`--recipient "Name"` → "Prepared for Name · <date>"). It drives headless Chromium via
-Playwright (so Lucide icons and web fonts render correctly), injects its own pagination
-CSS, and writes to `<deck>/output/pdf/`.
-
-PDF export is **optional**: `render.py` checks for Playwright and **fails with an explicit
-message** if it is missing — it never auto-installs. The developer must provision Playwright
-(and its Chromium build) in their local environment first. Build the deck first (`build.py`),
-then render.
-
-```bash
-python scripts/render.py --config path/to/config.yaml --recipient "Partner Name"
-```
+**The PDF is reproducible** ([#106](https://github.com/VictorHueni/homemade-claude-kit/issues/106), ADR-0013 in the kit repository): its creation and modification dates are the deck's source date, so the same sources and the same design give the same bytes. To check that a committed PDF is current, render it again to another path (`--output`) and compare the bytes with the committed file (`cmp`, or the two SHA-256 digests): equal bytes mean current; a difference means the sources, the design or the toolchain changed since. PDFs rendered before 2.0.0 change bytes once.
 
 ## Document mode (A4 / Letter documents)
 
-`mode: document` in `config.yaml` reuses the whole pipeline (brief, design system, token cascade, partials, bibliography, `build.py`, `render.py`) to produce a **paginated print document** instead of a 16:9 deck: a user guide, a data-collection form, a handout, a one-pager. Scaffold with `init.py --mode document` (creates `output/pages/` and `output/document/`, and a `script.js` with no presentation controls).
+`mode: document` in `config.yaml` reuses the whole pipeline (brief, design, partials, bibliography, `build.py`, `render.py`) to produce a **paginated print document** instead of a 16:9 deck: a user guide, a data-collection form, a handout, a one-pager. Scaffold with `init.py --mode document` (creates `output/pages/` and `output/document/`, and a `script.js` with no presentation controls).
 
 What changes versus slides:
 
-- **Partials are flowing sections, not fixed canvases.** Each file is `<section class="doc-section">…</section>`; no `.slide` wrapper, no absolute positioning, no `.slide-number`. A `.doc-section` starts a new page by default; add `doc-section--flow` to let it follow the previous one. Use `.doc-keep` on any block that must not split across pages.
-- **Page geometry lives in one place.** The `page:` block (`size`, `orientation`, `margin`, `running_header`, `footer_left`, `numbering`) is turned into the `@page` rule by `build.py` and passed verbatim to Chromium by `render.py`, so the pagination box and the print margins can never disagree. On screen, `build.py` previews the document on a paper sheet with the same margins.
-- **Page numbers come from Chromium**, not from `.slide-number` (partial count is not page count). The header and footer are page furniture rendered in the margin boxes; design tokens cannot reach them, so they stay neutral grey mono.
+- **Partials are flowing sections, not fixed canvases.** Each file is `<section class="doc-section">…</section>`; no `.slide` wrapper, no absolute positioning. A `.doc-section` starts a new page by default; add `doc-section--flow` to let it follow the previous one. Use `.doc-keep` on any block that must not split across pages. The `doc*` classes are the design's `document` module vocabulary.
+- **Page geometry lives in one place.** The `page:` block (`size`, `orientation`, `margin`, `running_header`, `footer_left`, `numbering`) is turned into the `@page` rule by `build.py` and passed verbatim to Chromium by `render.py`. On screen, `build.py` previews the document on a paper sheet with the same margins.
+- **Page numbers come from Chromium.** The running header and the footer sit in the page-margin boxes, a separate document the validator never sees; they carry the design's resolved `--muted` and `--font-mono`, and the brand logo and legal line when the design provides them.
 - **`render.py` prints with real print media** (`@media print` applies); slides mode emulates screen media. Set `lang:` in `config.yaml` for a non-English document.
-- **Never let an inline run exceed the measure.** A single unbreakable run wider than the page (a `white-space: nowrap` code span holding a SQL statement, a long URL) makes Chromium silently scale the *whole document* down to fit; the tell is a page count that drops and body text that looks smaller than the stylesheet says. Give long inline code `overflow-wrap: anywhere`, or set it in a `pre`.
-- **Break rules in the shipped baseline** (`templates/doc.baseline.css`): headings never strand at a page foot, tables repeat their `<thead>`, rows / list items / figures do not split, orphans and widows are three lines.
+- **Never let an inline run exceed the measure.** A single unbreakable run wider than the page (a `white-space: nowrap` code span holding a SQL statement, a long URL) makes Chromium scale the *whole document* down to fit; the tell is a page count that drops and body text that looks smaller than the stylesheet says. Give long inline code `overflow-wrap: anywhere`, or set it in a `pre`.
+- **Break rules in the shipped baseline** (`templates/doc.baseline.css`): headings never strand at a page foot, tables repeat their `<thead>`, rows, list items and figures do not split, orphans and widows are three lines.
 
-Design-system rules apply unchanged: every colour, font, radius through `var()`; the deck-level `design/styles.css` defines only document-local tokens and components. In `design/design-system.md`, §4 Canvas becomes the page geometry and §10 Presentation Mode is N/A.
+The design rules apply unchanged. In `design/design-system.md`, the canvas section becomes the page geometry and the presentation-mode section is N/A.
 
-```bash
-python scripts/init.py docs/communication/documents/user-guide --mode document --name "User guide" --author "Jane"
-python scripts/build.py --config docs/communication/documents/user-guide/config.yaml
-python scripts/render.py --config docs/communication/documents/user-guide/config.yaml   # → output/pdf/document.pdf
-```
+## Verification checklist
+
+1. [ ] Project folder exists with `config.yaml`; `context/brief.md` has no placeholders.
+2. [ ] `design_source.py provenance` names the intended design (a pin, a folder, or the base theme on purpose).
+3. [ ] `design/styles.css` holds deck components only, contract roles only; no literal colour anywhere.
+4. [ ] Each partial has one root `.slide` (slides mode) and no slide number, logo or legal line of its own.
+5. [ ] Every slide is listed in `config.yaml` in order; content follows the brief.
+6. [ ] Every external figure has a key in `context/bibliography.yaml`.
+7. [ ] `build.py` exited 0 and wrote `<output>.provenance.json`.
+8. [ ] `check_render.py --record <output>.verdict.txt <output>` reads `PASS: no findings`; report it.
+9. [ ] Slides mode: the deck scales on a mobile viewport (baseline responsive CSS is injected by `build.py`).
 
 ## Dependencies
 
-- Python 3.8+
-- PyYAML (`pip install pyyaml`)
-- **Playwright** — optional, only for `render.py` PDF export:
-  `pip install playwright && python -m playwright install chromium`
+- Python 3.12 or later and PyYAML (`pip install pyyaml`).
+- **Playwright**, optional, only for `render.py`: `pip install playwright && python3 -m playwright install chromium`.

@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** 12
+**Current Increment:** 13
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -367,7 +367,7 @@ Exit criteria:
 
 ### Increment 12: Skill evals for delivery-comms
 
-**Status:** pending
+**Status:** done
 
 The unit tests prove the code; these prove that an agent using the rewritten skills follows them. The pattern is the reference design system's own `claude plugin eval` suite and its `skill-evals` Makefile target, which already works around the two WSL sandbox blockers (filtered `PATH`, temporary `HOME`).
 

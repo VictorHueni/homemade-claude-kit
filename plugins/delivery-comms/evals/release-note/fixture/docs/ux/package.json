@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@acme-test/design-system": "file:design-system"
+  }
+}

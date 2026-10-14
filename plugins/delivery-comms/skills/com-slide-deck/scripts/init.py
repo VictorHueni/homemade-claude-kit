@@ -203,10 +203,12 @@ if (typeof lucide !== 'undefined') lucide.createIcons();
     print(f"\n[DONE] Project scaffolded at: {target}")
     print(f"\nNext steps:")
     print(f"  1. Fill in  {target / 'context/brief.md'}")
-    print(f"  2. Fill in  {target / 'design/design-system.md'}")
+    print(f"  2. Note deck components (optional) in  {target / 'design/design-system.md'}")
     print(f"  3. Create {'pages' if is_doc else 'slides'} in  {target / ('output/pages/' if is_doc else 'output/slides/')}")
     print(f"  4. Build with:")
-    print(f"       python {skill_rel / 'scripts/build.py'} --config {target / 'config.yaml'}")
+    print(f"       python3 {skill_rel / 'scripts/build.py'} --config {target / 'config.yaml'}")
+    print(f"  5. Record the verdict on the built HTML:")
+    print(f"       python3 {skill_rel / 'scripts/shared/check_render.py'} --record <output>.verdict.txt <output>")
 
 
 def main():

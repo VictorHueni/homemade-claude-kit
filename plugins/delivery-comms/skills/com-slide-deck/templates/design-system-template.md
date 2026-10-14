@@ -1,19 +1,18 @@
-# Design System Definition
+# Deck Design Notes
 
-> **This document must be completed before building any slides.**
-> Every section is required. The build process and all slide authoring
-> decisions depend on the tokens, components, and rules defined here.
-> Copy this template to `design-system.md` in the same folder and fill
-> every section. Leave nothing as a placeholder.
+> The palette, typography, spacing, slide canvas, slide frame (section label,
+> logo, legal line, slide number) and fonts come from the **project's design
+> system**, resolved by `build.py` and inlined before this deck's
+> `styles.css`. This file records only what the deck adds on top: its
+> components and layout rules. A deck that uses the frame and plain text needs
+> nothing here; fill a section when the deck adds what it describes.
+> Copy this template to `design-system.md` in the same folder.
 
 ---
 
 ## 1. Design Philosophy
 
-_Describe the visual identity in 2-3 sentences. What feeling should the
-presentation convey? What principles guide layout and decoration choices?_
-
-**Name**: (give the design system a short name)
+_Describe in 2-3 sentences what this deck's layouts should convey, within the project design (whose written guidance, when it provides the `guidance` module, the provenance report names)._
 
 **Principles** (list 3-5):
 
@@ -23,148 +22,104 @@ presentation convey? What principles guide layout and decoration choices?_
 
 ---
 
-## 2. Color Tokens
+## 2. Colour Roles
 
-The deck uses the **project design system as its single source of truth**: the
-base palette and typography are defined once in `docs/ux/tokens.css` by the
-[`ux-design-system`](../../../../ux-design-system/SKILL.md) skill and inlined by
-`build.py` **before** this stylesheet. **Do NOT redefine base palette values
-here** — reference them with `var()` and adopt the contract token names. Run
-`ux-design-system scaffold` (then `generate`) if `docs/ux/tokens.css` does not
-exist yet.
+The deck's colours are the project design's **contract roles**, inlined by
+`build.py` in a `<style data-design-layer>` before `styles.css`. The design
+comes from `paths.design_tokens` in `config.yaml` (a design-system folder),
+else the `docs/ux/package.json` pin found by walking up from the deck, else
+the kit's neutral base theme. A project without a design gets one from the
+[`ux-design-system`](../../../../ux-design-system/SKILL.md) skill (`point` a
+published package, or `subset` from a `docs/ux/DESIGN.md`); a legacy
+`docs/ux/tokens.css` is refused and moves with `subset --from-legacy`.
+The full role list is the contract (`plugins/delivery-comms/contract/README.md`).
 
-### Core palette — inherited from `docs/ux/tokens.css` (do not redefine)
+**Do not define colours in `styles.css`.** The build refuses a literal colour
+outside the design layer and a custom property outside the contract (and the
+reserved `--kit-*` prefix), and writes nothing until the CSS uses roles.
 
-Use these contract names everywhere in the stylesheet and in slide partials:
+### Core roles (use, never redefine)
 
-| Token          | Usage                                          |
+| Role           | Usage                                          |
 |----------------|------------------------------------------------|
-| `--canvas-bg`  | Slide / page background                        |
+| `--canvas-bg`  | Page background                                |
 | `--surface`    | Card and cell background                       |
 | `--surface-2`  | Recessed / grouped background                  |
 | `--ink`        | Primary text                                   |
-| `--muted`      | Secondary text (descriptions, body)            |
+| `--muted`      | Secondary and tertiary text                    |
 | `--border`     | Card borders, dividers, separators             |
-| `--accent`     | Primary accent (CTAs, highlights, labels)      |
+| `--accent`     | Primary accent (highlights, labels)            |
 | `--accent-ink` | Text on accent fills                           |
+| `--success` / `--warning` / `--danger` / `--info` | State colours |
 
-### Semantic state colors — inherited from `docs/ux/tokens.css`
+Text on a filled background uses `var(--kit-on-<fill>)` (for example `var(--kit-on-success)`), which the resolver points at the text role that reaches WCAG AA on that fill. Charts use `--chart-1` to `--chart-4` (darkest first), `--chart-rest`, `--chart-axis`, `--chart-grid`, `--chart-highlight`.
 
-State colours are part of the shared contract — use them directly in partials,
-do not redefine:
+### Deck-local values (declared exceptions)
 
-| Token | Usage |
-|---|---|
-| `--success` | Positive / done |
-| `--warning` | Caution / in-progress |
-| `--danger` | Negative / error |
-| `--info` | Informational / neutral-active |
+Prefer a role (`--muted` for tertiary text, `color-mix(in srgb, var(--accent) 14%, var(--surface))` for a light accent). A value the owner wants that no role gives is declared in `config.yaml` under `design.exceptions` (`NAME: VALUE`) and listed in the provenance report:
 
-### Deck-only tokens (declared exceptions)
-
-`build.py` refuses a custom property outside the contract. Prefer a contract role (`--muted` for tertiary text, `color-mix()` of roles for a light accent). A deck-local property that must stay is declared in `config.yaml` under `design.exceptions` (for example `--dim: "var(--muted)"`) and is listed in the provenance report:
-
-| Token         | Usage                                          |
-|---------------|------------------------------------------------|
-| `--dim`       | Tertiary text (timestamps, meta, captions)     |
-| `--accent-lt` | Light accent (subtle backgrounds, hover)       |
-| _extended_    | Per-level / per-category colours for multi-column decks |
+| Name | Value | Why the design does not give it |
+|------|-------|---------------------------------|
+|      |       |                                 |
 
 ### Migration map (renaming an older deck onto the contract)
 
-| Old deck token | Contract token |
-|----------------|----------------|
+| Old deck token | Contract role |
+|----------------|---------------|
 | `--bg`         | `--canvas-bg`  |
 | `--text`       | `--ink`        |
 | `--card-bg`    | `--surface`    |
-| `--muted`      | `--muted` (unchanged) |
-| `--border`     | `--border` (unchanged) |
-| `--accent`     | `--accent` (unchanged) |
-| `--success` / `--warning` / `--danger` | `--success` / `--warning` / `--danger` (now in the contract) |
-| `--danger-lt` | derive locally, e.g. `color-mix(in srgb, var(--danger) 14%, var(--surface))` |
-| `--dim` / `--accent-lt` / extended | replace with a role, or declare under `design.exceptions` |
+| `--font-sans`  | `--font-body`  |
+| `--danger-lt`  | `color-mix(in srgb, var(--danger) 14%, var(--surface))` |
+| `--dim` / `--accent-lt` / extended | a role, or a declared exception |
 
 ---
 
 ## 3. Typography
 
-### Font Stack
+The font roles (`--font-body`, `--font-heading`, `--font-mono`), the title size and, when the design provides the `type` module, the type scale come from the design; so do the font faces (its `@font-face` rules, inlined by `build.py`; no network font link is emitted). A new typeface goes in the project design, not here.
 
-Typography tokens are inherited from `docs/ux/tokens.css` — reference them,
-do not redefine:
+### Deck type usage
 
-| Token         | Usage                              | Source            |
-|---------------|------------------------------------|-------------------|
-| `--font-body` | Body text, labels, cards | contract (inherited) |
-| `--font-heading` | Headings, badges, UI chrome | contract (inherited) |
-| `--font-mono` | Code, tags, metadata, slide numbers | contract (inherited) |
-
-If the deck needs a distinct heading face, add a **deck-only** `--font-heading`
-in this stylesheet's `:root` (defaulting to `var(--font-body)`); otherwise the
-contract's `--font-heading` covers headings and `--font-body` covers body. Set the actual font families and web-
-font loading in the project's design system (its `@font-face` rules, inlined by
-`build.py`), so they flow from the one source.
-
-### Font Loading
-
-_Specify how fonts are loaded (the design system's `@font-face` rules, or system fonts).
-Include the exact URL or @font-face declarations needed._
-
-```
-(font loading URL or method)
-```
-
-### Type Scale
-
-| Element              | Font    | Size  | Weight | Line-Height | Letter-Spacing |
-|----------------------|---------|-------|--------|-------------|----------------|
-| Hero title           | heading |       |        |             |                |
-| Content slide title  | heading |       |        |             |                |
-| Section label        | mono    |       |        |             |                |
-| Body text            | body    |       |        |             |                |
-| Card label           | body    |       |        |             |                |
-| Card sublabel / meta | mono    |       |        |             |                |
-| Slide number         | mono    |       |        |             |                |
+| Element              | Role (font)  | Size role or value | Notes |
+|----------------------|--------------|--------------------|-------|
+| Hero title           | heading      |                    |       |
+| Content slide title  | heading      |                    |       |
+| Body text            | body         |                    |       |
+| Card label           | body         |                    |       |
+| Card sublabel / meta | mono         |                    |       |
 
 ---
 
 ## 4. Canvas
 
-_Document mode (`mode: document`): replace this table with the page geometry (size, orientation, margins) from `config.yaml`'s `page:` block and the print measure (page width minus side margins)._
+The canvas is the design's slide frame: `--slide-width` by `--slide-height` (960x540 in the base theme), background `--slide-bg`. Set `canvas:` in `config.yaml` only to give this one deck another size.
 
-| Property     | Value | Notes                                  |
-|--------------|-------|----------------------------------------|
-| Width        |       | in px                                  |
-| Height       |       | in px (should produce 16:9 ratio)      |
-| Background   |       | CSS token reference                    |
-| Overflow     |       | typically `hidden`                     |
-| Positioning  |       | `relative` (children use absolute)     |
+_Document mode (`mode: document`): replace this section with the page geometry (size, orientation, margins) from `config.yaml`'s `page:` block and the print measure (page width minus side margins)._
 
 ---
 
 ## 5. Layout & Spacing
 
-### Standard Regions
+The frame places the section label (`.slide-label`, top left) and the footer row (logo, legal line, slide number, bottom). Content sits between them.
 
-_Define the typical content zones within a slide._
+### Content regions
 
 | Region               | Position                          |
 |----------------------|-----------------------------------|
-| Section label        | `top: ___; left: ___;`            |
 | Slide title          | `top: ___; left: ___;`            |
 | Content area start   | `top: ___;` (below title)         |
 | Content area padding | `left: ___; right: ___;`          |
-| Slide number         | `bottom: ___; right: ___;`        |
 
-### Spacing Scale
+### Spacing
 
-| Context                  | Value  |
-|--------------------------|--------|
-| Card gap                 |        |
-| Grid gap                 |        |
-| Section label to title   |        |
-| Title to content         |        |
-| Bottom margin (numbers)  |        |
+Use the design's spacing roles (`--space-sm`, `--space-md`, `--space-lg`, and `--space-xs`, `--space-xl` when it provides `space-shape`).
+
+| Context                  | Role or value |
+|--------------------------|---------------|
+| Card gap                 |               |
+| Grid gap                 |               |
+| Title to content         |               |
 
 ---
 
@@ -180,9 +135,7 @@ _Define the typical content zones within a slide._
 
 ### Icon Usage Rules
 
-_Define how icons are used across the deck:_
-
-- Coloring: (monochrome / colored / inherit from parent)
+- Colouring: (inherit from parent / a role)
 - Default stroke width:
 - Size ranges: (small / medium / large with px values)
 - Usage in HTML: (e.g. `<i data-lucide="name"></i>`)
@@ -192,16 +145,7 @@ _Define how icons are used across the deck:_
 
 ## 7. Reusable Atoms
 
-_Define the small, repeated building blocks. For each atom, provide
-the CSS class name, a short description, and the CSS declaration._
-
-### Section Label
-
-```css
-.section-label {
-  /* fill in */
-}
-```
+_The frame already styles `.slide`, `.slide-label`, the footer row and `.slide-source-bar`. Define here the deck's own small building blocks, with roles only._
 
 ### Slide Title
 
@@ -213,38 +157,8 @@ the CSS class name, a short description, and the CSS declaration._
 
 ### Accent Line
 
-_Horizontal bar for visual separation._
-
 ```css
 .accent-line {
-  /* fill in */
-}
-```
-
-### Accent Bar Left
-
-_Full-height left edge bar on hero slides (if used)._
-
-```css
-.accent-bar-left {
-  /* fill in */
-}
-```
-
-### Dot Grid / Decorative Element
-
-_Any decorative texture element (dots, lines, shapes). Remove if unused._
-
-```css
-.dot-grid {
-  /* fill in */
-}
-```
-
-### Slide Number
-
-```css
-.slide-number {
   /* fill in */
 }
 ```
@@ -253,9 +167,7 @@ _Any decorative texture element (dots, lines, shapes). Remove if unused._
 
 ## 8. Component Library
 
-_Define every reusable component pattern available for slide authors.
-For each component, provide: name, purpose, HTML structure, and any
-variant classes._
+_For each component: name, purpose, HTML structure, variant classes._
 
 ### Component: (Name)
 
@@ -272,10 +184,9 @@ variant classes._
 
 ---
 
-_(Copy the component block above for each component in the system.
-Common components include: info card, pain/problem card, numbered list,
-data table, flow lane, hub/satellite diagram, status card, tag/badge,
-comparison columns, timeline, maturity ring, etc.)_
+_(Copy the component block above for each component. Common components:
+info card, pain/problem card, numbered list, data table, flow lane,
+hub/satellite diagram, status card, tag/badge, comparison columns, timeline.)_
 
 ---
 
@@ -291,16 +202,13 @@ comparison columns, timeline, maturity ring, etc.)_
 
 ## 10. Presentation Mode
 
-_Define the behavior when the deck enters fullscreen/presentation mode. Document mode has none: write "N/A (document mode)" and describe the running header / footer instead._
+_Document mode has none: write "N/A (document mode)"._
 
 | Property            | Value                                    |
 |---------------------|------------------------------------------|
-| Background          |                                          |
-| Scaling method      | (e.g. `transform: scale()` proportional) |
 | Navigation keys     |                                          |
 | Enter key           |                                          |
 | Exit key            |                                          |
-| Fullscreen API      | (yes / no)                               |
 
 ---
 
@@ -309,27 +217,15 @@ _Define the behavior when the deck enters fullscreen/presentation mode. Document
 ### Do
 
 - ...
-- ...
-- ...
 
 ### Don't
 
 - ...
-- ...
-- ...
 
 ---
 
-## 12. Checklist Before Building
+## 12. Checklist
 
-Before creating any slides, confirm all of the following are true:
-
-- [ ] Every color token in section 2 has a hex value
-- [ ] Every font in section 3 has a family, fallback, and loading method
-- [ ] The type scale in section 3 is fully filled in
-- [ ] Canvas dimensions in section 4 are set
-- [ ] At least the section label, slide title, and slide number atoms are defined
-- [ ] At least one component is documented in section 8
-- [ ] Icon library is specified with CDN URL and init call
-- [ ] Presentation mode behavior is documented
-- [ ] `design/styles.css` contains the CSS implementing all tokens and atoms above
+- [ ] No colour, font family or custom property outside the contract in `styles.css`; any deck-local value is a declared exception in `config.yaml`
+- [ ] Every component in section 8 is implemented in `design/styles.css` with roles only
+- [ ] The build prints PASS and the provenance names the intended design

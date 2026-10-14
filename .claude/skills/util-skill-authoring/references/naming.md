@@ -16,7 +16,7 @@ Folder name and `name:` field follow `<category>-<artifact-singular>[-<verb>]`. 
 | `qa-` | `docs/qa/` | Tests that verify the quality requirements `spec-quality-attributes` defines (`QA-XXNN`): `qa-test-strategy` (`TS-NN`, pyramid allocation, policy only), `qa-test-scenario` (`UC-NN.SC-NN`, `TC-NN`). Reserved, no skill yet: `qa-test-plan`, `qa-acceptance-test` (execution, results, bug filing) |
 | `dev-` | none (developer workflow) | `dev-git-init`, `dev-release-init`, `dev-git-commit`, `dev-pr`, `dev-git-worktree`, `dev-stack-guide`, `dev-getting-started` |
 | `agent-` | none (agent-centric development: Guide → Verify → Solve) | `agent-config` (Guide), `agent-grill-me`, `agent-peer-review` (Verify), `agent-ralph-loop`, `agent-issue-loop` (Solve), `agent-handoff` |
-| `ux-` | `docs/ux/` (design source of truth; tokens feed `com-`) | `ux-design-system` (→ `design-system.md` + `tokens.css`) |
+| `ux-` | `docs/ux/` (design source; the resolved design themes `com-`) | `ux-design-system` (→ `package.json` pin, or `DESIGN.md` + generated `design-system/`) |
 | `com-` | `docs/communication/` | `com-slide-deck` (→ `slides/{slug}/`), `com-artefact-viz`, `com-release-note` (→ `release-notes/`) |
 | `util-` | none (housekeeping) | `util-docs-audit`, `util-docs-lint`, `util-open-items`, `util-toolkit-doctor` |
 
