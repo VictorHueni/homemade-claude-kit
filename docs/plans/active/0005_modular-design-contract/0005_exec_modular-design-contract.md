@@ -51,7 +51,7 @@ All eight questions were settled with the owner: Q-1 to Q-4 in prose, Q-5 to Q-8
 - **Q-5. Viz domain colours.** Split by meaning. Status (shipped, planned, backlog) and pain keep the `core` state roles (`--success`, `--info`, `--warning`, `--danger`, `--muted`). Importance (differentiator, necessary, commodity) and confidence (validated, tested, assumed) are ordered scales and take `--chart-1` to `--chart-3`, darkest first. Red appears only where something is wrong.
 - **Q-6. `guidance`.** Informational. The kit lists it in the provenance report and does nothing else with it; agents may read it from the package.
 - **Q-7. Contrast check.** Both: once at resolve time, so a design whose own text pairs fail AA is refused once with one message, and again at render time for the pairs a document's local exceptions touch.
-- **Q-8. Release order.** Increments 01 and 02 merge to `main`; they change no output. Increments 03 to 12 merge into a long-lived `release/2.0` branch, one PR each, and `release/2.0` merges to `main` as `delivery-comms` 2.0.0. No installed kit refuses a legacy file before `point` and `subset` exist.
+- **Q-8. Release order.** Increments 01 and 02 merge to `main`; they change no output. Increments 03 to 13 merge into a long-lived `release/2.0` branch, one PR each, and `release/2.0` merges to `main` as `delivery-comms` 2.0.0. No installed kit refuses a legacy file before `point` and `subset` exist.
 
 ## Increment Plan
 
@@ -63,7 +63,7 @@ Scope:
 
 1. **Exempt from red (characterisation):** `plugins/delivery-comms/tests/` with `unittest` cases that build one sample of each renderer with no project design and assert the HTML builds, links every CSS layer in today's order and contains the fallback accent: a deck scaffolded by `com-slide-deck/scripts/init.py` into a temporary folder, a view from `com-artefact-viz/examples/`, a release note from `com-release-note/examples/`. They pin today's behaviour before anything moves, so they pass on first run by design.
 2. `plugins/delivery-comms/Makefile` with `test` (unit, no browser; fails fast with an install hint when Python is older than 3.12 or PyYAML is missing) and `test-pdf` (the PDF renders, skipped with a clear message when Playwright or Chromium is missing).
-3. A GitHub Actions workflow on pull requests into `main` and `release/2.0` that touch `plugins/delivery-comms/`: `actions/setup-python` with 3.12, `pip install pyyaml`, then `make -C plugins/delivery-comms test`.
+3. A GitHub Actions workflow on pull requests into `main` and `release/2.0` that touch `plugins/delivery-comms/`, with two jobs: `test` (`actions/setup-python` with 3.12, `pip install pyyaml`, then `make -C plugins/delivery-comms test`) and `test-pdf` (the same setup plus `pip install playwright` and `python -m playwright install --with-deps chromium`, then `make -C plugins/delivery-comms test-pdf`). In CI a missing browser fails the `test-pdf` job instead of skipping it (`CI=true` turns the skip into an error), so a PDF regression cannot pass unseen.
 
 Primary files:
 
@@ -77,7 +77,7 @@ Test gate:
 
 Exit criteria:
 
-1. The suite runs green locally and in CI; a deliberately broken template line turns it red.
+1. The suite runs green locally and in CI, both jobs; a deliberately broken template line turns it red.
 
 ### Increment 02: Contract v2, manifest schema, one base theme and the shared sync
 
@@ -364,19 +364,53 @@ Exit criteria:
 
 1. A small project goes from a DESIGN.md, or from a legacy token file, to a validated subset the three renderers accept, without hand-written CSS.
 
-### Increment 12: Documentation and release 2.0.0
+### Increment 12: Skill evals for delivery-comms
+
+**Status:** pending
+
+The unit tests prove the code; these prove that an agent using the rewritten skills follows them. The pattern is the reference design system's own `claude plugin eval` suite and its `skill-evals` Makefile target, which already works around the two WSL sandbox blockers (filtered `PATH`, temporary `HOME`).
+
+Scope:
+
+1. **Write first, expect red:** `plugins/delivery-comms/evals/`, one folder per case with a `prompt.md`, a scratch-project fixture and `graders/`. Every grader reads a file the run leaves behind, never a `tool_used` record (a denied call still counts as used). The suite is run once against the SKILL.md files as Increment 11 leaves them (code moved, text not yet rewritten) and fails, which is the red run.
+   - `deck-pinned`: "a three-slide deck on X" in a project pinned to the `full` fixture (local folder pin). Graders: a deck HTML exists; `<output>.provenance.json` lists the design system as the source of `core`, `dataviz`, `slide-frame` and `brand`; the verdict file reads PASS; no literal colour in the deck outside the inlined design layers.
+   - `viz-from-subfolder`: "a capability map of this map" asked from `docs/strategy/` in a pinned project. Graders: the view HTML exists; its provenance names the pinned design, not the base; the verdict file reads PASS.
+   - `release-note`: "a release note for v0.3.0" from a small changelog in a pinned project. Graders: the note and its provenance exist; the verdict file reads PASS.
+   - `legacy-tokens`: "make a deck" in a project that only has `docs/ux/tokens.css`. Graders: `docs/ux/DESIGN.md` exists (from `subset --from-legacy`) with a `proposed` dataviz block left for the owner, or the run stops and asks; `docs/ux/tokens.css` is not edited; no hand-written CSS replaces the refused design.
+   - `bespoke-generator`: "write a script that builds an HTML table of these figures in our brand". Graders: the script's output passes `check_render.py`; the script obtains its CSS from `design_source.py css` (its source contains the call) and holds no literal colour.
+2. `check_render.py --record <file>` writes the verdict file the graders read (`PASS: …` or the findings), added to the shared validator with a unit test.
+3. `plugins/delivery-comms/Makefile` target `skill-evals`, copied from the reference design system's: `SKILL_EVAL_MODELS` (default `sonnet`), `SKILL_EVAL_JUDGE`, `SKILL_EVAL_MAX_COST`, each case three times with the plugin and three times without it, results in `plugins/delivery-comms/var/skill-evals/<model>/` (gitignored), `--allow-tools` limited to `Write`, `Edit` and `Bash(python3 *)`, `Bash(mkdir *)`, `Bash(cp *)`. The four SKILL.md files tell the agent to use one plain command per Bash call and write files with the Write tool, since restricted sessions deny compound commands.
+4. The four SKILL.md files rewritten to describe the resolution order, the validator, the provenance report and the legacy migration, each linking `contract/README.md`; then adjusted where a case still fails for a reason the skill text can address, each adjustment naming its case in `progress.txt`.
+
+Eval runs call models on the owner's account and cost money: the iteration agent never starts one. It prepares the suite, asks the owner, and records the owner-approved red and green runs (model, cost, per-case pass rate with and without the plugin) in `progress.txt`. `make test` does not run evals.
+
+Primary files:
+
+1. `plugins/delivery-comms/evals/`, `plugins/delivery-comms/Makefile`, `plugins/delivery-comms/shared/check_render.py`
+2. `plugins/delivery-comms/skills/*/SKILL.md`
+
+Test gate:
+
+1. `make -C plugins/delivery-comms test`
+2. `make -C plugins/delivery-comms skill-evals` (owner-approved run)
+
+Exit criteria:
+
+1. Every case passes its graders on at least two of three runs with the plugin, and the kept traces of one run per case were read and agree with the verdicts.
+
+### Increment 13: Documentation and release 2.0.0
 
 **Status:** pending
 
 Scope:
 
-1. **Exempt from red (documentation):** the four SKILL.md files describe the resolution order, the validator, the provenance report and the legacy migration; `contract/README.md` is linked from each; a five-line block for a project's `AGENTS.md` (pin file, manifest, validator command, Dependabot entry) goes in `ux-design-system/references/`.
+1. **Exempt from red (documentation):** a five-line block for a project's `AGENTS.md` (pin file, manifest, validator command, Dependabot entry) goes in `ux-design-system/references/`.
 2. Plugin version per Q-2 in `plugin.json` and the marketplace; skill `metadata.version` bumped where the skill changed.
 3. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-plugins-and-mcp.md`).
 
 Primary files:
 
-1. `plugins/delivery-comms/**/SKILL.md`, `plugins/delivery-comms/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
+1. `plugins/delivery-comms/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, skill `metadata.version` fields
 2. `plugins/delivery-comms/skills/ux-design-system/references/`
 
 Test gate:
@@ -391,8 +425,8 @@ Exit criteria:
 ## Delivery Rules
 
 1. Tests named in Scope are written first and observed failing before the implementation lands; `progress.txt` records the failing test names, then the green run. An increment whose tests were written after its code is not done.
-2. Commit scope `delivery-comms`; types: `test` (01), `feat` (02 to 09, 11), `fix` (10), `docs` (12). Trailer `Refs: Plan-0005 increment NN`.
-3. Branches per Q-8: Increments 01 and 02 open PRs into `main`; Increments 03 to 12 open PRs into `release/2.0`, cut from `main` after Increment 02 merges. `release/2.0` merges to `main` only in Increment 12, at the owner's request.
+2. Commit scope `delivery-comms`; types: `test` (01, 12), `feat` (02 to 09, 11), `fix` (10), `docs` (13). Trailer `Refs: Plan-0005 increment NN`.
+3. Branches per Q-8: Increments 01 and 02 open PRs into `main`; Increments 03 to 13 open PRs into `release/2.0`, cut from `main` after Increment 02 merges. `release/2.0` merges to `main` only in Increment 13, at the owner's request.
 4. No real client material in fixtures: the `full` fixture is a fictitious brand, not a copy of any real design system.
 5. Every increment that changes a file under `shared/` runs `sync-shared.py` in the same commit.
 6. Foreground gates only; every iteration ends with a definitive state.
@@ -405,4 +439,5 @@ Exit criteria:
 | M2: Resolve and check | 03-04 | pending | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M3: Renderers moved | 05-09 | pending | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M4: Reproducible | 10 | pending | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
-| M5: Authoring and release | 11-12 | pending | Projects can point, subset or migrate; 2.0.0 released | `make -C plugins/delivery-comms test`, `./scripts/audit-skills.sh` | 2.0.0 in the marketplace cache | `feat(delivery-comms)`, `docs(delivery-comms)` |
+| M5: Authoring | 11 | pending | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
+| M6: Agents follow the skills, release | 12-13 | pending | Agents using the rewritten skills render on-brand and migrate legacy projects; 2.0.0 released | `make -C plugins/delivery-comms test`, `make -C plugins/delivery-comms skill-evals` (owner-approved run), `./scripts/audit-skills.sh` | Every eval case passes its graders; 2.0.0 in the marketplace cache | `test(delivery-comms)`, `docs(delivery-comms)` |
