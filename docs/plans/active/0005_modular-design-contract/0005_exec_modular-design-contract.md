@@ -407,7 +407,8 @@ Scope:
 
 1. **Exempt from red (documentation):** a five-line block for a project's `AGENTS.md` (pin file, manifest, validator command, Dependabot entry) goes in `ux-design-system/references/`.
 2. Plugin version per Q-2 in `plugin.json` and the marketplace; skill `metadata.version` bumped where the skill changed.
-3. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-plugins-and-mcp.md`).
+3. The 2.0.0 release notes name the reproducible-output cutover: every delivery-comms PDF changes bytes once, and `util-provenance` tokens over earlier PDFs are superseded per [ADR-0013](../../../architecture/decisions/adr-0013-reproducible-delivery-comms-output.md).
+4. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-plugins-and-mcp.md`).
 
 Primary files:
 
