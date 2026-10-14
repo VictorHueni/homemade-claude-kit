@@ -159,22 +159,16 @@ if (typeof lucide !== 'undefined') lucide.createIcons();
 """
 
     DEFAULT_STYLES = """/*
- * Deck styles. Base palette + typography + semantic state come from the design
- * system, inlined by build.py BEFORE this file: shared/base/core.css (shipped
- * defaults) then docs/ux/tokens.css (project override, if present). Use the
- * contract token names via var() — do NOT redefine the base palette here. See
- * design/design-system.md for the full token list and the migration map.
+ * Deck styles. The palette, typography and every other design value come from the
+ * project's design system, resolved by build.py and inlined BEFORE this file: the
+ * docs/ux/package.json pin (or paths.design_tokens), else the kit's base theme.
+ * Use contract roles only, var(--ink), var(--surface), var(--accent), var(--muted),
+ * var(--font-body), var(--font-mono): build.py refuses a literal colour or a custom
+ * property outside the contract. A deliberate local value is declared in config.yaml
+ * under design.exceptions. Contract roles: plugins/delivery-comms/contract/README.md.
  */
 
-:root {
-  /* Deck-only tokens (no contract equivalent). Base palette, typography, and
-     semantic state (--success/--warning/--danger/--info) come from tokens.css. */
-  --dim:       var(--muted);           /* tertiary text; override with a dimmer value if desired */
-  --accent-lt: color-mix(in srgb, var(--accent) 14%, var(--surface));  /* subtle accent background */
-}
-
-/* Component styles go here — reference var(--ink), var(--surface), var(--accent),
-   var(--font-body), var(--font-mono), etc. Never hard-code a hex value. */
+/* Component styles go here. */
 """
 
     placeholders = [

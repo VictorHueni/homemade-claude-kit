@@ -30,7 +30,11 @@ from pathlib import Path
 import yaml  # PyYAML — already a com-slide-deck dependency
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build import page_geometry  # noqa: E402 — single source of truth for page geometry
+# Page geometry, the design and the validator come from build.py, so the PDF prints
+# exactly what the build checked.
+from build import (DesignError, RenderRefused, check_deck, page_geometry, provenance_summary,  # noqa: E402
+                   resolve_design, write_provenance)
+from design_source import role_values  # noqa: E402
 
 
 def fail(msg: str, code: int = 1) -> None:
@@ -79,7 +83,7 @@ def resolve_paths(config_path: Path, cfg: dict, recipient: str | None, output_ov
 def print_css(width: int, height: int) -> str:
     """Pagination CSS injected at render time — one slide per page, no gaps, white page."""
     return f"""
-    html, body {{ margin: 0 !important; padding: 0 !important; background: #fff !important; }}
+    html, body {{ margin: 0 !important; padding: 0 !important; background: var(--surface) !important; }}
     .controls-hint {{ display: none !important; }}
     .slide {{
         break-after: page;
@@ -105,8 +109,8 @@ _PREP_JS = """
       f.textContent = footerText;
       f.style.cssText =
         'position:absolute;bottom:9px;left:0;right:0;text-align:center;' +
-        'font-family:ui-monospace,Menlo,monospace;font-size:9px;letter-spacing:.3px;' +
-        'color:rgba(130,130,130,.95);z-index:50;pointer-events:none;';
+        'font-family:var(--font-mono);font-size:9px;letter-spacing:.3px;' +
+        'color:var(--muted);z-index:50;pointer-events:none;';
       s.appendChild(f);
     });
   }
@@ -115,10 +119,28 @@ _PREP_JS = """
 
 
 # Chromium renders header/footer templates into the page-margin boxes as a separate
-# document, so design tokens cannot reach them — inline styles and a neutral grey.
-_CHROME_STYLE = ("width:100%;padding:0 {side};font-family:ui-monospace,Menlo,monospace;"
-                 "font-size:8px;color:rgba(130,130,130,.95);display:flex;"
+# document that the deck's CSS cannot reach, so the chrome inlines the resolved values
+# of the design's --font-mono and --muted roles.
+_CHROME_STYLE = ("width:100%;padding:0 {side};font-family:{font};"
+                 "font-size:8px;color:{colour};display:flex;"
                  "justify-content:space-between;align-items:center;")
+
+
+def role_value(design, role: str) -> str:
+    """The resolved value of a contract role, following var() references within the design."""
+    values = role_values("".join(design.css.values()))
+    value = values.get(role, "")
+    for _ in range(8):
+        ref = re.fullmatch(r"var\(\s*(--[\w-]+)\s*\)", value)
+        if not ref:
+            break
+        value = values.get(ref.group(1), "")
+    return value
+
+
+def stamp_text(recipient: str | None, date: str) -> str:
+    """The per-recipient footer stamp."""
+    return f"Prepared for {recipient} · {date}" if recipient else ""
 
 
 def _fill(template: str, cfg: dict, date: str) -> str:
@@ -126,30 +148,42 @@ def _fill(template: str, cfg: dict, date: str) -> str:
                            date_label=cfg.get("date_label", "") or date, date=date)
 
 
-def render_document(cfg: dict, built_html: Path, pdf_path: Path, recipient: str | None, date: str) -> None:
-    """Paginated document: real print media, @page from the config, header/footer chrome."""
+def document_chrome(cfg: dict, date: str, recipient: str | None, design) -> tuple[str, str]:
+    """(header, footer) templates of a paginated document, styled with the design's resolved roles."""
     import html as html_mod
 
     geom = page_geometry(cfg)
     page_cfg = cfg.get("page", {}) or {}
-    side = geom["margin"]["left"]
-    style = _CHROME_STYLE.format(side=side)
+    style = _CHROME_STYLE.format(side=geom["margin"]["left"], font=role_value(design, "--font-mono") or "monospace",
+                                 colour=role_value(design, "--muted") or "inherit")
 
     running = _fill(str(page_cfg.get("running_header", "{title}")), cfg, date)
-    footer_left = _fill(str(page_cfg.get("footer_left", "{author} · {date_label}")), cfg, date)
-    if recipient:
-        footer_left = f"Prepared for {recipient} · {date}"
+    footer_left = stamp_text(recipient, date) or _fill(str(page_cfg.get("footer_left", "{author} · {date_label}")),
+                                                       cfg, date)
     numbering = bool(page_cfg.get("numbering", True))
 
-    header_tpl = (f'<div style="{style}padding-bottom:2mm;"><span>{html_mod.escape(running)}</span><span></span></div>'
-                  if running else "<span></span>")
+    header_tpl = (f'<div style="{html_mod.escape(style + "padding-bottom:2mm;")}">'
+                  f'<span>{html_mod.escape(running)}</span><span></span></div>' if running else "<span></span>")
     right = '<span><span class="pageNumber"></span> / <span class="totalPages"></span></span>' if numbering else "<span></span>"
-    footer_tpl = f'<div style="{style}"><span>{html_mod.escape(footer_left)}</span>{right}</div>'
+    footer_tpl = f'<div style="{html_mod.escape(style)}"><span>{html_mod.escape(footer_left)}</span>{right}</div>'
+    return header_tpl, footer_tpl
+
+
+def render_document(cfg: dict, built_html: Path, pdf_path: Path, recipient: str | None, date: str, design) -> None:
+    """Paginated document: real print media, @page from the config, header/footer chrome."""
+    geom = page_geometry(cfg)
+    page_cfg = cfg.get("page", {}) or {}
+    running = page_cfg.get("running_header", "{title}")
+    footer_left = page_cfg.get("footer_left", "{author} · {date_label}")
+    numbering = bool(page_cfg.get("numbering", True))
+    header_tpl, footer_tpl = document_chrome(cfg, date, recipient, design)
 
     sync_playwright = require_playwright()
     print(f"[render] Mode:   document ({geom['size']} {geom['orientation']})")
     print(f"[render] Input:  {built_html}")
     print(f"[render] Output: {pdf_path}")
+    if recipient:
+        print(f"[render] Stamp:  {stamp_text(recipient, date)}")
 
     with sync_playwright() as p:
         try:
@@ -171,12 +205,31 @@ def render_document(cfg: dict, built_html: Path, pdf_path: Path, recipient: str 
             format=geom["size"],
             landscape=geom["orientation"] == "landscape",
             print_background=True,
-            display_header_footer=bool(running or footer_left or numbering),
+            display_header_footer=bool(running or footer_left or recipient or numbering),
             header_template=header_tpl,
             footer_template=footer_tpl,
             margin=geom["margin"],
         )
         browser.close()
+
+
+def checked_design(config_path: Path, cfg: dict, built_html: Path):
+    """Resolve the design and validate the built HTML against it before anything is printed."""
+    try:
+        design = resolve_design(cfg, config_path.parent)
+        report = check_deck(built_html.read_text(encoding="utf-8"), design, cfg, built_html)
+    except (DesignError, RenderRefused) as exc:
+        fail(str(exc), exc.code)
+    print("[render] Check:  PASS")
+    return design, report
+
+
+def finish(pdf_path: Path, design, report: dict) -> Path:
+    prov_file = write_provenance(pdf_path, design)
+    size_kb = pdf_path.stat().st_size / 1024
+    print("[render] Provenance: " + provenance_summary(design, report).replace("\n", "; ") + f" ({prov_file.name})")
+    print(f"[render] DONE: {pdf_path.name} ({size_kb:.1f} KB)")
+    return pdf_path
 
 
 def render(config_path: Path, recipient: str | None, date: str, output_override: str | None) -> Path:
@@ -185,11 +238,10 @@ def render(config_path: Path, recipient: str | None, date: str, output_override:
         built_html, pdf_path = resolve_paths(config_path, cfg, recipient, output_override)
         if not built_html.exists():
             fail(f"Built document not found at {built_html}. Run build.py first.")
+        design, report = checked_design(config_path, cfg, built_html)
         pdf_path.parent.mkdir(parents=True, exist_ok=True)
-        render_document(cfg, built_html, pdf_path, recipient, date)
-        size_kb = pdf_path.stat().st_size / 1024
-        print(f"[render] DONE: {pdf_path.name} ({size_kb:.1f} KB)")
-        return pdf_path
+        render_document(cfg, built_html, pdf_path, recipient, date, design)
+        return finish(pdf_path, design, report)
     canvas = cfg.get("canvas", {})
     width = int(canvas.get("width", 1280))
     height = int(canvas.get("height", 720))
@@ -197,9 +249,10 @@ def render(config_path: Path, recipient: str | None, date: str, output_override:
     built_html, pdf_path = resolve_paths(config_path, cfg, recipient, output_override)
     if not built_html.exists():
         fail(f"Built deck not found at {built_html}. Run build.py first.")
+    design, report = checked_design(config_path, cfg, built_html)
     pdf_path.parent.mkdir(parents=True, exist_ok=True)
 
-    footer_text = f"Prepared for {recipient} · {date}" if recipient else ""
+    footer_text = stamp_text(recipient, date)
 
     sync_playwright = require_playwright()
     print(f"[render] Input:  {built_html}")
@@ -234,9 +287,7 @@ def render(config_path: Path, recipient: str | None, date: str, output_override:
         )
         browser.close()
 
-    size_kb = pdf_path.stat().st_size / 1024
-    print(f"[render] DONE: {pdf_path.name} ({size_kb:.1f} KB)")
-    return pdf_path
+    return finish(pdf_path, design, report)
 
 
 def main() -> None:

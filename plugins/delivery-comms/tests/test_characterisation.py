@@ -18,8 +18,9 @@ class SlideDeckTest(RenderCase):
         build = run(SKILLS / "com-slide-deck/scripts/build.py", "-c", "deck/config.yaml", cwd=self.tmp)
         self.assertEqual(build.returncode, 0, build.stderr)
         html = (self.tmp / "deck/output/slide-deck/presentation.html").read_text(encoding="utf-8")
-        self.assertLayersInOrder(html, [FALLBACK_MARKER, "Deck styles."])
+        self.assertLayersInOrder(html, ["<style data-design-layer>", FALLBACK_MARKER, "Deck styles."])
         self.assertIn(FALLBACK_ACCENT, html)
+        self.assertNotIn("fonts.googleapis.com", html)  # Increment 05: fonts come from the design, never a CDN
 
 
 class ArtefactVizTest(RenderCase):

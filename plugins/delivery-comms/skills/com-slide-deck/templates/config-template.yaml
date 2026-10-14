@@ -31,10 +31,20 @@ canvas:
 #   footer_left: "{author} · {date_label}"
 #   numbering: true             # "n / total" in the footer, from Chromium
 
-# Google Fonts to load
+# Fonts come from the design system (its @font-face rules are inlined, no network).
+# This Google Fonts list is used only when the design provides no fonts, and is
+# ignored with a warning when it does.
 fonts: []
 #  - family: "Inter"
 #    weights: [400, 600, 700]
+
+# Design checks. build.py refuses a literal colour or a custom property outside the
+# contract; a deliberate local value is declared here as NAME: VALUE and listed in
+# the provenance report. A NAME that is a custom property may also be declared and
+# used by the deck; a NAME that is a contract role replaces it in the contrast check.
+# design:
+#   exceptions:
+#     cover-red: "#c8102e"
 
 # External scripts loaded before slides render
 external_scripts: []
@@ -55,12 +65,11 @@ paths:
   bibliography_file: "context/bibliography.yaml"
   output_dir:        "output/slide-deck"
   output_filename:   "presentation.html"
-  # Shared design-system tokens (the `ux-design-system` skill's output). Inlined
-  # before styles.css so base palette/typography flow from the project's single
-  # source of truth. Omit to auto-detect docs/ux/tokens.css by walking up
-  # from this deck; leave unset (and have no docs/ux/tokens.css) to build
-  # the deck standalone.
-  # design_tokens:   "../../../design/tokens.css"
+  # Design system: a folder with a kit-manifest.json (for previewing an unreleased
+  # design). Omit it to use the docs/ux/package.json pin found by walking up from
+  # this deck, else the kit's base theme. A single token file such as
+  # docs/ux/tokens.css is refused: run `ux-design-system point` or `subset`.
+  # design_tokens:   "../../../design-system"
 
 # Slide numbering
 numbering:

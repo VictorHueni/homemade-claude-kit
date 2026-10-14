@@ -40,7 +40,7 @@ LITERAL = re.compile(f"{HEX}|{FUNC}")
 NAMED_RE = re.compile(r"(?<![\w#-])(?:" + "|".join(NAMED) + r")(?![\w-])", re.I)
 COLOUR_PROP = re.compile(r"color|background|border|outline|fill|stroke|shadow|accent|caret|column-rule", re.I)
 DECL = re.compile(r"([\w-]+)\s*:\s*([^;{}]*[^;{}\s])(?=\s*(?:[;}]|$))")
-CUSTOM = re.compile(r"--[\w-]+")
+CUSTOM = re.compile(r"(?<![\w-])--[\w-]+")  # not a BEM modifier such as .block--flow
 
 
 def blank(match):
@@ -114,9 +114,10 @@ class Scanner(HTMLParser):
 
     def scan(self, text, line, where, colour_attr=False):
         text = clean(text)
-        for prop in CUSTOM.findall(text):
+        for match in CUSTOM.finditer(text):
+            prop = match.group(0)
             if prop not in self.known and not prop.startswith(KIT_PREFIX):
-                at = line + text[:text.index(prop)].count("\n")
+                at = line + text[:match.start()].count("\n")
                 self.finding("unknown-property", prop, at, where,
                              f"{prop} is not a contract role or a {KIT_PREFIX}* renderer property; use a role from "
                              f"contract/modules.json, rename it {KIT_PREFIX}{prop[2:]} if the renderer owns it, or "

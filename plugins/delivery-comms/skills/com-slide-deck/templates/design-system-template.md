@@ -60,9 +60,9 @@ do not redefine:
 | `--danger` | Negative / error |
 | `--info` | Informational / neutral-active |
 
-### Deck-only tokens (define here — not in the shared sheet)
+### Deck-only tokens (declared exceptions)
 
-Tokens with no contract equivalent stay deck-local. Define them in `:root`:
+`build.py` refuses a custom property outside the contract. Prefer a contract role (`--muted` for tertiary text, `color-mix()` of roles for a light accent). A deck-local property that must stay is declared in `config.yaml` under `design.exceptions` (for example `--dim: "var(--muted)"`) and is listed in the provenance report:
 
 | Token         | Usage                                          |
 |---------------|------------------------------------------------|
@@ -82,7 +82,7 @@ Tokens with no contract equivalent stay deck-local. Define them in `:root`:
 | `--accent`     | `--accent` (unchanged) |
 | `--success` / `--warning` / `--danger` | `--success` / `--warning` / `--danger` (now in the contract) |
 | `--danger-lt` | derive locally, e.g. `color-mix(in srgb, var(--danger) 14%, var(--surface))` |
-| `--dim` / `--accent-lt` / extended | keep as deck-only tokens |
+| `--dim` / `--accent-lt` / extended | replace with a role, or declare under `design.exceptions` |
 
 ---
 

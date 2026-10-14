@@ -17,6 +17,8 @@ Usage:
 
 import argparse
 import html
+import json
+import os
 import re
 import sys
 import textwrap
@@ -29,10 +31,13 @@ except ImportError:
     print("PyYAML is required. Install it with: pip install pyyaml")
     sys.exit(1)
 
-# Shipped neutral base theme (core module) — inlined before everything so a deck
-# renders correctly with no project design system. One copy for every renderer,
-# synced from plugins/delivery-comms/shared/ by scripts/sync-shared.py.
-FALLBACK_TOKENS = Path(__file__).resolve().parent / "shared" / "base" / "core.css"
+# The design comes from the shared resolver (pinned design system, local folder or the
+# kit's base theme) and every build is checked by the shared validator. One copy for
+# every renderer, synced from plugins/delivery-comms/shared/ by scripts/sync-shared.py.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
+import check_render  # noqa: E402
+import design_source  # noqa: E402
+from design_source import DesignError  # noqa: E402
 # Structural defaults for `mode: document` (paginated A4/Letter, flowing partials).
 DOC_BASELINE = Path(__file__).resolve().parent.parent / "templates" / "doc.baseline.css"
 
@@ -60,8 +65,9 @@ def make_document_css(geom: dict) -> str:
     return (
         f"@page {{ size: {geom['size']} {geom['orientation']}; "
         f"margin: {m['top']} {m['right']} {m['bottom']} {m['left']}; }}\n"
-        f":root {{ --doc-page-width: {geom['width_mm']}mm; --doc-margin-top: {m['top']}; "
-        f"--doc-margin-right: {m['right']}; --doc-margin-bottom: {m['bottom']}; --doc-margin-left: {m['left']}; }}\n"
+        f":root {{ --kit-doc-page-width: {geom['width_mm']}mm; --kit-doc-margin-top: {m['top']}; "
+        f"--kit-doc-margin-right: {m['right']}; --kit-doc-margin-bottom: {m['bottom']}; "
+        f"--kit-doc-margin-left: {m['left']}; }}\n"
         + read_file(DOC_BASELINE)
     )
 
@@ -83,37 +89,86 @@ def read_file(path: Path) -> str:
         return f.read()
 
 
-def find_design_tokens(cfg: dict, base: Path) -> tuple:
-    """Locate the shared design-system token sheet (docs/ux/tokens.css).
+class RenderRefused(Exception):
+    """The validator found violations; nothing was written. `code` is the process exit code."""
 
-    The deck's base colour/type tokens are defined once, project-wide, by the
-    `ux-design-system` skill. Resolution order:
-      1. `paths.design_tokens` in config (relative to the config file), if set.
-      2. Auto-detect: walk up from the deck dir to a `docs/ux/tokens.css`.
-    Returns (css_text, source_path), or ("", None) when absent — the deck then
-    builds with its own styles only (fully backwards compatible).
+    def __init__(self, message, code=1):
+        super().__init__(message)
+        self.code = code
+
+
+def resolve_design(cfg: dict, base: Path) -> "design_source.Design":
+    """Resolve the deck's design with the shared resolver.
+
+    `paths.design_tokens` (relative to the config file), when set, names a design-system
+    folder with a kit-manifest.json; a single token file such as docs/ux/tokens.css is
+    refused. Unset, the resolver walks up from the deck to the docs/ux/package.json pin,
+    else the deck renders on the kit's base theme.
     """
-    configured = cfg.get("paths", {}).get("design_tokens")
+    configured = (cfg.get("paths") or {}).get("design_tokens")
+    explicit = None
     if configured:
-        p = resolve_path(base, configured)
-        if p.exists():
-            return p.read_text(encoding="utf-8"), p
-        print(f"  [WARN] Configured design_tokens not found: {p}")
-        return "", None
-    cur = base.resolve()
-    legacy = None
-    for _ in range(8):  # walk up a bounded number of parents
-        candidate = cur / "docs" / "ux" / "tokens.css"
-        if candidate.exists():
-            return candidate.read_text(encoding="utf-8"), candidate
-        if legacy is None and (cur / "docs" / "design" / "tokens.css").exists():
-            legacy = cur / "docs" / "design" / "tokens.css"
-        if cur.parent == cur:
-            break
-        cur = cur.parent
-    if legacy:  # OI-0026: design tokens moved docs/design/ -> docs/ux/ — rename the folder to re-enable shared theming
-        print(f"  [HINT] Legacy {legacy} found but no docs/ux/tokens.css — design tokens moved to docs/ux/; rename the folder.")
-    return "", None
+        explicit = resolve_path(base, configured)
+        if explicit.is_file():
+            raise DesignError("paths.design_tokens names a single token file; it must name a design-system folder "
+                              "with a kit-manifest.json.\n" + design_source._legacy_message(explicit))
+        if not explicit.is_dir():
+            raise DesignError(f"paths.design_tokens: {explicit} does not exist; name a design-system folder with a "
+                              "kit-manifest.json, or remove the key to use the docs/ux/package.json pin")
+    return design_source.resolve(base, explicit=explicit)
+
+
+def design_exceptions(cfg: dict) -> dict:
+    """The deck's declared local exceptions, `design.exceptions` in config.yaml: NAME: VALUE (or NAME=VALUE items)."""
+    declared = (cfg.get("design") or {}).get("exceptions") or {}
+    if isinstance(declared, dict):
+        return {str(k): str(v) for k, v in declared.items()}
+    out = {}
+    for item in declared:
+        name, sep, value = str(item).partition("=")
+        if not sep or not name or not value:
+            raise DesignError(f"design.exceptions: expected NAME=VALUE, got {item!r}")
+        out[name] = value
+    return out
+
+
+def check_deck(text: str, design, cfg: dict, label) -> dict:
+    """Run the shared validator on a built deck; raise RenderRefused with the findings when it fails."""
+    report = check_render.check(text, design, design_exceptions(cfg))
+    if not report["ok"]:
+        raise RenderRefused(f"the deck breaks the design ({len(report['findings'])} finding(s)); nothing was written:\n"
+                            + check_render.format_text(report, label))
+    return report
+
+
+def provenance_summary(design, report: dict) -> str:
+    prov = design.provenance
+    ident = prov["designSystem"]
+    source = ident["source"] if ident["source"] == "base" else \
+        f"{ident.get('name') or ident.get('path')}{'@' + ident['version'] if ident.get('version') else ''}"
+    lines = [f"design {source}"]
+    for origin in ("design-system", "base"):
+        mods = [m for m, o in prov["modules"].items() if o == origin]
+        if mods:
+            lines.append(f"{origin}: {', '.join(mods)}")
+    lines += [f"exception {e['name']}={e['value']}" + ("" if e["known"] else " (not in the design's vocabulary)")
+              for e in report["exceptions"]]
+    lines += [f"warning: {w}" for w in prov.get("warnings", [])]
+    return "\n".join(lines)
+
+
+def write_atomic(path: Path, text: str) -> None:
+    """Write next to the target, then rename into place, so a failed run never leaves a half-written file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def write_provenance(output: Path, design) -> Path:
+    target = output.with_name(output.name + ".provenance.json")
+    write_atomic(target, json.dumps(design.provenance, indent=2) + "\n")
+    return target
 
 
 def build_font_url(fonts: list) -> str:
@@ -204,21 +259,21 @@ def make_baseline_css(canvas_w: int, canvas_h: int) -> str:
   padding: 10px 0 6px;
   font-family: system-ui, sans-serif;
   font-size: 12px;
-  color: #888;
+  color: var(--muted);
   user-select: none;
 }}
 .controls-hint kbd {{
   display: inline-block;
   padding: 1px 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 3px;
   font-size: 11px;
-  background: #f5f5f5;
-  color: #444;
+  background: var(--surface-2);
+  color: var(--ink);
 }}
 /* ── Baseline: presentation mode ── */
 body.presenting {{
-  background: #111;
+  background: var(--ink);
   overflow: hidden;
 }}
 body.presenting .controls-hint {{ display: none; }}
@@ -234,9 +289,9 @@ body.presenting .slide.active {{
   bottom: 28px;
   left: 72px;
   right: 52px;
-  font-family: var(--font-mono, 'SF Mono', monospace);
+  font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--dim, #8C8C8C);
+  color: var(--muted);
   line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
@@ -244,15 +299,16 @@ body.presenting .slide.active {{
   pointer-events: none;
 }}
 /* ── Baseline: mobile responsive scaling ── */
+:root {{ --kit-slide-scale: 1; }}
 @media (max-width: 980px) {{
   body:not(.presenting) {{
     padding: 1rem 0;
     gap: 1rem;
   }}
   body:not(.presenting) .slide {{
-    transform: scale(var(--slide-scale, 1));
+    transform: scale(var(--kit-slide-scale));
     transform-origin: top center;
-    margin-bottom: calc({canvas_h}px * (var(--slide-scale, 1) - 1));
+    margin-bottom: calc({canvas_h}px * (var(--kit-slide-scale) - 1));
   }}
 }}
 """
@@ -265,9 +321,9 @@ def make_baseline_js(canvas_w: int) -> str:
   function setMobileScale() {{
     if (window.innerWidth < 980) {{
       var scale = (window.innerWidth - 16) / {canvas_w};
-      document.documentElement.style.setProperty('--slide-scale', scale);
+      document.documentElement.style.setProperty('--kit-slide-scale', scale);
     }} else {{
-      document.documentElement.style.removeProperty('--slide-scale');
+      document.documentElement.style.removeProperty('--kit-slide-scale');
     }}
   }}
   setMobileScale();
@@ -276,8 +332,14 @@ def make_baseline_js(canvas_w: int) -> str:
 """
 
 
-def build_head(cfg: dict) -> str:
-    font_url = build_font_url(cfg.get("fonts", []))
+def build_head(cfg: dict, design_fonts: bool = False) -> str:
+    """The document head. Fonts come from the design (inlined @font-face rules); the
+    config's `fonts:` Google Fonts link is used only when the design provides none."""
+    configured = cfg.get("fonts") or []
+    if configured and design_fonts:
+        print("  [WARN] config.yaml fonts: is ignored: the design system provides the fonts (inlined, no network)")
+        configured = []
+    font_url = build_font_url(configured)
     font_tags = ""
     if font_url:
         font_tags = textwrap.dedent(f"""\
@@ -336,8 +398,6 @@ def build(config_path: Path, output_override: str = None):
         output_file = Path(output_override).resolve()
         output_dir = output_file.parent
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     # `mode: document` swaps the fixed-canvas slide baseline for a paginated,
     # flowing document (A4 by default) — same partial/stitch model, no canvas.
     is_doc = str(cfg.get("mode", "slides")).lower() == "document"
@@ -353,8 +413,11 @@ def build(config_path: Path, output_override: str = None):
     if bibliography:
         print(f"[BUILD] Sources: {len(bibliography)} entries in bibliography")
 
+    # Design: resolved once (pin, folder or base theme); a refusal raises DesignError.
+    design = resolve_design(cfg, base)
+
     # Head
-    parts = [build_head(cfg)]
+    parts = [build_head(cfg, design_fonts=bool(design.fonts))]
 
     # Canvas dimensions (used by baseline CSS/JS)
     canvas = cfg.get("canvas", {})
@@ -370,18 +433,14 @@ def build(config_path: Path, output_override: str = None):
         baseline_css = make_baseline_css(canvas_w, canvas_h)
         baseline_js  = make_baseline_js(canvas_w)
 
-    # Styles — layered so values cascade in the right order (same model as
-    # com-artefact-viz):
-    #   1. shared/base/core.css   — shipped neutral generic contract (zero-config)
-    #   2. docs/ux/tokens.css — project override (the source of truth; wins)
-    #   3. the deck's own styles.css — deck-only tokens + components
-    #   4. baseline CSS           — structural defaults
-    fallback_css = read_file(FALLBACK_TOKENS)
-    tokens_css, tokens_src = find_design_tokens(cfg, base)
-    if tokens_src:
-        print(f"[BUILD] Tokens:  {tokens_src} (shared design system)")
+    # Styles, in cascade order:
+    #   1. the resolved design (fonts, then every module, base first and the design
+    #      system after it), marked data-design-layer: the only place literals may live
+    #   2. the deck's own styles.css (components, roles only) and the baseline CSS
+    design_layer = "\n".join(design.fonts + [c for c in design.css.values() if c])
+    parts.append("<style data-design-layer>\n" + design_layer + "\n</style>")
     css = read_file(styles_path)
-    layers = [c for c in (fallback_css, tokens_css, css, baseline_css) if c]
+    layers = [c for c in (css, baseline_css) if c]
     parts.append("<style>\n" + "\n".join(layers) + "\n</style>")
     parts.append("</head>\n<body>\n")
 
@@ -444,12 +503,16 @@ def build(config_path: Path, output_override: str = None):
 
     parts.append("</body>\n</html>\n")
 
-    # Write
+    # Check, then write: a deck that breaks the design writes nothing.
     final = "\n".join(parts)
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(final)
+    report = check_deck(final, design, cfg, output_file)
+    write_atomic(output_file, final)
+    prov_file = write_provenance(output_file, design)
 
     size_kb = output_file.stat().st_size / 1024
+    print("\n[CHECK] PASS: the deck uses only the design's roles")
+    print("[PROVENANCE] " + provenance_summary(design, report).replace("\n", "\n             "))
+    print(f"[PROVENANCE] written to {prov_file.name}")
     print(f"\n[DONE] {output_file.name} ({size_kb:.1f} KB, {total} {unit})")
 
 
@@ -468,7 +531,11 @@ def main():
         help="Override output file path",
     )
     args = parser.parse_args()
-    build(Path(args.config).resolve(), args.output)
+    try:
+        build(Path(args.config).resolve(), args.output)
+    except (DesignError, RenderRefused) as exc:
+        print(f"[BUILD] REFUSED: {exc}", file=sys.stderr)
+        sys.exit(exc.code)
 
 
 if __name__ == "__main__":
