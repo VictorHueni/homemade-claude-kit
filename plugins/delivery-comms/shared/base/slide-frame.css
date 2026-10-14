@@ -3,4 +3,78 @@
   --slide-bg: #ffffff;
   --slide-fg: #1a1f29;
   --slide-padding: 48px;
+  --slide-width: 960px;
+  --slide-height: 540px;
+}
+
+/*
+ * The frame com-slide-deck puts around every slide: the canvas, the section label a
+ * partial may carry, and the footer row build.py injects (logo, legal line, slide
+ * number at the right). Roles only. A design restyles these classes in its own
+ * slide-frame module, inlined after this file; a deck's styles.css comes after both.
+ * A frame on a dark --slide-bg sets .slide-logo to var(--brand-logo-on-dark).
+ */
+.slide {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: var(--slide-width);
+  height: var(--slide-height);
+  background: var(--slide-bg);
+  color: var(--slide-fg);
+}
+.slide-label {
+  position: absolute;
+  top: calc(var(--slide-padding) / 2);
+  left: var(--slide-padding);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.slide-footer {
+  position: absolute;
+  left: var(--slide-padding);
+  right: var(--slide-padding);
+  bottom: calc(var(--slide-padding) / 2);
+  height: 20px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  color: var(--muted);
+  pointer-events: none;
+}
+.slide-logo {
+  flex: none;
+  width: 72px;
+  height: 20px;
+  background: var(--brand-logo-on-light) left center / contain no-repeat;
+}
+.slide-legal {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.slide-number {
+  margin-left: auto;
+  flex: none;
+}
+.slide-source-bar {
+  position: absolute;
+  left: var(--slide-padding);
+  right: var(--slide-padding);
+  bottom: calc(var(--slide-padding) / 2 + 28px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
 }

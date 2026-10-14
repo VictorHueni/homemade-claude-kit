@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** 06
+**Current Increment:** 07
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -218,7 +218,7 @@ Exit criteria:
 
 ### Increment 06: com-slide-deck slide frame and brand
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -297,6 +297,7 @@ Scope:
 
 1. **Write first, expect red:** fonts come from the resolved design (no hard-coded `docs/ux/fonts/fonts.css`); with `full`, the PDF uses the `print` module (page size, margins), the logo and the legal line; `_resolve_token` reads the resolved values, so a `var()` token no longer falls back silently to defaults; `--font-report` is honoured only as a declared exception; the template has no `var()` fallback; the validator runs; `<output>.provenance.json` is written next to the HTML.
 2. `render_pdf.py` uses the resolver and the validator.
+3. The print chrome (logo as a data URI and the legal line in the Chromium page margin, with the resolved values inlined as Increment 05 does for `--muted` and `--font-mono`) lives in `shared/`, and com-slide-deck's `mode: document` uses it too, so a document deck from `full` carries the logo and the legal line (owner 2026-10-14).
 
 Primary files:
 

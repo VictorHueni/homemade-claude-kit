@@ -64,6 +64,17 @@ class ModulesTest(unittest.TestCase):
         for name in ("core", "dataviz", "brand"):
             self.assertNotIn("classes", mods[name])
 
+    def test_slide_frame_roles_and_classes(self):
+        frame = modules()["modules"]["slide-frame"]
+        self.assertEqual(set(frame["roles"]), {"--slide-bg", "--slide-fg", "--slide-padding",
+                                               "--slide-width", "--slide-height"})
+        self.assertEqual(set(frame["classes"]), {"slide", "active", "presenting", "controls-hint", "slide-source-bar",
+                                                 "slide-label", "slide-footer", "slide-logo", "slide-legal",
+                                                 "slide-number"})
+        base = css_classes((SHARED / "base/slide-frame.css").read_text(encoding="utf-8"))
+        self.assertIn("slide-footer", base)
+        self.assertLessEqual(base, set(frame["classes"]))
+
     def test_brand_roles(self):
         self.assertEqual(set(modules()["modules"]["brand"]["roles"]),
                          {"--brand-logo-on-light", "--brand-logo-on-dark", "--brand-mark", "--brand-legal"})

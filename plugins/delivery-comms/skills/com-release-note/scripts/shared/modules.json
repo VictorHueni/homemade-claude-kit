@@ -87,14 +87,21 @@
       "roles": {
         "--slide-bg": "Slide background",
         "--slide-fg": "Slide text colour",
-        "--slide-padding": "Slide inner padding"
+        "--slide-padding": "Slide inner padding: the inset of the section label and the footer row",
+        "--slide-width": "Slide canvas width, a length in px (config.yaml canvas: overrides it for one deck)",
+        "--slide-height": "Slide canvas height, a length in px (config.yaml canvas: overrides it for one deck)"
       },
       "classes": [
         "slide",
         "active",
         "presenting",
         "controls-hint",
-        "slide-source-bar"
+        "slide-source-bar",
+        "slide-label",
+        "slide-footer",
+        "slide-logo",
+        "slide-legal",
+        "slide-number"
       ]
     },
     "print": {
