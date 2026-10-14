@@ -153,6 +153,18 @@ class ScaffoldTest(UxCase):
         result = self.subset(code=2)
         self.assertIn("proposed", result.stdout + result.stderr)
 
+    def test_written_files_take_the_umask_mode_not_the_temporary_file_mode(self):
+        # an atomic write through mkstemp would leave 0600 on a file the project commits and shares
+        umask = os.umask(0o022)
+        self.addCleanup(os.umask, umask)
+        self.ds("scaffold")
+        self.ds("subset", "docs/ux/DESIGN.md")
+        self.accept_proposal()
+        self.subset()
+        for path in (self.ux / "DESIGN.md", self.ux / "package.json", self.ux / "design-system/kit-manifest.json"):
+            with self.subTest(path=path.name):
+                self.assertEqual(path.stat().st_mode & 0o777, 0o644)
+
 
 class SubsetTest(UxCase):
     def test_writes_one_css_file_per_filled_module_and_the_manifest(self):

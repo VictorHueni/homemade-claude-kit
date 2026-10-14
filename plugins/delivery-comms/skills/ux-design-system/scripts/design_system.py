@@ -109,6 +109,9 @@ def write_text(path, text):
     fd, tmp = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
         handle.write(text)
+    umask = os.umask(0)
+    os.umask(umask)
+    os.chmod(tmp, 0o666 & ~umask)   # mkstemp creates 0600; the project commits and shares these files
     os.replace(tmp, path)
 
 
