@@ -90,7 +90,7 @@ Scope:
    - (b) the class modules (`document`, `slide-frame`, `print`) list a `classes` vocabulary, and every class the three renderers' templates emit for those concerns is in it;
    - (c) `brand` lists `--brand-logo-on-light`, `--brand-logo-on-dark`, `--brand-mark` (CSS strings naming a package export path) and `--brand-legal` (a CSS string);
    - (d) `pairs` lists the text pairs the contrast check uses (`fg`, `bg`, `use`), each naming existing roles;
-   - (e) the manifest checker accepts the three fixture manifests (full, subset, minimal) as structurally valid and rejects one missing `dataviz`, one with an unknown module, one with a non-SemVer `contractVersion` and one with an unknown key; the schema file uses only the keywords the checker implements;
+   - (e) the manifest checker accepts the full and subset fixture manifests and rejects `minimal-invalid` (missing `dataviz`), one with an unknown module, one with a non-SemVer `contractVersion` and one with an unknown key; the schema file uses only the keywords the checker implements;
    - (f) `shared/base/` defines every role of every module;
    - (g) after `scripts/sync-shared.py`, every skill's copy of `shared/` is byte-identical to the canonical one;
    - (h) the three skills no longer carry their own `tokens.fallback.css`, and their output is unchanged against the Increment 01 characterisation apart from `--font-heading`.
