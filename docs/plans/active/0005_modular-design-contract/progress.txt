@@ -38,3 +38,14 @@ Owner request after reviewing how the kit change will be tested:
 - Learnings: Deviations from the plan text. (1) Scope (e) says the checker accepts "full, subset, minimal" but the fixture `minimal-invalid/` is core only and must be rejected for the missing dataviz; the test accepts full and subset and rejects minimal-invalid. (2) The characterisation marker became "core.css — shipped neutral defaults" because the fallback files are gone; every other asserted layer and the fallback accent are unchanged. (3) Renderers still read only shared/base/core.css; the other eight base modules exist and are tested but the resolver (Increment 03) is what loads them, so no output changed apart from --font-heading on the deck and release note and the dropped --font-sans alias. (4) sync-shared.py also copies contract/modules.json and kit-manifest.schema.json into each skill's scripts/shared/ so the resolver can read them self-contained; it covers the three renderers, not ux-design-system (Increment 11). (5) Class vocabularies and the pair list are first drafts derived from today's templates.
 - Commit: see git log (feat(delivery-comms): contract v2, manifest schema, one base theme and the shared sync)
 - Timestamp: 2026-10-14
+
+## Iteration 3
+- Increment: 03 — Shared design resolver
+- Status: done
+- Files changed: plugins/delivery-comms/{shared/design_source.py, Makefile, tests/test_resolver.py, tests/fixtures/design-systems/full/{fonts/acme.woff2,css/type.css,package.json}}, the three skills' scripts/shared/ copies, plan status
+- Red: tests/test_resolver.py failed to import (ModuleNotFoundError: design_source), so none of its 32 tests could run.
+- Green: make test (50 tests, 32 new) passes.
+- Test gate: passed (make -C plugins/delivery-comms test; ./scripts/audit-skills.sh; sync-shared.py --check)
+- Learnings: (1) The base theme's own accent pairs fail AA (--accent-ink on --accent and --accent on --surface are 4.44, #3b6ef5 on white). Changing the base would change output Increment 01 pins, so the resolve-time contrast check (Q-7) runs only when a design-system package is in use; a base-only render skips it. Owner decision needed: darken the base accent, or leave it. (2) Added an @font-face and a font file to the `full` fixture so the font inlining is tested. (3) Resolver CLI has `css`, `fonts` and `provenance` subcommands; `--module` lists modules in the order given. (4) All refusals use exit code 2. (5) design_source.py finds modules.json and the schema beside itself in a skill copy, else under contract/. (6) Brand values are read from the raw CSS before inlining, since a data URI contains `;`.
+- Commit: see git log (feat(delivery-comms): shared design resolver)
+- Timestamp: 2026-10-14

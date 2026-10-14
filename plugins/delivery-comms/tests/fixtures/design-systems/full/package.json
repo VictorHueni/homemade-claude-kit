@@ -6,6 +6,7 @@
     "./dataviz.css": "./css/dataviz.css",
     "./css/*": "./css/*",
     "./brand/*": "./brand/*",
-    "./guidance/*": "./guidance/*"
+    "./guidance/*": "./guidance/*",
+    "./fonts/*": "./fonts/*"
   }
 }
