@@ -48,7 +48,7 @@ placeholders; keep it short.*
 | `--surface` | `#ffffff` | Card / panel background |
 | `--surface-2` | `#eef1f5` | Recessed / group background |
 | `--border` | `#d7dce3` | Hairlines, dividers |
-| `--accent` | `#3b6ef5` | Primary action, links, IDs |
+| `--accent` | `#396cf5` | Primary action, links, IDs |
 | `--accent-ink` | `#ffffff` | Text on accent fills |
 
 ### Semantic state (generic — portable)
@@ -62,7 +62,7 @@ onto these in its own stylesheet), so a project only ever themes these four.
 | `--success` | `#2e9e5b` | Positive / done / validated |
 | `--warning` | `#f0ad4e` | Caution / in-progress / tested |
 | `--danger` | `#d9534f` | Negative / error / critical |
-| `--info` | `#3b6ef5` | Informational / planned / neutral-active |
+| `--info` | `#396cf5` | Informational / planned / neutral-active |
 
 ### Typography
 

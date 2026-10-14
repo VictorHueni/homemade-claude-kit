@@ -14,7 +14,7 @@ in `SKILL.md` and `parsing-contract.md`.
    names and `var(--token)` references only — never a literal colour, font,
    radius, or shadow. The default token sheet is deliberately neutral so a
    project's `--design-system` sheet themes every view by overriding `:root`.
-   A renderer that hard-codes `#3b6ef5` is a bug.
+   A renderer that hard-codes `#396cf5` is a bug.
 
 3. **One self-contained file.** All CSS and JS are inlined. No build step at
    view-time, no network fetch, no runtime dependency. The output is shareable

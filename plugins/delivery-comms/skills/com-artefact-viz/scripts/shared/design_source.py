@@ -339,7 +339,7 @@ def resolve(start_dir, explicit=None):
             text += "\n" + own
         css[module] = text
 
-    bad = failing_pairs("".join(css.values()), contract["pairs"]) if root is not None else []
+    bad = failing_pairs("".join(css.values()), contract["pairs"])
     if bad:
         lines = [f"  {fg} on {bg} ({use}): contrast {ratio:.2f}, below WCAG AA {AA}" for fg, bg, use, ratio in bad]
         raise DesignError("the design's own text pairs fail WCAG AA:\n" + "\n".join(lines))

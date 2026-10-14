@@ -110,7 +110,7 @@ generics (see `references/token-contract.md`), so a project themes four portable
 names instead of kit jargon.
 
 **Discipline:** renderers reference `var(--token)` only — never a literal
-colour, font, or radius. A renderer that hard-codes `#3b6ef5` is a bug. That
+colour, font, or radius. A renderer that hard-codes `#396cf5` is a bug. That
 contract is what makes the design system the single lever for re-theming.
 
 ---

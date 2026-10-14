@@ -299,12 +299,17 @@ class ManifestTest(ResolverCase):
         self.assertIn("--surface", message)
         self.assertRegex(message, r"\d+\.\d+")
 
+    def test_base_theme_passes_its_own_pairs(self):
+        contract = design_source._contract()
+        css = "".join(design_source._base_css(module) for module in contract["modules"])
+        self.assertEqual(design_source.failing_pairs(css, contract["pairs"]), [])
+
 
 class AssemblyTest(ResolverCase):
     def test_package_modules_come_after_base_so_the_package_wins(self):
         design = design_source.resolve(self.project, explicit=FIXTURES / "full")
         css = design.css["core"]
-        self.assertLess(css.index("#3b6ef5"), css.index("#0e7090"))  # base accent, then the package accent
+        self.assertLess(css.index("#396cf5"), css.index("#0e7090"))  # base accent, then the package accent
 
     def test_subset_takes_omitted_modules_from_the_base(self):
         design = design_source.resolve(self.project, explicit=FIXTURES / "subset")
@@ -368,7 +373,7 @@ class CliTest(ResolverCase):
     def test_base_render_without_any_design(self):
         proc = self.cli("css", "--module", "core", "--from", self.project)
         self.assertEqual(proc.returncode, 0, proc.stderr)
-        self.assertIn("#3b6ef5", proc.stdout)
+        self.assertIn("#396cf5", proc.stdout)
 
 
 if __name__ == "__main__":
