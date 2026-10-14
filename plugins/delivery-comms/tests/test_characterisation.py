@@ -8,7 +8,7 @@ import unittest
 
 from helpers import FALLBACK_ACCENT, SKILLS, RenderCase, run
 
-FALLBACK_MARKER = "tokens.fallback.css — shipped neutral defaults"
+FALLBACK_MARKER = "core.css — shipped neutral defaults"
 
 
 class SlideDeckTest(RenderCase):

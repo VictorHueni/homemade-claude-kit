@@ -1,0 +1,7 @@
+{
+  "name": "@acme-test/design-minimal",
+  "version": "1.0.0",
+  "exports": {
+    "./core.css": "./css/core.css"
+  }
+}

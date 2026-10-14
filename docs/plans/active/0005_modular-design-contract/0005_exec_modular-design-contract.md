@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** --
+**Current Increment:** 03
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -81,7 +81,7 @@ Exit criteria:
 
 ### Increment 02: Contract v2, manifest schema, one base theme and the shared sync
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -435,7 +435,7 @@ Exit criteria:
 
 | Milestone | Increments | Status | Coherent Outcome | Standalone Test Gate | Exit Criteria | Commit Guidance |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| M1: Contract on main | 01-02 | in-progress | Test lane, contract 2.0.0, one synced base theme; no output change | `make -C plugins/delivery-comms test` | Characterisation green; fallback copies gone | `test(delivery-comms)`, `feat(delivery-comms)` |
+| M1: Contract on main | 01-02 | done | Test lane, contract 2.0.0, one synced base theme; no output change | `make -C plugins/delivery-comms test` | Characterisation green; fallback copies gone | `test(delivery-comms)`, `feat(delivery-comms)` |
 | M2: Resolve and check | 03-04 | pending | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M3: Renderers moved | 05-09 | pending | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M4: Reproducible | 10 | pending | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |

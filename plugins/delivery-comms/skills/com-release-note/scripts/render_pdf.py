@@ -5,8 +5,8 @@ Reads the committed release-note Markdown (the single source of truth), parses
 its deterministic template structure, and emits:
 
   * a self-contained A4-print-styled HTML file (always), themed by the same
-    token cascade as com-slide-deck / com-artefact-viz — ``templates/
-    tokens.fallback.css`` first, then the project's ``docs/ux/tokens.css``
+    token cascade as com-slide-deck / com-artefact-viz — ``scripts/shared/
+    base/core.css`` first, then the project's ``docs/ux/tokens.css``
     (auto-detected, or ``--design-system PATH``), project values winning.
     ``tokens.css`` only ever carries font *names* (``--font-body``); if the
     project also self-hosts real font files under ``docs/ux/fonts/fonts.css``
@@ -553,7 +553,7 @@ def render_content(model: dict, release_url: str, note_label: str, today: str, g
 
 def _design_system_css(explicit: str | None) -> str:
     """Same token layering as com-slide-deck / com-artefact-viz: fallback, then project (wins)."""
-    css = (_TEMPLATE_DIR / "tokens.fallback.css").read_text(encoding="utf-8")
+    css = (Path(__file__).resolve().parent / "shared" / "base" / "core.css").read_text(encoding="utf-8")
     sheet = Path(explicit) if explicit else Path("docs/ux/tokens.css")
     if explicit and not sheet.is_file():
         _fail(f"--design-system not found: {sheet}")

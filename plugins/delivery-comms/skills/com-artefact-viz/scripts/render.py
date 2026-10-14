@@ -134,11 +134,11 @@ def _emit(model, rendered, kind, args, source_label):
     # Design system: defaults first, then the project sheet (project tokens win).
     # Resolution order for the project sheet:
     # Token layering (same model as com-slide-deck):
-    #   1. tokens.fallback.css   — shipped neutral generic contract (zero-config)
+    #   1. shared/base/core.css  — shipped neutral generic contract (zero-config)
     #   2. docs/ux/tokens.css — project override (explicit --design-system, or
     #                                auto-detected; project values win)
     #   3. tokens.domain.css     — viz domain tokens derived from the generics
-    ds = _read(os.path.join(TEMPLATE_DIR, "tokens.fallback.css"))
+    ds = _read(os.path.join(HERE, "shared", "base", "core.css"))
     project_sheet = args.design_system
     if not project_sheet:
         shared = os.path.join("docs", "ux", "tokens.css")

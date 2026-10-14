@@ -1,0 +1,12 @@
+{
+  "contractVersion": "2.0.0",
+  "provides": {
+    "core": "./core.css",
+    "dataviz": "./dataviz.css"
+  },
+  "omitted": {
+    "brand": "no logo yet",
+    "type": "body font only",
+    "guidance": "no written guidelines"
+  }
+}

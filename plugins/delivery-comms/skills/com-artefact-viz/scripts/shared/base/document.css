@@ -1,0 +1,6 @@
+/* document.css — neutral defaults for the `document` module (paginated documents). */
+:root {
+  --doc-page-bg: #ffffff;
+  --doc-text-size: 11pt;
+  --doc-rule: #d7dce3;
+}

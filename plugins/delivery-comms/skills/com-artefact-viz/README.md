@@ -65,12 +65,12 @@ com-artefact-viz/
   README.md                    This file
   templates/
     base.html.tmpl             Shell with {{slots}}
-    tokens.fallback.css        Shipped generic contract defaults (zero-config; project sheet overrides)
     tokens.domain.css          Domain tokens derived from the generics (status/pain/confidence/importance)
     runtime.js                 Vanilla JS: collapse, orientation, disclosure
   scripts/
     render.py                  CLI entrypoint (parse -> render -> write)
     parsers.py                 Canonical Markdown -> model (one per kind)
+    shared/                    Base theme + contract, synced from plugins/delivery-comms/shared/ (do not edit here)
     renderers.py               Model -> HTML fragment + view CSS (one per kind)
     dev_server.py              Watch + serve live preview
   references/

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/VictorHueni/homemade-claude-kit/plugins/delivery-comms/contract/kit-manifest.schema.json#2.0.0",
+  "title": "delivery-comms design-system manifest (contract 2.0.0)",
+  "type": "object",
+  "properties": {
+    "contractVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "provides": {
+      "type": "object",
+      "properties": {
+        "core": {
+          "type": "string"
+        },
+        "dataviz": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "space-shape": {
+          "type": "string"
+        },
+        "document": {
+          "type": "string"
+        },
+        "slide-frame": {
+          "type": "string"
+        },
+        "print": {
+          "type": "string"
+        },
+        "brand": {
+          "type": "string"
+        },
+        "guidance": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "core",
+        "dataviz"
+      ],
+      "additionalProperties": false
+    },
+    "omitted": {
+      "type": "object",
+      "properties": {
+        "core": {
+          "type": "string"
+        },
+        "dataviz": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "space-shape": {
+          "type": "string"
+        },
+        "document": {
+          "type": "string"
+        },
+        "slide-frame": {
+          "type": "string"
+        },
+        "print": {
+          "type": "string"
+        },
+        "brand": {
+          "type": "string"
+        },
+        "guidance": {
+          "type": "string"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "exceptions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "contractVersion",
+    "provides"
+  ],
+  "additionalProperties": false
+}

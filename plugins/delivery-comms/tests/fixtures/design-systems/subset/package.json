@@ -1,0 +1,8 @@
+{
+  "name": "@acme-test/design-subset",
+  "version": "1.0.0",
+  "exports": {
+    "./core.css": "./css/core.css",
+    "./dataviz.css": "./css/dataviz.css"
+  }
+}
