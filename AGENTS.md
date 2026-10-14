@@ -16,7 +16,7 @@ These guidelines are working if: fewer unnecessary changes in diffs, clarifying 
 
 ## Project
 
-`homemade-claude-kit` is a personal, **harness-agnostic** skill/plugin toolkit — 60 skills across 11 toggleable plugin sets (strategic-architecture docs, developer workflow, agent-execution) — authored once and installed natively into Claude Code, Codex, and OpenCode by `install.sh`, or consumed as a Claude Code marketplace (`.claude-plugin/marketplace.json`). The north star is [`docs/VISION.md`](docs/VISION.md): one authored capability, run everywhere from a single source of truth. The repo also dogfoods its own governance system: its backlog runs on the `github` open-items backend (see Domain context below).
+`homemade-claude-kit` is a personal, **harness-agnostic** skill/plugin toolkit — 61 skills across 11 toggleable plugin sets (strategic-architecture docs, developer workflow, agent-execution) — authored once and installed natively into Claude Code, Codex, and OpenCode by `install.sh`, or consumed as a Claude Code marketplace (`.claude-plugin/marketplace.json`). The north star is [`docs/VISION.md`](docs/VISION.md): one authored capability, run everywhere from a single source of truth. The repo also dogfoods its own governance system: its backlog runs on the `github` open-items backend (see Domain context below).
 
 **Stack:** Bash (`install.sh`, `scripts/`) · Python 3 stdlib (skill helper scripts under `plugins/*/skills/*/scripts/`; PyYAML available system-side for YAML validation) · YAML (skill frontmatter, GitHub Actions, `marketplace.json`) · Markdown (skills, docs, rules).
 **Package manager:** none — no npm/pip project; every script is a direct interpreter invocation.
@@ -46,9 +46,16 @@ Before doing any documentation work: read `docs/index.md` to know which steps ar
 ./install.sh --verbose                      # per-item actions
 ./install.sh /path/to/project               # install into one project instead of user-global
 ./install.sh --claude-channel marketplace   # serve Claude via /plugin; prune ~/.claude symlinks (ADR-0006 §3)
+./install.sh --personal-rules on            # also install rules/personal/ (owner machines; remembered in var/)
 
-# Regenerate per-plugin .mcp.json after editing mcp/registry.json (not run by install.sh)
+# Regenerate per-plugin .mcp.json after editing mcp/registry.json (not run by install.sh);
+# refuses an enabled npx server without an exact version
 python3 scripts/gen-mcp.py plugins .
+
+# Checks; .githooks/pre-commit runs each one when the commit touches what it covers
+python3 scripts/check-rules.py          # rule budgets: 3k per always-on rule, 6k total, 4k path-scoped
+python3 -B scripts/test-hooks.py        # kit-core hook tables
+bash scripts/test-install-rules.sh      # installer rule handling, against a throwaway kit
 
 # Audit skill naming, frontmatter validity, length constraints (closest thing to a linter)
 ./scripts/audit-skills.sh
@@ -64,7 +71,7 @@ for skill in plugins/*/skills/*/; do
 done
 ```
 
-No compiled build step and no automated test suite — this is a documentation + skill-definition repo. "Done" means: `audit-skills.sh` is clean, every touched YAML parses, and `install.sh` symlinks without error.
+No compiled build step — this is a documentation + skill-definition repo. "Done" means: the checks above that cover what you touched pass (the pre-commit hook runs them), every touched YAML parses, and `install.sh` symlinks without error.
 
 ---
 

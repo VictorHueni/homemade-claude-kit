@@ -10,7 +10,7 @@
         "command": "npx",
         "args": [
           "-y",
-          "chrome-devtools-mcp@latest",
+          "chrome-devtools-mcp@1.6.0",
           "--headless",
           "--isolated",
           "--executablePath",
@@ -28,7 +28,7 @@
         "command": "npx",
         "args": [
           "-y",
-          "@upstash/context7-mcp"
+          "@upstash/context7-mcp@3.2.5"
         ]
       },
       "notes": "Live version-pinned library docs; no CLI equivalent. Used by dev-stack-guide and framework work."
@@ -42,7 +42,7 @@
         "command": "npx",
         "args": [
           "-y",
-          "@playwright/mcp@latest"
+          "@playwright/mcp@0.0.78"
         ]
       },
       "notes": "Official Microsoft server. Verifies com-slide-deck / com-artefact-viz HTML output. Demotion candidate if browser-server overlap with chrome-devtools ever bites."
