@@ -4,9 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{TITLE}}</title>
+<style data-design-layer>
+/* ===== 1. The resolved design: font faces, then the core and dataviz modules (contract roles) ===== */
+{{DESIGN_LAYER}}
+</style>
 <style>
-/* ===== 1. Design CSS (contract roles), then the viz domain colours (--kit-*) ===== */
-{{DESIGN_SYSTEM_CSS}}
+/* ===== 1b. The viz domain colours (--kit-* on contract roles) ===== */
+{{DOMAIN_CSS}}
 
 /* ===== 2. Baseline layout (contract roles and --kit-* only; never hard-codes colour) ===== */
 /* Views are dashboard-density surfaces: the title reads the renderer's own

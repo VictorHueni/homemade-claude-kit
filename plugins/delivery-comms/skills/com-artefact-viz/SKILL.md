@@ -81,8 +81,8 @@ worked multi-file fixture lives in `examples/service-blueprint/`.
 | Render an artefact (auto-detect kind) | `python scripts/render.py docs/business/03a-capability-map.md` |
 | Force the kind | `python scripts/render.py SRC.md --kind fbs` |
 | Compose a service blueprint | `python scripts/render.py --kind service-blueprint --proc PROC.md --value-stream VS.md --personas PERSONAS/` |
-| Theme from the shared design system | automatic — `docs/ux/tokens.css` (from the `ux-design-system` skill) is auto-detected |
-| Theme with a specific sheet | `python scripts/render.py SRC.md --design-system path/to/styles.css` |
+| Theme from the shared design system | automatic: the `docs/ux/package.json` pin is found by walking up from the working directory, else the kit base theme; a legacy `docs/ux/tokens.css` is refused |
+| Theme with a specific design system | `python scripts/render.py SRC.md --design-system path/to/design-system/` (a folder with a `kit-manifest.json`; a single stylesheet is refused) |
 | Override the capability/FBS left-axis label | `python scripts/render.py SRC.md --left-axis-label "Customer Journey" --left-axis-arrow "→"` |
 | Choose the output path | `python scripts/render.py SRC.md --out docs/communication/visualisations/capability-map.html` |
 | Just print the detected kind | `python scripts/render.py SRC.md --detect` |

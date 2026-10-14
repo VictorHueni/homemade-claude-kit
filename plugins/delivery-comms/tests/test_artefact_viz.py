@@ -1,10 +1,16 @@
-"""com-artefact-viz domain colours on contract roles (Plan-0005 increment 07).
+"""com-artefact-viz domain colours on contract roles (Plan-0005 increment 07), on the resolver and the
+validator (increment 08).
 
 Owner ruling Q-5: status and pain keep the core state roles; importance and
 confidence are ordered scales on --chart-1 to --chart-3, darkest first. Every
 colour a view draws traces to a contract role through one --kit-* property.
 """
+import datetime
+import json
+import os
 import re
+import shutil
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -23,6 +29,8 @@ DOMAIN = VIZ / "templates/tokens.domain.css"
 TEMPLATE = VIZ / "templates/base.html.tmpl"
 RENDERERS = VIZ / "scripts/renderers.py"
 EXAMPLES = VIZ / "examples"
+DESIGNS = PLUGIN / "tests/fixtures/design-systems"
+SB = EXAMPLES / "service-blueprint"
 ROLES = {role for module in design_source._contract()["modules"].values() for role in module["roles"]}
 DOMAIN_MARKER = "/* ---- viz domain tokens (derived) ---- */"
 KIT_ON = "--kit-on-"
@@ -91,26 +99,35 @@ class DomainTokensTest(unittest.TestCase):
                 self.assertEqual(stray, set())
 
 
-class RenderedViewsTest(RenderCase):
-    """The views as render.py writes them today (base theme; the resolver arrives in Increment 08)."""
+def source_args(kind):
+    if kind == "service-blueprint":
+        return ("--proc", SB / "process-slot-rebooking.md", "--value-stream", SB / "value-stream.md",
+                "--personas", SB / "personas.md")
+    return (EXAMPLES / f"{kind}.sample.md",)
 
-    def render(self, kind):
+
+def split(html):
+    """(the design layer render.py marked, everything the renderer wrote around it)."""
+    open_tag = "<style data-design-layer>"
+    start = html.index(open_tag) + len(open_tag)
+    end = html.index("</style>", start)
+    return html[start:end], html[:start - len(open_tag)] + html[end + len("</style>"):]
+
+
+class ViewCase(RenderCase):
+    """Renders an example view into the temporary folder."""
+
+    def render(self, kind, *extra, cwd=None, env=None):
         out = f"out/{kind}.html"
-        if kind == "service-blueprint":
-            sb = EXAMPLES / "service-blueprint"
-            result = run(RENDER, "--proc", sb / "process-slot-rebooking.md", "--value-stream", sb / "value-stream.md",
-                         "--personas", sb / "personas.md", "--out", out, cwd=self.tmp)
-        else:
-            result = run(RENDER, EXAMPLES / f"{kind}.sample.md", "--out", out, cwd=self.tmp)
+        result = run(RENDER, *source_args(kind), *extra, "--out", out, cwd=cwd or self.tmp, env=env)
         self.assertEqual(result.returncode, 0, result.stderr)
-        return (self.tmp / out).read_text(encoding="utf-8")
+        return ((cwd or self.tmp) / out).read_text(encoding="utf-8")
 
-    @staticmethod
-    def split(html):
-        """(inlined design CSS, everything the renderer wrote around it)."""
-        start = html.index("<style>") + len("<style>")
-        end = html.index(DOMAIN_MARKER)
-        return html[start:end], html[:start] + html[end:]
+    split = staticmethod(split)
+
+
+class RenderedViewsTest(ViewCase):
+    """The views as render.py writes them on the base theme."""
 
     def test_every_colour_traces_to_a_role_through_one_kit_property(self):
         for kind, paints in PAINTS.items():
@@ -143,11 +160,7 @@ class RenderedViewsTest(RenderCase):
         base = design_source.resolve(self.tmp)
         for kind in PAINTS:
             with self.subTest(kind=kind):
-                html = self.render(kind)
-                design, rest = self.split(html)
-                # Increment 08 makes render.py mark the design layer; here the test marks it.
-                marked = rest.replace("<style>", f"<style data-design-layer>{design}</style>\n<style>", 1)
-                report = check_render.check(marked, base)
+                report = check_render.check(self.render(kind), base)
                 self.assertEqual(report["findings"], [])
 
     def test_text_on_every_filled_badge_is_the_role_the_resolver_picked(self):
@@ -191,18 +204,158 @@ class RenderedViewsTest(RenderCase):
             "--muted": "--accent-ink", "--chart-1": "--accent-ink", "--chart-2": "--accent-ink", "--chart-3": "--ink"})
 
     def test_dark_state_fills_meant_for_white_text_get_white_badge_text(self):
-        sheet = self.tmp / "tokens.css"
-        sheet.write_text(":root { --ink: #1a1a1a; --accent-ink: #ffffff; --success: #2e7d32; --warning: #a06400;\n"
-                         "  --danger: #d8232a; --info: #1565c0; --muted: #555555; }\n", encoding="utf-8")
-        out = "out/roadmap.html"
-        result = run(RENDER, EXAMPLES / "delivery-roadmap.sample.md", "--design-system", sheet, "--out", out, cwd=self.tmp)
-        self.assertEqual(result.returncode, 0, result.stderr)
-        design, rest = self.split((self.tmp / out).read_text(encoding="utf-8"))
+        # a design-system folder (subset fixture copied) whose state fills are dark, meant for white text
+        dark = self.tmp / "dark-fills"
+        shutil.copytree(DESIGNS / "subset", dark)
+        core = dark / "css" / "core.css"
+        text = core.read_text(encoding="utf-8")
+        for role, value in (("--ink", "#1a1a1a"), ("--accent-ink", "#ffffff"), ("--success", "#2e7d32"),
+                            ("--warning", "#a06400"), ("--danger", "#d8232a"), ("--info", "#1565c0"),
+                            ("--muted", "#555555")):
+            text = re.sub(re.escape(role) + r":\s*#[0-9a-fA-F]+", f"{role}: {value}", text)
+        core.write_text(text, encoding="utf-8")
+        design, rest = self.split(self.render("delivery-roadmap", "--design-system", dark))
         decls = declarations(design)
         for fill in ("--success", "--info", "--warning", "--danger", "--muted"):
             self.assertEqual(decls[KIT_ON + fill[2:]], "var(--accent-ink)", fill)
         self.assertRegex(rest, r"\.epic-chip\.st--shipped\s*\{[^}]*color:\s*var\(--kit-on-success\)")
 
+
+class ResolvedViewsTest(ViewCase):
+    """Increment 08: every view resolves its design (folder, pin or base) and passes the validator."""
+
+    DESIGN_ARGS = {"full": ("--design-system", DESIGNS / "full"),
+                   "subset": ("--design-system", DESIGNS / "subset"), "base": ()}
+
+    def refused(self, *extra, cwd=None, code=2):
+        out = (cwd or self.tmp) / "out/roadmap.html"
+        result = run(RENDER, *source_args("delivery-roadmap"), *extra, "--out", out, cwd=cwd or self.tmp)
+        self.assertEqual(result.returncode, code, result.stdout + result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertFalse(out.exists(), "a refused render wrote its output")
+        self.assertFalse(out.with_name(out.name + ".provenance.json").exists())
+        return result.stderr
+
+    def test_every_kind_renders_and_passes_on_full_subset_and_base(self):
+        for name, extra in self.DESIGN_ARGS.items():
+            design = design_source.resolve(self.tmp, explicit=DESIGNS / name if extra else None)
+            for kind in PAINTS:
+                with self.subTest(design=name, kind=kind):
+                    html = self.render(kind, *extra)
+                    self.assertIn("<style data-design-layer>", html)
+                    self.assertEqual(check_render.check(html, design)["findings"], [])
+                    prov = json.loads((self.tmp / f"out/{kind}.html.provenance.json").read_text(encoding="utf-8"))
+                    self.assertEqual(prov["designSystem"]["source"], "path" if extra else "base")
+                    self.assertEqual(prov["modules"]["dataviz"], "design-system" if extra else "base")
+
+    def test_full_embeds_the_package_fonts(self):
+        design, _ = self.split(self.render("capability-map", *self.DESIGN_ARGS["full"]))
+        self.assertIn('font-family: "Acme Sans"', design)
+        self.assertIn("data:font/woff2;base64,", design)
+        base, _ = self.split(self.render("capability-map"))
+        self.assertNotIn("@font-face", base)
+
+    def test_full_importance_and_confidence_read_chart_1_to_3_in_order(self):
+        full = design_source.role_values((DESIGNS / "full/css/dataviz.css").read_text(encoding="utf-8"))
+        for kind, prefix in (("capability-map", ("differentiator", "necessary", "commodity")),
+                             ("bmc", ("conf-validated", "conf-tested", "conf-assumed"))):
+            with self.subTest(kind=kind):
+                design, rest = self.split(self.render(kind, *self.DESIGN_ARGS["full"]))
+                values, kits = design_source.role_values(design), declarations(rest)
+                for step, name in enumerate(prefix, start=1):
+                    self.assertEqual(kits["--kit-" + name], f"var(--chart-{step})")
+                    self.assertEqual(values[f"--chart-{step}"], full[f"--chart-{step}"])
+
+    def test_inlines_only_the_modules_the_views_use(self):
+        # owner 2026-10-14: core and dataviz (and the font faces), never the slide frame or other modules
+        design, _ = self.split(self.render("fbs", *self.DESIGN_ARGS["full"]))
+        defined = set(declarations(design))
+        modules = design_source._contract()["modules"]
+        for module in ("core", "dataviz"):
+            self.assertLessEqual(set(modules[module]["roles"]), defined, module)
+        for module in ("type", "space-shape", "document", "slide-frame", "print", "brand"):
+            self.assertEqual(set(modules[module]["roles"]) & defined, set(), module)
+
+    def test_finds_the_project_pin_from_a_subfolder(self):
+        shutil.copytree(DESIGNS / "subset", self.tmp / "design-system")
+        (self.tmp / "docs/ux").mkdir(parents=True)
+        (self.tmp / "docs/ux/package.json").write_text(json.dumps(
+            {"dependencies": {"@acme-test/design-subset": "file:../../design-system"}}), encoding="utf-8")
+        sub = self.tmp / "docs/product/views"
+        sub.mkdir(parents=True)
+        design, _ = self.split(self.render("fbs", cwd=sub))
+        self.assertIn("#7a3ea8", design)   # the subset accent
+        prov = json.loads((sub / "out/fbs.html.provenance.json").read_text(encoding="utf-8"))
+        self.assertEqual(prov["designSystem"]["name"], "@acme-test/design-subset")
+
+    def test_legacy_token_file_in_the_project_is_refused(self):
+        (self.tmp / "docs/ux").mkdir(parents=True)
+        (self.tmp / "docs/ux/tokens.css").write_text(":root { --accent: #123456; }\n", encoding="utf-8")
+        sub = self.tmp / "sub"
+        sub.mkdir()
+        stderr = self.refused(cwd=sub)
+        self.assertIn("ux-design-system subset --from-legacy", stderr)
+
+    def test_a_plain_stylesheet_is_refused_with_the_migration_message(self):
+        sheet = self.tmp / "styles.css"
+        sheet.write_text(":root { --accent: #123456; }\n", encoding="utf-8")
+        stderr = self.refused("--design-system", sheet)
+        self.assertIn("kit-manifest.json", stderr)
+        self.assertIn("ux-design-system point", stderr)
+
+    def test_missing_design_system_path_is_a_clear_error(self):
+        stderr = self.refused("--design-system", self.tmp / "nowhere")
+        self.assertIn("does not exist", stderr)
+
+    def test_a_render_that_breaks_the_design_writes_nothing(self):
+        # --muted on --surface at 1.16:1: the validator refuses the declared exception
+        stderr = self.refused("--exception=--muted=#eeeeee", code=1)   # the = form: the value starts with --
+        self.assertIn("contrast", stderr)
+
+    def test_declared_exception_passes_and_is_reported(self):
+        self.render("fbs", "--exception", "mine=#123456")
+        prov = json.loads((self.tmp / "out/fbs.html.provenance.json").read_text(encoding="utf-8"))
+        self.assertEqual(prov["exceptions"], ["mine"])
+
+    def test_out_with_a_bare_file_name(self):
+        result = run(RENDER, *source_args("delivery-roadmap"), "--out", "roadmap.html", cwd=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((self.tmp / "roadmap.html").is_file())
+        self.assertTrue((self.tmp / "roadmap.html.provenance.json").is_file())
+
+
+class FooterDateTest(RenderCase):
+    """The footer date comes from the shared date source, never today's date."""
+
+    def render_copy(self, env, prepare=None):
+        project = self.tmp / "project"
+        project.mkdir()
+        source = project / "fbs.sample.md"
+        shutil.copyfile(EXAMPLES / "fbs.sample.md", source)
+        if prepare:
+            prepare(project, source)
+        result = run(RENDER, source, "--out", "out/fbs.html", cwd=project,
+                     env={"SOURCE_DATE_EPOCH": None, "GIT_CEILING_DIRECTORIES": str(self.tmp), **env})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        _, rest = split((project / "out/fbs.html").read_text(encoding="utf-8"))
+        return re.search(r'<footer class="viz-footer">.* on (\d{4}-\d{2}-\d{2})\.', rest).group(1)
+
+    def test_source_date_epoch_wins(self):
+        self.assertEqual(self.render_copy({"SOURCE_DATE_EPOCH": "31536000"}), "1971-01-01")
+
+    def test_last_commit_date_of_the_source_folder(self):
+        def commit(project, source):
+            git = ["git", "-C", str(project), "-c", "user.name=t", "-c", "user.email=t@example.invalid"]
+            env = {**os.environ, "GIT_COMMITTER_DATE": "2001-02-03T12:00:00Z", "GIT_AUTHOR_DATE": "2001-02-03T12:00:00Z"}
+            for args in (["init", "-q"], ["add", "fbs.sample.md"], ["commit", "-q", "-m", "source"]):
+                subprocess.run(git + args, check=True, env=env, capture_output=True)
+        self.assertEqual(self.render_copy({}, commit), "2001-02-03")
+
+    def test_newest_source_mtime_outside_git(self):
+        def touch(project, source):
+            stamp = datetime.datetime(2003, 4, 5, 12, tzinfo=datetime.timezone.utc).timestamp()
+            os.utime(source, (stamp, stamp))
+        self.assertEqual(self.render_copy({}, touch), "2003-04-05")
 
 if __name__ == "__main__":
     unittest.main()
