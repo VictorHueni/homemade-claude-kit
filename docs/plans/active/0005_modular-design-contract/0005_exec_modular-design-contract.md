@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** 10
+**Current Increment:** 11
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -315,7 +315,7 @@ Exit criteria:
 
 ### Increment 10: Reproducible output (closes #106)
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -407,7 +407,8 @@ Scope:
 
 1. **Exempt from red (documentation):** a five-line block for a project's `AGENTS.md` (pin file, manifest, validator command, Dependabot entry) goes in `ux-design-system/references/`.
 2. Plugin version per Q-2 in `plugin.json` and the marketplace; skill `metadata.version` bumped where the skill changed.
-3. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-plugins-and-mcp.md`).
+3. The 2.0.0 release notes name the reproducible-output cutover: every delivery-comms PDF changes bytes once, and `util-provenance` tokens over earlier PDFs are superseded per [ADR-0013](../../../architecture/decisions/adr-0013-reproducible-delivery-comms-output.md).
+4. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-plugins-and-mcp.md`).
 
 Primary files:
 
@@ -439,6 +440,6 @@ Exit criteria:
 | M1: Contract on main | 01-02 | done | Test lane, contract 2.0.0, one synced base theme; no output change | `make -C plugins/delivery-comms test` | Characterisation green; fallback copies gone | `test(delivery-comms)`, `feat(delivery-comms)` |
 | M2: Resolve and check | 03-04 | done | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M3: Renderers moved | 05-09 | done | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
-| M4: Reproducible | 10 | pending | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
+| M4: Reproducible | 10 | done | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
 | M5: Authoring | 11 | pending | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
 | M6: Agents follow the skills, release | 12-13 | pending | Agents using the rewritten skills render on-brand and migrate legacy projects; 2.0.0 released | `make -C plugins/delivery-comms test`, `make -C plugins/delivery-comms skill-evals` (owner-approved run), `./scripts/audit-skills.sh` | Every eval case passes its graders; 2.0.0 in the marketplace cache | `test(delivery-comms)`, `docs(delivery-comms)` |

@@ -82,6 +82,14 @@ def resolve_path(base: Path, relative: str) -> Path:
     return (base / relative).resolve()
 
 
+def deck_sources(config_path: Path, cfg: dict) -> list:
+    """The files a deck is built from (config, partials folder, styles, script, bibliography), never its
+    outputs: shared/source_date.py dates the PDF from these, so a committed output cannot move the date."""
+    base, paths = config_path.parent, cfg.get("paths") or {}
+    keys = ("slides_dir", "styles_file", "script_file", "bibliography_file")
+    return [config_path, *(resolve_path(base, paths[k]) for k in keys if paths.get(k))]
+
+
 def read_file(path: Path) -> str:
     if not path.exists():
         print(f"  [WARN] File not found: {path}")

@@ -34,6 +34,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import manifest_check  # noqa: E402
+from source_path import display_path  # noqa: E402  (provenance names a folder the same on every machine)
 
 MAX_LEVELS = 8
 LEGACY = ("docs/ux/tokens.css", "docs/design/tokens.css")
@@ -347,17 +348,18 @@ def resolve(start_dir, explicit=None):
 
     if explicit is not None:
         root = Path(explicit).resolve()
-        identity = {"source": "path", "path": str(root)}
+        identity = {"source": "path", "path": display_path(root)}
     else:
         pin_file, legacy = _find_source(Path(start_dir))
         if pin_file is None and legacy is not None:
             raise DesignError(_legacy_message(legacy))
         if pin_file is not None:
             if legacy is not None:
-                warnings.append(f"{legacy} is ignored because docs/ux/package.json pins a design system; delete it")
+                warnings.append(f"{display_path(legacy)} is ignored because docs/ux/package.json pins a design "
+                                "system; delete it")
             name, folder, version = _pin_target(pin_file)
             if folder is not None:
-                root, identity = folder, {"source": "path", "path": str(folder)}
+                root, identity = folder, {"source": "path", "path": display_path(folder)}
             else:
                 root, identity = _fetch_package(name, version), {"source": "registry"}
             identity["name"] = name

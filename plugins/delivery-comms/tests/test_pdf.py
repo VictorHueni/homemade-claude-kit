@@ -1,6 +1,9 @@
 """PDF renders (need Playwright and Chromium); run by `make test-pdf`."""
 import json
+import os
 import re
+import shutil
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -132,6 +135,93 @@ class SlideDeckPdfTest(RenderCase):
         self.assertEqual(len(boxes), 2, boxes)
         for w, h in boxes:
             self.assertEqual((round(float(w)), round(float(h))), (960, 540))
+
+
+class ReproduciblePdfTest(RenderCase):
+    """Increment 10 (#106): two PDF renders of the same source are byte-identical, and the Info dates are the
+    source date (shared/source_date.py), not Chromium's clock. Skia writes no /ID and no XMP today."""
+
+    EPOCH = {"SOURCE_DATE_EPOCH": "31536000"}           # 1971-01-01T00:00:00Z
+    STAMP = b"D:19710101000000+00'00'"
+
+    def assertReproducible(self, first, second, stamp=STAMP):
+        a, b = (self.tmp / first).read_bytes(), (self.tmp / second).read_bytes()
+        dates = re.findall(rb"/(CreationDate|ModDate) \((D:[^)]*)\)", a)
+        self.assertEqual(sorted(d[0] for d in dates), [b"CreationDate", b"ModDate"], dates)
+        for name, value in dates:
+            self.assertEqual(value, stamp, f"{first}: /{name.decode()} is {value!r}, not the source date")
+        self.assertNotRegex(a, rb"/ID\s*\[", "Chromium now writes a document /ID; normalise it")
+        self.assertNotIn(b"/Metadata", a, "Chromium now writes XMP metadata; normalise it")
+        diff = [i for i in range(min(len(a), len(b))) if a[i] != b[i]]
+        self.assertEqual((len(a), diff), (len(b), []), f"{first} and {second} differ")
+        prov = [self.tmp / f"{n}.provenance.json" for n in (first, second)]
+        if not prov[0].exists():   # the release note writes its provenance beside the HTML
+            prov = [self.tmp / f"{Path(n).with_suffix('.html')}.provenance.json" for n in (first, second)]
+        self.assertEqual(prov[0].read_bytes(), prov[1].read_bytes())
+
+    def pin_full(self):
+        ux = self.tmp / "docs/ux"
+        ux.mkdir(parents=True)
+        (ux / "package.json").write_text(json.dumps({"dependencies": {"@acme-test/full": f"file:{DESIGNS / 'full'}"}}),
+                                         encoding="utf-8")
+
+    def deck(self, mode, recipient=()):
+        self.assertEqual(run(SKILLS / "com-slide-deck/scripts/init.py", mode, "--mode", mode, cwd=self.tmp).returncode, 0)
+        folder = "pages" if mode == "document" else "slides"
+        (self.tmp / f"{mode}/output/{folder}/01.html").write_text(
+            '<div class="slide"><h2>Reproducible</h2><p>Same source, same bytes.</p></div>\n', encoding="utf-8")
+        cfg = self.tmp / f"{mode}/config.yaml"
+        text = cfg.read_text(encoding="utf-8")
+        cfg.write_text(re.sub(r"^(slides|pages): \[\]", r'\1:\n  - file: "01.html"', text, flags=re.M),
+                       encoding="utf-8")
+        build = run(SKILLS / "com-slide-deck/scripts/build.py", "-c", f"{mode}/config.yaml", cwd=self.tmp, env=self.EPOCH)
+        self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
+        outs = []
+        for tag in ("a", "b"):
+            result = run(SKILLS / "com-slide-deck/scripts/render.py", "--config", f"{mode}/config.yaml", *recipient,
+                         "--output", f"{mode}-{tag}.pdf", cwd=self.tmp, env=self.EPOCH)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            outs.append(result.stdout)
+        return outs
+
+    def test_slide_deck(self):
+        require_browser(self)
+        self.pin_full()
+        stdout = self.deck("slides", ("--recipient", "Partner Co"))
+        self.assertReproducible("slides-a.pdf", "slides-b.pdf")
+        self.assertIn("Prepared for Partner Co · 1971-01-01", stdout[0], "the stamp date is the source date")
+
+    def test_document_deck(self):
+        require_browser(self)
+        self.pin_full()
+        self.deck("document")
+        self.assertReproducible("document-a.pdf", "document-b.pdf")
+
+    def test_release_note(self):
+        require_browser(self)
+        note = SKILLS / "com-release-note/examples/release-note.complete.md"
+        for tag in ("a", "b"):
+            result = run(SKILLS / "com-release-note/scripts/render_pdf.py", note, "--design-system", DESIGNS / "full",
+                         "--output", f"rn-{tag}.pdf", cwd=self.tmp, env=self.EPOCH)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertReproducible("rn-a.pdf", "rn-b.pdf")
+        self.assertEqual((self.tmp / "rn-a.html").read_bytes(), (self.tmp / "rn-b.html").read_bytes())
+
+    def test_release_note_without_epoch_takes_the_commit_date(self):
+        require_browser(self)
+        project = self.tmp / "project"
+        project.mkdir()
+        shutil.copyfile(SKILLS / "com-release-note/examples/release-note.complete.md", project / "note.md")
+        git = ["git", "-C", str(project), "-c", "user.name=t", "-c", "user.email=t@example.invalid"]
+        env = {**os.environ, "GIT_COMMITTER_DATE": "2001-02-03T12:00:00Z", "GIT_AUTHOR_DATE": "2001-02-03T12:00:00Z"}
+        for args in (["init", "-q"], ["add", "note.md"], ["commit", "-q", "-m", "note"]):
+            subprocess.run(git + args, check=True, env=env, capture_output=True)
+        for tag in ("a", "b"):
+            result = run(SKILLS / "com-release-note/scripts/render_pdf.py", project / "note.md",
+                         "--output", self.tmp / f"rn-{tag}.pdf", cwd=self.tmp,
+                         env={"SOURCE_DATE_EPOCH": None, "GIT_CEILING_DIRECTORIES": str(self.tmp)})
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertReproducible("rn-a.pdf", "rn-b.pdf", stamp=b"D:20010203120000+00'00'")
 
 
 if __name__ == "__main__":
