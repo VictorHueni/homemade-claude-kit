@@ -21,7 +21,7 @@ python3 scripts/design_system.py subset docs/ux/DESIGN.md
 python3 scripts/design_system.py subset --from-legacy docs/ux/tokens.css
 ```
 
-The first `subset` run on a DESIGN.md without a `dataviz` block writes a proposed chart palette into it and stops; the owner reviews it and removes the `proposed:` line.
+The DESIGN.md is a [Google DESIGN.md](https://github.com/google-labs-code/design.md): it passes Google's linter (`make -C plugins/delivery-comms test-design-md`), and `subset` reads a Google DESIGN.md, skipping the keys and tokens the kit does not use. The first `subset` run on a DESIGN.md without chart colours writes a proposed chart palette into its `colors` and stops; the owner reviews it and removes the `proposed:` line.
 
 ## Layout
 

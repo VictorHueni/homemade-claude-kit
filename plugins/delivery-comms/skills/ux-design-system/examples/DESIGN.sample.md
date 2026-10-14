@@ -7,6 +7,7 @@ last_reviewed: "2026-10-14"
 review_interval: 180d
 name: Example Platform
 colors:
+  primary: "{colors.accent}"
   ink: "#13211f"
   muted: "#5f6b69"
   canvas-bg: "#f4f7f6"
@@ -19,11 +20,22 @@ colors:
   warning: "#e0973a"
   danger: "#c2453d"
   info: "#0b7a6f"
+  chart-1: "#0b7a6f"
+  chart-2: "#489b93"
+  chart-3: "#85bcb7"
+  chart-4: "#c2dedb"
+  chart-rest: "#afb5b4"
+  chart-axis: "#5f6b69"
+  chart-grid: "#cfdbd8"
+  chart-highlight: "#e0973a"
 typography:
-  font-body: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
-  font-heading: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
-  font-mono: 'ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace'
-  title-size: 1.7rem
+  body:
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+  heading:
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+    fontSize: 1.7rem
+  mono:
+    fontFamily: 'ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace'
 rounded:
   card-radius: 14px
   btn-radius: 8px
@@ -33,24 +45,15 @@ spacing:
   space-md: 1rem
   space-lg: 2rem
   shell-max: 1400px
-elevation:
+kit:
   shadow: "0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.10)"
-dataviz:
-  chart-1: "#0b7a6f"
-  chart-2: "#489b93"
-  chart-3: "#85bcb7"
-  chart-4: "#c2dedb"
-  chart-rest: "#afb5b4"
-  chart-axis: "#5f6b69"
-  chart-grid: "#cfdbd8"
-  chart-highlight: "#e0973a"
-omitted:
-  type: "the core font roles are enough"
-  space-shape: "the core spacing is enough"
-  document: "no paginated documents"
-  slide-frame: "the kit slide frame is fine"
-  print: "the kit page size and margins are fine"
-  brand: "no logo yet"
+  omitted:
+    type: "the core font roles are enough"
+    space-shape: "the core spacing is enough"
+    document: "no paginated documents"
+    slide-frame: "the kit slide frame is fine"
+    print: "the kit page size and margins are fine"
+    brand: "no logo yet"
 ---
 
 # Example Platform design
@@ -61,7 +64,7 @@ A filled example, drafted from `legacy.tokens.css` with `subset --from-legacy` a
 
 Precise, calm, technical. Read by operators and engineers evaluating the platform.
 
-## Colours
+## Colors
 
 A confident teal reads as trustworthy without the usual product blue. Red appears only where something is wrong.
 

@@ -32,21 +32,33 @@ CORE = list(CONTRACT["modules"]["core"]["roles"])
 COLORS = {"ink": "#101828", "muted": "#475467", "canvas-bg": "#f9fafb", "surface": "#ffffff",
           "surface-2": "#f2f4f7", "border": "#d0d5dd", "accent": "#7a3ea8", "accent-ink": "#ffffff",
           "success": "#027a48", "warning": "#b54708", "danger": "#b42318", "info": "#7a3ea8"}
-TYPOGRAPHY = {"font-body": "Georgia, serif", "font-heading": "system-ui, sans-serif",
-              "font-mono": "ui-monospace, monospace", "title-size": "1.8rem"}
+TYPOGRAPHY = {"body": {"fontFamily": "Georgia, serif"},
+              "heading": {"fontFamily": "system-ui, sans-serif", "fontSize": "1.8rem"},
+              "mono": {"fontFamily": "ui-monospace, monospace"}}
 ROUNDED = {"card-radius": "6px", "btn-radius": "4px", "node-radius": "6px"}
 SPACING = {"space-sm": "0.5rem", "space-md": "1rem", "space-lg": "2rem", "shell-max": "1200px"}
-ELEVATION = {"shadow": "none"}
 CHARTS = {"chart-1": "#1d2939", "chart-2": "#0e7090", "chart-3": "#6ab2c9", "chart-4": "#b7dbe6",
           "chart-rest": "#98a2b3", "chart-axis": "#475467", "chart-grid": "#eaecf0", "chart-highlight": "#b54708"}
+KIT = {"shadow": "none", "omitted": {"brand": "no logo yet", "print": "no printed reports"}}
 PROSE = "\n# Small project design\n\n## Overview\n\nCalm and plain.\n\n## Do's and Don'ts\n\n- Do keep red for errors.\n"
 
+# Google DESIGN.md (github.com/google-labs-code/design.md, docs/spec.md): the top-level schema keys and the
+# typography properties; the kit adds `kit` and `proposed`, and the artefact front matter keys.
+GOOGLE_KEYS = {"version", "name", "description", "omitted", "colors", "typography", "rounded", "spacing",
+               "components"}
+TYPOGRAPHY_PROPS = {"fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing", "fontFeature",
+                    "fontVariation"}
+ARTEFACT_KEYS = {"type", "title", "description", "tags", "timestamp", "status", "owner", "last_reviewed",
+                 "review_interval"}
 
-def front(**overrides):
-    data = {"name": "Small Project", "colors": dict(COLORS), "typography": dict(TYPOGRAPHY),
-            "rounded": dict(ROUNDED), "spacing": dict(SPACING), "elevation": dict(ELEVATION),
-            "dataviz": dict(CHARTS), "omitted": {"brand": "no logo yet", "print": "no printed reports"}}
-    for key, value in overrides.items():
+
+def front(colors=None, charts=CHARTS, typography=None, kit=None, **top):
+    """A DESIGN.md front matter: `charts=None` leaves the chart colours out; a top-level key set to None is
+    removed, any other is added or replaced."""
+    data = {"name": "Small Project", "colors": {**(COLORS if colors is None else colors), **(charts or {})},
+            "typography": TYPOGRAPHY if typography is None else typography, "rounded": dict(ROUNDED),
+            "spacing": dict(SPACING), "kit": KIT if kit is None else kit}
+    for key, value in top.items():
         if value is None:
             data.pop(key, None)
         else:
@@ -56,6 +68,10 @@ def front(**overrides):
 
 def design_md(data, prose=PROSE):
     return "---\n" + yaml.safe_dump(data, sort_keys=False, allow_unicode=True) + "---\n" + prose
+
+
+def front_matter(path):
+    return yaml.safe_load(Path(path).read_text(encoding="utf-8").split("---\n")[1])
 
 
 class UxCase(RenderCase):
@@ -155,7 +171,11 @@ class SubsetTest(UxCase):
         self.assertIn("Do keep red for errors.", (out / "guidance.md").read_text(encoding="utf-8"))
         design = design_source.resolve(self.project, explicit=out)
         self.assertEqual(design.provenance["modules"]["core"], "design-system")
-        self.assertEqual(design_source.role_values(design.css["core"])["--accent"], "#7a3ea8")
+        values = design_source.role_values(design.css["core"])
+        self.assertEqual(values["--accent"], "#7a3ea8")
+        self.assertEqual(values["--font-body"], "Georgia, serif")          # typography.body.fontFamily
+        self.assertEqual(values["--title-size"], "1.8rem")                 # typography.heading.fontSize
+        self.assertEqual(values["--shadow"], "none")                       # kit.shadow
 
     def test_writes_the_pin_the_renderers_follow(self):
         self.write(front())
@@ -177,22 +197,32 @@ class SubsetTest(UxCase):
                          {"@acme-test/ds": "1.0.0"})
 
     def test_optional_modules_are_written_when_filled_whole(self):
-        typography = {**TYPOGRAPHY, "font-size-xs": "0.75rem", "font-size-sm": "0.875rem", "font-size-md": "1rem",
-                      "font-size-lg": "1.25rem", "font-size-xl": "2rem", "line-height-body": 1.5,
-                      "line-height-tight": 1.2, "font-weight-regular": 400, "font-weight-bold": 700}
-        self.write(front(typography=typography))
+        typography = {"body": {**TYPOGRAPHY["body"], "fontSize": "1rem", "lineHeight": 1.5, "fontWeight": 400},
+                      "heading": {**TYPOGRAPHY["heading"], "lineHeight": 1.2, "fontWeight": 700},
+                      "mono": TYPOGRAPHY["mono"], "text-xs": {"fontSize": "0.75rem"},
+                      "text-sm": {"fontSize": "0.875rem"}, "text-lg": {"fontSize": "1.25rem"},
+                      "text-xl": {"fontSize": "2rem"}}
+        self.write(front(typography=typography, rounded={**ROUNDED, "radius-sm": "4px", "radius-pill": "999px"},
+                         spacing={**SPACING, "space-xs": "0.25rem", "space-xl": "3rem"},
+                         kit={**KIT, "border-width": "1px"}))
         self.subset()
         manifest = json.loads((self.ux / "design-system/kit-manifest.json").read_text(encoding="utf-8"))
         self.assertIn("type", manifest["provides"])
+        self.assertIn("space-shape", manifest["provides"])
         css = (self.ux / "design-system/type.css").read_text(encoding="utf-8")
+        self.assertIn("--font-size-md: 1rem;", css)
+        self.assertIn("--font-size-xl: 2rem;", css)
         self.assertIn("--line-height-body: 1.5;", css)
+        self.assertIn("--line-height-tight: 1.2;", css)
+        self.assertIn("--font-weight-regular: 400;", css)
         self.assertIn("--font-weight-bold: 700;", css)
+        self.assertIn("--border-width: 1px;", (self.ux / "design-system/space-shape.css").read_text(encoding="utf-8"))
 
     def test_a_module_filled_in_part_is_an_error_naming_the_missing_roles(self):
-        self.write(front(typography={**TYPOGRAPHY, "font-size-xs": "0.7rem"}))
+        self.write(front(typography={**TYPOGRAPHY, "text-xs": {"fontSize": "0.7rem"}}))
         result = self.subset(code=2)
         self.assertIn("type", result.stderr)
-        self.assertIn("font-size-xl", result.stderr)
+        self.assertIn("typography.text-xl.fontSize", result.stderr)
         self.assertFalse((self.ux / "design-system").exists())
 
     def test_core_must_be_complete(self):
@@ -200,11 +230,17 @@ class SubsetTest(UxCase):
         del colors["border"]
         self.write(front(colors=colors))
         result = self.subset(code=2)
-        self.assertIn("border", result.stderr)
+        self.assertIn("colors.border", result.stderr)
         self.assertFalse((self.ux / "design-system").exists())
 
+    def test_core_roles_outside_colors_are_named_by_their_design_md_path(self):
+        self.write(front(typography={"body": TYPOGRAPHY["body"], "mono": TYPOGRAPHY["mono"]}, kit={}))
+        stderr = self.subset(code=2).stderr
+        for path in ("typography.heading.fontFamily", "typography.heading.fontSize", "kit.shadow"):
+            self.assertIn(path, stderr)
+
     def test_a_module_both_filled_and_omitted_is_an_error(self):
-        self.write(front(omitted={"dataviz": "none"}))
+        self.write(front(kit={**KIT, "omitted": {"dataviz": "none"}}))
         self.assertIn("dataviz", self.subset(code=2).stderr)
 
     def test_colours_must_be_hex(self):
@@ -214,8 +250,14 @@ class SubsetTest(UxCase):
         self.assertIn("hex", result.stderr)
 
     def test_a_value_that_could_break_out_of_css_is_refused(self):
-        self.write(front(typography={**TYPOGRAPHY, "font-body": "serif; } body { color: red"}))
-        self.assertIn("font-body", self.subset(code=2).stderr)
+        self.write(front(typography={**TYPOGRAPHY, "body": {"fontFamily": "serif; } body { color: red"}}))
+        self.assertIn("typography.body.fontFamily", self.subset(code=2).stderr)
+
+    def test_a_typography_entry_must_be_an_object(self):
+        self.write(front(typography={**TYPOGRAPHY, "body": "Georgia, serif"}))
+        stderr = self.subset(code=2).stderr
+        self.assertIn("typography.body", stderr)
+        self.assertIn("fontFamily", stderr)
 
     def test_a_refused_run_keeps_the_previous_output(self):
         self.write(front())
@@ -228,8 +270,8 @@ class SubsetTest(UxCase):
 
     def test_font_faces_are_copied_and_inlined_by_the_resolver(self):
         shutil.copy(DESIGNS / "full/fonts/acme.woff2", self.ux / "acme.woff2")
-        self.write(front(fonts=[{"family": "Acme Sans", "src": "acme.woff2", "weight": 400}],
-                         typography={**TYPOGRAPHY, "font-body": '"Acme Sans", sans-serif'}))
+        self.write(front(kit={**KIT, "fonts": [{"family": "Acme Sans", "src": "acme.woff2", "weight": 400}]},
+                         typography={**TYPOGRAPHY, "body": {"fontFamily": '"Acme Sans", sans-serif'}}))
         self.subset()
         self.assertTrue((self.ux / "design-system/fonts/acme.woff2").is_file())
         design = design_source.resolve(self.project)
@@ -238,27 +280,76 @@ class SubsetTest(UxCase):
         self.assertIn("data:font/woff2;base64,", design.fonts[0])
 
     def test_a_network_font_is_refused(self):
-        self.write(front(fonts=[{"family": "Remote", "src": "https://fonts.example.test/r.woff2"}]))
-        self.assertIn("fonts", self.subset(code=2).stderr)
+        self.write(front(kit={**KIT, "fonts": [{"family": "Remote", "src": "https://fonts.example.test/r.woff2"}]}))
+        self.assertIn("kit.fonts", self.subset(code=2).stderr)
 
 
 class FrontMatterTest(UxCase):
-    def test_unknown_top_level_key_names_the_key_and_the_allowed_keys(self):
-        self.write(front(components={"button": {"backgroundColor": "#000"}}))
-        stderr = self.subset(code=2).stderr
-        self.assertIn("components", stderr)
-        for allowed in ("colors", "typography", "rounded", "spacing", "omitted"):
-            self.assertIn(allowed, stderr)
+    def test_google_keys_the_kit_does_not_use_are_skipped_with_one_note(self):
+        data = front(colors={"primary": "#7a3ea8", "secondary": "#475467", **COLORS},
+                     typography={**TYPOGRAPHY, "h1": {"fontFamily": "Georgia, serif", "fontSize": "3rem"},
+                                 "body": {**TYPOGRAPHY["body"], "letterSpacing": "0.01em"}},
+                     rounded={**ROUNDED, "sm": "4px"},
+                     version="alpha", description="A small design",
+                     omitted=["components"],
+                     components={"button-primary": {"backgroundColor": "{colors.accent}",
+                                                    "textColor": "{colors.accent-ink}"}})
+        self.write(data)
+        stdout = self.subset().stdout
+        notes = [line for line in stdout.splitlines() if "skipped" in line]
+        self.assertEqual(len(notes), 1, stdout)
+        for name in ("components", "version", "description", "omitted", "colors.primary", "colors.secondary",
+                     "typography.h1", "typography.body.letterSpacing", "rounded.sm"):
+            self.assertIn(name, notes[0])
 
-    def test_unknown_key_in_a_group_names_the_key_and_the_allowed_keys(self):
-        self.write(front(colors={**COLORS, "primary": "#000000"}))
-        stderr = self.subset(code=2).stderr
-        self.assertIn("primary", stderr)
-        self.assertIn("accent-ink", stderr)
+    def test_the_primary_alias_of_the_accent_is_not_noted(self):
+        self.write(front(colors={"primary": "{colors.accent}", **COLORS}))
+        self.assertNotIn("skipped", self.subset().stdout)
+
+    def test_a_typo_of_a_kit_key_is_an_error(self):
+        data = front()
+        data["colours"] = data.pop("colors")
+        stderr = self.subset_of(data)
+        self.assertIn("colours", stderr)
+        self.assertIn("did you mean `colors`", stderr)
+
+    def test_a_typo_in_a_kit_token_name_is_named_with_the_missing_role(self):
+        colors = dict(COLORS)
+        colors["acent"] = colors.pop("accent")
+        stderr = self.subset_of(front(colors=colors))
+        self.assertIn("colors.accent", stderr)
+        self.assertIn("acent", stderr)
+
+    def test_a_typo_in_a_typography_property_is_an_error(self):
+        stderr = self.subset_of(front(typography={**TYPOGRAPHY, "body": {"fontfamily": "Georgia, serif"}}))
+        self.assertIn("fontfamily", stderr)
+        self.assertIn("fontFamily", stderr)
+
+    def test_an_unknown_kit_key_is_an_error(self):
+        stderr = self.subset_of(front(kit={**KIT, "shadows": "none"}))
+        self.assertIn("kit.shadows", stderr)
+        self.assertIn("shadow", stderr)
+
+    def test_primary_without_accent_suggests_the_accent_line(self):
+        colors = {k: v for k, v in COLORS.items() if k != "accent"}
+        stderr = self.subset_of(front(colors={"primary": "#7a3ea8", **colors}))
+        self.assertIn("colors.accent", stderr)
+        self.assertIn('accent: "#7a3ea8"', stderr)
+
+    def test_the_pre_google_keys_name_where_they_moved(self):
+        for key, value, moved in (("dataviz", CHARTS, "colors"), ("elevation", {"shadow": "none"}, "kit.shadow"),
+                                  ("fonts", [], "kit.fonts")):
+            with self.subTest(key=key):
+                stderr = self.subset_of(front(**{key: value}))
+                self.assertIn(key, stderr)
+                self.assertIn(moved, stderr)
+
+    def test_module_omissions_in_the_google_omitted_key_are_an_error(self):
+        stderr = self.subset_of(front(omitted={"brand": "no logo"}))
+        self.assertIn("kit.omitted", stderr)
 
     def test_unknown_omitted_module_is_an_error(self):
-        self.write(front(omitted={"logo": "none"}))
-        self.assertIn("logo", self.subset(code=2).stderr)
+        self.assertIn("logo", self.subset_of(front(kit={**KIT, "omitted": {"logo": "none"}})))
 
     def test_safe_loader_refuses_python_tags(self):
         path = self.ux / "DESIGN.md"
@@ -274,7 +365,54 @@ class FrontMatterTest(UxCase):
         data = {"type": "Design System", "title": "Small", "status": "draft", "owner": "someone",
                 "last_reviewed": "2026-10-14", "review_interval": "180d", **front()}
         self.write(data)
-        self.subset()
+        self.assertNotIn("skipped", self.subset().stdout)
+
+    def subset_of(self, data):
+        self.write(data)
+        return self.subset(code=2).stderr
+
+
+class GoogleShapeTest(UxCase):
+    """The DESIGN.md files the kit writes are Google DESIGN.md files (the structure the Google linter reads);
+    `make test-design-md` runs the linter itself on the same files."""
+
+    def assert_google_shape(self, path):
+        data = front_matter(path)
+        unknown = set(data) - GOOGLE_KEYS - ARTEFACT_KEYS - {"kit", "proposed"}
+        self.assertEqual(unknown, set(), f"{path.name}: top-level keys outside the Google schema")
+        self.assertIn("primary", data["colors"], f"{path.name}: Google warns without a primary colour")
+        for name, entry in data["typography"].items():
+            self.assertIsInstance(entry, dict, f"{path.name}: typography.{name} is not an object")
+            self.assertLessEqual(set(entry), TYPOGRAPHY_PROPS, f"{path.name}: typography.{name}")
+        self.assertIsInstance(data.get("omitted", []), list, f"{path.name}: Google `omitted` is a list")
+        self.assertIsInstance(data.get("kit", {}), dict)
+        for value in data.get("kit", {}).values():   # the linter sees no token in the extension key
+            if isinstance(value, str):
+                self.assertNotRegex(value, r"^#[0-9a-fA-F]{3,8}$|^-?\d*\.?\d+[a-zA-Z%]+$")
+        return data
+
+    def test_the_template_and_a_scaffolded_file(self):
+        self.ds("scaffold")
+        for path in (UX / "templates/DESIGN.template.md", self.ux / "DESIGN.md"):
+            with self.subTest(path=path.name):
+                self.assert_google_shape(path)
+
+    def test_the_sample_holds_its_chart_colours_under_colors(self):
+        data = self.assert_google_shape(UX / "examples/DESIGN.sample.md")
+        self.assertLessEqual({r[2:] for r in DATAVIZ}, set(data["colors"]))
+        self.assertNotIn("proposed", data)
+
+    def test_a_proposal_and_a_legacy_draft(self):
+        self.ds("scaffold")
+        self.subset(code=2)
+        data = self.assert_google_shape(self.ux / "DESIGN.md")
+        self.assertLessEqual({r[2:] for r in DATAVIZ}, set(data["colors"]))
+        self.assertEqual(set(data["proposed"]), {r[2:] for r in DATAVIZ})
+        (self.ux / "DESIGN.md").unlink()
+        (self.ux / "tokens.css").write_text(FromLegacyTest.LEGACY, encoding="utf-8")
+        self.assertEqual(self.ds("subset", "--from-legacy", "docs/ux/tokens.css").returncode, 0)
+        data = self.assert_google_shape(self.ux / "DESIGN.md")
+        self.assertLessEqual({r[2:] for r in DATAVIZ}, set(data["colors"]))
 
 
 class ContrastTest(UxCase):
@@ -291,7 +429,7 @@ class ContrastTest(UxCase):
         self.subset()
 
     def test_a_fill_on_which_neither_text_role_passes_is_refused(self):
-        self.write(front(dataviz={**CHARTS, "chart-2": "#808080"}))
+        self.write(front(charts={**CHARTS, "chart-2": "#808080"}))
         stderr = self.subset(code=2).stderr
         self.assertIn("--chart-2", stderr)
         self.assertIn("no text role reaches WCAG AA", stderr)
@@ -299,25 +437,29 @@ class ContrastTest(UxCase):
 
 class ProposedPaletteTest(UxCase):
     def proposed(self, colors=None):
-        self.write(front(dataviz=None, colors=colors or dict(COLORS)))
+        self.write(front(charts=None, colors=colors or dict(COLORS)))
         result = self.subset(code=2)
         text = (self.ux / "DESIGN.md").read_text(encoding="utf-8")
         data = yaml.safe_load(text.split("---\n")[1])
-        return result, data["dataviz"], text
+        charts = {k: v for k, v in data["colors"].items() if k.startswith("chart-")}
+        return result, charts, data, text
 
-    def test_a_source_without_dataviz_gets_a_proposed_block_and_no_output(self):
-        result, block, text = self.proposed()
-        self.assertIn("proposed", block)
+    def test_a_source_without_chart_colours_gets_a_proposal_and_no_output(self):
+        result, _, data, text = self.proposed()
+        self.assertIn("proposed", data)
         self.assertIn("proposed", result.stdout + result.stderr)
         self.assertIn(PROSE.strip(), text)
         self.assertFalse((self.ux / "design-system").exists())
 
-    def test_the_proposal_fills_exactly_the_dataviz_roles(self):
-        _, block, _ = self.proposed()
-        self.assertEqual({"--" + k for k in block if k != "proposed"}, DATAVIZ)
+    def test_the_proposal_fills_exactly_the_dataviz_roles_under_colors(self):
+        _, charts, data, _ = self.proposed()
+        self.assertEqual({"--" + k for k in charts}, DATAVIZ)
+        self.assertEqual({"--" + k for k in data["proposed"]}, DATAVIZ)
+        self.assertEqual({k: v for k, v in data["colors"].items() if not k.startswith("chart-")}, COLORS)
+        self.assertNotIn("dataviz", data)
 
     def test_four_steps_from_the_accent_towards_the_surface_darkest_first(self):
-        _, block, _ = self.proposed()
+        _, block, _, _ = self.proposed()
         self.assertEqual(block["chart-1"].lower(), COLORS["accent"])
         lum = [design_source._luminance(block[f"chart-{i}"]) for i in range(1, 5)]
         self.assertEqual(lum, sorted(lum))
@@ -331,9 +473,10 @@ class ProposedPaletteTest(UxCase):
         for accent in ("#7a3ea8", "#396cf5", "#0e7090", "#c2410c"):
             with self.subTest(accent=accent):
                 self.setUp()
-                _, block, _ = self.proposed(colors={**COLORS, "accent": accent})
+                _, block, _, _ = self.proposed(colors={**COLORS, "accent": accent})
+                self.assertEqual(len(block), len(DATAVIZ))
                 css = ":root {" + "".join(f"--{k}: {v};" for k, v in {**COLORS, "accent": accent}.items())
-                css += "".join(f"--{k}: {v};" for k, v in block.items() if k != "proposed") + "}"
+                css += "".join(f"--{k}: {v};" for k, v in block.items()) + "}"
                 self.assertEqual(design_source.failing_pairs(css, charts), [])
 
     def test_generation_refuses_while_the_mark_remains(self):
@@ -365,17 +508,18 @@ class FromLegacyTest(UxCase):
         path.write_text(self.LEGACY, encoding="utf-8")
         return path
 
-    def test_writes_a_draft_design_md_with_core_and_a_proposed_dataviz_block(self):
+    def test_writes_a_draft_design_md_with_core_and_proposed_chart_colours(self):
         self.legacy()
         result = self.ds("subset", "--from-legacy", "docs/ux/tokens.css")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        text = (self.ux / "DESIGN.md").read_text(encoding="utf-8")
-        data = yaml.safe_load(text.split("---\n")[1])
+        data = front_matter(self.ux / "DESIGN.md")
         self.assertEqual(data["colors"]["accent"], "#0f766e")
         self.assertEqual(data["colors"]["info"], "#0f766e")             # var(--accent) followed
-        self.assertEqual(data["typography"]["font-body"], '"Inter", system-ui, sans-serif')  # --font-sans alias
-        self.assertEqual(data["elevation"]["shadow"], "0 1px 2px rgba(0,0,0,.08)")
-        self.assertIn("proposed", data["dataviz"])
+        self.assertEqual(data["typography"]["body"]["fontFamily"], '"Inter", system-ui, sans-serif')  # --font-sans
+        self.assertEqual(data["typography"]["heading"]["fontSize"], "1.5rem")
+        self.assertEqual(data["kit"]["shadow"], "0 1px 2px rgba(0,0,0,.08)")
+        self.assertIn("chart-1", data["colors"])
+        self.assertIn("chart-1", data["proposed"])
         self.assertIn("--dim", result.stdout + result.stderr)            # not mapped, named
         self.assertEqual((self.ux / "tokens.css").read_text(encoding="utf-8"), self.LEGACY)
 
@@ -386,16 +530,17 @@ class FromLegacyTest(UxCase):
         result = self.ds("subset", "--from-legacy", "docs/ux/tokens.css")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("@import", result.stdout)
+        self.assertIn("kit.fonts", result.stdout)
         self.assertNotIn("fonts.example.test", (self.ux / "DESIGN.md").read_text(encoding="utf-8"))
 
     def test_missing_core_roles_come_from_the_base_and_are_named(self):
         self.legacy()
         result = self.ds("subset", "--from-legacy", "docs/ux/tokens.css")
-        data = yaml.safe_load((self.ux / "DESIGN.md").read_text(encoding="utf-8").split("---\n")[1])
+        data = front_matter(self.ux / "DESIGN.md")
         base = design_source.role_values(re.sub(r"/\*.*?\*/", "", (PLUGIN / "shared/base/core.css").read_text(
             encoding="utf-8"), flags=re.S))
-        self.assertEqual(data["typography"]["font-heading"], base["--font-heading"])
-        self.assertIn("font-heading", result.stdout + result.stderr)
+        self.assertEqual(data["typography"]["heading"]["fontFamily"], base["--font-heading"])
+        self.assertIn("typography.heading.fontFamily", result.stdout + result.stderr)
 
     def test_accepts_the_older_docs_design_location(self):
         self.legacy("docs/design/tokens.css")
