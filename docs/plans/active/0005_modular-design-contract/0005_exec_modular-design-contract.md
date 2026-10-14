@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** 04
+**Current Increment:** 05
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -156,7 +156,7 @@ Exit criteria:
 
 ### Increment 04: Blocking validator
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -166,10 +166,10 @@ Scope:
    - literals inside the resolved design layers the renderer inlined, and inside brand assets (inlined logo SVG, data URIs), pass;
    - a `var(--role, #hex)` fallback is stripped before the check, so it neither passes nor fails a page on its own;
    - an unknown `--name` fails; a `--kit-*` property whose value references only roles or non-colour values passes, and one carrying a literal colour fails;
-   - a declared exception passes and appears in the report; the report notes whether the manifest's `exceptions` vocabulary knows the name, and an unknown name is not refused;
+   - a declared exception passes and appears in the report; the report notes whether the manifest's `exceptions` vocabulary knows the name, and an unknown name is not refused; an exception whose name is a custom property (`--font-report`) allows the page to declare and use that property;
    - an exception that brings a `pairs` text pair below 4.5:1 fails (Q-7);
    - the check reads the resolved design, so the same HTML passes against one design and fails against another;
-   - each skill's current template, with its `var()` fallbacks removed and its renderer-internal properties renamed to `--kit-*`, passes on the base theme (a dry run of what Increments 05 to 09 will do; expected red today).
+   - each skill's current template, with its `var()` fallbacks removed and its renderer-internal properties renamed to `--kit-*`, passes on the base theme (a dry run of what Increments 05 to 09 will do; the test applies that migration itself, so it is red only until the validator exists).
 2. `plugins/delivery-comms/shared/check_render.py`: parse the built HTML and its inlined CSS (stdlib `html.parser` and a small CSS tokenizer), check per constraint 5 and the rules above, return findings as JSON and as text. Exceptions are declared per artefact (deck `config.yaml` `design.exceptions`, viz and release-note `--exception NAME=VALUE`). A command-line entry `check_render.py <file.html> [--exception NAME=VALUE]...` checks any HTML file against the resolved design, for bespoke generators.
 3. `sync-shared.py` run.
 
@@ -436,7 +436,7 @@ Exit criteria:
 | Milestone | Increments | Status | Coherent Outcome | Standalone Test Gate | Exit Criteria | Commit Guidance |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | M1: Contract on main | 01-02 | done | Test lane, contract 2.0.0, one synced base theme; no output change | `make -C plugins/delivery-comms test` | Characterisation green; fallback copies gone | `test(delivery-comms)`, `feat(delivery-comms)` |
-| M2: Resolve and check | 03-04 | in-progress | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
+| M2: Resolve and check | 03-04 | done | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M3: Renderers moved | 05-09 | pending | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M4: Reproducible | 10 | pending | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
 | M5: Authoring | 11 | pending | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
