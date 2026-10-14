@@ -19,6 +19,7 @@ run_if '^(rules/|scripts/check-rules\.py$)' python3 scripts/check-rules.py
 run_if '^(plugins/kit-core/hooks/|scripts/test-hooks\.py$)' python3 -B scripts/test-hooks.py
 run_if '^(plugins/[^/]+/skills/|\.claude/skills/|scripts/audit-skills\.sh$)' bash scripts/audit-skills.sh
 run_if '^(rules/|install\.sh$|scripts/test-install-rules\.sh$)' bash scripts/test-install-rules.sh
+run_if '^plugins/delivery-comms/(shared/|contract/|scripts/sync-shared\.py$|skills/[^/]+/scripts/shared/)' python3 -B plugins/delivery-comms/scripts/sync-shared.py --check
 
 if [[ $failed -ne 0 ]]; then
     echo "pre-commit: a kit check failed; fix it, or bypass once with --no-verify." >&2
