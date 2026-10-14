@@ -104,6 +104,11 @@ class CustomPropertyTest(ValidatorCase):
                 self.assertEqual(self.kinds(report), ["unknown-property"])
                 self.assertIn("--mystery", report["findings"][0]["message"])
 
+    def test_class_name_with_a_double_hyphen_modifier_is_not_a_property(self):
+        # BEM modifiers such as .doc-section--flow (com-slide-deck doc.baseline.css)
+        self.assertTrue(self.check(page(".doc-section.doc-section--flow { break-before: auto; }"))["ok"])
+        self.assertEqual(self.kinds(self.check(page(".a--b { color: var(--nope); }"))), ["unknown-property"])
+
     def test_kit_property_with_roles_or_plain_values_passes(self):
         self.assertTrue(self.check(page(":root { --kit-a: var(--accent); --kit-b: 3rem; --kit-c: 1px solid var(--border); }"))["ok"])
 
@@ -175,7 +180,9 @@ class TemplateDryRunTest(ValidatorCase):
     TEMPLATES = {
         "com-artefact-viz": ("templates/base.html.tmpl", "templates/tokens.domain.css"),
         "com-release-note": ("templates/report.html.tmpl",),
-        "com-slide-deck": ("templates/doc.baseline.css",),
+    }
+    MIGRATED = {
+        "com-slide-deck": ("templates/doc.baseline.css",),   # Increment 05
     }
 
     @staticmethod
@@ -192,6 +199,14 @@ class TemplateDryRunTest(ValidatorCase):
                     wrap = (lambda c: c) if rel.endswith(".tmpl") else (lambda c: f"<style>{c}</style>")
                     self.assertEqual(self.kinds(self.check(wrap(text))), ["unknown-property"])
                     self.assertEqual(self.check(wrap(self.migrate(text)))["findings"], [])
+
+    def test_migrated_templates_pass_as_shipped(self):
+        for skill, files in self.MIGRATED.items():
+            for rel in files:
+                with self.subTest(template=f"{skill}/{rel}"):
+                    text = (PLUGIN / "skills" / skill / rel).read_text(encoding="utf-8")
+                    self.assertEqual(self.check(f"<style>{text}</style>")["findings"], [])
+                    self.assertEqual(check_render.strip_fallbacks(text), text, "a var() fallback is left")
 
 
 class CommandLineTest(ValidatorCase):

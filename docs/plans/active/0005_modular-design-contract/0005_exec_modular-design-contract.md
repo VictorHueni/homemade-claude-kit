@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** 05
+**Current Increment:** 06
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -188,7 +188,7 @@ Exit criteria:
 
 ### Increment 05: com-slide-deck on the resolver and the validator
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
