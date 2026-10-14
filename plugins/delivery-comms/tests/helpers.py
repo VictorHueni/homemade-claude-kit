@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 SKILLS = Path(__file__).resolve().parent.parent / "skills"
-FALLBACK_ACCENT = "#3b6ef5"
+FALLBACK_ACCENT = "#396cf5"
 
 
 def run(script, *args, cwd):

@@ -350,7 +350,7 @@ def _measures(model: dict) -> dict:
 
 
 _HEX_RE = re.compile(r"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b")
-_TOKEN_DEFAULTS = {"accent": "#3b6ef5", "ink": "#1a1f29", "surface": "#ffffff"}
+_TOKEN_DEFAULTS = {"accent": "#396cf5", "ink": "#1a1f29", "surface": "#ffffff"}
 
 
 def _resolve_token(css_text: str, name: str) -> str:

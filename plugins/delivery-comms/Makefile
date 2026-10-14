@@ -10,7 +10,7 @@ check-python:
 
 # Unit tests, no browser.
 test: check-python
-	$(UNITTEST) -v test_characterisation test_contract
+	$(UNITTEST) -v test_characterisation test_contract test_resolver
 
 # PDF renders. A missing browser skips locally and fails when CI=true.
 test-pdf: check-python

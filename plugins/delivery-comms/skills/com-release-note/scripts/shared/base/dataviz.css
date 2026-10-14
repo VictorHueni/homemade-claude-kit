@@ -1,7 +1,7 @@
 /* dataviz.css — neutral defaults for the `dataviz` module (chart palette, darkest first). */
 :root {
   --chart-1: #1f3a8a;
-  --chart-2: #3b6ef5;
+  --chart-2: #396cf5;
   --chart-3: #7aa2f7;
   --chart-4: #b4c8f8;
   --chart-rest: #9ca3af;
