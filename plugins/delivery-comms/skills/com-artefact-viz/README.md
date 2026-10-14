@@ -22,21 +22,25 @@ Markdown artefact ──parser──> model ──renderer──> one HTML file 
 
 ```bash
 # Auto-detect kind, default output under docs/communication/visualisations/
-python scripts/render.py docs/business/03a-capability-map.md
+python3 scripts/render.py docs/business/03a-capability-map.md
 
-# Theme with a project design system (e.g. reuse a com-slide-deck stylesheet)
-python scripts/render.py docs/product-specs/07a-fbs.md \
-  --design-system docs/communication/slides/{slug}/design/styles.css
+# The theme is the project design: the docs/ux/package.json pin found by walking up
+# from the working directory, else the kit base theme. To preview another design,
+# name a design-system folder (with a kit-manifest.json); a single stylesheet is refused.
+python3 scripts/render.py docs/product-specs/07a-fbs.md --design-system path/to/design-system/
+
+# Record the validator verdict next to the view
+python3 scripts/shared/check_render.py --record docs/communication/visualisations/fbs.html.verdict.txt docs/communication/visualisations/fbs.html
 
 # Vary the capability/FBS left-axis label + arrow per project
-python scripts/render.py docs/business/03a-capability-map.md \
+python3 scripts/render.py docs/business/03a-capability-map.md \
   --left-axis-label "Customer Journey" --left-axis-arrow "→"
 
 # Live preview while editing the source
-python scripts/dev_server.py docs/business/03a-capability-map.md --port 8000
+python3 scripts/dev_server.py docs/business/03a-capability-map.md --port 8000
 
 # Compose a service blueprint (multi-source: process + value stream + personas)
-python scripts/render.py --kind service-blueprint \
+python3 scripts/render.py --kind service-blueprint \
   --proc docs/business/05a-processes/proc-03-slot-rebooking.md \
   --value-stream docs/business/04a-value-stream.md \
   --personas docs/business/03b-personas/
@@ -46,11 +50,11 @@ Try it against the bundled fixtures:
 
 ```bash
 for k in capability-map fbs delivery-roadmap bmc; do
-  python scripts/render.py examples/$k.sample.md --out /tmp/$k.html
+  python3 scripts/render.py examples/$k.sample.md --out /tmp/$k.html
 done
 
 # the service blueprint fixture is a multi-file set
-python scripts/render.py --kind service-blueprint \
+python3 scripts/render.py --kind service-blueprint \
   --proc examples/service-blueprint/process-slot-rebooking.md \
   --value-stream examples/service-blueprint/value-stream.md \
   --personas examples/service-blueprint/personas.md \
@@ -65,7 +69,7 @@ com-artefact-viz/
   README.md                    This file
   templates/
     base.html.tmpl             Shell with {{slots}}
-    tokens.domain.css          Domain tokens derived from the generics (status/pain/confidence/importance)
+    tokens.domain.css          Domain colours as --kit-* properties on contract roles (status/pain on state roles, importance/confidence on the chart scale)
     runtime.js                 Vanilla JS: collapse, orientation, disclosure
   scripts/
     render.py                  CLI entrypoint (parse -> render -> write)
@@ -79,4 +83,4 @@ com-artefact-viz/
   examples/                    Domain-neutral fixtures, one per kind
 ```
 
-Python 3.8+, standard library only. No Node, no third-party packages.
+Python 3.12+, standard library only. No Node, no third-party packages. Each render writes `<out>.provenance.json` (which design themed it) and refuses to write a view that breaks the design contract ([`../../contract/README.md`](../../contract/README.md)).

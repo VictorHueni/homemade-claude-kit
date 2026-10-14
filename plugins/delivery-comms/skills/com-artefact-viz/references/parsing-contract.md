@@ -102,6 +102,6 @@ personas + value stream).
 1. Add `parse_<kind>(text) -> model` to `scripts/parsers.py`; register it in
    `PARSERS` and add a detection rule in `detect_kind`.
 2. Add `render_<kind>(model, options)` to `scripts/renderers.py`; register it
-   in `RENDERERS`. Emit only `var(--token)` styling.
+   in `RENDERERS`. Style with contract roles and `--kit-*` properties only (no literal colour).
 3. Add an `examples/<kind>.sample.md` fixture and dry-run
-   `python scripts/render.py examples/<kind>.sample.md`.
+   `python3 scripts/render.py examples/<kind>.sample.md`.
