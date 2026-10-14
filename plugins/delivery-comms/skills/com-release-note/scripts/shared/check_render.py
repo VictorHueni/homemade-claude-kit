@@ -17,7 +17,10 @@ also stands in for that role when the contract's text pairs are checked.
 
 As a command, for generators outside the kit:
     check_render.py FILE.html [--exception NAME=VALUE]... [--json] [--design-system DIR | --from DIR]
-Exit 0 pass, 1 findings, 2 the design was refused.
+                    [--record VERDICT.txt]
+Exit 0 pass, 1 findings, 2 the design was refused. --record also writes the verdict to a file, the evidence
+a skill eval grades: `PASS: no findings`, `FAIL: N finding(s)` or `FAIL: the design was refused`, then
+`file: FILE.html`, `design: NAME@VERSION` (or `base`) and the findings or exceptions, one per line.
 """
 import argparse
 import json
@@ -218,6 +221,20 @@ def format_text(report, file):
     return "\n".join(lines)
 
 
+def design_label(design):
+    ident = design.provenance["designSystem"]
+    if ident.get("source") == "base":
+        return "base"
+    label = ident.get("name") or ident.get("path", "")
+    return label + (f"@{ident['version']}" if ident.get("version") else "")
+
+
+def record(target, file, verdict, design=None, details=""):
+    """Write the verdict file: a PASS or FAIL line, the checked file, the design, then `details` lines."""
+    lines = [verdict, f"file: {file}"] + ([f"design: {design_label(design)}"] if design is not None else [])
+    Path(target).write_text("\n".join(lines + ([details] if details else [])) + "\n", encoding="utf-8")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("file")
@@ -225,6 +242,7 @@ def main(argv=None):
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--design-system", help="a design-system folder, bypassing the pin")
     ap.add_argument("--from", dest="start", help="folder to start the pin search from (default: the file's folder)")
+    ap.add_argument("--record", metavar="VERDICT", help="also write the verdict to this file")
     args = ap.parse_args(argv)
     exceptions = {}
     for item in args.exception:
@@ -238,9 +256,15 @@ def main(argv=None):
                                        explicit=args.design_system)
     except design_source.DesignError as exc:
         print(f"check_render: {exc}", file=sys.stderr)
+        if args.record:
+            record(args.record, path, "FAIL: the design was refused", details=str(exc))
         return exc.code
     report = check(path.read_text(encoding="utf-8"), design, exceptions)
-    print(json.dumps(report, indent=2) if args.json else format_text(report, path))
+    text = format_text(report, path)
+    print(json.dumps(report, indent=2) if args.json else text)
+    if args.record:
+        count = len(report["findings"])
+        record(args.record, path, "PASS: no findings" if report["ok"] else f"FAIL: {count} finding(s)", design, text)
     return 0 if report["ok"] else 1
 
 

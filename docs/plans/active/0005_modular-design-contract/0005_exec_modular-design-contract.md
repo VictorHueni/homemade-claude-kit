@@ -367,7 +367,7 @@ Exit criteria:
 
 ### Increment 12: Skill evals for delivery-comms
 
-**Status:** pending
+**Status:** in-progress (suite prepared, not run; SKILL.md rewrite and the owner-approved runs pending)
 
 The unit tests prove the code; these prove that an agent using the rewritten skills follows them. The pattern is the reference design system's own `claude plugin eval` suite and its `skill-evals` Makefile target, which already works around the two WSL sandbox blockers (filtered `PATH`, temporary `HOME`).
 
