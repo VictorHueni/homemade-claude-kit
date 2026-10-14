@@ -166,10 +166,10 @@ Scope:
    - literals inside the resolved design layers the renderer inlined, and inside brand assets (inlined logo SVG, data URIs), pass;
    - a `var(--role, #hex)` fallback is stripped before the check, so it neither passes nor fails a page on its own;
    - an unknown `--name` fails; a `--kit-*` property whose value references only roles or non-colour values passes, and one carrying a literal colour fails;
-   - a declared exception passes and appears in the report; the report notes whether the manifest's `exceptions` vocabulary knows the name, and an unknown name is not refused;
+   - a declared exception passes and appears in the report; the report notes whether the manifest's `exceptions` vocabulary knows the name, and an unknown name is not refused; an exception whose name is a custom property (`--font-report`) allows the page to declare and use that property;
    - an exception that brings a `pairs` text pair below 4.5:1 fails (Q-7);
    - the check reads the resolved design, so the same HTML passes against one design and fails against another;
-   - each skill's current template, with its `var()` fallbacks removed and its renderer-internal properties renamed to `--kit-*`, passes on the base theme (a dry run of what Increments 05 to 09 will do; expected red today).
+   - each skill's current template, with its `var()` fallbacks removed and its renderer-internal properties renamed to `--kit-*`, passes on the base theme (a dry run of what Increments 05 to 09 will do; the test applies that migration itself, so it is red only until the validator exists).
 2. `plugins/delivery-comms/shared/check_render.py`: parse the built HTML and its inlined CSS (stdlib `html.parser` and a small CSS tokenizer), check per constraint 5 and the rules above, return findings as JSON and as text. Exceptions are declared per artefact (deck `config.yaml` `design.exceptions`, viz and release-note `--exception NAME=VALUE`). A command-line entry `check_render.py <file.html> [--exception NAME=VALUE]...` checks any HTML file against the resolved design, for bespoke generators.
 3. `sync-shared.py` run.
 

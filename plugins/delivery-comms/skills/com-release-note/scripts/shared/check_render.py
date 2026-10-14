@@ -5,11 +5,13 @@ Rules (Plan-0005 constraint 5):
   literal-colour    a hex, rgb()/hsl()-family or named colour in a style attribute, a <style> block or an
                     SVG presentation attribute. Exempt: <style data-design-layer> (the resolved design the
                     renderer inlined), elements marked data-brand-asset, url() contents, declared exceptions.
-  unknown-property  a custom property outside the contract's roles and the reserved --kit-* prefix.
+  unknown-property  a custom property outside the contract's roles, the reserved --kit-* prefix and the
+                    names of declared exceptions.
   contrast          a contract text pair that an exception brings below WCAG AA.
 A `var(--role, fallback)` is read as `var(--role)`: the fallback neither passes nor fails a page.
 
-An exception is NAME=VALUE: it allows the literal VALUE. When NAME is a contract role (`--muted=#6b7280`) it
+An exception is NAME=VALUE: it allows the literal VALUE. When NAME is a custom property (`--font-report=Lora,
+serif`) the page may also declare and use that property. When NAME is a contract role (`--muted=#6b7280`) it
 also stands in for that role when the contract's text pairs are checked.
 
 As a command, for generators outside the kit:
@@ -117,7 +119,8 @@ class Scanner(HTMLParser):
                 at = line + text[:text.index(prop)].count("\n")
                 self.finding("unknown-property", prop, at, where,
                              f"{prop} is not a contract role or a {KIT_PREFIX}* renderer property; use a role from "
-                             f"contract/modules.json or rename it {KIT_PREFIX}{prop[2:]}")
+                             f"contract/modules.json, rename it {KIT_PREFIX}{prop[2:]} if the renderer owns it, or "
+                             f"declare it as an exception if the project sets it")
         spans = [(m.start(2), m.group(1), m.group(2)) for m in DECL.finditer(text)] if not colour_attr \
             else [(0, "color", text)]
         for offset, prop, value in spans:
@@ -175,6 +178,7 @@ def check(html, design, exceptions=None, name=None):
     exceptions = dict(exceptions or {})
     contract = design_source._contract()
     known = {role for module in contract["modules"].values() for role in module["roles"]}
+    known |= {n for n in exceptions if n.startswith("--")}
     role_colours, values = _hex_roles(design)
     scanner = Scanner(known, {norm(v) for v in exceptions.values()}, role_colours)
     scanner.feed(html)

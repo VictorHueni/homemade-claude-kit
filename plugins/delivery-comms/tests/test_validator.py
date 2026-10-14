@@ -146,6 +146,16 @@ class ExceptionTest(ValidatorCase):
     def test_exception_that_keeps_the_pair_passes(self):
         self.assertTrue(self.check(PAGE, exceptions={"--muted": "#4b5563"})["ok"])
 
+    def test_exception_named_as_a_property_allows_that_property(self):
+        # a project re-faces the release note alone with --font-report (com-release-note SKILL.md)
+        html = page(":root { --font-report: Lora, serif; } body { font-family: var(--font-report); }")
+        refused = self.check(html)
+        self.assertEqual(self.kinds(refused), ["unknown-property"])
+        self.assertIn("declare it as an exception", refused["findings"][0]["message"])
+        report = self.check(html, exceptions={"--font-report": "Lora, serif"})
+        self.assertTrue(report["ok"], report["findings"])
+        self.assertEqual([e["name"] for e in report["exceptions"]], ["--font-report"])
+
 
 class ResolvedDesignTest(ValidatorCase):
     def test_same_html_passes_one_design_and_fails_another(self):
@@ -171,7 +181,6 @@ class TemplateDryRunTest(ValidatorCase):
     @staticmethod
     def migrate(text):
         text = check_render.strip_fallbacks(text)
-        names = set(re.findall(r"--[\w-]+", text)) - ROLES
         return re.sub(r"--[\w-]+", lambda m: m.group(0) if m.group(0) in ROLES or m.group(0).startswith("--kit-")
                       else "--kit-" + m.group(0)[2:], text)
 
