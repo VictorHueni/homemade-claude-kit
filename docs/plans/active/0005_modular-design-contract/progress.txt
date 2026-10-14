@@ -9,3 +9,10 @@ An independent reviewer read the plan against origin/main (34414d7) and the desi
 - Majors: Python 3.12 + PyYAML (already imported by com-slide-deck) instead of "stdlib only"; a small manifest checker instead of a JSON Schema library; contractVersion 2.0.0 stated; class vocabularies, brand roles, contrast pairs, font rule and guidance shape defined in modules.json; viz HTML date and HTML reproducibility added, no viz PDF promised; subset --from-legacy, pin-plus-legacy and docs/design/tokens.css handling, refresh alias removal.
 - Minors: registry override and XDG cache in tests, atomic cache, integrity on cache hit, wildcard exports, provenance file name and per-renderer tests, exception vocabulary rule, Dependabot entry printed by point, no Google Fonts fetch without design fonts, dark-theme clause dropped, increments 05 and 06 split (now 05-06 deck, 07-08 viz), reference implementation anonymised, research note open decisions recorded.
 - Owner rulings Q-5 to Q-8 recorded (viz colours split by meaning, guidance informational, contrast at resolve and render time, release/2.0 branch for 03 to 12).
+
+## Plan amendment (2026-10-14)
+
+Owner request after reviewing how the kit change will be tested:
+- Increment 01: a second CI job, `test-pdf`, installs Playwright and Chromium and runs the PDF tests; in CI a missing browser fails the job instead of skipping it.
+- New Increment 12: `claude plugin eval` suite for delivery-comms (five cases: deck in a pinned project, viz from a subfolder, release note, legacy tokens.css, bespoke generator), graded on files the run leaves (provenance, `check_render.py --record` verdict), never on tool-use records; runs only with owner approval. The SKILL.md rewrite moves from the release increment into 12 so the evals check it.
+- The release increment becomes 13; release/2.0 now carries 03 to 13.
