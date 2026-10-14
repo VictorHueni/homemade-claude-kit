@@ -33,7 +33,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 # Page geometry, the design and the validator come from build.py, so the PDF prints
 # exactly what the build checked.
 from build import (DesignError, RenderRefused, canvas_size, check_deck, page_geometry,  # noqa: E402
-                   provenance_summary, resolve_design, role_value, write_provenance)
+                   provenance_summary, resolve_design, write_provenance)
+import print_chrome  # noqa: E402  (shared: the page-margin chrome com-release-note draws too)
 
 
 def fail(msg: str, code: int = 1) -> None:
@@ -117,14 +118,6 @@ _PREP_JS = """
 """
 
 
-# Chromium renders header/footer templates into the page-margin boxes as a separate
-# document that the deck's CSS cannot reach, so the chrome inlines the resolved values
-# of the design's --font-mono and --muted roles.
-_CHROME_STYLE = ("width:100%;padding:0 {side};font-family:{font};"
-                 "font-size:8px;color:{colour};display:flex;"
-                 "justify-content:space-between;align-items:center;")
-
-
 def stamp_text(recipient: str | None, date: str) -> str:
     """The per-recipient footer stamp."""
     return f"Prepared for {recipient} · {date}" if recipient else ""
@@ -136,24 +129,21 @@ def _fill(template: str, cfg: dict, date: str) -> str:
 
 
 def document_chrome(cfg: dict, date: str, recipient: str | None, design) -> tuple[str, str]:
-    """(header, footer) templates of a paginated document, styled with the design's resolved roles."""
-    import html as html_mod
-
+    """(header, footer) templates of a paginated document. Chromium draws them in the page margins as a
+    separate document the deck's CSS cannot reach, so the shared print chrome inlines the design's resolved
+    --muted and --font-mono values and carries the brand logo (a data URI) and the legal line."""
     geom = page_geometry(cfg)
     page_cfg = cfg.get("page", {}) or {}
-    style = _CHROME_STYLE.format(side=geom["margin"]["left"], font=role_value(design, "--font-mono") or "monospace",
-                                 colour=role_value(design, "--muted") or "inherit")
-
+    side = geom["margin"]["left"]
     running = _fill(str(page_cfg.get("running_header", "{title}")), cfg, date)
     footer_left = stamp_text(recipient, date) or _fill(str(page_cfg.get("footer_left", "{author} · {date_label}")),
                                                        cfg, date)
     numbering = bool(page_cfg.get("numbering", True))
-
-    header_tpl = (f'<div style="{html_mod.escape(style + "padding-bottom:2mm;")}">'
-                  f'<span>{html_mod.escape(running)}</span><span></span></div>' if running else "<span></span>")
-    right = '<span><span class="pageNumber"></span> / <span class="totalPages"></span></span>' if numbering else "<span></span>"
-    footer_tpl = f'<div style="{html_mod.escape(style)}"><span>{html_mod.escape(footer_left)}</span>{right}</div>'
-    return header_tpl, footer_tpl
+    try:
+        return (print_chrome.header_template(design, running, side),
+                print_chrome.footer_template(design, footer_left, side, numbering))
+    except DesignError as exc:
+        fail(str(exc), exc.code)
 
 
 def render_document(cfg: dict, built_html: Path, pdf_path: Path, recipient: str | None, date: str, design) -> None:

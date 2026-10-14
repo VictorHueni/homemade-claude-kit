@@ -189,29 +189,12 @@ class ResolvedDesignTest(ValidatorCase):
 
 
 class TemplateDryRunTest(ValidatorCase):
-    """What Increments 05 to 09 will do: drop var() fallbacks, rename renderer-internal properties to --kit-*."""
-    TEMPLATES = {
-        "com-release-note": ("templates/report.html.tmpl",),
-    }
+    """Increments 05 to 09 dropped the var() fallbacks and renamed renderer-internal properties to --kit-*."""
     MIGRATED = {
         "com-slide-deck": ("templates/doc.baseline.css",),   # Increment 05
         "com-artefact-viz": ("templates/base.html.tmpl", "templates/tokens.domain.css"),   # Increment 07
+        "com-release-note": ("templates/report.html.tmpl",),   # Increment 09
     }
-
-    @staticmethod
-    def migrate(text):
-        text = check_render.strip_fallbacks(text)
-        return re.sub(r"--[\w-]+", lambda m: m.group(0) if m.group(0) in ROLES or m.group(0).startswith("--kit-")
-                      else "--kit-" + m.group(0)[2:], text)
-
-    def test_current_templates_pass_on_the_base_theme_once_migrated(self):
-        for skill, files in self.TEMPLATES.items():
-            for rel in files:
-                with self.subTest(template=f"{skill}/{rel}"):
-                    text = (PLUGIN / "skills" / skill / rel).read_text(encoding="utf-8")
-                    wrap = (lambda c: c) if rel.endswith(".tmpl") else (lambda c: f"<style>{c}</style>")
-                    self.assertEqual(self.kinds(self.check(wrap(text))), ["unknown-property"])
-                    self.assertEqual(self.check(wrap(self.migrate(text)))["findings"], [])
 
     def test_migrated_templates_pass_as_shipped(self):
         for skill, files in self.MIGRATED.items():

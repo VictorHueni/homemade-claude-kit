@@ -38,6 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
 import check_render  # noqa: E402
 import design_source  # noqa: E402
 from design_source import DesignError  # noqa: E402
+from print_chrome import css_string, role_value  # noqa: E402  (shared with the page-margin chrome)
 # Structural defaults for `mode: document` (paginated A4/Letter, flowing partials).
 DOC_BASELINE = Path(__file__).resolve().parent.parent / "templates" / "doc.baseline.css"
 
@@ -240,18 +241,6 @@ def inject_before_slide_end(slide_html: str, injection: str) -> str:
     return slide_html  # fallback: return unchanged if invariant not met
 
 
-def role_value(design, role: str) -> str:
-    """The resolved value of a contract role, following var() references within the design."""
-    values = design_source.role_values("".join(design.css.values()))
-    value = values.get(role, "")
-    for _ in range(8):
-        ref = re.fullmatch(r"var\(\s*(--[\w-]+)\s*\)", value)
-        if not ref:
-            break
-        value = values.get(ref.group(1), "")
-    return value
-
-
 def canvas_size(cfg: dict, design) -> tuple:
     """(width, height) in px of the slide canvas: config.yaml `canvas:` when the deck sets it, else the
     design's slide-frame roles --slide-width and --slide-height. build.py and render.py share it."""
@@ -267,17 +256,6 @@ def canvas_size(cfg: dict, design) -> tuple:
                               "(or set canvas: width and height in config.yaml)")
         size.append(round(float(m.group(1))))
     return size[0], size[1]
-
-
-def css_string(value: str) -> str:
-    """The text of a CSS string value such as `"Acme Ltd."`; empty for none or no value."""
-    value = (value or "").strip()
-    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
-        value = value[1:-1]
-    elif value in ("none", "initial", "normal"):
-        return ""
-    value = re.sub(r"\\([0-9a-fA-F]{1,6})\s?", lambda m: chr(int(m.group(1), 16)), value)
-    return re.sub(r"\\(.)", r"\1", value)
 
 
 def has_logo(design) -> bool:
