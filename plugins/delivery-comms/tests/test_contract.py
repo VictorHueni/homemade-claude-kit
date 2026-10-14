@@ -91,6 +91,11 @@ class ModulesTest(unittest.TestCase):
         self.assertIn("slide-footer", base)
         self.assertLessEqual(base, set(frame["classes"]))
 
+    def test_print_roles(self):
+        # Increment 09: the print module gives the page box (size and margin) and the page background
+        self.assertEqual(set(modules()["modules"]["print"]["roles"]), {"--print-bg", "--print-margin",
+                                                                       "--print-page-size"})
+
     def test_brand_roles(self):
         self.assertEqual(set(modules()["modules"]["brand"]["roles"]),
                          {"--brand-logo-on-light", "--brand-logo-on-dark", "--brand-mark", "--brand-legal"})

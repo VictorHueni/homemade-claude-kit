@@ -1,11 +1,15 @@
 """PDF renders (need Playwright and Chromium); run by `make test-pdf`."""
 import json
 import re
+import sys
 import unittest
 from pathlib import Path
 
 from helpers import SKILLS, RenderCase, run
 from pdf_helpers import require_browser
+
+PLUGIN = Path(__file__).resolve().parent.parent
+DESIGNS = PLUGIN / "tests/fixtures/design-systems"
 
 
 class ReleaseNotePdfTest(RenderCase):
@@ -15,6 +19,59 @@ class ReleaseNotePdfTest(RenderCase):
         result = run(SKILLS / "com-release-note/scripts/render_pdf.py", note, "--output", "rn.pdf", cwd=self.tmp)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue((self.tmp / "rn.pdf").read_bytes().startswith(b"%PDF"))
+        self.assertTrue((self.tmp / "rn.html.provenance.json").is_file())
+
+    def test_page_size_comes_from_the_print_module(self):
+        # Increment 09: the full fixture's print module sets Letter; the base theme is A4
+        require_browser(self)
+        note = SKILLS / "com-release-note/examples/release-note.complete.md"
+        for name, extra, expected in (("full", ("--design-system", DESIGNS / "full"), (612, 792)),
+                                      ("base", (), (595, 842))):
+            with self.subTest(design=name):
+                result = run(SKILLS / "com-release-note/scripts/render_pdf.py", note, *extra,
+                             "--output", f"{name}.pdf", cwd=self.tmp)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                boxes = re.findall(rb"/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)\s*\]",
+                                   (self.tmp / f"{name}.pdf").read_bytes())
+                self.assertTrue(boxes)
+                for w, h in boxes:   # Chromium rounds the page box to whole CSS pixels: within 1 pt
+                    self.assertLessEqual(abs(float(w) - expected[0]), 1, (w, h))
+                    self.assertLessEqual(abs(float(h) - expected[1]), 1, (w, h))
+
+
+class PrintChromePdfTest(RenderCase):
+    def test_full_logo_in_the_page_chrome_decodes_in_chromium(self):
+        # The footer template is a separate Chromium document: the logo must be a data URI it can draw.
+        require_browser(self)
+        sys.path.insert(0, str(PLUGIN / "shared"))
+        import design_source
+        import print_chrome
+        from playwright.sync_api import sync_playwright
+        design = design_source.resolve(self.tmp, explicit=DESIGNS / "full")
+        footer = print_chrome.footer_template(design, "Release note", "16mm")
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.set_content(footer)
+            width = page.evaluate("() => { const i = document.querySelector('img'); "
+                                  "return i && i.complete ? i.naturalWidth : 0; }")
+            browser.close()
+        self.assertGreater(width, 0)
+
+    def test_full_document_deck_renders_with_branded_chrome(self):
+        require_browser(self)
+        ux = self.tmp / "docs/ux"
+        ux.mkdir(parents=True)
+        (ux / "package.json").write_text(json.dumps({"dependencies": {"@acme-test/full": f"file:{DESIGNS / 'full'}"}}),
+                                         encoding="utf-8")
+        self.assertEqual(run(SKILLS / "com-slide-deck/scripts/init.py", "doc", "--mode", "document",
+                             cwd=self.tmp).returncode, 0)
+        build = run(SKILLS / "com-slide-deck/scripts/build.py", "-c", "doc/config.yaml", cwd=self.tmp)
+        self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
+        result = run(SKILLS / "com-slide-deck/scripts/render.py", "--config", "doc/config.yaml",
+                     "--output", "doc.pdf", cwd=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.tmp / "doc.pdf").read_bytes().startswith(b"%PDF"))
 
 
 class SlideDeckPdfTest(RenderCase):

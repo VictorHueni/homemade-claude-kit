@@ -239,6 +239,20 @@ class RenderScriptTest(DeckCase):
         _, stamped = self.render.document_chrome(cfg, "2026-10-14", "Partner Co", design)
         self.assertIn("Prepared for Partner Co · 2026-10-14", stamped)
 
+    def test_document_chrome_from_full_carries_the_logo_and_the_legal_line(self):
+        # Increment 09 (owner 2026-10-14): the shared print chrome brands a document deck's page margins
+        for name, branded in (("full", True), ("subset", False)):
+            with self.subTest(design=name):
+                self.setUp()
+                self.pin(name)
+                self.scaffold(mode="document")
+                cfg = yaml.safe_load((self.deck / "config.yaml").read_text(encoding="utf-8"))
+                design = self.render.resolve_design(cfg, self.deck)
+                _, footer = self.render.document_chrome(cfg, "2026-10-14", None, design)
+                self.assertEqual(bool(re.search(r'<img [^>]*src="data:image/svg\+xml;base64,', footer)), branded)
+                self.assertEqual("Acme Test is a fictitious brand." in footer, branded)
+                self.assertIn('class="pageNumber"', footer)
+
     def test_render_refuses_an_off_brand_built_deck_and_prints_nothing(self):
         self.scaffold()
         self.assertBuilds()
