@@ -102,7 +102,7 @@ Default output: `docs/communication/visualisations/<kind>.html`.
    `--design-system PATH`; (b) the shared `docs/ux/tokens.css` produced by
    the **`ux-design-system`** skill, auto-detected if present (the view prints
    "using shared design system …"); (c) the skill's shipped defaults
-   (`templates/tokens.fallback.css`). The project sheet's `:root` tokens are
+   (`scripts/shared/base/core.css`). The project sheet's `:root` tokens are
    inlined over the fallback and win. Prefer the shared `ux-design-system` skill so decks and
    views theme from one source; you can still point `--design-system` at a
    `com-slide-deck` `design/styles.css`. This is the supported way to make
@@ -120,7 +120,7 @@ Default output: `docs/communication/visualisations/<kind>.html`.
 The pipeline keeps parsing, structure, and styling independent so each can
 evolve alone:
 
-1. **Design tokens** — layered like `com-slide-deck`: `templates/tokens.fallback.css`
+1. **Design tokens** — layered like `com-slide-deck`: `scripts/shared/base/core.css`
    (shipped generic contract — base palette, `--success`/`--warning`/`--danger`/
    `--info`, typography, spacing) is inlined first; the project sheet
    (`docs/ux/tokens.css` or `--design-system`) is inlined over it and wins;

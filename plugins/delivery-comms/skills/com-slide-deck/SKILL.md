@@ -314,7 +314,7 @@ and run a build to verify.
 ## Migrating an Existing Deck onto the Design System
 
 A deck built before the shared design system keeps building unchanged — the
-shipped `tokens.fallback.css` is a harmless base layer and the deck's own
+shipped `scripts/shared/base/core.css` is a harmless base layer and the deck's own
 `styles.css` (inlined after it) overrides any overlapping tokens. Migration is
 **optional**, and only needed to make the deck theme from the project's
 `docs/ux/tokens.css` (so deck + artefact views share one source).

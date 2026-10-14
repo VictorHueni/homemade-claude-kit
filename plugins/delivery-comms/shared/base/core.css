@@ -1,13 +1,10 @@
 /*
- * tokens.fallback.css — shipped neutral defaults for the generic token contract.
+ * core.css — shipped neutral defaults for the `core` module of the design contract.
  *
- * Inlined FIRST so a deck/view renders correctly with ZERO project setup. When a
- * project's docs/ux/tokens.css exists it is inlined AFTER this and overrides
- * these values (project wins). Same layering in com-artefact-viz + com-slide-deck.
- *
- * Keep this :root in sync with the canonical contract,
- * design-system/templates/tokens.template.css (generic names only — no kit-domain
- * tokens; those are consumer-derived, e.g. com-artefact-viz/templates/tokens.domain.css).
+ * Inlined FIRST so a deck, view or report renders correctly with ZERO project setup;
+ * a project's own design is inlined AFTER and overrides these values. One copy
+ * for every renderer: canonical in plugins/delivery-comms/shared/base/, copied into
+ * each skill by scripts/sync-shared.py. Role list: contract/modules.json.
  */
 :root {
   /* ---- Base palette ---- */
@@ -27,9 +24,7 @@
   --info:    #3b6ef5;   /* informational / planned / neutral-active */
 
   /* ---- Typography ---- */
-  /* Body text. --font-sans is honored as a legacy alias: older project sheets
-     that still define it theme --font-body through the var() chain. */
-  --font-body:  var(--font-sans, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+  --font-body:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   /* UI chrome (view titles, group/card headings, badges, toolbar buttons).
      Deliberately independent of --font-body: a project may theme --font-body
      with a serif reading face (com-slide-deck decks do), and headings/badges

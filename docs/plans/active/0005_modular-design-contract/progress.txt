@@ -16,3 +16,25 @@ Owner request after reviewing how the kit change will be tested:
 - Increment 01: a second CI job, `test-pdf`, installs Playwright and Chromium and runs the PDF tests; in CI a missing browser fails the job instead of skipping it.
 - New Increment 12: `claude plugin eval` suite for delivery-comms (five cases: deck in a pinned project, viz from a subfolder, release note, legacy tokens.css, bespoke generator), graded on files the run leaves (provenance, `check_render.py --record` verdict), never on tool-use records; runs only with owner approval. The SKILL.md rewrite moves from the release increment into 12 so the evals check it.
 - The release increment becomes 13; release/2.0 now carries 03 to 13.
+
+## Iteration 1
+- Increment: 01 — Test lane for delivery-comms
+- Status: done
+- Files changed: plugins/delivery-comms/Makefile, plugins/delivery-comms/tests/{helpers,pdf_helpers,test_characterisation,test_pdf}.py, .github/workflows/delivery-comms.yml, plan status
+- Red: n/a (exempt: characterisation tests pin today's behaviour and pass on first run by design). Sensitivity checked instead: breaking the fallback marker/accent line in the release-note, slide-deck and artefact-viz tokens.fallback.css turned the matching test red; restored after.
+- Green: make test (3 tests) and make test-pdf (2 tests) pass locally.
+- Test gate: passed (make -C plugins/delivery-comms test; ./scripts/audit-skills.sh). CI=true with no browser makes test-pdf fail (2 failures); without CI it skips.
+- Learnings: the viz "domain tokens" layer marker comes from render.py, not tokens.domain.css, so the test is sensitive to the fallback template only. The release-note accent appears in 9 places of the HTML, so the marker (not the accent) is what catches a broken fallback there. The two CI jobs themselves have not run yet; they run on the PR.
+- Commit: see git log (test(delivery-comms): test lane for delivery-comms)
+- Timestamp: 2026-10-14
+
+## Iteration 2
+- Increment: 02 — Contract v2, manifest schema, one base theme and the shared sync
+- Status: done
+- Files changed: plugins/delivery-comms/{contract/,shared/,scripts/sync-shared.py,Makefile}, tests/{test_contract.py,test_characterisation.py,fixtures/design-systems/}, the three renderers' scripts (+ scripts/shared/ copies), three tokens.fallback.css removed, ux-design-system/references/token-contract.md (now a pointer), SKILL/README mentions, plan status
+- Red: test_contract (all 13 new tests errored or failed: no contract, no checker, no sync script, fallback copies present) plus the 3 characterisation tests failing on the renamed marker. ERROR: test_accepts_full_and_subset ERROR: test_base_defines_every_role_of_every_module ERROR: test_brand_roles ERROR: test_class_vocabularies_cover_what_the_renderers_emit ERROR: test_core_has_heading_font_and_no_legacy_alias ERROR: test_core_keeps_todays_24_roles ERROR: test_dataviz_roles ERROR: test_declares_contract_version_and_nine_modules ERROR: test_no_role_in_two_modules ERROR: test_pairs_name_existing_roles ERROR: test_rejects_missing_dataviz ERROR: test_rejects_unknown_module_bad_semver_and_unknown_key ERROR: test_schema_uses_only_implemented_keywords FAIL: test_every_skill_copy_matches_the_canonical_shared FAIL: test_fallback_copies_are_gone_and_renderers_still_theme FAIL: test_fbs_sample_builds_on_fallback_and_domain_tokens FAIL: test_release_note_example_builds_on_fallback_tokens FAIL: test_scaffolded_deck_builds_on_fallback_tokens
+- Green: make test (18 tests) and make test-pdf (2 tests) pass.
+- Test gate: passed (make -C plugins/delivery-comms test; ./scripts/audit-skills.sh)
+- Learnings: Deviations from the plan text. (1) Scope (e) says the checker accepts "full, subset, minimal" but the fixture `minimal-invalid/` is core only and must be rejected for the missing dataviz; the test accepts full and subset and rejects minimal-invalid. (2) The characterisation marker became "core.css — shipped neutral defaults" because the fallback files are gone; every other asserted layer and the fallback accent are unchanged. (3) Renderers still read only shared/base/core.css; the other eight base modules exist and are tested but the resolver (Increment 03) is what loads them, so no output changed apart from --font-heading on the deck and release note and the dropped --font-sans alias. (4) sync-shared.py also copies contract/modules.json and kit-manifest.schema.json into each skill's scripts/shared/ so the resolver can read them self-contained; it covers the three renderers, not ux-design-system (Increment 11). (5) Class vocabularies and the pair list are first drafts derived from today's templates.
+- Commit: see git log (feat(delivery-comms): contract v2, manifest schema, one base theme and the shared sync)
+- Timestamp: 2026-10-14

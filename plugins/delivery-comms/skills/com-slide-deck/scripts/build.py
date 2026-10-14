@@ -29,10 +29,10 @@ except ImportError:
     print("PyYAML is required. Install it with: pip install pyyaml")
     sys.exit(1)
 
-# Shipped neutral fallback (generic token contract) — inlined before everything
-# so a deck renders correctly with no project design system. Mirrors
-# com-artefact-viz/templates/tokens.fallback.css (same name, same role).
-FALLBACK_TOKENS = Path(__file__).resolve().parent.parent / "templates" / "tokens.fallback.css"
+# Shipped neutral base theme (core module) — inlined before everything so a deck
+# renders correctly with no project design system. One copy for every renderer,
+# synced from plugins/delivery-comms/shared/ by scripts/sync-shared.py.
+FALLBACK_TOKENS = Path(__file__).resolve().parent / "shared" / "base" / "core.css"
 # Structural defaults for `mode: document` (paginated A4/Letter, flowing partials).
 DOC_BASELINE = Path(__file__).resolve().parent.parent / "templates" / "doc.baseline.css"
 
@@ -372,7 +372,7 @@ def build(config_path: Path, output_override: str = None):
 
     # Styles — layered so values cascade in the right order (same model as
     # com-artefact-viz):
-    #   1. tokens.fallback.css    — shipped neutral generic contract (zero-config)
+    #   1. shared/base/core.css   — shipped neutral generic contract (zero-config)
     #   2. docs/ux/tokens.css — project override (the source of truth; wins)
     #   3. the deck's own styles.css — deck-only tokens + components
     #   4. baseline CSS           — structural defaults

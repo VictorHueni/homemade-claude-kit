@@ -1,0 +1,158 @@
+{
+  "contractVersion": "2.0.0",
+  "modules": {
+    "core": {
+      "required": true,
+      "roles": {
+        "--ink": "Primary text",
+        "--muted": "Secondary text",
+        "--canvas-bg": "Page background",
+        "--surface": "Card or panel background",
+        "--surface-2": "Recessed or group background",
+        "--border": "Hairlines and dividers",
+        "--accent": "Primary action, links, IDs",
+        "--accent-ink": "Text on accent fills",
+        "--success": "Positive, done, validated",
+        "--warning": "Caution, in progress, tested",
+        "--danger": "Negative, error, critical",
+        "--info": "Informational, planned, neutral-active",
+        "--font-body": "Body and reading text",
+        "--font-heading": "UI chrome: titles, headings, badges, buttons",
+        "--font-mono": "IDs, code, labels",
+        "--title-size": "View or slide title size",
+        "--space-sm": "Small spacing step",
+        "--space-md": "Medium spacing step",
+        "--space-lg": "Large spacing step",
+        "--shell-max": "Maximum content width",
+        "--card-radius": "Card corner radius",
+        "--btn-radius": "Button corner radius",
+        "--node-radius": "Node corner radius",
+        "--shadow": "Card elevation"
+      }
+    },
+    "dataviz": {
+      "required": true,
+      "roles": {
+        "--chart-1": "First series, darkest",
+        "--chart-2": "Second series",
+        "--chart-3": "Third series",
+        "--chart-4": "Fourth series",
+        "--chart-rest": "Every series past the fourth",
+        "--chart-axis": "Axis and baseline",
+        "--chart-grid": "Gridlines",
+        "--chart-highlight": "Highlighted mark"
+      }
+    },
+    "type": {
+      "required": false,
+      "roles": {
+        "--font-size-xs": "Smallest text",
+        "--font-size-sm": "Small text",
+        "--font-size-md": "Body text size",
+        "--font-size-lg": "Large text",
+        "--font-size-xl": "Display text",
+        "--line-height-body": "Body line height",
+        "--line-height-tight": "Heading line height",
+        "--font-weight-regular": "Regular weight",
+        "--font-weight-bold": "Bold weight"
+      }
+    },
+    "space-shape": {
+      "required": false,
+      "roles": {
+        "--space-xs": "Extra-small spacing step",
+        "--space-xl": "Extra-large spacing step",
+        "--radius-sm": "Small corner radius",
+        "--radius-pill": "Pill corner radius",
+        "--border-width": "Hairline width"
+      }
+    },
+    "document": {
+      "required": false,
+      "roles": {
+        "--doc-page-bg": "Paper sheet background",
+        "--doc-text-size": "Document body text size",
+        "--doc-rule": "Rule between document sections"
+      },
+      "classes": [
+        "doc",
+        "doc-keep",
+        "doc-label",
+        "doc-section",
+        "doc-section--flow"
+      ]
+    },
+    "slide-frame": {
+      "required": false,
+      "roles": {
+        "--slide-bg": "Slide background",
+        "--slide-fg": "Slide text colour",
+        "--slide-padding": "Slide inner padding"
+      },
+      "classes": [
+        "slide",
+        "active",
+        "presenting",
+        "controls-hint",
+        "slide-source-bar"
+      ]
+    },
+    "print": {
+      "required": false,
+      "roles": {
+        "--print-bg": "Printed page background",
+        "--print-margin": "Printed page margin"
+      },
+      "classes": [
+        "report",
+        "report-framing",
+        "report-kicker",
+        "report-title",
+        "section",
+        "section--breaking",
+        "section--page-break",
+        "section-label"
+      ]
+    },
+    "brand": {
+      "required": false,
+      "roles": {
+        "--brand-logo-on-light": "CSS url() of the logo for light backgrounds, a package export path",
+        "--brand-logo-on-dark": "CSS url() of the logo for dark backgrounds, a package export path",
+        "--brand-mark": "CSS url() of the compact mark, a package export path",
+        "--brand-legal": "Legal line as a CSS string"
+      }
+    },
+    "guidance": {
+      "required": false,
+      "roles": {}
+    }
+  },
+  "pairs": [
+    {
+      "fg": "--ink",
+      "bg": "--canvas-bg",
+      "use": "Body text on the page"
+    },
+    {
+      "fg": "--ink",
+      "bg": "--surface",
+      "use": "Body text on cards"
+    },
+    {
+      "fg": "--muted",
+      "bg": "--surface",
+      "use": "Secondary text on cards"
+    },
+    {
+      "fg": "--accent-ink",
+      "bg": "--accent",
+      "use": "Text on accent fills"
+    },
+    {
+      "fg": "--accent",
+      "bg": "--surface",
+      "use": "Links and IDs on cards"
+    }
+  ]
+}

@@ -40,8 +40,9 @@ def watched_paths(args):
             paths += [os.path.join(p, n) for n in os.listdir(p) if n.lower().endswith(".md")]
         else:
             paths.append(p)
-    for name in ("base.html.tmpl", "tokens.fallback.css", "tokens.domain.css", "runtime.js"):
+    for name in ("base.html.tmpl", "tokens.domain.css", "runtime.js"):
         paths.append(os.path.join(TEMPLATE_DIR, name))
+    paths.append(os.path.join(HERE, "shared", "base", "core.css"))
     return paths
 
 

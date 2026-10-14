@@ -1,0 +1,6 @@
+/* slide-frame.css — neutral defaults for the `slide-frame` module (slide canvas). */
+:root {
+  --slide-bg: #ffffff;
+  --slide-fg: #1a1f29;
+  --slide-padding: 48px;
+}

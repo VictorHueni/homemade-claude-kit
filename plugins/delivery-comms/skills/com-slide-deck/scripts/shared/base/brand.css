@@ -1,0 +1,7 @@
+/* brand.css — neutral defaults for the `brand` module (logos and legal line; none in the base theme). */
+:root {
+  --brand-logo-on-light: none;
+  --brand-logo-on-dark: none;
+  --brand-mark: none;
+  --brand-legal: "";
+}

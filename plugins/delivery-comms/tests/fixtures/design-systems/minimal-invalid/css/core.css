@@ -1,0 +1,7 @@
+:root {
+  --ink: #101828; --muted: #475467; --canvas-bg: #f9fafb; --surface: #ffffff; --surface-2: #f2f4f7; --border: #d0d5dd;
+  --accent: #c4320a; --accent-ink: #ffffff; --success: #027a48; --warning: #b54708; --danger: #b42318; --info: #c4320a;
+  --font-body: Georgia, serif; --font-heading: system-ui, sans-serif; --font-mono: ui-monospace, monospace; --title-size: 1.8rem;
+  --space-sm: 0.5rem; --space-md: 1rem; --space-lg: 2rem; --shell-max: 1200px;
+  --card-radius: 6px; --btn-radius: 4px; --node-radius: 6px; --shadow: none;
+}

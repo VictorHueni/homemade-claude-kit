@@ -1,0 +1,35 @@
+name: delivery-comms
+
+on:
+  pull_request:
+    branches: [main, release/2.0]
+    paths:
+      - 'plugins/delivery-comms/**'
+      - '.github/workflows/delivery-comms.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pyyaml
+      - run: make -C plugins/delivery-comms test
+
+  test-pdf:
+    runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pyyaml playwright
+      - run: python -m playwright install --with-deps chromium
+      - run: make -C plugins/delivery-comms test-pdf
