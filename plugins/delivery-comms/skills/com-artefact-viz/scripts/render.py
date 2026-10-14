@@ -134,11 +134,13 @@ def _emit(model, rendered, kind, args, source_label):
     # Design system: defaults first, then the project sheet (project tokens win).
     # Resolution order for the project sheet:
     # Token layering (same model as com-slide-deck):
-    #   1. shared/base/core.css  — shipped neutral generic contract (zero-config)
+    #   1. shared/base/core.css + dataviz.css — shipped neutral base (zero-config);
+    #      dataviz carries the --chart-* roles the importance and confidence
+    #      scales read (until Increment 08 resolves every module)
     #   2. docs/ux/tokens.css — project override (explicit --design-system, or
     #                                auto-detected; project values win)
-    #   3. tokens.domain.css     — viz domain tokens derived from the generics
-    ds = _read(os.path.join(HERE, "shared", "base", "core.css"))
+    #   3. tokens.domain.css     — viz domain colours, --kit-* on contract roles
+    ds = "\n\n".join(_read(os.path.join(HERE, "shared", "base", f"{module}.css")) for module in ("core", "dataviz"))
     project_sheet = args.design_system
     if not project_sheet:
         shared = os.path.join("docs", "ux", "tokens.css")

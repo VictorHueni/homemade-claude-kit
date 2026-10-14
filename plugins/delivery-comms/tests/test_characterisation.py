@@ -29,7 +29,8 @@ class ArtefactVizTest(RenderCase):
         result = run(SKILLS / "com-artefact-viz/scripts/render.py", sample, "--out", "out/viz.html", cwd=self.tmp)
         self.assertEqual(result.returncode, 0, result.stderr)
         html = (self.tmp / "out/viz.html").read_text(encoding="utf-8")
-        self.assertLayersInOrder(html, [FALLBACK_MARKER, "viz domain tokens (derived)"])
+        # Increment 07: the domain tokens read --chart-1 to --chart-3, so the base dataviz module is inlined too
+        self.assertLayersInOrder(html, [FALLBACK_MARKER, "dataviz.css — neutral defaults", "viz domain tokens (derived)"])
         self.assertIn(FALLBACK_ACCENT, html)
 
 

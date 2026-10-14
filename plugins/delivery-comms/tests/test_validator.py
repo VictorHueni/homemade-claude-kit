@@ -178,11 +178,11 @@ class ResolvedDesignTest(ValidatorCase):
 class TemplateDryRunTest(ValidatorCase):
     """What Increments 05 to 09 will do: drop var() fallbacks, rename renderer-internal properties to --kit-*."""
     TEMPLATES = {
-        "com-artefact-viz": ("templates/base.html.tmpl", "templates/tokens.domain.css"),
         "com-release-note": ("templates/report.html.tmpl",),
     }
     MIGRATED = {
         "com-slide-deck": ("templates/doc.baseline.css",),   # Increment 05
+        "com-artefact-viz": ("templates/base.html.tmpl", "templates/tokens.domain.css"),   # Increment 07
     }
 
     @staticmethod
@@ -205,7 +205,8 @@ class TemplateDryRunTest(ValidatorCase):
             for rel in files:
                 with self.subTest(template=f"{skill}/{rel}"):
                     text = (PLUGIN / "skills" / skill / rel).read_text(encoding="utf-8")
-                    self.assertEqual(self.check(f"<style>{text}</style>")["findings"], [])
+                    wrap = (lambda c: c) if rel.endswith(".tmpl") else (lambda c: f"<style>{c}</style>")
+                    self.assertEqual(self.check(wrap(text))["findings"], [])
                     self.assertEqual(check_render.strip_fallbacks(text), text, "a var() fallback is left")
 
 
