@@ -12,6 +12,7 @@ is forwarded, except --out which is fixed to a temp file the server serves.
 """
 
 import argparse
+import functools
 import http.server
 import os
 import socketserver
@@ -62,6 +63,7 @@ def main():
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--kind", choices=None)
     ap.add_argument("--design-system", dest="design_system")
+    ap.add_argument("--exception", action="append", metavar="NAME=VALUE")
     ap.add_argument("--left-axis-label", dest="left_axis_label")
     ap.add_argument("--left-axis-arrow", dest="left_axis_arrow", default="▼")
     ap.add_argument("--title")
@@ -90,6 +92,8 @@ def main():
             print(f"[{time.strftime('%H:%M:%S')}] rendered {label}")
         except SystemExit as e:
             print(f"render error: {e}")
+        except (render_mod.DesignError, render_mod.RenderRefused) as e:
+            print(f"render refused: {e}")
         except Exception as e:  # keep the server alive on parse errors
             print(f"render error: {e}")
 
@@ -109,8 +113,9 @@ def main():
 
     threading.Thread(target=watch, daemon=True).start()
 
-    os.chdir(tmpdir)
-    handler = http.server.SimpleHTTPRequestHandler
+    # Serve the temp folder without changing directory, so each rebuild still finds the sources and
+    # walks up from the working directory to the project's design-system pin.
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=tmpdir)
     with socketserver.TCPServer(("127.0.0.1", args.port), handler) as httpd:
         print(f"serving http://127.0.0.1:{args.port}/  (Ctrl-C to stop)")
         try:
