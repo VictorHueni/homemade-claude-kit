@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Role-only page</title>
+<style data-design-layer>
+:root { --ink: #101828; --surface: #ffffff; --accent: #396cf5; }
+</style>
+<style>
+:root { --kit-gap: calc(var(--space-md) * 2); --kit-edge: 1px solid var(--border); --kit-tint: var(--surface-2); }
+body { color: var(--ink); background: var(--canvas-bg); font-family: var(--font-body); }
+.card { background: var(--surface); border: var(--kit-edge); padding: var(--kit-gap); border-radius: var(--card-radius); }
+.card a { color: var(--accent); }
+.muted { color: var(--muted, #6b7280); }
+</style>
+</head>
+<body>
+<div class="card" style="color: var(--ink); background: var(--kit-tint)">
+  <a href="#">link</a>
+  <svg width="10" height="10"><rect width="10" height="10" fill="var(--chart-1)" stroke="var(--chart-axis)"/></svg>
+  <span data-brand-asset><svg width="10" height="10"><path d="M0 0h10v10z" fill="#c8102e"/></svg></span>
+  <i style="background-image: url(data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmYwMDAwIi8+)"></i>
+</div>
+</body>
+</html>

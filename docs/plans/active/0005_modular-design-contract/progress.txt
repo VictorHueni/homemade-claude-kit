@@ -50,3 +50,14 @@ Owner request after reviewing how the kit change will be tested:
 - Commit: see git log (feat(delivery-comms): shared design resolver)
 - Owner decision (2026-10-14) on learning (1): darken the base accent to #396cf5 (4.53:1 on white) everywhere #3b6ef5 appeared (accent, info, chart-2, templates, docs) and run the resolve-time contrast check on the base theme too. Red: test_base_theme_passes_its_own_pairs failed on #3b6ef5 (--accent-ink on --accent); green: make test 51 tests, make test-pdf 2 tests.
 - Timestamp: 2026-10-14
+
+## Iteration 4
+- Increment: 04 — Blocking validator
+- Status: done
+- Files changed: plugins/delivery-comms/{shared/check_render.py, Makefile, tests/test_validator.py, tests/fixtures/pages/role-only.html}, the three skills' scripts/shared/ copies, plan status
+- Red: tests/test_validator.py failed to import (ModuleNotFoundError: check_render), so none of its 22 tests could run.
+- Green: make test (73 tests, 22 new) passes.
+- Test gate: passed (make -C plugins/delivery-comms test; ./scripts/audit-skills.sh; sync-shared.py --check)
+- Learnings: Deviations and choices the plan left open. (1) The dry-run test over the current templates is green, not red: it asserts the raw templates fail with unknown-property only (renderer-internal names such as --viz-title-size, --font-report, --doc-page-width) and that the migrated text (fallbacks stripped, those names renamed --kit-*) passes on the base theme; no template carries a literal colour outside var() fallbacks. (2) Markers the renderers must emit from Increments 05 to 09: `<style data-design-layer>` around the inlined design CSS and `data-brand-asset` on an inlined logo element; both are exempt from the literal-colour rule. (3) An exception is NAME=VALUE: VALUE is the literal it allows; when NAME is a contract role (--muted) it stands in for that role in the text-pair check. (4) Named colours are flagged only in colour-bearing properties; url() contents (data URIs, fragments) are blanked before scanning. (5) Exit codes: 0 pass, 1 findings, 2 design refused. (6) The renderers do not call check_render yet; wiring and the "no output on failure" behaviour land with Increments 05, 08 and 09.
+- Commit: see git log (feat(delivery-comms): blocking render validator)
+- Timestamp: 2026-10-14
