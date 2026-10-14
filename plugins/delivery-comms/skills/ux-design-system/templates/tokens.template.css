@@ -25,6 +25,7 @@
   --accent-ink: #ffffff;   /* text on accent fills */
 
   /* ---- Semantic state (generic; portable across projects + tools) ---- */
+  /* Text on these fills is --accent-ink or --ink, whichever reaches WCAG AA. */
   --success: #2e9e5b;   /* positive / done / validated */
   --warning: #f0ad4e;   /* caution / in-progress / tested */
   --danger:  #d5413d;   /* negative / error / critical */

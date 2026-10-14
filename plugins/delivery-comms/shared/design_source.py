@@ -6,6 +6,10 @@ source (at most 8 levels), then the kit's base theme. A legacy token file with n
 pinned version is downloaded from the npm registry (no npm, no node_modules), verified against npm's
 `dist.integrity`, extracted with the tar `data` filter and cached per machine.
 
+Text on a fill: a contract pair whose `fg` is a list passes when any of its roles reaches WCAG AA on the fill.
+For each such pair the resolver appends `--kit-on-<fill>: var(<first role in list order that passes>)` to the
+CSS of the module that owns the fill role, so renderers paint that text with `var(--kit-on-<fill>)`.
+
 As a command, for generators outside the kit:
     design_source.py css [--module core,dataviz] [--design-system DIR | --from DIR]
     design_source.py fonts | provenance  [same selection]
@@ -251,16 +255,66 @@ def role_values(css):
     return {m.group(1): m.group(2).strip() for m in re.finditer(r"(--[\w-]+)\s*:\s*([^;}]+)", css)}
 
 
+_HEX = re.compile(r"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})")
+KIT_ON = "--kit-on-"
+
+
+def text_roles(pair):
+    """The text roles of a contract pair: one role, or a list where any role that reaches AA will do."""
+    return list(pair["fg"]) if isinstance(pair["fg"], list) else [pair["fg"]]
+
+
+def pair_ratios(values, pair):
+    """[(text role, contrast on the pair's fill)] in list order, or None when a value is not a hex colour."""
+    bg = values.get(pair["bg"], "")
+    fgs = [(role, values.get(role, "")) for role in text_roles(pair)]
+    if not _HEX.fullmatch(bg) or not all(_HEX.fullmatch(value) for _, value in fgs):
+        return None
+    return [(role, contrast(value, bg)) for role, value in fgs]
+
+
 def failing_pairs(css, pairs):
-    """(fg, bg, use, ratio) for every contract pair whose two roles are hex colours and fall below AA."""
+    """(tried, bg, use) for every contract pair whose roles are hex colours and none of whose text roles
+    reaches AA; `tried` is [(text role, ratio)] in list order."""
     values, failed = role_values(css), []
     for pair in pairs:
-        fg, bg = values.get(pair["fg"], ""), values.get(pair["bg"], "")
-        if re.fullmatch(r"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})", fg) and re.fullmatch(r"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})", bg):
-            ratio = contrast(fg, bg)
-            if ratio < AA:
-                failed.append((pair["fg"], pair["bg"], pair["use"], ratio))
+        tried = pair_ratios(values, pair)
+        if tried and all(ratio < AA for _, ratio in tried):
+            failed.append((tried, pair["bg"], pair["use"]))
     return failed
+
+
+def describe_failure(tried, bg, use):
+    """One line naming every text role tried on `bg` with its ratio."""
+    if len(tried) == 1:
+        (fg, ratio), = tried
+        return f"{fg} on {bg} ({use}): contrast {ratio:.2f}, below WCAG AA {AA}"
+    roles = " or ".join(f"{fg} (contrast {ratio:.2f})" for fg, ratio in tried)
+    return f"{roles} on {bg} ({use}): no text role reaches WCAG AA {AA}"
+
+
+def kit_on(fill):
+    """The renderer property that holds the text role chosen for `fill`: --success -> --kit-on-success."""
+    return KIT_ON + fill.lstrip("-")
+
+
+def fill_text(css, pairs):
+    """{fill: text role} for every list pair: the first role in list order that reaches AA on the fill, else
+    (a value that is not a hex colour, or no role passing) the first role of the list."""
+    values, chosen = role_values(css), {}
+    for pair in pairs:
+        if not isinstance(pair["fg"], list):
+            continue
+        tried = pair_ratios(values, pair) or []
+        chosen[pair["bg"]] = next((role for role, ratio in tried if ratio >= AA), text_roles(pair)[0])
+    return chosen
+
+
+def fill_text_css(chosen):
+    """A `:root` block declaring --kit-on-<fill>: var(<role>) for each entry of `chosen`, or "" when empty."""
+    if not chosen:
+        return ""
+    return ":root {\n" + "".join(f"  {kit_on(fill)}: var({role});\n" for fill, role in chosen.items()) + "}\n"
 
 
 # --- resolve --------------------------------------------------------------------------------------
@@ -339,10 +393,18 @@ def resolve(start_dir, explicit=None):
             text += "\n" + own
         css[module] = text
 
-    bad = failing_pairs("".join(css.values()), contract["pairs"])
+    assembled = "".join(css.values())
+    bad = failing_pairs(assembled, contract["pairs"])
     if bad:
-        lines = [f"  {fg} on {bg} ({use}): contrast {ratio:.2f}, below WCAG AA {AA}" for fg, bg, use, ratio in bad]
+        lines = ["  " + describe_failure(*failure) for failure in bad]
         raise DesignError("the design's own text pairs fail WCAG AA:\n" + "\n".join(lines))
+    # text on a fill: one --kit-on-<fill> per list pair, declared in the module that owns the fill role
+    owner = {role: module for module, spec in contract["modules"].items() for role in spec["roles"]}
+    chosen = fill_text(assembled, contract["pairs"])
+    for module in css:
+        block = fill_text_css({fill: role for fill, role in chosen.items() if owner[fill] == module})
+        if block:
+            css[module] += ("" if css[module].endswith("\n") else "\n") + block
 
     brand_roles = contract["modules"]["brand"]["roles"]
     brand = {role: _inline_brand_value(raw_brand[role], root, exports) for role in brand_roles if role in raw_brand}

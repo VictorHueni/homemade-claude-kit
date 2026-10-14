@@ -162,42 +162,66 @@
       "use": "Links and IDs on cards"
     },
     {
-      "fg": "--ink",
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
       "bg": "--success",
       "use": "Text on a success fill (shipped badge)"
     },
     {
-      "fg": "--accent-ink",
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
       "bg": "--info",
       "use": "Text on an info fill (planned badge)"
     },
     {
-      "fg": "--ink",
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
       "bg": "--warning",
       "use": "Text on a warning fill (high-pain badge)"
     },
     {
-      "fg": "--accent-ink",
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
       "bg": "--danger",
       "use": "Text on a danger fill"
     },
     {
-      "fg": "--accent-ink",
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
       "bg": "--muted",
       "use": "Text on a muted fill (backlog badge)"
     },
     {
-      "fg": "--accent-ink",
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
       "bg": "--chart-1",
       "use": "Text on the first chart step (differentiator, validated)"
     },
     {
-      "fg": "--accent-ink",
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
       "bg": "--chart-2",
       "use": "Text on the second chart step (necessary, tested)"
     },
     {
-      "fg": "--ink",
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
       "bg": "--chart-3",
       "use": "Text on the third chart step (commodity, assumed)"
     }

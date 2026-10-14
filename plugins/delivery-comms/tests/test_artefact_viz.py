@@ -25,6 +25,8 @@ RENDERERS = VIZ / "scripts/renderers.py"
 EXAMPLES = VIZ / "examples"
 ROLES = {role for module in design_source._contract()["modules"].values() for role in module["roles"]}
 DOMAIN_MARKER = "/* ---- viz domain tokens (derived) ---- */"
+KIT_ON = "--kit-on-"
+FILLS = ("--success", "--info", "--warning", "--danger", "--muted", "--chart-1", "--chart-2", "--chart-3")
 
 EXPECTED = {
     # status and pain: core state roles
@@ -125,7 +127,11 @@ class RenderedViewsTest(RenderCase):
                     if prop.startswith("--") or not check_render.COLOUR_PROP.search(prop):
                         continue
                     for used in VAR.findall(value):
-                        if used.startswith("--kit-"):
+                        if used.startswith(KIT_ON):
+                            # text on a fill: declared in the design layer, reading the text role that passes
+                            self.assertIn(VAR.fullmatch(declarations(design).get(used, "")).group(1),
+                                          ("--accent-ink", "--ink"), f"{prop}: {value}")
+                        elif used.startswith("--kit-"):
                             self.assertIn(used, EXPECTED, f"{prop}: {value}")
                         else:
                             self.assertIn(used, ROLES, f"{prop}: {value}")
@@ -144,14 +150,13 @@ class RenderedViewsTest(RenderCase):
                 report = check_render.check(marked, base)
                 self.assertEqual(report["findings"], [])
 
-    def test_text_on_every_filled_badge_is_the_role_its_pair_names(self):
-        # owner 2026-10-14: text on every fill is a contract pair (modules.json "pairs")
-        pairs = design_source._contract()["pairs"]
+    def test_text_on_every_filled_badge_is_the_role_the_resolver_picked(self):
+        # owner 2026-10-14: text on every fill is a contract pair; a list pair's text reads --kit-on-<fill>
         allowed = {}
-        for pair in pairs:
-            allowed.setdefault(pair["bg"], set()).add(pair["fg"])
-        fills = {bg for bg in allowed if bg.startswith(("--chart-", "--success", "--info", "--warning", "--danger",
-                                                        "--muted", "--accent"))}
+        for pair in design_source._contract()["pairs"]:
+            fg = {KIT_ON + pair["bg"][2:]} if isinstance(pair["fg"], list) else {pair["fg"]}
+            allowed.setdefault(pair["bg"], set()).update(fg)
+        fills = {bg for bg in allowed if bg in FILLS or bg == "--accent"}
         checked = set()
         for kind in PAINTS:
             with self.subTest(kind=kind):
@@ -176,6 +181,28 @@ class RenderedViewsTest(RenderCase):
                               ".bmc-conf--validated", ".bmc-conf--tested", ".bmc-conf--assumed",
                               ".epic-chip.st--shipped", ".epic-chip.st--planned", ".epic-chip.st--backlog",
                               ".sb-badge--warn", ".sb-badge--fail"}, checked)
+
+    def test_design_layer_declares_the_text_role_for_every_fill(self):
+        # the base theme: --ink where its fill is light, --accent-ink where it is dark
+        design, _ = self.split(self.render("delivery-roadmap"))
+        decls = declarations(design)
+        self.assertEqual({fill: VAR.fullmatch(decls[KIT_ON + fill[2:]]).group(1) for fill in FILLS}, {
+            "--success": "--ink", "--info": "--accent-ink", "--warning": "--ink", "--danger": "--accent-ink",
+            "--muted": "--accent-ink", "--chart-1": "--accent-ink", "--chart-2": "--accent-ink", "--chart-3": "--ink"})
+
+    def test_dark_state_fills_meant_for_white_text_get_white_badge_text(self):
+        sheet = self.tmp / "tokens.css"
+        sheet.write_text(":root { --ink: #1a1a1a; --accent-ink: #ffffff; --success: #2e7d32; --warning: #a06400;\n"
+                         "  --danger: #d8232a; --info: #1565c0; --muted: #555555; }\n", encoding="utf-8")
+        out = "out/roadmap.html"
+        result = run(RENDER, EXAMPLES / "delivery-roadmap.sample.md", "--design-system", sheet, "--out", out, cwd=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        design, rest = self.split((self.tmp / out).read_text(encoding="utf-8"))
+        decls = declarations(design)
+        for fill in ("--success", "--info", "--warning", "--danger", "--muted"):
+            self.assertEqual(decls[KIT_ON + fill[2:]], "var(--accent-ink)", fill)
+        self.assertRegex(rest, r"\.epic-chip\.st--shipped\s*\{[^}]*color:\s*var\(--kit-on-success\)")
+
 
 if __name__ == "__main__":
     unittest.main()

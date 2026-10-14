@@ -51,16 +51,20 @@ class ModulesTest(unittest.TestCase):
                                  "--chart-axis", "--chart-grid", "--chart-highlight"})
 
     def test_every_filled_badge_has_a_text_pair(self):
-        # owner 2026-10-14: text on every fill the renderers paint text on is a checked pair
-        fills = {"--success": "--ink", "--info": "--accent-ink", "--warning": "--ink", "--danger": "--accent-ink",
-                 "--muted": "--accent-ink", "--chart-1": "--accent-ink", "--chart-2": "--accent-ink",
-                 "--chart-3": "--ink"}
+        # owner 2026-10-14: text on every fill the renderers paint text on is a checked pair; either text role
+        # may carry it (a list pair passes when any of its roles reaches AA, the resolver picks that role)
+        fills = ("--success", "--info", "--warning", "--danger", "--muted", "--chart-1", "--chart-2", "--chart-3")
         pairs = modules()["pairs"]
-        for bg, fg in fills.items():
+        for bg in fills:
             with self.subTest(fill=bg):
                 named = [p for p in pairs if p["bg"] == bg]
-                self.assertEqual([p["fg"] for p in named], [fg])
-                self.assertTrue(named[0]["use"].strip())
+                self.assertEqual([p["fg"] for p in named], [["--accent-ink", "--ink"]])
+                self.assertIn("text on", named[0]["use"].lower())
+
+    def test_single_role_pairs_stay_single(self):
+        single = {(p["fg"], p["bg"]) for p in modules()["pairs"] if isinstance(p["fg"], str)}
+        self.assertLessEqual({("--ink", "--canvas-bg"), ("--ink", "--surface"), ("--muted", "--surface"),
+                              ("--accent-ink", "--accent"), ("--accent", "--surface")}, single)
 
     def test_class_vocabularies_cover_what_the_renderers_emit(self):
         mods = modules()["modules"]
@@ -97,8 +101,14 @@ class ModulesTest(unittest.TestCase):
         self.assertTrue(pairs)
         for pair in pairs:
             self.assertEqual(set(pair), {"fg", "bg", "use"})
-            self.assertIn(pair["fg"], roles)
+            fg = pair["fg"] if isinstance(pair["fg"], list) else [pair["fg"]]
+            self.assertTrue(fg, pair)
+            self.assertEqual(len(set(fg)), len(fg), pair)
+            for role in fg:
+                self.assertIn(role, roles)
             self.assertIn(pair["bg"], roles)
+            self.assertNotIn(pair["bg"], fg)
+            self.assertTrue(pair["use"].strip())
 
 
 class ManifestCheckTest(unittest.TestCase):

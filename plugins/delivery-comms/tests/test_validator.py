@@ -151,6 +151,19 @@ class ExceptionTest(ValidatorCase):
     def test_exception_that_keeps_the_pair_passes(self):
         self.assertTrue(self.check(PAGE, exceptions={"--muted": "#4b5563"})["ok"])
 
+    def test_exception_on_a_fill_passes_when_either_text_role_reaches_aa(self):
+        # --success is a list pair (--accent-ink or --ink): a dark green keeps white text above AA
+        self.assertTrue(self.check(PAGE, exceptions={"--success": "#1b5e20"})["ok"])
+        self.assertTrue(self.check(PAGE, exceptions={"--success": "#8fd19e"})["ok"])   # light: --ink carries it
+
+    def test_exception_on_a_fill_fails_when_no_text_role_reaches_aa(self):
+        report = self.check(PAGE, exceptions={"--success": "#777777"})   # white 4.48, --ink 3.8
+        self.assertEqual(self.kinds(report), ["contrast"])
+        message = report["findings"][0]["message"]
+        self.assertIn("on --success", message)
+        self.assertRegex(message, r"--accent-ink \(contrast \d+\.\d+\)")
+        self.assertRegex(message, r"--ink \(contrast \d+\.\d+\)")
+
     def test_exception_named_as_a_property_allows_that_property(self):
         # a project re-faces the release note alone with --font-report (com-release-note SKILL.md)
         html = page(":root { --font-report: Lora, serif; } body { font-family: var(--font-report); }")
