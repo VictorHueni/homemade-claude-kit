@@ -240,8 +240,77 @@ def inject_before_slide_end(slide_html: str, injection: str) -> str:
     return slide_html  # fallback: return unchanged if invariant not met
 
 
-def make_baseline_css(canvas_w: int, canvas_h: int) -> str:
-    return f"""\
+def role_value(design, role: str) -> str:
+    """The resolved value of a contract role, following var() references within the design."""
+    values = design_source.role_values("".join(design.css.values()))
+    value = values.get(role, "")
+    for _ in range(8):
+        ref = re.fullmatch(r"var\(\s*(--[\w-]+)\s*\)", value)
+        if not ref:
+            break
+        value = values.get(ref.group(1), "")
+    return value
+
+
+def canvas_size(cfg: dict, design) -> tuple:
+    """(width, height) in px of the slide canvas: config.yaml `canvas:` when the deck sets it, else the
+    design's slide-frame roles --slide-width and --slide-height. build.py and render.py share it."""
+    canvas = cfg.get("canvas") or {}
+    if canvas.get("width") and canvas.get("height"):
+        return int(canvas["width"]), int(canvas["height"])
+    size = []
+    for role in ("--slide-width", "--slide-height"):
+        value = role_value(design, role)
+        m = re.fullmatch(r"(\d+(?:\.\d+)?)px", value.strip())
+        if not m:
+            raise DesignError(f"the design's slide-frame role {role} is {value!r}; it must be a length in px "
+                              "(or set canvas: width and height in config.yaml)")
+        size.append(round(float(m.group(1))))
+    return size[0], size[1]
+
+
+def css_string(value: str) -> str:
+    """The text of a CSS string value such as `"Acme Ltd."`; empty for none or no value."""
+    value = (value or "").strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        value = value[1:-1]
+    elif value in ("none", "initial", "normal"):
+        return ""
+    value = re.sub(r"\\([0-9a-fA-F]{1,6})\s?", lambda m: chr(int(m.group(1), 16)), value)
+    return re.sub(r"\\(.)", r"\1", value)
+
+
+def has_logo(design) -> bool:
+    return any("url(" in design.brand.get(role, "") for role in ("--brand-logo-on-light", "--brand-logo-on-dark"))
+
+
+def slide_footer(design, number: str) -> str:
+    """The footer row of the slide frame: the brand logo, the legal line and the slide number at the right.
+    The logo image is the design layer's --brand-logo-on-light (one copy, not one per slide); an empty row is
+    not emitted, so a design with no brand and no numbering gets no footer."""
+    cells = []
+    if has_logo(design):
+        cells.append('<span class="slide-logo" data-brand-asset aria-hidden="true"></span>')
+    legal = css_string(design.brand.get("--brand-legal", ""))
+    if legal:
+        cells.append(f'<span class="slide-legal">{html.escape(legal)}</span>')
+    if number:
+        cells.append(f'<span class="slide-number">{html.escape(number)}</span>')
+    return f'<div class="slide-footer">{"".join(cells)}</div>' if cells else ""
+
+
+# The frame owns the number and the footer row: a partial's legacy `<div class="slide-number">`
+# placeholder and a footer row left by split.py are removed before the frame is injected.
+LEGACY_NUMBER = re.compile(r'\s*<div\s+class="slide-number"\s*>.*?</div>', re.S)
+OLD_FOOTER = re.compile(r'\s*<div\s+class="slide-footer"[^>]*>.*?</div>', re.S)
+
+
+def make_baseline_css(canvas_override: tuple = None) -> str:
+    """Deck behaviour CSS. The frame itself (canvas, section label, footer row, source bar) is the
+    design's slide-frame module, inlined in the design layer."""
+    override = (f":root {{ --slide-width: {canvas_override[0]}px; --slide-height: {canvas_override[1]}px; }}\n"
+                if canvas_override else "")
+    return override + f"""\
 /* ── Baseline: controls hint ── */
 .controls-hint {{
   text-align: center;
@@ -272,21 +341,6 @@ body.presenting .slide.active {{
   top: 50%;
   left: 50%;
 }}
-/* ── Baseline: source bar ── */
-.slide-source-bar {{
-  position: absolute;
-  bottom: 28px;
-  left: 72px;
-  right: 52px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--muted);
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-}}
 /* ── Baseline: mobile responsive scaling ── */
 :root {{ --kit-slide-scale: 1; }}
 @media (max-width: 980px) {{
@@ -297,7 +351,7 @@ body.presenting .slide.active {{
   body:not(.presenting) .slide {{
     transform: scale(var(--kit-slide-scale));
     transform-origin: top center;
-    margin-bottom: calc({canvas_h}px * (var(--kit-slide-scale) - 1));
+    margin-bottom: calc(var(--slide-height) * (var(--kit-slide-scale) - 1));
   }}
 }}
 """
@@ -353,16 +407,6 @@ def build_head(cfg: dict) -> str:
     """)
 
 
-def update_slide_numbers(html: str, current: int, total: int, fmt: str) -> str:
-    number_text = fmt.format(current=current, total=total)
-    return re.sub(
-        r'(<div\s+class="slide-number">)(.*?)(</div>)',
-        rf"\g<1>{number_text}\g<3>",
-        html,
-        flags=re.DOTALL,
-    )
-
-
 def build(config_path: Path, output_override: str = None):
     cfg = load_config(config_path)
     base = config_path.parent
@@ -399,10 +443,6 @@ def build(config_path: Path, output_override: str = None):
     # Head
     parts = [build_head(cfg)]
 
-    # Canvas dimensions (used by baseline CSS/JS)
-    canvas = cfg.get("canvas", {})
-    canvas_w = int(canvas.get("width",  960))
-    canvas_h = int(canvas.get("height", 540))
     if is_doc:
         geom = page_geometry(cfg)
         baseline_css = make_document_css(geom)
@@ -410,7 +450,11 @@ def build(config_path: Path, output_override: str = None):
         print(f"[BUILD] Page:    {geom['size']} {geom['orientation']}, margins "
               f"{geom['margin']['top']} {geom['margin']['right']} {geom['margin']['bottom']} {geom['margin']['left']}")
     else:
-        baseline_css = make_baseline_css(canvas_w, canvas_h)
+        # Canvas: the design's slide-frame module, unless config.yaml sets `canvas:` for this deck
+        canvas_w, canvas_h = canvas_size(cfg, design)
+        overridden = bool((cfg.get("canvas") or {}).get("width") and (cfg.get("canvas") or {}).get("height"))
+        print(f"[BUILD] Canvas:  {canvas_w}x{canvas_h} px ({'config.yaml canvas' if overridden else 'design slide-frame'})")
+        baseline_css = make_baseline_css((canvas_w, canvas_h) if overridden else None)
         baseline_js  = make_baseline_js(canvas_w)
 
     # Styles, in cascade order:
@@ -442,6 +486,7 @@ def build(config_path: Path, output_override: str = None):
     # not page count), so .slide-number rewriting is a slides-only feature.
     num_enabled = numbering.get("enabled", True) and not is_doc
     num_format = numbering.get("format", "{current} / {total}")
+    dropped_numbers = 0
 
     for idx, entry in enumerate(slide_entries, start=1):
         filename = entry["file"] if isinstance(entry, dict) else entry
@@ -454,8 +499,10 @@ def build(config_path: Path, output_override: str = None):
             print(" (MISSING)")
             continue
 
-        if num_enabled:
-            html = update_slide_numbers(html, idx, total, num_format)
+        if not is_doc:
+            html, dropped = LEGACY_NUMBER.subn("", html)
+            dropped_numbers += bool(dropped)
+            html = OLD_FOOTER.sub("", html)
 
         # Inject source bar if the slide declares data-sources and bibliography exists
         if bibliography:
@@ -468,6 +515,12 @@ def build(config_path: Path, output_override: str = None):
                 if source_bar:
                     html = inject_before_slide_end(html, "\n" + source_bar)
 
+        # The slide frame's footer row: logo, legal line, number at the right
+        if not is_doc:
+            footer = slide_footer(design, num_format.format(current=idx, total=total) if num_enabled else "")
+            if footer:
+                html = inject_before_slide_end(html, "\n" + footer)
+
         parts.append(f"\n<!-- slide {idx}: {label} -->\n")
         parts.append(html.strip())
         parts.append("\n")
@@ -475,6 +528,9 @@ def build(config_path: Path, output_override: str = None):
 
     if is_doc:
         parts.append("</div>\n")
+    if dropped_numbers:
+        print(f"  [NOTE] {dropped_numbers} partial(s) carry a <div class=\"slide-number\"> placeholder; the slide "
+              "frame now numbers every slide in its footer row, so the placeholder was left out")
 
     # Script (baseline responsive + project; document mode ships no baseline JS)
     js = read_file(script_path) if script_path.exists() else ""

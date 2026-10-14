@@ -16,10 +16,12 @@ lang: "en"
 # (paginated A4/Letter, flowing partials, running header + page numbers in the PDF).
 mode: slides
 
-# Dimensions of the slide canvas (px) — slides mode only
-canvas:
-  width: 960
-  height: 540
+# Slide canvas (px), slides mode only. It comes from the design's slide-frame module
+# (--slide-width, --slide-height; 960x540 in the kit's base theme). Set it here only
+# to give this one deck another size; build.py and render.py then both use it.
+# canvas:
+#   width: 1280
+#   height: 720
 
 # Page geometry — document mode only. build.py turns this into the @page rule and
 # render.py passes the same values to Chromium, so the two can never disagree.

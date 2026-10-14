@@ -1,4 +1,4 @@
-"""com-slide-deck on the resolver and the validator (Plan-0005 increment 05)."""
+"""com-slide-deck on the resolver and the validator (Plan-0005 increment 05), slide frame and brand (06)."""
 import importlib.util
 import json
 import re
@@ -269,6 +269,169 @@ class InitTest(DeckCase):
         self.scaffold()
         styles = (self.deck / "design" / "styles.css").read_text(encoding="utf-8")
         self.assertNotRegex(re.sub(r"/\*.*?\*/", "", styles, flags=re.S), r"--[\w-]+\s*:")
+
+
+FULL_LEGAL = "Acme Test is a fictitious brand."
+SLIDE_FRAME_CLASSES = {"slide", "active", "presenting", "controls-hint", "slide-source-bar",
+                       "slide-label", "slide-footer", "slide-logo", "slide-legal", "slide-number"}
+
+
+def classes_in(text):
+    """Class names used in class attributes and in CSS selectors of `text`."""
+    names = set()
+    for attr in re.findall(r'class="([^"]*)"', text):
+        names |= set(attr.split())
+    css = re.sub(r"/\*.*?\*/", "", " ".join(re.findall(r"<style[^>]*>(.*?)</style>", text, re.S)), flags=re.S)
+    css = re.sub(r"url\([^)]*\)", "url()", css)
+    names |= set(re.findall(r"\.([a-zA-Z][\w-]*)", re.sub(r"\{[^{}]*\}", "{}", css)))
+    return names
+
+
+def footers(html):
+    return re.findall(r'<div class="slide-footer"[^>]*>(.*?)</div>', html, re.S)
+
+
+class SlideFrameTest(DeckCase):
+    """The slide frame (canvas, section label, footer row) and the brand from the resolved design (increment 06)."""
+
+    def add_slides(self, count, legacy_number=True):
+        slides = self.deck / "output" / "slides"
+        entries = []
+        for i in range(1, count + 1):
+            number = '\n  <div class="slide-number"></div>' if legacy_number else ""
+            (slides / f"{i:02d}.html").write_text(
+                f'<div class="slide s-{i}">\n  <div class="slide-label">Section {i}</div>\n'
+                f'  <h2>Slide {i}</h2>{number}\n</div>\n', encoding="utf-8")
+            entries.append({"file": f"{i:02d}.html", "label": f"Slide {i}"})
+        path = self.deck / "config.yaml"
+        cfg = yaml.safe_load(path.read_text(encoding="utf-8"))
+        cfg["slides"] = entries
+        path.write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
+
+    def design_layer(self, html):
+        return re.search(r"<style data-design-layer>(.*?)</style>", html, re.S).group(1)
+
+    def kit_style(self, html):
+        return re.findall(r"<style>(.*?)</style>", html, re.S)[-1]
+
+    def test_full_takes_the_frame_and_the_brand_of_the_design(self):
+        self.pin("full")
+        self.scaffold()
+        self.add_slides(3)
+        self.assertBuilds()
+        html = self.html()
+        layer = self.design_layer(html)
+        # canvas size from the design's slide-frame module, not a number baked into the kit
+        self.assertIn("--slide-width: 1280px", layer)
+        self.assertIn("--slide-height: 720px", layer)
+        self.assertIn("/ 1280;", html)
+        self.assertIn("var(--slide-height)", self.kit_style(html))
+        self.assertNotIn("540px", self.kit_style(html))
+        # the frame classes the base defines, then the design's own restyle of the section label
+        self.assertRegex(layer, r"\.slide-label\s*\{")
+        self.assertIn("letter-spacing: 0.14em", layer)
+        self.assertLess(layer.index("slide-frame.css — neutral"), layer.index("letter-spacing: 0.14em"))
+        # logo, legal line and number on every slide, number at the right (last in the footer row)
+        rows = footers(html)
+        self.assertEqual(len(rows), 3)
+        for i, row in enumerate(rows, start=1):
+            self.assertRegex(row, r'<span class="slide-logo" data-brand-asset[^>]*></span>')
+            self.assertIn(f'<span class="slide-legal">{FULL_LEGAL}</span>', row)
+            self.assertTrue(row.rstrip().endswith(f'<span class="slide-number">{i} / 3</span>'), row)
+        self.assertIn("var(--brand-logo-on-light)", layer)
+        # one copy of each logo (in the design layer), not one per slide
+        self.assertEqual(html.count("data:image/svg+xml"), 3)
+        # the frame owns the number: the partials' legacy placeholder is dropped
+        self.assertEqual(html.count('class="slide-number"'), 3)
+
+    def test_subset_has_the_neutral_frame_and_no_brand(self):
+        self.pin("subset")
+        self.scaffold()
+        self.add_slides(2)
+        result = self.assertBuilds()
+        html = self.html()
+        self.assertNotIn("slide-logo\"", html.split("</head>", 1)[1])
+        self.assertNotIn("slide-legal", html.split("</head>", 1)[1])
+        self.assertNotIn("data:image/svg+xml", html)
+        rows = footers(html)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[1].strip(), '<span class="slide-number">2 / 2</span>')
+        self.assertIn("--slide-width: 960px", self.design_layer(html))
+        self.assertIn("/ 960;", html)
+        mods = self.provenance()["modules"]
+        self.assertEqual((mods["slide-frame"], mods["brand"]), ("base", "base"))
+        base_line = next(line for line in result.stdout.splitlines() if "base:" in line)
+        self.assertIn("slide-frame", base_line)
+        self.assertIn("brand", base_line)
+
+    def test_no_numbering_and_no_brand_means_no_footer_row(self):
+        self.scaffold(numbering={"enabled": False})
+        self.add_slides(2)
+        self.assertBuilds()
+        self.assertEqual(footers(self.html()), [])
+        self.assertNotIn('class="slide-number"', self.html())
+
+    def test_config_canvas_overrides_the_design_canvas(self):
+        self.pin("full")
+        self.scaffold(canvas={"width": 1024, "height": 768})
+        self.add_slides(1)
+        result = self.assertBuilds()
+        html = self.html()
+        self.assertIn("/ 1024;", html)
+        self.assertRegex(self.kit_style(html), r"--slide-width:\s*1024px;\s*--slide-height:\s*768px")
+        self.assertIn("1024x768", result.stdout)
+
+    def test_new_config_takes_the_canvas_from_the_design(self):
+        self.scaffold()
+        cfg = yaml.safe_load((self.deck / "config.yaml").read_text(encoding="utf-8"))
+        self.assertNotIn("canvas", cfg)
+
+    def test_rebuilding_a_split_slide_keeps_one_footer_row(self):
+        self.pin("full")
+        self.scaffold()
+        self.add_slides(1)
+        self.assertBuilds()
+        built = re.search(r'<div class="slide s-1">.*?</div>\s*</div>', self.html(), re.S).group(0)
+        (self.deck / "output/slides/01.html").write_text(built + "\n", encoding="utf-8")
+        self.assertBuilds()
+        self.assertEqual(len(footers(self.html())), 1)
+
+    def test_the_kit_emits_only_the_slide_frame_vocabulary(self):
+        mods = json.loads((DECK.parent.parent.parent / "contract" / "modules.json").read_text(encoding="utf-8"))
+        vocabulary = set(mods["modules"]["slide-frame"]["classes"])
+        self.assertEqual(vocabulary, SLIDE_FRAME_CLASSES)
+        base_frame = (DECK / "shared" / "base" / "slide-frame.css").read_text(encoding="utf-8")
+        self.assertLessEqual(classes_in(f"<style>{base_frame}</style>"), vocabulary)
+        self.pin("full")
+        self.scaffold()
+        self.add_slides(2)
+        self.assertBuilds()
+        html = self.html()
+        body = html.split("</head>", 1)[1]
+        emitted = classes_in(self.kit_style(html)) | classes_in(body)
+        emitted -= {"s-1", "s-2"}  # the partials' own slide classes
+        self.assertLessEqual(emitted, vocabulary)
+
+
+class FrameRenderTest(DeckCase):
+    """render.py prints at the canvas build.py used: the design's, unless config.yaml sets one."""
+
+    def setUp(self):
+        super().setUp()
+        self.render = load("slide_deck_render", DECK / "render.py")
+
+    def test_canvas_comes_from_the_resolved_design(self):
+        for name, expected in (("full", (1280, 720)), ("subset", (960, 540)), ("base", (960, 540))):
+            with self.subTest(design=name):
+                self.setUp()
+                if name != "base":
+                    self.pin(name)
+                self.scaffold()
+                cfg = yaml.safe_load((self.deck / "config.yaml").read_text(encoding="utf-8"))
+                design = self.render.resolve_design(cfg, self.deck)
+                self.assertEqual(self.render.canvas_size(cfg, design), expected)
+                self.assertEqual(self.render.canvas_size({**cfg, "canvas": {"width": 800, "height": 600}}, design),
+                                 (800, 600))
 
 
 if __name__ == "__main__":

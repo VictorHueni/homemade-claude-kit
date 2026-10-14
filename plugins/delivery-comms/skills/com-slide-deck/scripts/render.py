@@ -32,9 +32,8 @@ import yaml  # PyYAML — already a com-slide-deck dependency
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 # Page geometry, the design and the validator come from build.py, so the PDF prints
 # exactly what the build checked.
-from build import (DesignError, RenderRefused, check_deck, page_geometry, provenance_summary,  # noqa: E402
-                   resolve_design, write_provenance)
-from design_source import role_values  # noqa: E402
+from build import (DesignError, RenderRefused, canvas_size, check_deck, page_geometry,  # noqa: E402
+                   provenance_summary, resolve_design, role_value, write_provenance)
 
 
 def fail(msg: str, code: int = 1) -> None:
@@ -124,18 +123,6 @@ _PREP_JS = """
 _CHROME_STYLE = ("width:100%;padding:0 {side};font-family:{font};"
                  "font-size:8px;color:{colour};display:flex;"
                  "justify-content:space-between;align-items:center;")
-
-
-def role_value(design, role: str) -> str:
-    """The resolved value of a contract role, following var() references within the design."""
-    values = role_values("".join(design.css.values()))
-    value = values.get(role, "")
-    for _ in range(8):
-        ref = re.fullmatch(r"var\(\s*(--[\w-]+)\s*\)", value)
-        if not ref:
-            break
-        value = values.get(ref.group(1), "")
-    return value
 
 
 def stamp_text(recipient: str | None, date: str) -> str:
@@ -242,14 +229,17 @@ def render(config_path: Path, recipient: str | None, date: str, output_override:
         pdf_path.parent.mkdir(parents=True, exist_ok=True)
         render_document(cfg, built_html, pdf_path, recipient, date, design)
         return finish(pdf_path, design, report)
-    canvas = cfg.get("canvas", {})
-    width = int(canvas.get("width", 1280))
-    height = int(canvas.get("height", 720))
-
     built_html, pdf_path = resolve_paths(config_path, cfg, recipient, output_override)
     if not built_html.exists():
         fail(f"Built deck not found at {built_html}. Run build.py first.")
     design, report = checked_design(config_path, cfg, built_html)
+    # The page is the slide canvas build.py used: the design's slide-frame roles, or config.yaml canvas:.
+    # The footer row (logo, legal line, number) is part of each slide, so the deck's CSS reaches it in
+    # the PDF; unlike a document's page chrome it needs no inlined values.
+    try:
+        width, height = canvas_size(cfg, design)
+    except DesignError as exc:
+        fail(str(exc), exc.code)
     pdf_path.parent.mkdir(parents=True, exist_ok=True)
 
     footer_text = stamp_text(recipient, date)
