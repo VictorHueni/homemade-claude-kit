@@ -22,7 +22,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import datetime
 import re
 import sys
 from pathlib import Path
@@ -32,9 +31,11 @@ import yaml  # PyYAML — already a com-slide-deck dependency
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 # Page geometry, the design and the validator come from build.py, so the PDF prints
 # exactly what the build checked.
-from build import (DesignError, RenderRefused, canvas_size, check_deck, page_geometry,  # noqa: E402
-                   provenance_summary, resolve_design, write_provenance)
+from build import (DesignError, RenderRefused, canvas_size, check_deck, deck_sources,  # noqa: E402
+                   page_geometry, provenance_summary, resolve_design, write_provenance)
+import pdf_dates  # noqa: E402  (shared: the source date replaces Chromium's render time in the PDF)
 import print_chrome  # noqa: E402  (shared: the page-margin chrome com-release-note draws too)
+import source_date  # noqa: E402
 
 
 def fail(msg: str, code: int = 1) -> None:
@@ -209,8 +210,20 @@ def finish(pdf_path: Path, design, report: dict) -> Path:
     return pdf_path
 
 
-def render(config_path: Path, recipient: str | None, date: str, output_override: str | None) -> Path:
+def source_when(config_path: Path, cfg: dict):
+    """The deck's source date (SOURCE_DATE_EPOCH, else the sources' last commit, else their newest mtime)."""
+    try:
+        return source_date.source_datetime(deck_sources(config_path, cfg))
+    except source_date.SourceDateError as exc:
+        fail(str(exc), 2)
+
+
+def render(config_path: Path, recipient: str | None, date: str | None, output_override: str | None) -> Path:
     cfg = load_config(config_path)
+    when = source_when(config_path, cfg)
+    # The stamp and footer date default to the source date, never today, so an unchanged deck re-renders
+    # to the same bytes; --date still sets it explicitly.
+    date = date or when.date().isoformat()
     if str(cfg.get("mode", "slides")).lower() == "document":
         built_html, pdf_path = resolve_paths(config_path, cfg, recipient, output_override)
         if not built_html.exists():
@@ -218,6 +231,7 @@ def render(config_path: Path, recipient: str | None, date: str, output_override:
         design, report = checked_design(config_path, cfg, built_html)
         pdf_path.parent.mkdir(parents=True, exist_ok=True)
         render_document(cfg, built_html, pdf_path, recipient, date, design)
+        pdf_dates.normalise(pdf_path, when)
         return finish(pdf_path, design, report)
     built_html, pdf_path = resolve_paths(config_path, cfg, recipient, output_override)
     if not built_html.exists():
@@ -267,6 +281,7 @@ def render(config_path: Path, recipient: str | None, date: str, output_override:
         )
         browser.close()
 
+    pdf_dates.normalise(pdf_path, when)
     return finish(pdf_path, design, report)
 
 
@@ -276,7 +291,9 @@ def main() -> None:
     )
     parser.add_argument("--config", required=True, help="Path to the project's config.yaml")
     parser.add_argument("--recipient", default=None, help="Per-recipient footer stamp (e.g. a partner name)")
-    parser.add_argument("--date", default=datetime.date.today().isoformat(), help="Date for the stamp (ISO, default today)")
+    parser.add_argument("--date", default=None,
+                        help="Date for the stamp and footer (ISO; default the deck's source date: SOURCE_DATE_EPOCH, "
+                             "else the sources' last commit, else their newest modification time)")
     parser.add_argument("--output", default=None, help="Output PDF path (default: <deck>/output/pdf/<name>[--recipient].pdf)")
     args = parser.parse_args()
 

@@ -51,8 +51,11 @@ _TEMPLATE_DIR = _HERE.parent / "templates"
 sys.path.insert(0, str(_HERE / "shared"))
 import check_render  # noqa: E402
 import design_source  # noqa: E402
+import pdf_dates  # noqa: E402
 import print_chrome  # noqa: E402
+import source_date  # noqa: E402
 from design_source import DesignError  # noqa: E402
+from source_path import display_path  # noqa: E402
 
 # The modules the report reads: core (palette, fonts, radii), dataviz (the donut's chart scale) and
 # print (the page box and background, and the report class vocabulary a design may style). Brand reaches
@@ -277,7 +280,7 @@ def _changelog_cell(changelog: str) -> str:
     return f"<code>{_esc(value)}</code>"
 
 
-def _cartouche(model: dict, release_url: str, note_label: str, today: str) -> str:
+def _cartouche(model: dict, release_url: str, note_label: str, stamped: str) -> str:
     """The title block under the summary: all release metadata, in place of a footer.
 
     Rows with nothing to show are omitted, so a note without a changelog line or
@@ -290,7 +293,7 @@ def _cartouche(model: dict, release_url: str, note_label: str, today: str) -> st
         ("Status", _esc(meta.get("status", ""))),
         ("Full changelog", _changelog_cell(model["changelog"])),
         ("Release notes", f'<a href="{_esc(release_url)}">{_esc(release_url)}</a>' if release_url else ""),
-        ("Generated", f'com-release-note on {_esc(today)} from <code>{_esc(note_label)}</code>. '
+        ("Generated", f'com-release-note on {_esc(stamped)} from <code>{_esc(note_label)}</code>. '
                       f'Source note is the single source of truth; re-render after edits.'),
     ]
     cells = "".join(f'<div class="cart-row"><span class="cart-k">{key}</span>'
@@ -481,13 +484,13 @@ def _bucket_section(label: str, entries: list[dict], page_break: bool = False,
             f'<div class="bucket"><ul class="entry-list">{items}</ul></div></section>')
 
 
-def render_content(model: dict, release_url: str, note_label: str, today: str, git: dict) -> str:
+def render_content(model: dict, release_url: str, note_label: str, stamped: str, git: dict) -> str:
     out = []
     out.append(f'<div class="report-kicker">Release note · {_esc(model["version"])}</div>')
     out.append(f'<h1 class="report-title">{_esc(model["theme"])}</h1>')
     if model["framing"]:
         out.append(f'<p class="report-framing">{_inline(model["framing"])}</p>')
-    out.append(_cartouche(model, release_url, note_label, today))
+    out.append(_cartouche(model, release_url, note_label, stamped))
     out.append(_recap(model, git))
 
     if model["products"]:
@@ -640,22 +643,29 @@ def build_html(note_path: Path, design, exceptions: dict, release_url: str | Non
                exclude_paths: list[str] | None = None) -> str:
     model = parse_note(note_path.read_text(encoding="utf-8"))
     _warn_unknown_sections(model)
-    today = datetime.date.today().isoformat()
+    # The cartouche names the note relative to its repository root (else by file name) and dates it from the
+    # note (shared/source_date.py), never the clock, so a re-render of an unchanged note changes no byte.
+    stamped = note_date(note_path).date().isoformat()
     url = _github_release_url(note_path, model["version"], release_url)
-    try:
-        note_label = os.path.relpath(note_path)
-    except ValueError:
-        note_label = str(note_path)
+    note_label = display_path(note_path)
     tmpl = (_TEMPLATE_DIR / "report.html.tmpl").read_text(encoding="utf-8")
     title = model["meta"].get("title") or f'{model["version"]}: {model["theme"]}'
     for key, value in {"TITLE": _esc(title),
                        "REPORT_FONT_CSS": report_font_css(exceptions),
                        "PAGE_RULE": page_rule(print_chrome.print_geometry(design)),
                        "DESIGN_LAYER": design_layer(design),
-                       "CONTENT": render_content(model, url, note_label, today,
+                       "CONTENT": render_content(model, url, note_label, stamped,
                                                  _git_stats(note_path, model["changelog"], exclude_paths))}.items():
         tmpl = tmpl.replace("{{" + key + "}}", value)
     return tmpl
+
+
+def note_date(note_path: Path) -> "datetime.datetime":
+    """The note's source date: SOURCE_DATE_EPOCH, else its last commit, else its modification time."""
+    try:
+        return source_date.source_datetime([note_path])
+    except source_date.SourceDateError as exc:
+        raise DesignError(str(exc))
 
 
 def checked_html(note_path: Path, design, exceptions: dict, release_url: str | None,
@@ -707,7 +717,8 @@ def _fit_scale(page, geometry: dict) -> float:
     return max(scale for scale, n in counts.items() if n == fewest)
 
 
-def render_pdf(html_path: Path, pdf_path: Path, design, running_title: str = "", version: str = "") -> None:
+def render_pdf(html_path: Path, pdf_path: Path, design, note_path: Path, running_title: str = "",
+               version: str = "") -> None:
     geometry = print_chrome.print_geometry(design)
     side = geometry["margin"]["left"]
     # Chromium draws the chrome in the page margins as a separate document; the shared print chrome inlines
@@ -749,6 +760,8 @@ def render_pdf(html_path: Path, pdf_path: Path, design, running_title: str = "",
             **_page_args(geometry),
         )
         browser.close()
+    # Chromium stamps the render time in the Info dictionary; the note's source date replaces it in place.
+    pdf_dates.normalise(pdf_path, note_date(note_path))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -799,7 +812,7 @@ def main(argv: list[str] | None = None) -> int:
 
     model = parse_note(args.note.read_text(encoding="utf-8"))
     running = model["meta"].get("title") or f'{model["version"]}: {model["theme"]}'
-    render_pdf(html_path, pdf_path, design, running, model["version"])
+    render_pdf(html_path, pdf_path, design, args.note, running, model["version"])
     print(f"render_pdf.py: wrote {pdf_path} ({pdf_path.stat().st_size / 1024:.1f} KB)")
     return 0
 
