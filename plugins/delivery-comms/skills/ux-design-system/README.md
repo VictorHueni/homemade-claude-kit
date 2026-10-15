@@ -37,6 +37,7 @@ ux-design-system/
   references/
     token-contract.md         Pointer to the plugin's contract/README.md
     discipline.md             Principles and boundaries
+    agents-md-block.md        The block a project copies into its AGENTS.md
   examples/
     DESIGN.sample.md          A filled DESIGN.md
     legacy.tokens.css         A legacy token file to try --from-legacy on
