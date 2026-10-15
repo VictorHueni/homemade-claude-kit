@@ -108,8 +108,15 @@ class ModulesTest(unittest.TestCase):
 
     def test_print_roles(self):
         # Increment 09: the print module gives the page box (size and margin) and the page background
-        self.assertEqual(set(modules()["modules"]["print"]["roles"]), {"--print-bg", "--print-margin",
-                                                                       "--print-page-size"})
+        # plus --print-breaking, the optional accent of breaking changes in printed reports (defaults to --danger)
+        roles = modules()["modules"]["print"]["roles"]
+        self.assertEqual(set(roles), {"--print-bg", "--print-margin", "--print-page-size", "--print-breaking"})
+        self.assertIn("optional", roles["--print-breaking"])
+        self.assertIn("--danger", roles["--print-breaking"])
+
+    def test_print_breaking_defaults_to_danger_in_the_base_theme(self):
+        css = (SHARED / "base/print.css").read_text(encoding="utf-8")
+        self.assertRegex(css, r"--print-breaking:\s*var\(--danger\);")
 
     def test_brand_roles(self):
         self.assertEqual(set(modules()["modules"]["brand"]["roles"]),

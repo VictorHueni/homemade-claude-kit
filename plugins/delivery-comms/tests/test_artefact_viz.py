@@ -91,6 +91,13 @@ class DomainTokensTest(unittest.TestCase):
                 text = path.read_text(encoding="utf-8")
                 self.assertEqual(check_render.strip_fallbacks(text), text, "a var() fallback is left")
 
+    def test_viz_sources_hold_no_fixed_bold_weight_or_pill_radius(self):
+        for path in (DOMAIN, TEMPLATE, RENDERERS):
+            with self.subTest(file=path.name):
+                text = check_render.clean(path.read_text(encoding="utf-8"))
+                self.assertNotRegex(text, r"font-weight:\s*(700|bold)\b", "the bold weight is --font-weight-bold")
+                self.assertNotIn("999px", text, "the pill radius is --radius-pill")
+
     def test_viz_sources_use_only_roles_and_kit_properties(self):
         for path in (DOMAIN, TEMPLATE, RENDERERS):
             with self.subTest(file=path.name):
@@ -267,14 +274,47 @@ class ResolvedViewsTest(ViewCase):
                     self.assertEqual(values[f"--chart-{step}"], full[f"--chart-{step}"])
 
     def test_inlines_only_the_modules_the_views_use(self):
-        # owner 2026-10-14: core and dataviz (and the font faces), never the slide frame or other modules
-        design, _ = self.split(self.render("fbs", *self.DESIGN_ARGS["full"]))
+        # owner 2026-10-14: core and dataviz (and the font faces), never the slide frame or other modules;
+        # type and space-shape too, for the bold weight and the pill radius the views draw with
+        out = self.tmp / "out/fbs.html"
+        result = run(RENDER, *source_args("fbs"), *self.DESIGN_ARGS["full"], "--out", out, cwd=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        design, _ = self.split(out.read_text(encoding="utf-8"))
         defined = set(declarations(design))
         modules = design_source._contract()["modules"]
-        for module in ("core", "dataviz"):
+        for module in ("core", "dataviz", "type", "space-shape"):
             self.assertLessEqual(set(modules[module]["roles"]), defined, module)
-        for module in ("type", "space-shape", "document", "slide-frame", "print", "brand"):
+        for module in ("document", "slide-frame", "print", "brand"):
             self.assertEqual(set(modules[module]["roles"]) & defined, set(), module)
+        self.assertIn("inlined: core, dataviz, type, space-shape", result.stdout)
+
+    def test_a_design_sets_the_bold_weight_and_the_pill_radius_of_every_view(self):
+        folder = self.tmp / "ds"
+        shutil.copytree(DESIGNS / "full", folder)
+        for name, old, new in (("type.css", "--font-weight-bold: 700;", "--font-weight-bold: 500;"),
+                               ("space-shape.css", "--radius-pill: 999px;", "--radius-pill: 6px;")):
+            path = folder / "css" / name
+            text = path.read_text(encoding="utf-8")
+            self.assertIn(old, text)
+            path.write_text(text.replace(old, new), encoding="utf-8")
+        resolved = design_source.resolve(self.tmp, explicit=folder)
+        for kind in PAINTS:
+            with self.subTest(kind=kind):
+                html = self.render(kind, "--design-system", folder)
+                self.assertEqual(check_render.check(html, resolved)["findings"], [])
+                design, rest = self.split(html)
+                values = design_source.role_values(design)
+                self.assertEqual(values["--font-weight-bold"], "500")
+                self.assertEqual(values["--radius-pill"], "6px")
+                css = check_render.clean(rest)
+                self.assertNotRegex(css, r"font-weight:\s*(700|bold)\b")
+                self.assertNotIn("999px", css)
+                if kind != "capability-map":   # the capability map draws in 600 only, no bold
+                    self.assertIn("var(--font-weight-bold)", css)
+                self.assertIn("var(--radius-pill)", css)
+        base, _ = self.split(self.render("fbs"))
+        self.assertEqual(design_source.role_values(base)["--font-weight-bold"], "700")
+        self.assertEqual(design_source.role_values(base)["--radius-pill"], "999px")
 
     def test_finds_the_project_pin_from_a_subfolder(self):
         shutil.copytree(DESIGNS / "subset", self.tmp / "design-system")

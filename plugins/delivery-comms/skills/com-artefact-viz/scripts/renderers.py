@@ -115,7 +115,7 @@ def render_capability_map(model, options):
 .cap-children { margin-top: 0.35rem; padding-left: 0.5rem; border-left: 2px solid var(--surface-2);
   display: flex; flex-direction: column; gap: 0.3rem; }
 .cap-imp { position: absolute; right: 0.3rem; bottom: 0.28rem; font-family: var(--font-heading); font-size: 0.44rem; text-transform: uppercase;
-  letter-spacing: 0.04em; padding: 0.03rem 0.3rem; border-radius: 999px; font-weight: 600;
+  letter-spacing: 0.04em; padding: 0.03rem 0.3rem; border-radius: var(--radius-pill); font-weight: 600;
   min-width: 5.1rem; text-align: center; box-sizing: border-box; }
 .cap-imp--differentiator { background: var(--kit-differentiator); color: var(--kit-on-chart-1); }
 .cap-imp--necessary { background: var(--kit-necessary); color: var(--kit-on-chart-2); }
@@ -203,10 +203,10 @@ def render_fbs(model, options):
 .st--shipped { background: var(--kit-status-shipped); }
 .st--planned { background: var(--kit-status-planned); }
 .st--backlog { background: var(--kit-status-backlog); }
-.fbs-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: 700; }
+.fbs-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: var(--font-weight-bold); }
 .fbs-label { font-family: var(--font-heading); font-size: 0.9rem; font-weight: 600; }
 .fbs-count { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted);
-  background: var(--surface-2); border-radius: 999px; padding: 0 0.4rem; }
+  background: var(--surface-2); border-radius: var(--radius-pill); padding: 0 0.4rem; }
 .fbs-vs { font-size: 0.68rem; color: var(--muted); font-style: italic; }
 .fbs-list { list-style: none; margin: 0; padding: 0; }
 .fbs-row { display: flex; align-items: center; gap: 0.45rem; padding: 0.3rem 0.5rem;
@@ -334,7 +334,7 @@ def render_roadmap(model, options):
   background: var(--border); z-index: 0; }
 .phase-col { flex: 1 0 260px; min-width: 260px; position: relative; z-index: 1; }
 .phase-head { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.3rem 0; }
-.phase-name { font-family: var(--font-heading); font-weight: 700; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.4rem; }
+.phase-name { font-family: var(--font-heading); font-weight: var(--font-weight-bold); font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.4rem; }
 .phase-name::before { content: ""; width: 0.8rem; height: 0.8rem; border-radius: 50%;
   background: var(--accent); display: inline-block; }
 .phase-vs { font-size: 0.7rem; color: var(--muted); }
@@ -348,12 +348,12 @@ def render_roadmap(model, options):
 .epic-card.epic--medium { border-left-color: var(--kit-pain-medium); }
 .epic-card.epic--low { border-left-color: var(--kit-pain-low); }
 .epic-head { display: flex; gap: 0.4rem; align-items: baseline; }
-.epic-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: 700; }
+.epic-id { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); font-weight: var(--font-weight-bold); }
 .epic-name { font-family: var(--font-heading); font-size: 0.9rem; font-weight: 600; }
 .epic-vstmt { font-size: 0.8rem; color: var(--muted); margin: 0.35rem 0 0.4rem; }
 .epic-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .epic-chip { font-size: 0.66rem; font-family: var(--font-mono); background: var(--surface-2);
-  color: var(--ink); border-radius: 999px; padding: 0.05rem 0.45rem; }
+  color: var(--ink); border-radius: var(--radius-pill); padding: 0.05rem 0.45rem; }
 .epic-chip.st--shipped { background: var(--kit-status-shipped); color: var(--kit-on-success); }
 .epic-chip.st--planned { background: var(--kit-status-planned); color: var(--kit-on-info); }
 .epic-chip.st--backlog { background: var(--kit-status-backlog); color: var(--kit-on-muted); }
@@ -414,10 +414,10 @@ def render_bmc(model, options):
   background: var(--border); border: 1px solid var(--border); border-radius: var(--card-radius); overflow: hidden; }
 .bmc-cell { background: var(--surface); padding: 0.6rem 0.7rem; display: flex; flex-direction: column; min-height: 120px; }
 .bmc-cell-head { display: flex; gap: 0.4rem; align-items: baseline; margin-bottom: 0.4rem; flex-wrap: wrap; }
-.bmc-key { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); font-weight: 700; }
-.bmc-name { font-family: var(--font-heading); font-size: 0.82rem; font-weight: 700; }
+.bmc-key { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); font-weight: var(--font-weight-bold); }
+.bmc-name { font-family: var(--font-heading); font-size: 0.82rem; font-weight: var(--font-weight-bold); }
 .bmc-conf { margin-left: auto; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em;
-  padding: 0.05rem 0.4rem; border-radius: 999px; }
+  padding: 0.05rem 0.4rem; border-radius: var(--radius-pill); }
 .bmc-conf--assumed { background: var(--kit-conf-assumed); color: var(--kit-on-chart-3); }
 .bmc-conf--tested { background: var(--kit-conf-tested); color: var(--kit-on-chart-2); }
 .bmc-conf--validated { background: var(--kit-conf-validated); color: var(--kit-on-chart-1); }
@@ -554,14 +554,14 @@ def render_service_blueprint(model, options):
 .sb-row { display: contents; }
 .sb-corner { background: var(--surface-2); }
 .sb-ph { background: var(--surface-2); padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.1rem; }
-.sb-ph-id { font-family: var(--font-mono); font-size: 0.62rem; color: var(--accent); font-weight: 700; }
-.sb-ph-name { font-size: 0.82rem; font-weight: 700; }
+.sb-ph-id { font-family: var(--font-mono); font-size: 0.62rem; color: var(--accent); font-weight: var(--font-weight-bold); }
+.sb-ph-name { font-size: 0.82rem; font-weight: var(--font-weight-bold); }
 .sb-ph--critical { box-shadow: inset 0 -3px 0 var(--kit-pain-critical); }
 .sb-ph--high { box-shadow: inset 0 -3px 0 var(--kit-pain-high); }
 .sb-ph--medium { box-shadow: inset 0 -3px 0 var(--kit-pain-medium); }
 .sb-ph--low { box-shadow: inset 0 -3px 0 var(--kit-pain-low); }
 .sb-band-tag { grid-column: 1 / -1; background: var(--surface-2); color: var(--muted);
-  font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+  font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: var(--font-weight-bold);
   padding: 0.25rem 0.6rem; }
 .sb-lane-label { background: var(--surface); padding: 0.5rem 0.6rem; display: flex; flex-direction: column;
   gap: 0.15rem; border-right: 2px solid var(--surface-2); }
@@ -574,13 +574,13 @@ def render_service_blueprint(model, options):
   border-radius: var(--node-radius); padding: 0.15rem 0.45rem; }
 .sb-step--fail { border-color: var(--kit-pain-high); box-shadow: inset 3px 0 0 var(--kit-pain-high); }
 .sb-evidence { font-size: 0.72rem; background: var(--surface); border: 1px dashed var(--accent);
-  border-radius: 999px; padding: 0.15rem 0.55rem; color: var(--ink); }
+  border-radius: var(--radius-pill); padding: 0.15rem 0.55rem; color: var(--ink); }
 .sb-line { background: var(--canvas-bg); border-top: 2px dashed var(--muted); height: 1.4rem;
   display: flex; align-items: center; }
 .sb-line-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--muted); font-weight: 700; padding: 0 0.6rem; }
-.sb-badge { font-family: var(--font-heading); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
-  border-radius: 999px; padding: 0.05rem 0.4rem; width: fit-content; }
+  color: var(--muted); font-weight: var(--font-weight-bold); padding: 0 0.6rem; }
+.sb-badge { font-family: var(--font-heading); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-pill); padding: 0.05rem 0.4rem; width: fit-content; }
 .sb-badge--warn { background: var(--kit-pain-medium); color: var(--kit-on-info); }
 .sb-badge--fail { background: var(--kit-pain-high); color: var(--kit-on-warning); }
 .sb-spine { margin-top: var(--space-lg); background: var(--surface-2); border-radius: var(--card-radius);
@@ -589,9 +589,9 @@ def render_service_blueprint(model, options):
 .sb-spine-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .sb-handoff { font-size: 0.72rem; background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--node-radius); padding: 0.2rem 0.5rem; display: inline-flex; align-items: center; gap: 0.3rem; }
-.sb-arrow { color: var(--accent); font-weight: 700; }
+.sb-arrow { color: var(--accent); font-weight: var(--font-weight-bold); }
 .sb-handoff-obj { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted);
-  background: var(--surface-2); border-radius: 999px; padding: 0 0.4rem; margin-left: 0.2rem; }
+  background: var(--surface-2); border-radius: var(--radius-pill); padding: 0 0.4rem; margin-left: 0.2rem; }
 .sb-note { font-size: 0.74rem; color: var(--muted); }
 """
     meta = (

@@ -75,10 +75,76 @@ class TemplateTest(unittest.TestCase):
                 self.assertEqual(stray - {"--font-report", "--exception", "--design-system", "--release-url",
                                           "--output", "--html-only", "--exclude-path"}, set())
 
+    def test_template_holds_no_fixed_bold_weight_or_pill_radius(self):
+        text = check_render.clean(TEMPLATE.read_text(encoding="utf-8"))
+        self.assertNotRegex(text, r"font-weight:\s*(700|bold)\b", "the bold weight is --font-weight-bold")
+        self.assertNotIn("999px", text, "the pill radius is --radius-pill")
+
+    def test_template_paints_breaking_changes_with_the_print_role(self):
+        text = check_render.clean(TEMPLATE.read_text(encoding="utf-8"))
+        self.assertNotIn("var(--danger)", text, "the breaking accent is --print-breaking")
+        self.assertIn("var(--print-breaking)", text)
+
     def test_template_holds_no_literal_colour_and_no_fixed_page_box(self):
         text = check_render.clean(TEMPLATE.read_text(encoding="utf-8"))
         self.assertIsNone(check_render.LITERAL.search(text))
         self.assertNotRegex(text, r"@page\s*\{\s*size:\s*A4", "the page box comes from the print module")
+
+
+class DesignWeightRadiusBreakingTest(NoteCase):
+    """The bold weight, the pill radius and the breaking accent come from the design, never the template."""
+
+    NAVY = "#1f2a5c"
+
+    def mutated(self):
+        folder = self.tmp / "ds"
+        shutil.copytree(DESIGNS / "full", folder)
+        css = folder / "css"
+        for name, old, new in (("type.css", "--font-weight-bold: 700;", "--font-weight-bold: 500;"),
+                               ("space-shape.css", "--radius-pill: 999px;", "--radius-pill: 6px;"),
+                               ("print.css", "--print-page-size: Letter;",
+                                f"--print-page-size: Letter; --print-breaking: {self.NAVY};")):
+            text = (css / name).read_text(encoding="utf-8")
+            self.assertIn(old, text)
+            (css / name).write_text(text.replace(old, new), encoding="utf-8")
+        return folder
+
+    def rule(self, rest, selector):
+        match = re.search(re.escape(selector) + r"\s*\{([^}]*)\}", rest)
+        self.assertIsNotNone(match, selector)
+        return match.group(1)
+
+    def assertDrawsWithRoles(self, rest):
+        for selector in (".report-title", ".cartouche a", ".donut-total", ".dl-v", ".rc-v", ".section-label",
+                         ".product-name", ".capability-label"):
+            self.assertIn("font-weight: var(--font-weight-bold)", self.rule(rest, selector), selector)
+        self.assertIn("border-radius: var(--radius-pill)", self.rule(rest, ".product-id"))
+        label = self.rule(rest, ".section--breaking .section-label")
+        self.assertIn("color: var(--print-breaking)", label)
+        self.assertIn("border-bottom-color: var(--print-breaking)", label)
+        box = self.rule(rest, ".breaking")
+        self.assertIn("color-mix(in srgb, var(--print-breaking) 35%, transparent)", box)
+        self.assertIn("color-mix(in srgb, var(--print-breaking) 8%, transparent)", box)
+
+    def test_a_design_sets_the_bold_weight_the_pill_radius_and_the_breaking_accent(self):
+        folder = self.mutated()
+        html = self.render("--design-system", folder)
+        self.assertEqual(check_render.check(html, design_source.resolve(self.tmp, explicit=folder))["findings"], [])
+        layer, rest = design_layers(html)
+        values = design_source.role_values(layer)
+        self.assertEqual(values["--font-weight-bold"], "500")
+        self.assertEqual(values["--radius-pill"], "6px")
+        self.assertEqual(values["--print-breaking"], self.NAVY)
+        self.assertDrawsWithRoles(rest)
+        self.assertIn('class="section section--breaking', rest)   # the example note has a breaking section
+
+    def test_the_base_theme_keeps_700_999px_and_the_danger_colour(self):
+        layer, rest = design_layers(self.render())
+        values = design_source.role_values(layer)
+        self.assertEqual(values["--font-weight-bold"], "700")
+        self.assertEqual(values["--radius-pill"], "999px")
+        self.assertEqual(values["--print-breaking"], "var(--danger)")
+        self.assertDrawsWithRoles(rest)
 
 
 class ResolvedNoteTest(NoteCase):
@@ -93,14 +159,16 @@ class ResolvedNoteTest(NoteCase):
                 self.assertEqual(prov["designSystem"]["source"], "path" if extra else "base")
                 self.assertEqual(prov["modules"]["print"], "design-system" if name == "full" else "base")
 
-    def test_inlines_core_dataviz_and_print_only(self):
+    def test_inlines_core_dataviz_type_space_shape_and_print_only(self):
+        # type and space-shape give the bold weight and the pill radius the report draws with
         layer, _ = design_layers(self.render(*self.DESIGN_ARGS["full"]))
         defined = {name for name, _ in DECLARATION.findall(layer)}
         modules = design_source._contract()["modules"]
-        for module in ("core", "dataviz", "print"):
+        for module in ("core", "dataviz", "type", "space-shape", "print"):
             self.assertLessEqual(set(modules[module]["roles"]), defined, module)
-        for module in ("type", "space-shape", "document", "slide-frame", "brand"):
+        for module in ("document", "slide-frame", "brand"):
             self.assertEqual(set(modules[module]["roles"]) & defined, set(), module)
+        self.assertIn("inlined: core, dataviz, type, space-shape, print", self.result.stdout)
 
     def test_full_embeds_the_package_fonts(self):
         layer, _ = design_layers(self.render(*self.DESIGN_ARGS["full"]))

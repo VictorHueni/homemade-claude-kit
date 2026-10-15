@@ -7,8 +7,8 @@ its deterministic template structure, and emits:
   * a self-contained print-styled HTML file (always), themed by the resolved
     design (shared/design_source.py): the `--design-system DIR` folder, else the
     docs/ux/package.json pin found by walking up from the working directory,
-    else the kit's base theme. The font faces and the `core`, `dataviz` and
-    `print` modules are inlined in a <style data-design-layer> block; the page
+    else the kit's base theme. The font faces and the `core`, `dataviz`, `type`,
+    `space-shape` and `print` modules are inlined in a <style data-design-layer> block; the page
     box comes from the `print` module. The HTML is checked against the design
     (shared/check_render.py) before anything is written: a report that breaks
     the design writes nothing and exits 1, a refused design exits 2. The
@@ -57,10 +57,11 @@ import source_date  # noqa: E402
 from design_source import DesignError  # noqa: E402
 from source_path import display_path  # noqa: E402
 
-# The modules the report reads: core (palette, fonts, radii), dataviz (the donut's chart scale) and
-# print (the page box and background, and the report class vocabulary a design may style). Brand reaches
-# the PDF through the page-margin chrome, not the page; the other modules style nothing the report draws.
-REPORT_MODULES = ("core", "dataviz", "print")
+# The modules the report reads: core (palette, fonts, radii), dataviz (the donut's chart scale), type
+# (the bold weight), space-shape (the pill radius) and print (the page box and background, the breaking
+# accent, and the report class vocabulary a design may style). Brand reaches the PDF through the
+# page-margin chrome, not the page; the other modules style nothing the report draws.
+REPORT_MODULES = ("core", "dataviz", "type", "space-shape", "print")
 REPORT_FONT = "--font-report"
 OLD_FONTS_CSS = Path("docs/ux/fonts/fonts.css")
 

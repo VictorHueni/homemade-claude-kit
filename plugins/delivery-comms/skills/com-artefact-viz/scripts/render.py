@@ -66,10 +66,10 @@ import source_date  # noqa: E402
 from source_path import display_path  # noqa: E402
 from design_source import DesignError  # noqa: E402
 
-# The modules the views read: core (every colour, font and spacing role) and dataviz (the --chart-*
-# scale steps). The other modules (type, space-shape, document, slide-frame, print, brand) style
-# nothing a view draws, so they are not inlined; guidance is informational.
-VIEW_MODULES = ("core", "dataviz")
+# The modules the views read: core (every colour, font and spacing role), dataviz (the --chart-*
+# scale steps), type (the bold weight) and space-shape (the pill radius). The other modules (document,
+# slide-frame, print, brand) style nothing a view draws, so they are not inlined; guidance is informational.
+VIEW_MODULES = ("core", "dataviz", "type", "space-shape")
 
 SKILL_DIR = os.path.dirname(HERE)
 TEMPLATE_DIR = os.path.join(SKILL_DIR, "templates")
@@ -218,9 +218,9 @@ def write_atomic(path, text):
 
 
 def _emit(model, rendered, kind, args, source_label, sources):
-    # Cascade: the resolved design (font faces, core, dataviz; marked data-design-layer, the only place
-    # literals may live, and declaring --kit-on-<fill> for text on each fill), then the viz domain
-    # colours (--kit-* on contract roles), the baseline layout and the view CSS (roles only).
+    # Cascade: the resolved design (font faces, core, dataviz, type, space-shape; marked data-design-layer,
+    # the only place literals may live, and declaring --kit-on-<fill> for text on each fill), then the viz
+    # domain colours (--kit-* on contract roles), the baseline layout and the view CSS (roles only).
     design = resolve_design(args)
     exceptions = parse_exceptions(args.exception)
     domain = "/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))
