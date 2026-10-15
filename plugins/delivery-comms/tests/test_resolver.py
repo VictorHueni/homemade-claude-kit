@@ -326,6 +326,19 @@ class ManifestTest(ResolverCase):
                 self.assertRegex(line, r"--accent-ink \(contrast \d+\.\d+\)")
                 self.assertRegex(line, r"--ink \(contrast \d+\.\d+\)")
 
+    def test_tertiary_defaults_to_the_design_muted(self):
+        # a design that does not set --tertiary keeps its footers in its own --muted
+        design = design_source.resolve(self.project, explicit=FIXTURES / "full")
+        self.assertRegex(design.css["core"], r"--tertiary:\s*var\(--muted\)")
+
+    def test_a_tertiary_below_aa_is_refused(self):
+        def mutate(folder):
+            css = folder / "css" / "core.css"
+            css.write_text(css.read_text().replace("--muted: #475467;", "--muted: #475467; --tertiary: #b0b0b0;"))
+        with self.assertRaises(design_source.DesignError) as cm:
+            self.resolve_copy("full", mutate)()
+        self.assertIn("--tertiary on --canvas-bg", str(cm.exception))
+
     def test_base_theme_passes_its_own_pairs(self):
         contract = design_source._contract()
         css = "".join(design_source._base_css(module) for module in contract["modules"])

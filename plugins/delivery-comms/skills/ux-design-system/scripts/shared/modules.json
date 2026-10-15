@@ -6,6 +6,7 @@
       "roles": {
         "--ink": "Primary text",
         "--muted": "Secondary text",
+        "--tertiary": "Tertiary text: slide footers, legal lines, slide numbers, source lines (optional; defaults to --muted)",
         "--canvas-bg": "Page background",
         "--surface": "Card or panel background",
         "--surface-2": "Recessed or group background",
@@ -146,6 +147,11 @@
       "fg": "--ink",
       "bg": "--surface",
       "use": "Body text on cards"
+    },
+    {
+      "fg": "--tertiary",
+      "bg": "--canvas-bg",
+      "use": "Footers, legal lines and slide numbers on the page"
     },
     {
       "fg": "--muted",

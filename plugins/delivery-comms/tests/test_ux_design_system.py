@@ -178,6 +178,8 @@ class SubsetTest(UxCase):
         for module in ("core", "dataviz"):
             css = (out / f"{module}.css").read_text(encoding="utf-8")
             for role in CONTRACT["modules"][module]["roles"]:
+                if role == "--tertiary":  # optional: a DESIGN.md without it takes the base default, --muted
+                    continue
                 self.assertRegex(css, re.escape(role) + r"\s*:", f"{module}.css lacks {role}")
         self.assertFalse((out / "type.css").exists())
         self.assertIn("Do keep red for errors.", (out / "guidance.md").read_text(encoding="utf-8"))
