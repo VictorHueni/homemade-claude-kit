@@ -42,8 +42,23 @@ class ModulesTest(unittest.TestCase):
                 self.assertNotIn(role, seen, f"{role} in {seen.get(role)} and {name}")
                 seen[role] = name
 
-    def test_core_keeps_todays_24_roles(self):
-        self.assertEqual(len(modules()["modules"]["core"]["roles"]), 24)
+    def test_core_keeps_todays_24_roles_plus_tertiary(self):
+        # the 24 roles of the old contract, plus the optional --tertiary text role added for 2.0.0
+        roles = modules()["modules"]["core"]["roles"]
+        self.assertEqual(len(roles), 25)
+        self.assertIn("--tertiary", roles)
+
+    def test_tertiary_text_is_a_checked_pair(self):
+        self.assertIn({"fg": "--tertiary", "bg": "--canvas-bg"},
+                      [{"fg": p["fg"], "bg": p["bg"]} for p in modules()["pairs"]])
+
+    def test_slide_footer_and_source_bar_use_tertiary(self):
+        css = (PLUGIN / "shared" / "base" / "slide-frame.css").read_text(encoding="utf-8")
+        for selector in (".slide-footer", ".slide-source-bar"):
+            with self.subTest(selector=selector):
+                block = css[css.index(selector + " {"):]
+                block = block[:block.index("}")]
+                self.assertIn("color: var(--tertiary)", block)
 
     def test_dataviz_roles(self):
         roles = set(modules()["modules"]["dataviz"]["roles"])

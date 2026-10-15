@@ -6,7 +6,7 @@ What a design system gives the three renderers (`com-slide-deck`, `com-artefact-
 
 | Module | Required | Holds |
 |---|---|---|
-| `core` | yes | The 24 roles of the old contract: palette, state colours, three font roles, title size, spacing, radii, shadow |
+| `core` | yes | The 24 roles of the old contract: palette, state colours, three font roles, title size, spacing, radii, shadow; plus `--tertiary`, the optional text role for footers, legal lines and slide numbers, which defaults to `--muted` |
 | `dataviz` | yes | `--chart-1` to `--chart-4` (darkest first), `--chart-rest`, `--chart-axis` (axis and baseline), `--chart-grid`, `--chart-highlight` |
 | `type` | no | Type scale, line heights, weights |
 | `space-shape` | no | Extra spacing steps, radii, border width |

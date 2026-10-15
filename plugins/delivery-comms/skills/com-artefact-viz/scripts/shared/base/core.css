@@ -10,6 +10,7 @@
   /* ---- Base palette ---- */
   --ink:        #1a1f29;   /* primary text */
   --muted:      #6b7280;   /* secondary text */
+  --tertiary:   var(--muted);   /* tertiary text: footers, legal lines; a design may set its own */
   --canvas-bg:  #f6f7f9;   /* page background */
   --surface:    #ffffff;   /* card / panel background */
   --surface-2:  #eef1f5;   /* recessed / group background */

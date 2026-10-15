@@ -45,7 +45,7 @@
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   line-height: 1;
-  color: var(--muted);
+  color: var(--tertiary);
   pointer-events: none;
 }
 .slide-logo {
@@ -71,7 +71,7 @@
   bottom: calc(var(--slide-padding) / 2 + 28px);
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--muted);
+  color: var(--tertiary);
   line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;

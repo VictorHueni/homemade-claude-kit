@@ -51,7 +51,7 @@ GOOGLE_KEYS = ("version", "name", "description", "omitted", "colors", "typograph
                "components")
 TYPOGRAPHY_PROPS = ("fontFamily", "fontSize", "fontWeight", "lineHeight", "letterSpacing", "fontFeature",
                     "fontVariation")
-COLOR_ROLES = ("ink", "muted", "canvas-bg", "surface", "surface-2", "border", "accent", "accent-ink", "success",
+COLOR_ROLES = ("ink", "muted", "tertiary", "canvas-bg", "surface", "surface-2", "border", "accent", "accent-ink", "success",
                "warning", "danger", "info", "chart-1", "chart-2", "chart-3", "chart-4", "chart-rest",
                "chart-axis", "chart-grid", "chart-highlight")
 TYPOGRAPHY_ROLES = {
@@ -66,6 +66,8 @@ TYPOGRAPHY_ROLES = {
 ROUNDED_ROLES = ("card-radius", "btn-radius", "node-radius", "radius-sm", "radius-pill")
 SPACING_ROLES = ("space-sm", "space-md", "space-lg", "shell-max", "space-xs", "space-xl")
 KIT_ROLES = ("shadow", "border-width")
+# Roles a DESIGN.md may set and never has to: the base theme fills them (`--tertiary` defaults to `--muted`).
+OPTIONAL_ROLES = ("--tertiary",)
 PLACES = {**{"--" + n: ("colors", n, None) for n in COLOR_ROLES},
           **{role: ("typography", token, prop) for role, (token, prop) in TYPOGRAPHY_ROLES.items()},
           **{"--" + n: ("rounded", n, None) for n in ROUNDED_ROLES},
@@ -278,7 +280,8 @@ def parse(src):
                  "contrast can be checked")
         values.setdefault(module_of[role], {})[role] = text
     for module in [m for m in contract["modules"] if m in values or m == "core"]:
-        missing = [r for r in contract["modules"][module]["roles"] if r not in values.get(module, {})]
+        missing = [r for r in contract["modules"][module]["roles"]
+                   if r not in values.get(module, {}) and r not in OPTIONAL_ROLES]
         if missing:
             fail(missing_message(src, module, missing, values.get(module), skipped, colors))
 
@@ -428,7 +431,7 @@ def write_subset(spec, src, out_dir):
             continue
         name = f"{module}.css"
         css = GENERATED.format(src=src.name) + (faces if module == face_module else "") + ":root {\n"
-        css += "".join(f"  {role}: {roles[role]};\n" for role in module_spec["roles"]) + "}\n"
+        css += "".join(f"  {role}: {roles[role]};\n" for role in module_spec["roles"] if role in roles) + "}\n"
         (out_dir / name).write_text(css, encoding="utf-8")
         provides[module], exports[f"./{name}"] = f"./{name}", f"./{name}"
     if spec["body"].strip() and "guidance" not in spec["omitted"]:
@@ -541,7 +544,7 @@ def mode_from_legacy(tokens):
     dest = ux_dir / "DESIGN.md"
     if dest.exists():
         fail(f"{rel(dest)} exists and is not overwritten; move it away to draft again from {rel(tokens)}")
-    core_roles = list(design_source._contract()["modules"]["core"]["roles"])
+    core_roles = [r for r in design_source._contract()["modules"]["core"]["roles"] if r not in OPTIONAL_ROLES]
     legacy_text = tokens.read_text(encoding="utf-8")
     found = legacy_values(legacy_text)
     at_rules = sorted(set(re.findall(r"@(?:font-face|import)\b", re.sub(r"/\*.*?\*/", "", legacy_text, flags=re.S))))

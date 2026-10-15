@@ -61,7 +61,7 @@ A folder pin is for previewing an unreleased design; pin a published version bef
 | Key | Holds |
 |---|---|
 | `name` | the design's name (the generated package is `<name>-design-subset`) |
-| `colors` | the colour roles by contract name: `ink`, `muted`, `canvas-bg`, `surface`, `surface-2`, `border`, `accent`, `accent-ink`, `success`, `warning`, `danger`, `info` (`core`), and `chart-1` to `chart-4` (darkest first), `chart-rest`, `chart-axis`, `chart-grid`, `chart-highlight` (`dataviz`); hex only. `primary: "{colors.accent}"` keeps Google's primary colour on the accent. |
+| `colors` | the colour roles by contract name: `ink`, `muted`, `canvas-bg`, `surface`, `surface-2`, `border`, `accent`, `accent-ink`, `success`, `warning`, `danger`, `info` (`core`), optionally `tertiary` (`core`: footers, legal lines and slide numbers; without it they use `muted`), and `chart-1` to `chart-4` (darkest first), `chart-rest`, `chart-axis`, `chart-grid`, `chart-highlight` (`dataviz`); hex only. `primary: "{colors.accent}"` keeps Google's primary colour on the accent. |
 | `typography` | Google typography tokens, each an object (`fontFamily`, `fontSize`, `fontWeight`, `lineHeight`, ...); the mapping is below |
 | `rounded` | `card-radius`, `btn-radius`, `node-radius` (`core`); `radius-sm`, `radius-pill` (`space-shape`) |
 | `spacing` | `space-sm`, `space-md`, `space-lg`, `shell-max` (`core`); `space-xs`, `space-xl` (`space-shape`) |
