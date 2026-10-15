@@ -191,6 +191,19 @@ class SubsetTest(UxCase):
         self.assertEqual(values["--title-size"], "1.8rem")                 # typography.heading.fontSize
         self.assertEqual(values["--shadow"], "none")                       # kit.shadow
 
+    def test_print_breaking_is_neither_required_nor_drafted(self):
+        # --print-breaking is optional (the base theme sets it to var(--danger)), like --tertiary
+        self.write(front(kit={"shadow": "none", "omitted": {"brand": "no logo yet"}}))
+        result = self.subset()
+        out = self.ux / "design-system"
+        self.assertFalse((out / "print.css").exists())
+        for path in out.rglob("*"):
+            if path.is_file():
+                self.assertNotIn("--print-breaking", path.read_text(encoding="utf-8", errors="replace"), path.name)
+        self.assertNotIn("print-breaking", result.stdout + result.stderr)
+        design = design_source.resolve(self.project, explicit=out)
+        self.assertEqual(design_source.role_values(design.css["print"])["--print-breaking"], "var(--danger)")
+
     def test_writes_the_pin_the_renderers_follow(self):
         self.write(front())
         self.subset()

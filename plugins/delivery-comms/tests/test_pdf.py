@@ -42,6 +42,64 @@ class ReleaseNotePdfTest(RenderCase):
                     self.assertLessEqual(abs(float(h) - expected[1]), 1, (w, h))
 
 
+class ReleaseNoteComputedStyleTest(RenderCase):
+    """Chromium draws the report's bold weight, pill radius and breaking accent from the design's roles."""
+
+    NAVY = "#1f2a5c"
+
+    @staticmethod
+    def rgb(hex_colour):
+        h = hex_colour.lstrip("#")
+        return "rgb({}, {}, {})".format(*(int(h[i:i + 2], 16) for i in (0, 2, 4)))
+
+    def computed(self, *extra):
+        note = SKILLS / "com-release-note/examples/release-note.complete.md"
+        result = run(SKILLS / "com-release-note/scripts/render_pdf.py", note, "--html-only", *extra,
+                     "--output", "rn.pdf", cwd=self.tmp)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.goto((self.tmp / "rn.html").as_uri())
+            styles = page.evaluate("""() => {
+                const cs = (sel) => getComputedStyle(document.querySelector(sel));
+                return {title: cs('.report-title').fontWeight, product: cs('.product-name').fontWeight,
+                        pill: cs('.product-id').borderTopLeftRadius,
+                        breaking: cs('.section--breaking .section-label').color,
+                        breakingRule: cs('.section--breaking .section-label').borderBottomColor};
+            }""")
+            browser.close()
+        return styles
+
+    def test_base_theme_keeps_700_999px_and_the_danger_colour(self):
+        require_browser(self)
+        sys.path.insert(0, str(PLUGIN / "shared"))
+        import design_source
+        danger = design_source.role_values(design_source.resolve(self.tmp).css["core"])["--danger"]
+        styles = self.computed()
+        self.assertEqual((styles["title"], styles["product"]), ("700", "700"))
+        self.assertEqual(styles["pill"], "999px")
+        self.assertEqual(styles["breaking"], self.rgb(danger))
+        self.assertEqual(styles["breakingRule"], self.rgb(danger))
+
+    def test_a_design_with_500_6px_and_a_navy_breaking_accent(self):
+        require_browser(self)
+        folder = self.tmp / "ds"
+        shutil.copytree(DESIGNS / "full", folder)
+        for name, old, new in (("type.css", "--font-weight-bold: 700;", "--font-weight-bold: 500;"),
+                               ("space-shape.css", "--radius-pill: 999px;", "--radius-pill: 6px;"),
+                               ("print.css", "--print-page-size: Letter;",
+                                f"--print-page-size: Letter; --print-breaking: {self.NAVY};")):
+            path = folder / "css" / name
+            path.write_text(path.read_text(encoding="utf-8").replace(old, new), encoding="utf-8")
+        styles = self.computed("--design-system", folder)
+        self.assertEqual((styles["title"], styles["product"]), ("500", "500"))
+        self.assertEqual(styles["pill"], "6px")
+        self.assertEqual(styles["breaking"], self.rgb(self.NAVY))
+        self.assertEqual(styles["breakingRule"], self.rgb(self.NAVY))
+
+
 class PrintChromePdfTest(RenderCase):
     def test_full_logo_in_the_page_chrome_decodes_in_chromium(self):
         # The footer template is a separate Chromium document: the logo must be a data URI it can draw.

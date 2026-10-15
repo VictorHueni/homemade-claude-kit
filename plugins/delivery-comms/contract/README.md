@@ -12,7 +12,7 @@ What a design system gives the three renderers (`com-slide-deck`, `com-artefact-
 | `space-shape` | no | Extra spacing steps, radii, border width |
 | `document` | no | Paper sheet roles and the `doc*` class vocabulary |
 | `slide-frame` | no | Slide canvas roles and the slide class vocabulary |
-| `print` | no | Printed page roles and the report class vocabulary |
+| `print` | no | Printed page roles and the report class vocabulary; plus `--print-breaking`, the optional accent for breaking changes in printed reports, which defaults to `--danger` |
 | `brand` | no | `--brand-logo-on-light`, `--brand-logo-on-dark`, `--brand-mark` (CSS `url()` strings naming a package export path) and `--brand-legal` (a CSS string) |
 | `guidance` | no | Written guidelines: one export path to a Markdown file |
 

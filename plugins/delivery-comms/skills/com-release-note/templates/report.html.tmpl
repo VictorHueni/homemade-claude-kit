@@ -40,7 +40,7 @@ body {
   font-size: 8pt; text-transform: uppercase; letter-spacing: 0.14em;
   color: var(--accent); margin-top: 9mm; margin-bottom: 2.5mm;
 }
-.report-title { font-size: 21pt; font-weight: 700; line-height: 1.2; margin: 0 0 2mm; }
+.report-title { font-size: 21pt; font-weight: var(--font-weight-bold); line-height: 1.2; margin: 0 0 2mm; }
 .report-framing { font-size: 10.5pt; color: var(--muted); font-style: italic; margin: 0 0 3mm; }
 /* --- Cartouche: the title block under the summary. Holds every piece of release
    metadata (period, owner, status, changelog range, release link, provenance), so
@@ -62,7 +62,7 @@ body {
   color: var(--accent);
 }
 .cart-v { color: var(--ink); overflow-wrap: anywhere; }
-.cartouche a { color: var(--accent); text-decoration: none; font-weight: 700; }
+.cartouche a { color: var(--accent); text-decoration: none; font-weight: var(--font-weight-bold); }
 .cartouche code { font-family: var(--font-mono); font-size: 0.95em; }
 
 /* --- Recap: donut of the release composition, plus context cards.
@@ -85,7 +85,7 @@ body {
   position: absolute; inset: 6.5mm; border-radius: 50%; background: var(--surface);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.donut-total { font-size: 14pt; font-weight: 700; color: var(--ink); line-height: 1; }
+.donut-total { font-size: 14pt; font-weight: var(--font-weight-bold); color: var(--ink); line-height: 1; }
 .donut-cap {
   font-family: var(--font-mono); font-size: 6.5pt;
   color: var(--muted);
@@ -95,7 +95,7 @@ body {
 .dl-sw { width: 3mm; height: 3mm; border-radius: 1px; }
 .dl-k { font-size: 8pt; color: var(--ink); white-space: nowrap; }
 .dl-v, .dl-p { font-size: 8pt; font-variant-numeric: tabular-nums; text-align: right; }
-.dl-v { color: var(--ink); font-weight: 700; }
+.dl-v { color: var(--ink); font-weight: var(--font-weight-bold); }
 .dl-p { color: var(--muted); }
 /* Quadrant, not a row: two columns keep the card block roughly as tall as the
    donut beside it, so the two halves of the recap balance. */
@@ -108,7 +108,7 @@ body {
    missing measure rather than a deliberate stop. Let it span the row instead. */
 .recap-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .rc-k { font-size: 7.5pt; color: var(--muted); margin-bottom: 1mm; }
-.rc-v { font-size: 15pt; font-weight: 700; color: var(--ink); line-height: 1; }
+.rc-v { font-size: 15pt; font-weight: var(--font-weight-bold); color: var(--ink); line-height: 1; }
 /* Added/removed share one card; the signs carry the direction, not colour.
    Sized like every other value — the pair only ever needed to be smaller while
    it was competing for a half-width cell. */
@@ -123,7 +123,7 @@ body {
 .section-label {
   display: block;
   font-family: var(--kit-report-font);
-  font-size: 13pt; font-weight: 700; letter-spacing: 0.02em;
+  font-size: 13pt; font-weight: var(--font-weight-bold); letter-spacing: 0.02em;
   text-transform: uppercase; color: var(--ink);
   border-bottom: 1.2mm solid var(--accent);
   padding-bottom: 2.5mm; margin-bottom: 4mm;
@@ -143,11 +143,11 @@ body {
   padding: 3.5mm 5mm; margin-bottom: 3.5mm;
   break-inside: avoid;
 }
-.product-name { font-size: 11.5pt; font-weight: 700; margin: 0 0 2.5mm; display: flex; align-items: baseline; gap: 2.5mm; }
+.product-name { font-size: 11.5pt; font-weight: var(--font-weight-bold); margin: 0 0 2.5mm; display: flex; align-items: baseline; gap: 2.5mm; }
 .product-id {
   font-family: var(--font-mono); font-size: 8pt; font-weight: 600;
   color: var(--accent-ink); background: var(--accent);
-  border-radius: 999px; padding: 0.5mm 2.5mm;
+  border-radius: var(--radius-pill); padding: 0.5mm 2.5mm;
 }
 /* A capability groups its child entries under one heading (shown once), instead
    of repeating the capability name on every entry. Unnamed (flat) groups — a note
@@ -156,7 +156,7 @@ body {
   margin-top: 4mm; padding-top: 4mm; border-top: 1px solid var(--border);
 }
 .capability-label {
-  font-size: 9.5pt; font-weight: 700; margin: 0 0 1.5mm;
+  font-size: 9.5pt; font-weight: var(--font-weight-bold); margin: 0 0 1.5mm;
   display: flex; align-items: baseline; gap: 2mm;
 }
 .entry-list { list-style: none; margin: 0; padding: 0; }
@@ -187,18 +187,19 @@ body {
 .entry--titled + .entry--titled { margin-top: 4mm; padding-top: 4mm; }
 
 /* --- Breaking changes --- */
-/* The section heading carries the warning colour; the panel is washed to match.
+/* The section heading carries the breaking accent (--print-breaking, the design's
+   --danger unless it sets its own); the panel is washed to match.
    Each color-mix is preceded by a flat fallback for engines without it. */
 .section--breaking .section-label {
-  color: var(--danger);
-  border-bottom-color: var(--danger);
+  color: var(--print-breaking);
+  border-bottom-color: var(--print-breaking);
 }
 .breaking {
   border: 1px solid var(--border);
-  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--print-breaking) 35%, transparent);
   border-radius: var(--card-radius);
   background: var(--surface-2);
-  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  background: color-mix(in srgb, var(--print-breaking) 8%, transparent);
   padding: 3.5mm 5mm; break-inside: avoid;
 }
 .breaking .entry-list li + li { border-top-color: var(--border); }

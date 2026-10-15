@@ -331,6 +331,12 @@ class ManifestTest(ResolverCase):
         design = design_source.resolve(self.project, explicit=FIXTURES / "full")
         self.assertRegex(design.css["core"], r"--tertiary:\s*var\(--muted\)")
 
+    def test_print_breaking_defaults_to_danger_when_the_design_print_module_omits_it(self):
+        # the full fixture provides print without --print-breaking: the base default, read after it, stays
+        design = design_source.resolve(self.project, explicit=FIXTURES / "full")
+        self.assertEqual(design.provenance["modules"]["print"], "design-system")
+        self.assertEqual(design_source.role_values(design.css["print"])["--print-breaking"], "var(--danger)")
+
     def test_a_tertiary_below_aa_is_refused(self):
         def mutate(folder):
             css = folder / "css" / "core.css"

@@ -110,7 +110,8 @@
       "roles": {
         "--print-bg": "Printed page background",
         "--print-margin": "Printed page margin: one to four lengths, CSS margin shorthand order",
-        "--print-page-size": "Printed page size: A3, A4, A5, Letter or Legal, optionally followed by landscape, or a width and a height"
+        "--print-page-size": "Printed page size: A3, A4, A5, Letter or Legal, optionally followed by landscape, or a width and a height",
+        "--print-breaking": "Accent for breaking changes in printed reports (optional; defaults to --danger)"
       },
       "classes": [
         "report",

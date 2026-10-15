@@ -66,8 +66,9 @@ TYPOGRAPHY_ROLES = {
 ROUNDED_ROLES = ("card-radius", "btn-radius", "node-radius", "radius-sm", "radius-pill")
 SPACING_ROLES = ("space-sm", "space-md", "space-lg", "shell-max", "space-xs", "space-xl")
 KIT_ROLES = ("shadow", "border-width")
-# Roles a DESIGN.md may set and never has to: the base theme fills them (`--tertiary` defaults to `--muted`).
-OPTIONAL_ROLES = ("--tertiary",)
+# Roles a DESIGN.md may set and never has to: the base theme fills them (`--tertiary` defaults to `--muted`,
+# `--print-breaking` to `--danger`). No DESIGN.md key reads a `print` role, so subset never writes print.css.
+OPTIONAL_ROLES = ("--tertiary", "--print-breaking")
 PLACES = {**{"--" + n: ("colors", n, None) for n in COLOR_ROLES},
           **{role: ("typography", token, prop) for role, (token, prop) in TYPOGRAPHY_ROLES.items()},
           **{"--" + n: ("rounded", n, None) for n in ROUNDED_ROLES},
