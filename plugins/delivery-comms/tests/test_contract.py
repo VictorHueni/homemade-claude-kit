@@ -155,6 +155,10 @@ class ManifestCheckTest(unittest.TestCase):
         walk(self.schema)
         self.assertIn("2.0.0", self.schema["$id"])
 
+    def test_schema_id_has_no_fragment(self):
+        # JSON Schema 2020-12 forbids a non-empty fragment in $id, and ajv refuses the schema with one
+        self.assertNotIn("#", self.schema["$id"].rstrip("#"))
+
 
 class BaseThemeTest(unittest.TestCase):
     def test_base_defines_every_role_of_every_module(self):
