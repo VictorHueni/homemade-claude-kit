@@ -2,7 +2,7 @@
 
 All notable changes to the `delivery-comms` plugin. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The release date is set when the release merges to `main`.
 
-## 2.0.0 - Unreleased
+## 2.0.0 - 2026-10-15
 
 Decks, artefact views and release notes now render in your organisation's real design system, pinned at an exact version, and every render is checked against it before anything is written. The same source and the same design now give the same bytes every time.
 
