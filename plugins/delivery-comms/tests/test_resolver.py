@@ -262,6 +262,18 @@ class ManifestTest(ResolverCase):
             self.resolve_copy("full", mutate)()
         self.assertIn("contractVersion", str(cm.exception))
 
+    def test_an_export_that_names_a_folder_is_refused_as_a_folder(self):
+        # the contract wants one file per module, guidance included (#145)
+        def mutate(folder):
+            path = folder / "kit-manifest.json"
+            data = json.loads(path.read_text())
+            data["provides"]["guidance"] = "./guidance/"
+            path.write_text(json.dumps(data))
+        with self.assertRaises(design_source.DesignError) as cm:
+            self.resolve_copy("full", mutate)()
+        self.assertIn("is a folder", str(cm.exception))
+        self.assertIn("one file", str(cm.exception))
+
     def test_missing_dataviz_names_the_module(self):
         with self.assertRaises(design_source.DesignError) as cm:
             design_source.resolve(self.project, explicit=FIXTURES / "minimal-invalid")

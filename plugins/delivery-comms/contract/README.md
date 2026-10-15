@@ -14,7 +14,7 @@ What a design system gives the three renderers (`com-slide-deck`, `com-artefact-
 | `slide-frame` | no | Slide canvas roles and the slide class vocabulary |
 | `print` | no | Printed page roles and the report class vocabulary |
 | `brand` | no | `--brand-logo-on-light`, `--brand-logo-on-dark`, `--brand-mark` (CSS `url()` strings naming a package export path) and `--brand-legal` (a CSS string) |
-| `guidance` | no | Written guidelines: one export path to a Markdown file or a folder |
+| `guidance` | no | Written guidelines: one export path to a Markdown file |
 
 Every role belongs to exactly one module. `type` and `space-shape` add roles and never redefine a `core` role. A module absent from a design system comes from the kit's neutral base theme (`shared/base/<module>.css`), which defines every role of every module. The class modules list a `classes` vocabulary: the class names the renderers emit for that concern, which the design may style.
 
