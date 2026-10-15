@@ -1,0 +1,10 @@
+# Plan-0006 progress
+
+One entry per increment: red run (failing test names), green run, gates, owner actions.
+
+## Plan drafted (2026-10-15)
+
+- Drafted on branch docs/plan-dark-slides-and-classification from main at c43a29a (2.0.0 merged); status draft, owner review pending (D-1 to D-6).
+- Source: Paracel Plan 0190 Q-17 (dark slides on a design-owned dark theme; the owner chose a near-black with a navy cast, a lifted navy for marks, a light navy for highlighted text and a navy glow on the key element) and Q-19 (a classification per deck in the footer, four levels used with GDPR and the Swiss nFADP).
+- Evidence: build.py slide_footer and OLD_FOOTER (deck footers stripped); design_source.py compares the contract major only, so 2.1.0 is additive; precedents #148 and #149 for optional roles.
+- Consumer: @medquantis/design-system 1.2.0 (its Plan 0003) provides the first dark module; Paracel Plan 0190 Inc 04 onward waits for both releases.
