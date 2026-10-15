@@ -238,3 +238,14 @@ Owner request after reviewing how the kit change will be tested:
 - Next: the owner asks for the merge; then `release/2.0` merges to `main` with this CHANGELOG as the PR body, the CHANGELOG date is set, the marketplace is refreshed and `claude plugin update delivery-comms@<marketplace>` is checked against the cache, and the three fixtures are rendered in a fresh session from the cache (exit criterion).
 - Commit: see git log (docs(delivery-comms): release notes, AGENTS.md block and versions for 2.0.0)
 - Timestamp: 2026-10-15
+
+## Increment 13 release (2026-10-15): merge, cache, exit criterion
+
+- Gates on release/2.0 before the merge: `mise exec -- make -C plugins/delivery-comms test` exit 0, "Ran 273 tests", "OK"; `test-pdf` exit 0, "Ran 13 tests", "OK"; `./scripts/audit-skills.sh` exit 0, "Errors: 0", "Warnings: 0".
+- CHANGELOG heading dated `## 2.0.0 - 2026-10-15` on release/2.0 (b4d75c9). PR #150 (release/2.0 into main), CI test, test-pdf and test-design-md green, merged at the owner's word with a merge commit (c43a29a), so the increment PRs keep their commits on main.
+- Cache: `claude plugin marketplace update homemade-claude-kit` then `claude plugin update delivery-comms@homemade-claude-kit`: "updated from 1.4.0 to 2.0.0"; `~/.claude/plugins/cache/homemade-claude-kit/delivery-comms/` lists 2.0.0.
+- Exit criterion, read both ways ("three fixtures" is the three design fixtures and the three outputs): with the scripts of the cached 2.0.0 (standalone Python, so the running session's loaded skills do not matter), the deck (com-slide-deck build.py), a view (com-artefact-viz render.py --out on capability-map.sample.md) and the release note with its PDF (com-release-note render_pdf.py) each exit 0 against the `full` fixture, the `subset` fixture and the first real consumer, `@medquantis/design-system@1.1.0` pinned with `point` in a scratch project; check_render.py exit 0 on all nine. Provenance: `full` and MedQuantis read all nine modules from the design; `subset` reads core and dataviz, the base theme the other seven. `minimal-invalid` is refused by design and was not rendered.
+- Learning: com-artefact-viz render.py takes `--out`, not `--output`.
+- Next, outside this plan: consumers move off the legacy `docs/ux/tokens.css` (blocops, clew); open: a WCAG pair for `--print-breaking`; clew's metamodel may need the `docs/ux/DESIGN.md` design_system default path; split `com-slide-deck` into deck and `com-document` skills (undecided).
+- Commit: see git log (docs(delivery-comms): close the modular design contract plan after the 2.0.0 release)
+- Timestamp: 2026-10-15
