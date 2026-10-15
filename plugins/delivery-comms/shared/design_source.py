@@ -196,6 +196,8 @@ def _inside(root, path):
     path = path.resolve()
     if root.resolve() not in path.parents:
         raise DesignError(f"{path} lies outside the design-system package")
+    if path.is_dir():
+        raise DesignError(f"{path.relative_to(root.resolve())} is a folder; an export names one file (contract/README.md)")
     if not path.is_file():
         raise DesignError(f"{path.relative_to(root.resolve())} is missing from the design-system package")
     return path
