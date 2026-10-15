@@ -401,7 +401,7 @@ Exit criteria:
 
 ### Increment 13: Documentation and release 2.0.0
 
-**Status:** pending
+**Status:** in-progress (scope items 1 to 3 done; scope item 4's merge to `main`, the marketplace cache refresh and the exit criterion wait for the owner's merge request)
 
 Scope:
 
@@ -442,4 +442,4 @@ Exit criteria:
 | M3: Renderers moved | 05-09 | done | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
 | M4: Reproducible | 10 | done | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
 | M5: Authoring | 11 | done | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
-| M6: Agents follow the skills, release | 12-13 | pending | Agents using the rewritten skills render on-brand and migrate legacy projects; 2.0.0 released | `make -C plugins/delivery-comms test`, `make -C plugins/delivery-comms skill-evals` (owner-approved run), `./scripts/audit-skills.sh` | Every eval case passes its graders; 2.0.0 in the marketplace cache | `test(delivery-comms)`, `docs(delivery-comms)` |
+| M6: Agents follow the skills, release | 12-13 | in-progress | Agents using the rewritten skills render on-brand and migrate legacy projects; 2.0.0 released | `make -C plugins/delivery-comms test`, `make -C plugins/delivery-comms skill-evals` (owner-approved run), `./scripts/audit-skills.sh` | Every eval case passes its graders; 2.0.0 in the marketplace cache | `test(delivery-comms)`, `docs(delivery-comms)` |

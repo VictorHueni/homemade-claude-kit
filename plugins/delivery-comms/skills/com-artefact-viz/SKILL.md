@@ -7,7 +7,7 @@ user-invocable: true
 metadata:
   category: "communication"
   complexity: "medium"
-  version: "1.0.0"
+  version: "2.0.0"
   status: active
   last_reviewed: 2026-10-14
   review_interval: 180d

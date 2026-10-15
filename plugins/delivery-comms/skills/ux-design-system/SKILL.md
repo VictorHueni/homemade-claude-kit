@@ -7,7 +7,7 @@ user-invocable: true
 metadata:
   category: "ux"
   complexity: "low"
-  version: "1.0.0"
+  version: "2.0.0"
   status: active
   last_reviewed: 2026-10-14
   review_interval: 180d
@@ -136,5 +136,6 @@ A script or page outside the three renderers (a table, a dashboard, an email) th
 
 - [`contract/README.md`](../../contract/README.md): modules, manifest, contrast pairs, fonts.
 - `references/discipline.md`: principles and boundaries.
+- [`references/agents-md-block.md`](references/agents-md-block.md): the five lines a project copies into its `AGENTS.md` (pin, manifest, validator, Dependabot).
 - `examples/DESIGN.sample.md` (a filled DESIGN.md) and `examples/legacy.tokens.css` (a legacy file to try `--from-legacy` on; its accent is refused for contrast).
 - `com-slide-deck`, `com-artefact-viz`, `com-release-note`: the renderers.
