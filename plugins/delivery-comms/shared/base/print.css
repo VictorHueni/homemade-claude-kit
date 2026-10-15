@@ -2,4 +2,6 @@
 :root {
   --print-bg: #ffffff;
   --print-margin: 14mm 16mm 18mm;
+  --print-page-size: A4;
+  --print-breaking: var(--danger);   /* breaking-changes accent; a design may set its own */
 }

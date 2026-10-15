@@ -51,7 +51,9 @@ Default output is a `provenance/` folder in the **same directory as the target**
 
 ## Anchoring guidance
 
-Prefer anchoring on a **committed / reproducible source artefact** (e.g. a built HTML deck retained in git) over a non-deterministic derived artefact (e.g. a PDF whose bytes change per render). The git blob OID then makes the proof durable: the exact bytes are preserved in history and re-hash identically. Timestamp a specific *distributed* binary (and retain its exact bytes) only when you need proof of that copy.
+Prefer anchoring on a **committed / reproducible artefact** (e.g. a built HTML deck retained in git) over a non-deterministic derived one. The git blob OID then makes the proof durable: the exact bytes are preserved in history and re-hash identically. Timestamp a specific *distributed* binary (and retain its exact bytes) only when you need proof of that copy.
+
+**Rebuild hazard.** A token proves one exact byte sequence. A renderer whose output is not deterministic (a PDF stamped with the render time, an embedded random ID) produces different bytes on every rebuild, so a token over its output no longer matches anything a later rebuild produces: anchor on the source or keep the timestamped copy itself. delivery-comms 2.0.0 renderers are reproducible (the same source and design give the same bytes, dates taken from the source; ADR-0013, [#106](https://github.com/VictorHueni/homemade-claude-kit/issues/106)), so a re-render reproduces a timestamped PDF and re-hashing it is a currency check; the cutover changed every delivery-comms PDF's bytes once, so a token over a PDF rendered before 2.0.0 stays tied to that retained copy.
 
 ## Dependencies
 

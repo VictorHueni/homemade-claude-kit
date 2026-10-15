@@ -11,6 +11,9 @@
 > touched; the authoritative *why* for each is its row in
 > `docs/project-control/open-items/open-items.md`.
 
+**`design_system` default path follows delivery-comms 2.0.0 (2026-10-14):**
+The `design_system` registry row's `default_path` moves from `docs/ux/design-system.md` to `docs/ux/DESIGN.md`, the file `ux-design-system subset` reads since Plan-0005 increment 11 (the skill no longer writes `design-system.md` or `tokens.css`). No ID, ER or Check-5 change: the type mints no IDs. Coupled text updated in the same commit: `metamodel-reference.md` (supporting-skills bullets for `ux-design-system`, `com-slide-deck`, `com-artefact-viz`; the build-order note; the canonical `docs/ux/` tree; the `ux-` prefix row) and `.claude/skills/util-skill-authoring/references/naming.md`. Refs: Plan-0005 increment 12.
+
 **`qa-test-scenario` ships — second `qa-` skill, three-tier scenario/case model (2026-08-13):**
 Derives test scenarios from a use case's flows (Cockburn: one `SC-NN` per main-success-scenario
 step or extension) and expands scenarios into concrete cases — plus two direct-to-case paths with

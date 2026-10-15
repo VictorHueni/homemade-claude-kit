@@ -1,1 +1,2 @@
-:root { --slide-bg: #ffffff; --slide-fg: #101828; --slide-padding: 56px; }
+:root { --slide-bg: #ffffff; --slide-fg: #101828; --slide-padding: 56px; --slide-width: 1280px; --slide-height: 720px; }
+.slide-label { letter-spacing: 0.14em; color: var(--ink); }

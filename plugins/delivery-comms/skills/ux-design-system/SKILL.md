@@ -1,152 +1,141 @@
 ---
 name: ux-design-system
 license: MIT
-description: "Author a project's single visual design system once and generate the canonical token sheet every com-* artefact consumes. Adapts Anthropic's brand-guidelines pattern (a design system as a shared, on-demand resource) kept domain-agnostic: scaffolds a fillable design-system.md (brand rationale + token tables for palette, typography, spacing, and semantic tokens) and generates docs/ux/tokens.css, a :root variable contract. com-slide-deck and com-artefact-viz reference these via var() and never hard-code colour/font/radius, so editing the design system re-themes every deck and view with no renderer change. Modes: scaffold, generate/refresh. Use when the user wants to define a design system, brand tokens, theme, colour palette, typography, or shared visual style for generated decks and visualisations. Triggers on: design system, design tokens, brand guidelines, theme, colour palette, typography tokens, tokens.css. Output: docs/ux/. Mints no IDs; cross-cutting foundation for the presentation layer."
-allowed-tools: Bash(python ${CLAUDE_SKILL_DIR}/scripts/generate_tokens.py *)
+description: "Point a project at the design system its decks, views and release notes render with, or author a declared subset of one. Modes: point (pin a published design-system package at an exact version in docs/ux/package.json, validate its kit manifest through the kit resolver, print the Dependabot entry), subset (build docs/ux/design-system/, module CSS and kit-manifest.json, from a Google-format DESIGN.md; propose a contrast-checked chart palette for the owner to confirm), subset --from-legacy (draft that DESIGN.md from a legacy docs/ux/tokens.css, which the 2.0 renderers refuse), scaffold (a DESIGN.md template). Use when the user wants a design system, brand tokens, theme, colour or chart palette, or typography for generated decks and views, when a render refuses a legacy tokens.css, or when a bespoke script or page must be in the project's brand. Triggers on: design system, design tokens, DESIGN.md, theme, colour palette, in our brand, pin design system, migrate tokens.css. Output: docs/ux/. Mints no IDs."
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/design_system.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/shared/design_source.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/shared/check_render.py *)
 user-invocable: true
 metadata:
   category: "ux"
   complexity: "low"
-  version: "1.0.0"
+  version: "2.0.0"
   status: active
-  last_reviewed: 2026-05-29
+  last_reviewed: 2026-10-14
   review_interval: 180d
   impact: "low"
 ---
 
-# ux-design-system — Project Design System
+# ux-design-system: the project's design source
 
-Own the project's **single visual source of truth**. Author the brand once in a
-human-readable `design-system.md`; generate `tokens.css`, a `:root` variable
-sheet that every `com-*` artefact themes from. Change a token, regenerate, and
-every slide deck and artefact visualisation re-themes — no renderer touched.
+The three delivery-comms renderers (`com-slide-deck`, `com-artefact-viz`, `com-release-note`) theme every output from one design, resolved once per render: an explicit `--design-system` folder, else the pin in `docs/ux/package.json` found by walking up from the working folder, else the kit's neutral base theme. The design is modular (contract `2.0.0`: `core` and `dataviz` required, seven optional modules); the contract is [`contract/README.md`](../../contract/README.md), the role list `contract/modules.json`. A legacy `docs/ux/tokens.css` (or `docs/design/tokens.css`) is refused by every renderer.
 
-This is the kit's adaptation of Anthropic's
-[`brand-guidelines`](https://github.com/anthropics/skills/tree/main/skills/brand-guidelines)
-pattern (a design system encoded as a shared, on-demand resource), kept
-**domain-agnostic**: it never hard-codes a brand — it scaffolds a fillable
-design system the project owns.
+This skill gives a project its design in one of two ways:
 
-```
-design-system.md  ──(generate_tokens.py)──>  tokens.css  ──var(--token)──>  com-slide-deck
-  (authored, human)                          (:root contract)              com-artefact-viz
-```
+- **`point`**: the project uses a published design-system package. The pin holds an exact version, so Dependabot proposes bumps.
+- **`subset`**: the project has no design system of its own. The owner writes a DESIGN.md (a Google DESIGN.md) with the modules it can fill and a `kit.omitted` list; the skill generates the module CSS, the manifest and the pin.
 
-It mints no IDs and links to no other artefact. It is a **cross-cutting
-foundation** for the presentation layer — scaffold it any time before producing
-communication artefacts.
-
----
+It mints no IDs and links to no other artefact. A complete design system from a template is out of scope ([#114](https://github.com/VictorHueni/homemade-claude-kit/issues/114)).
 
 ## Quick reference
 
 | Task | Command |
 |---|---|
-| Scaffold the design system | `python scripts/generate_tokens.py scaffold` (creates `docs/ux/design-system.md` + `tokens.css`) |
-| Regenerate tokens after editing the doc | `python scripts/generate_tokens.py generate docs/ux/design-system.md` |
-| Refresh (alias) | `python scripts/generate_tokens.py refresh docs/ux/design-system.md` |
+| Use a published design system | `python3 <skill-dir>/scripts/design_system.py point @scope/name@1.2.3` |
+| Preview an unreleased design-system folder | `python3 <skill-dir>/scripts/design_system.py point ../design-system` |
+| Start a DESIGN.md | `python3 <skill-dir>/scripts/design_system.py scaffold` (writes `docs/ux/DESIGN.md`) |
+| Build the subset from a DESIGN.md | `python3 <skill-dir>/scripts/design_system.py subset docs/ux/DESIGN.md` |
+| Migrate a refused legacy token file | `python3 <skill-dir>/scripts/design_system.py subset --from-legacy docs/ux/tokens.css` |
+| See which design renders will use | `python3 <skill-dir>/scripts/shared/design_source.py provenance` |
+| The design's CSS for a bespoke generator | `python3 <skill-dir>/scripts/shared/design_source.py css` (see **Bespoke generators**) |
+| Record the verdict on any built HTML | `python3 <skill-dir>/scripts/shared/check_render.py --record OUT.html.verdict.txt OUT.html` |
 
-Output lives at `docs/ux/` (the `ux-` category folder — the skill name
-`ux-design-system` follows the standard `<category>-<artefact>` convention).
+Every refusal exits 2 with a message naming what to change. `generate` and its `refresh` alias were removed in 2.0.0: running either exits 2 and prints the `subset` commands above.
 
----
+`<skill-dir>` is the absolute path on the "Base directory for this skill" line at the top of this skill; write it out in full, with no shell variable and no `cd`. Run **one plain command per Bash call**, starting with `python3` (no `&&`, `;`, pipes or redirections): restricted sessions allow only `python3`, `mkdir` and `cp` and deny compound commands. Look at files with Read, Glob and Grep, and write files with the Write tool. If a command is denied or a run refuses, stop and report the message and what the owner must do.
 
 ## Modes
 
-### `scaffold`
+### `point SPEC [--docs DOCS]`
 
-Create `docs/ux/design-system.md` (from the template — brand-rationale
-placeholders + token tables pre-filled with neutral defaults) and
-`docs/ux/tokens.css` (neutral defaults). Existing files are skipped, never
-overwritten. `owner` is taken from `git config user.name`.
+`SPEC` is a package with an exact version (`@scope/name@1.2.3` or `name@1.2.3`; a range such as `^1.2.3` or a tag such as `latest` is refused) or a design-system folder.
 
-```bash
-python scripts/generate_tokens.py scaffold          # -> docs/ux/...
-python scripts/generate_tokens.py scaffold path/docs # custom docs root
-```
+1. A package is downloaded through the kit resolver (registry `${DELIVERY_COMMS_NPM_REGISTRY:-https://registry.npmjs.org}`, `dist.integrity` checked, cached under `${XDG_CACHE_HOME:-~/.cache}/delivery-comms/design-systems/`) and resolved: its `kit-manifest.json` against the schema, `core` and `dataviz` present, every export path present, the contract's text pairs at WCAG AA. A folder is resolved the same way, without the network.
+2. Only then is `DOCS/ux/package.json` written: one dependency, the design system, at the exact version (or `file:<relative path>` for a folder). Other keys of an existing file are kept; a previous dependency is replaced.
+3. For a package, it prints the `.github/dependabot.yml` entry (`package-ecosystem: "npm"`, `directory: "/docs/ux"`) for the owner to add. The skill never writes that file.
 
-### `generate` / `refresh`
+A folder pin is for previewing an unreleased design; pin a published version before sharing renders.
 
-Parse the `## Tokens` tables in `design-system.md` and (re)write `tokens.css`
-next to it. The token **names** are the fixed contract; values are free. The
-generator warns if a contract token is missing or an unknown token appears, but
-keeps unknown tokens so a project can extend the palette.
+### `subset SRC`
 
-```bash
-python scripts/generate_tokens.py generate docs/ux/design-system.md
-```
+`SRC` is a DESIGN.md: a [Google DESIGN.md](https://github.com/google-labs-code/design.md) (format `alpha`; spec in `docs/spec.md` there), YAML front matter (read with PyYAML's safe loader) then prose. The files the skill writes (template, scaffold, proposal, `--from-legacy` draft, `examples/DESIGN.sample.md`) pass Google's linter with no error and no warning (`make -C plugins/delivery-comms test-design-md`). The front matter keys are:
 
----
+| Key | Holds |
+|---|---|
+| `name` | the design's name (the generated package is `<name>-design-subset`) |
+| `colors` | the colour roles by contract name: `ink`, `muted`, `canvas-bg`, `surface`, `surface-2`, `border`, `accent`, `accent-ink`, `success`, `warning`, `danger`, `info` (`core`), optionally `tertiary` (`core`: footers, legal lines and slide numbers; without it they use `muted`), and `chart-1` to `chart-4` (darkest first), `chart-rest`, `chart-axis`, `chart-grid`, `chart-highlight` (`dataviz`); hex only. `primary: "{colors.accent}"` keeps Google's primary colour on the accent. |
+| `typography` | Google typography tokens, each an object (`fontFamily`, `fontSize`, `fontWeight`, `lineHeight`, ...); the mapping is below |
+| `rounded` | `card-radius`, `btn-radius`, `node-radius` (`core`); `radius-sm`, `radius-pill` (`space-shape`) |
+| `spacing` | `space-sm`, `space-md`, `space-lg`, `shell-max` (`core`); `space-xs`, `space-xl` (`space-shape`) |
+| `kit` | the kit's extension key, for what Google DESIGN.md has no key for: `shadow` (`core`), `border-width` (`space-shape`), `fonts` (font faces: `family`, `src` a font file beside the DESIGN.md and never a URL, `weight`, `style`; their `@font-face` goes in `type` if filled, else `core`), `omitted` (optional module name to the reason it is not provided; the manifest's `omitted`) |
+| `proposed` | the mark of an unreviewed chart palette: the chart colours `subset` proposed |
+
+Typography mapping (token and property to contract role):
+
+| Token | `fontFamily` | `fontSize` | `lineHeight` | `fontWeight` |
+|---|---|---|---|---|
+| `body` | `--font-body` | `--font-size-md` | `--line-height-body` | `--font-weight-regular` |
+| `heading` | `--font-heading` | `--title-size` | `--line-height-tight` | `--font-weight-bold` |
+| `mono` | `--font-mono` | | | |
+| `text-xs`, `text-sm`, `text-lg`, `text-xl` | | `--font-size-xs`, `--font-size-sm`, `--font-size-lg`, `--font-size-xl` | | |
+
+`body.fontFamily`, `heading.fontFamily`, `heading.fontSize` and `mono.fontFamily` are `core`; the other cells are the `type` module. Google's `rounded` takes px, rem or em only, so keep those units for the linter to pass.
+
+Reading a Google DESIGN.md: keys and tokens the kit does not use (`version`, `description`, Google's `omitted` list, `components`, colours such as `primary` or `secondary`, typography tokens such as `h1`, properties such as `letterSpacing`) are skipped, listed in one printed note. The artefact front matter keys (`type`, `title`, `tags`, `timestamp`, `status`, `owner`, `last_reviewed`, `review_interval`) are ignored silently. A top-level key within two edits of a key the kit reads (`colours`) is an error naming the key it resembles, as are an unknown property inside a kit typography token and an unknown key under `kit`; the pre-Google keys `dataviz`, `elevation` and `fonts` are errors naming where their content goes.
+
+Rules:
+
+- `core` is required and filled whole; a missing role is named by its DESIGN.md path (`colors.accent`, `typography.heading.fontSize`, `kit.shadow`), with a skipped token it may be a typo of, and, when Google's `primary` is a hex colour and `accent` is missing, the `accent:` line to add. An optional module is filled whole or not at all; a module filled in part is an error naming the missing roles. A module both filled and in `kit.omitted` is an error.
+- A value is one CSS value: `;`, `{`, `}`, `<`, `>` and comments are refused.
+- **No chart colours**: the run writes a proposed palette at the end of `colors` and a top-level `proposed: [chart-1, ...]` line after it, and stops (exit 2) without generating anything. The mark is a YAML key, not a comment, because the safe loader drops comments; Google's linter ignores it. The proposal: `chart-1` to `chart-4` are four steps from `accent` towards `surface` (0, 25, 50 and 75 per cent, darkest first), each step moved further towards the surface until `accent-ink` or `ink` reaches AA on it; `chart-rest` (the remainder fill) is `muted` halfway towards `surface`; `chart-axis` is `muted`; `chart-grid` is `border`; `chart-highlight` is `warning`. Show it to the owner. Generation refuses while the `proposed:` line remains; only the owner removes it.
+- The prose after the front matter becomes the `guidance` module (`guidance.md`), informational, unless `kit.omitted` lists `guidance`. Its `##` sections follow Google's order: Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts.
+
+Output, beside `SRC`: `design-system/` with `<module>.css` per filled module, `guidance.md`, `kit-manifest.json` (contract `2.0.0`, `provides`, `omitted` from the file) and a `package.json` naming the exports. The folder is written to a staging folder and resolved there by the kit resolver, the same rules a render applies (a contrast pair below AA is refused with the pair and its ratio; a fill passes when either text role reaches AA); a refused run leaves the previous `design-system/` untouched. Then, when `docs/ux/package.json` does not exist, it is written as `file:design-system`, so every renderer finds the subset; a project already pinned to another design keeps that pin, and the run prints the `point` command that switches.
+
+The generated CSS is a machine artefact: change the DESIGN.md and run `subset` again.
+
+### `subset --from-legacy TOKENS`
+
+`TOKENS` is a legacy `docs/ux/tokens.css` or `docs/design/tokens.css`. Writes a draft `docs/ux/DESIGN.md` (never overwriting one) with:
+
+- every `core` role found in the file, `var()` references to another property of the file followed to their value, and the legacy `--font-sans` alias taken as `font-body`;
+- each `core` role the file lacks taken from the kit base theme, and named by its DESIGN.md path in the output and in a comment;
+- `primary: "{colors.accent}"`, proposed chart colours under the `proposed` mark (see `subset`), and `guidance` in `kit.omitted`.
+
+Then **stop**: show the owner the draft, the proposed chart colours and what the run could not map, and leave the next steps to them (review the palette and remove the `proposed:` line, darken a colour the resolver refuses for contrast, run `subset`). Do not remove the mark, do not run `subset` to get past it, and do not write `docs/ux/design-system/` yourself. If a deck, view or note was asked for, it is not delivered in this run: no hand-written CSS replaces the refused design.
+
+It prints what it could not map: properties that are not contract roles (deck-only names such as `--dim`, domain names such as `--status-shipped`), colours that are not hex (subset refuses them until changed), and `@font-face` or `@import` rules (fonts move to `kit.fonts` with a local file). It leaves `TOKENS` unedited, and so do you: the owner deletes it once the subset renders (a render with both a pin and a legacy file prints a warning).
+
+### `scaffold [DOCS]`
+
+Creates `DOCS/ux/DESIGN.md` (default `docs/ux/DESIGN.md`) from `templates/DESIGN.template.md`: neutral `core` values, every optional module in `kit.omitted`, prose sections to fill, no chart colours (the first `subset` run proposes them). An existing file is kept. `owner` comes from `git config user.name`.
 
 ## Operating sequence
 
-1. **Scaffold** (once per project): `scaffold`. This is a good early step — do
-   it before the first `com-slide-deck` deck or `com-artefact-viz` view so they
-   theme consistently from day one.
-2. **Author** `docs/ux/design-system.md`: fill the brand rationale and set
-   the token **values** (palette, typography, spacing, semantic accents). Keep
-   the `Token` and `Value` columns intact; do not rename or drop tokens.
-3. **Generate**: run `generate` to produce `tokens.css`.
-4. **Consume** from the presentation skills:
-   - `com-artefact-viz` auto-detects `docs/ux/tokens.css` (or pass
-     `--design-system docs/ux/tokens.css`).
-   - `com-slide-deck`'s `build.py` inlines `docs/ux/tokens.css` before the
-     deck `styles.css` (config `paths.design_tokens`, or auto-detected).
-5. **Refresh** whenever the brand changes — re-run `generate`; every consumer
-   re-themes on its next build.
+1. **A published design system exists**: `point` it, add the printed Dependabot entry, done.
+2. **No design system**: `scaffold` (or `subset --from-legacy` when a refused `tokens.css` exists), fill the values and the prose with the owner, run `subset`, show the proposed chart palette to the owner, and run `subset` again once the owner has removed the `proposed:` line.
+3. Render with any of the three skills. Each validates the output before writing it (exit 1 on findings, 2 on a refused design), prints and writes `<output>.provenance.json` naming which modules came from the design and which from the base, and is done only when `check_render.py --record <output>.verdict.txt <output>` reads `PASS: no findings`.
 
----
+Do not hand-write CSS to get around a refusal, and do not edit `design-system/` by hand.
 
-## The token contract
+## Bespoke generators
 
-`tokens.css` defines one agreed `:root` vocabulary so any `com-*` renderer can
-rely on the same variable names. The canonical names, grouped, live in
-`references/token-contract.md` and in `templates/tokens.template.css` (the
-generator validates against the latter). Groups: base palette · generic
-semantic state (`--success/--warning/--danger/--info`) · typography · spacing &
-shape. The contract stays generic on purpose — kit-domain tokens (delivery
-status, pain, confidence, importance) are **consumer-derived** as aliases to the
-generics (see `references/token-contract.md`), so a project themes four portable
-names instead of kit jargon.
+A script or page outside the three renderers (a table, a dashboard, an email) that must be in the project's brand takes its CSS from the kit resolver, never from colours copied into the script:
 
-**Discipline:** renderers reference `var(--token)` only — never a literal
-colour, font, or radius. A renderer that hard-codes `#3b6ef5` is a bug. That
-contract is what makes the design system the single lever for re-theming.
-
----
-
-## Output frontmatter
-
-`docs/ux/design-system.md` opens with the standard OKF-superset artefact
-frontmatter — `type: Design System` (its `okf_type` in the `metamodel` skill's `references/artefact-types-registry.yaml`),
-plus `title`, `description`, `tags`, `timestamp`, `status`, `owner`, `last_reviewed`,
-`review_interval`; default `review_interval: 180d`. Full schema: the `metamodel` skill's `references/artefact-frontmatter.md`.
-
-`tokens.css` is a generated machine artefact (no frontmatter) — author durable
-changes in the `.md`, not the `.css`.
-
----
+1. In the script, run `<skill-dir>/scripts/shared/design_source.py` with the same Python, once with `fonts` and once with `css` (`subprocess.run([sys.executable, DESIGN_SOURCE, "css"], capture_output=True, text=True, check=True)`, `DESIGN_SOURCE` the absolute path written out), and read their standard output: the design's `@font-face` rules (fonts inlined as data URIs), then its CSS, every module in contract order, including the `--kit-on-<fill>` text roles. It resolves the design like a render (the `docs/ux/package.json` pin found by walking up from the working directory, else the base theme) and exits 2 when the design is refused; let that error stop the script.
+2. Put the two outputs, unchanged and fonts first, in one `<style data-design-layer>` block, then the page's own rules in a plain `<style>` that uses contract roles only (`var(--ink)`, `var(--surface)`, `var(--border)`, `var(--accent)`, `var(--font-body)`; text on `--accent` with `var(--accent-ink)`, text on a state or chart fill with `var(--kit-on-<fill>)`). No literal colour (hex, `rgb()`, `hsl()`, a named colour) anywhere in the script or its output, and no custom property outside the contract.
+3. Run the script, then `python3 <skill-dir>/scripts/shared/check_render.py --record <output>.verdict.txt <output>`, and report the verdict's first line. On a `FAIL`, fix the script to use the role each finding names and run both again.
 
 ## Verification checklist
 
-1. [ ] `docs/ux/design-system.md` exists with the brand rationale filled (no `_TODO_`).
-2. [ ] `generate` runs with no missing-contract-token warning.
-3. [ ] `docs/ux/tokens.css` defines the full contract (`references/token-contract.md`).
-4. [ ] `com-artefact-viz` auto-detects the sheet (prints "using shared design system …").
-5. [ ] A token-value edit, after `generate`, visibly changes a rendered deck/view.
-
----
-
-## Follow-up work
-
-Planned enhancements for this skill — and the deferred unification of
-`com-slide-deck`'s `styles.css` onto this shared `tokens.css` — are tracked as
-central-only rows in `docs/project-control/open-items/open-items.md` (per
-the `metamodel` skill's `references/open-items-governance.md` §9), not in this folder.
+1. [ ] `docs/ux/package.json` pins exactly one design system: an exact version, or `file:design-system` for a subset.
+2. [ ] `point` or `subset` exited 0; no `proposed:` line is left in the DESIGN.md.
+3. [ ] `kit.omitted` gives a reason for every optional module the project does not fill.
+4. [ ] A render's provenance lists `core` and `dataviz` from the design system, and its validator verdict is PASS.
+5. [ ] No legacy `tokens.css` is left in `docs/ux/` or `docs/design/`.
 
 ## See also
 
-- `references/token-contract.md` — the canonical `:root` variable schema.
-- `references/discipline.md` — principles and boundaries.
-- `com-artefact-viz/SKILL.md` · `com-slide-deck/SKILL.md` — the consumers.
-- `rules/skill-creation-sync.md` · the `metamodel` skill's `references/artefact-frontmatter.md`.
+- [`contract/README.md`](../../contract/README.md): modules, manifest, contrast pairs, fonts.
+- `references/discipline.md`: principles and boundaries.
+- [`references/agents-md-block.md`](references/agents-md-block.md): the five lines a project copies into its `AGENTS.md` (pin, manifest, validator, Dependabot).
+- `examples/DESIGN.sample.md` (a filled DESIGN.md) and `examples/legacy.tokens.css` (a legacy file to try `--from-legacy` on; its accent is refused for contrast).
+- `com-slide-deck`, `com-artefact-viz`, `com-release-note`: the renderers.

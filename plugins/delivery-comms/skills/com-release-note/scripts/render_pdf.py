@@ -4,18 +4,19 @@
 Reads the committed release-note Markdown (the single source of truth), parses
 its deterministic template structure, and emits:
 
-  * a self-contained A4-print-styled HTML file (always), themed by the same
-    token cascade as com-slide-deck / com-artefact-viz — ``scripts/shared/
-    base/core.css`` first, then the project's ``docs/ux/tokens.css``
-    (auto-detected, or ``--design-system PATH``), project values winning.
-    ``tokens.css`` only ever carries font *names* (``--font-body``); if the
-    project also self-hosts real font files under ``docs/ux/fonts/fonts.css``
-    (plain ``@font-face`` rules, relative ``url()`` to sibling files —
-    auto-detected, no flag), those are inlined as base64 data URIs so the
-    fonts actually render instead of silently falling back to the CSS stack
-    fallback (e.g. Georgia instead of a real serif brand font); and
-  * a paginated A4 PDF via headless Chromium (Playwright), with page numbers
-    and a link to the version's GitHub Release.
+  * a self-contained print-styled HTML file (always), themed by the resolved
+    design (shared/design_source.py): the `--design-system DIR` folder, else the
+    docs/ux/package.json pin found by walking up from the working directory,
+    else the kit's base theme. The font faces and the `core`, `dataviz`, `type`,
+    `space-shape` and `print` modules are inlined in a <style data-design-layer> block; the page
+    box comes from the `print` module. The HTML is checked against the design
+    (shared/check_render.py) before anything is written: a report that breaks
+    the design writes nothing and exits 1, a refused design exits 2. The
+    provenance report is printed and written next to the HTML as
+    <html>.provenance.json; and
+  * a paginated PDF via headless Chromium (Playwright), with the shared print
+    chrome in the page margins (running title, the brand logo and legal line,
+    page numbers) and a link to the version's GitHub Release.
 
 Playwright is an optional dependency — NOT auto-installed. If it is missing,
 the HTML is still written and the script fails the PDF step with an explicit
@@ -25,16 +26,17 @@ Usage::
 
     python render_pdf.py docs/communication/release-notes/v1.4.0-rebooking.md
     python render_pdf.py NOTE.md --release-url https://github.com/o/r/releases/tag/v1.4.0
-    python render_pdf.py NOTE.md --design-system docs/ux/tokens.css --output /tmp/note.pdf
+    python render_pdf.py NOTE.md --design-system path/to/design-system --output /tmp/note.pdf
+    python render_pdf.py NOTE.md --exception=--font-report="Lora, serif"
     python render_pdf.py NOTE.md --html-only
 """
 
 from __future__ import annotations
 
 import argparse
-import base64
 import datetime
 import html
+import json
 import math
 import os
 import re
@@ -44,6 +46,32 @@ from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
 _TEMPLATE_DIR = _HERE.parent / "templates"
+
+# The synced copies of the shared resolver, validator and print chrome (scripts/sync-shared.py).
+sys.path.insert(0, str(_HERE / "shared"))
+import check_render  # noqa: E402
+import design_source  # noqa: E402
+import pdf_dates  # noqa: E402
+import print_chrome  # noqa: E402
+import source_date  # noqa: E402
+from design_source import DesignError  # noqa: E402
+from source_path import display_path  # noqa: E402
+
+# The modules the report reads: core (palette, fonts, radii), dataviz (the donut's chart scale), type
+# (the bold weight), space-shape (the pill radius) and print (the page box and background, the breaking
+# accent, and the report class vocabulary a design may style). Brand reaches the PDF through the
+# page-margin chrome, not the page; the other modules style nothing the report draws.
+REPORT_MODULES = ("core", "dataviz", "type", "space-shape", "print")
+REPORT_FONT = "--font-report"
+OLD_FONTS_CSS = Path("docs/ux/fonts/fonts.css")
+
+
+class RenderRefused(Exception):
+    """The report breaks the resolved design; nothing was written."""
+
+    def __init__(self, message, code=1):
+        super().__init__(message)
+        self.code = code
 
 _PRODUCT_RE = re.compile(r"^\*\*(?:(P\d+)\s*·\s*)?(.+?)\*\*$")
 _CAPABILITY_RE = re.compile(r"^\*\*(C\d+(?:\.\d+)*)\s+(.+?)\*\*$")
@@ -253,7 +281,7 @@ def _changelog_cell(changelog: str) -> str:
     return f"<code>{_esc(value)}</code>"
 
 
-def _cartouche(model: dict, release_url: str, note_label: str, today: str) -> str:
+def _cartouche(model: dict, release_url: str, note_label: str, stamped: str) -> str:
     """The title block under the summary: all release metadata, in place of a footer.
 
     Rows with nothing to show are omitted, so a note without a changelog line or
@@ -266,7 +294,7 @@ def _cartouche(model: dict, release_url: str, note_label: str, today: str) -> st
         ("Status", _esc(meta.get("status", ""))),
         ("Full changelog", _changelog_cell(model["changelog"])),
         ("Release notes", f'<a href="{_esc(release_url)}">{_esc(release_url)}</a>' if release_url else ""),
-        ("Generated", f'com-release-note on {_esc(today)} from <code>{_esc(note_label)}</code>. '
+        ("Generated", f'com-release-note on {_esc(stamped)} from <code>{_esc(note_label)}</code>. '
                       f'Source note is the single source of truth; re-render after edits.'),
     ]
     cells = "".join(f'<div class="cart-row"><span class="cart-k">{key}</span>'
@@ -349,62 +377,8 @@ def _measures(model: dict) -> dict:
             "days": days}
 
 
-_HEX_RE = re.compile(r"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b")
-_TOKEN_DEFAULTS = {"accent": "#3b6ef5", "ink": "#1a1f29", "surface": "#ffffff"}
-
-
-def _resolve_token(css_text: str, name: str) -> str:
-    """The hex value a --name custom property resolves to, last declaration wins.
-
-    A regex scan over the assembled CSS text (fallback, then project — the same
-    cascade order the stylesheet itself uses), not a real CSS parser: sufficient
-    because every token file declares these as plain hex literals. Falls back to
-    the kit's own neutral default if the property is never declared (e.g. a
-    project tokens.css that doesn't define --ink).
-    """
-    matches = re.findall(rf"--{name}:\s*([^;]+);", css_text)
-    for value in reversed(matches):  # last declaration in the cascade wins
-        hexm = _HEX_RE.search(value)
-        if hexm:
-            return "#" + hexm.group(1)
-    return _TOKEN_DEFAULTS[name]
-
-
-def _hex_to_rgb(hex_value: str) -> tuple[int, int, int]:
-    h = hex_value.lstrip("#")
-    if len(h) == 3:
-        h = "".join(c * 2 for c in h)
-    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-
-
-def _mix_hex(hex_a: str, pct_a: float, hex_b: str) -> str:
-    """color-mix(in srgb, A pct_a%, B) computed in Python: a linear per-channel
-    blend of the encoded sRGB bytes, matching the CSS Color 4 semantics for two
-    opaque colours. Baking the result as a literal hex string (rather than
-    leaving color-mix() to resolve live) sidesteps a real divergence observed
-    between environments when color-mix() is nested inside a gradient's stop
-    list during PDF export — plain `background: color-mix(...)` rendered
-    correctly everywhere tested, but the identical expression inside
-    conic-gradient(...) did not on at least one reader's setup."""
-    ra, ga, ba = _hex_to_rgb(hex_a)
-    rb, gb, bb = _hex_to_rgb(hex_b)
-    t = pct_a / 100
-    mix = lambda a, b: round(a * t + b * (1 - t))  # noqa: E731
-    return f"#{mix(ra, rb):02x}{mix(ga, gb):02x}{mix(ba, bb):02x}"
-
-
-def _donut_steps(tokens: dict) -> tuple[str, str, str, str]:
-    """Ordinal ramp of the accent hue, as literal hex — see _mix_hex for why not
-    color-mix(). The four sections are tiers, so one hue with monotone lightness
-    is the right colour job (validated: monotone L, adjacent dL, light-end
-    contrast, single hue). Dark to light, in slice order."""
-    accent, ink, surface = tokens["accent"], tokens["ink"], tokens["surface"]
-    return (
-        _mix_hex(accent, 55, ink),
-        _mix_hex(accent, 78, ink),
-        accent,
-        _mix_hex(accent, 72, surface),
-    )
+# The composition ring's ordinal ramp: the design's chart scale, darkest first, one step per tier.
+_CHART_STEPS = ("--chart-1", "--chart-2", "--chart-3", "--chart-4")
 
 
 _SLICE_GAP_DEG = 1.4  # blank separator between slices, ~2px at this radius
@@ -415,7 +389,7 @@ _RING_THICKNESS = 100 * 6.5 / 28
 _RING_RADIUS = 50 - _RING_THICKNESS / 2
 
 
-def _donut_svg(slices: list, total: int, tokens: dict) -> str:
+def _donut_svg(slices: list, total: int) -> str:
     """The composition ring as flat-filled SVG arcs.
 
     Deliberately NOT a CSS conic-gradient: Chromium compiles one into a PDF
@@ -427,7 +401,7 @@ def _donut_svg(slices: list, total: int, tokens: dict) -> str:
     draws identically. Arcs are stroked on one circle via dash offsets, so a
     slice's angular position needs no path arithmetic.
     """
-    steps = _donut_steps(tokens)
+    steps = _CHART_STEPS
     circumference = 2 * math.pi * _RING_RADIUS
     arcs, angle = [], 0.0
     for i, (_label, count) in enumerate(slices):
@@ -436,7 +410,7 @@ def _donut_svg(slices: list, total: int, tokens: dict) -> str:
         arc = circumference * drawn / 360
         arcs.append(
             f'<circle cx="50" cy="50" r="{_RING_RADIUS:.2f}" fill="none" '
-            f'stroke="{steps[i % len(steps)]}" stroke-width="{_RING_THICKNESS:.2f}" '
+            f'style="stroke:var({steps[i % len(steps)]})" stroke-width="{_RING_THICKNESS:.2f}" '
             f'stroke-dasharray="{arc:.2f} {circumference - arc:.2f}" '
             f'stroke-dashoffset="{-circumference * angle / 360:.2f}"/>'
         )
@@ -446,7 +420,7 @@ def _donut_svg(slices: list, total: int, tokens: dict) -> str:
             f'<g transform="rotate(-90 50 50)">{"".join(arcs)}</g></svg>')
 
 
-def _recap(model: dict, git: dict, tokens: dict) -> str:
+def _recap(model: dict, git: dict) -> str:
     """Donut of the release's composition, with context cards beside it.
 
     The donut and its legend stay together as one figure; the cards carry only
@@ -459,11 +433,11 @@ def _recap(model: dict, git: dict, tokens: dict) -> str:
               ("Fixes", m["fixes"]), ("Breaking changes", m["breaking"])]
     slices = [(label, count) for label, count in slices if count]
 
-    donut_steps = _donut_steps(tokens)
+    donut_steps = _CHART_STEPS
     # The legend carries every value, so close slices are read as numbers, not arcs.
     legend = "".join(
         f'<div class="dl-row">'
-        f'<span class="dl-sw" style="background:{donut_steps[i % len(donut_steps)]}"></span>'
+        f'<span class="dl-sw" style="background:var({donut_steps[i % len(donut_steps)]})"></span>'
         f'<span class="dl-k">{_esc(label)}</span><span class="dl-v">{count}</span>'
         f'<span class="dl-p">{round(100 * count / m["total"])}%</span></div>'
         for i, (label, count) in enumerate(slices)
@@ -484,7 +458,7 @@ def _recap(model: dict, git: dict, tokens: dict) -> str:
     return (f'<div class="recap"><div class="recap-label">Release at a glance</div>'
             f'<div class="recap-body">'
             f'<div class="recap-figure">'
-            f'<div class="donut">{_donut_svg(slices, m["total"], tokens)}'
+            f'<div class="donut">{_donut_svg(slices, m["total"])}'
             f'<div class="donut-hole"><span class="donut-total">{m["total"]}</span>'
             f'<span class="donut-cap">entries</span></div></div>'
             f'<div class="donut-legend">{legend}</div></div>'
@@ -511,15 +485,14 @@ def _bucket_section(label: str, entries: list[dict], page_break: bool = False,
             f'<div class="bucket"><ul class="entry-list">{items}</ul></div></section>')
 
 
-def render_content(model: dict, release_url: str, note_label: str, today: str, git: dict,
-                   tokens: dict) -> str:
+def render_content(model: dict, release_url: str, note_label: str, stamped: str, git: dict) -> str:
     out = []
     out.append(f'<div class="report-kicker">Release note · {_esc(model["version"])}</div>')
     out.append(f'<h1 class="report-title">{_esc(model["theme"])}</h1>')
     if model["framing"]:
         out.append(f'<p class="report-framing">{_inline(model["framing"])}</p>')
-    out.append(_cartouche(model, release_url, note_label, today))
-    out.append(_recap(model, git, tokens))
+    out.append(_cartouche(model, release_url, note_label, stamped))
+    out.append(_recap(model, git))
 
     if model["products"]:
         out.append('<section class="section section--page-break">'
@@ -551,47 +524,82 @@ def render_content(model: dict, release_url: str, note_label: str, today: str, g
     return "\n".join(out)
 
 
-def _design_system_css(explicit: str | None) -> str:
-    """Same token layering as com-slide-deck / com-artefact-viz: fallback, then project (wins)."""
-    css = (Path(__file__).resolve().parent / "shared" / "base" / "core.css").read_text(encoding="utf-8")
-    sheet = Path(explicit) if explicit else Path("docs/ux/tokens.css")
-    if explicit and not sheet.is_file():
-        _fail(f"--design-system not found: {sheet}")
-    if sheet.is_file():
-        if not explicit:
-            print(f"using shared design system {sheet} (pass --design-system to override)")
-        css += "\n\n/* ---- project design system (overrides) ---- */\n" + sheet.read_text(encoding="utf-8")
-    return css
+def resolve_design(explicit: str | None):
+    """The report's design: the --design-system folder, else the docs/ux/package.json pin found by walking up
+    from the working directory, else the kit's base theme. A single stylesheet is refused."""
+    folder = None
+    if explicit:
+        folder = Path(explicit)
+        if folder.is_file():
+            raise DesignError("--design-system names a single stylesheet; it must name a design-system folder with "
+                              "a kit-manifest.json.\n" + design_source._legacy_message(folder))
+        if not folder.is_dir():
+            raise DesignError(f"--design-system: {folder} does not exist; name a design-system folder with a "
+                              "kit-manifest.json, or leave it out to use the docs/ux/package.json pin")
+    return design_source.resolve(Path.cwd(), explicit=folder)
 
 
-_FONT_URL_RE = re.compile(r"url\(\s*\.?/?([^)'\"]+\.woff2?)\s*\)")
+def parse_exceptions(items: list[str]) -> dict:
+    out = {}
+    for item in items or []:
+        name, sep, value = item.partition("=")
+        if not sep or not name or not value:
+            raise DesignError(f"--exception wants NAME=VALUE, got {item!r}")
+        out[name] = value
+    if REPORT_FONT in out and re.search(r"[;{}<>]", out[REPORT_FONT]):
+        raise DesignError(f"--exception {REPORT_FONT} wants a font-family list, got {out[REPORT_FONT]!r}")
+    return out
 
 
-def _embed_fonts(fonts_dir: Path) -> str:
-    """Inline docs/ux/fonts/fonts.css's @font-face rules with base64 font data.
+def design_layer(design) -> str:
+    """The font faces, then the modules the report reads (base first, the design system after it)."""
+    css = "\n".join(design.fonts + [design.css[m] for m in REPORT_MODULES if design.css.get(m)])
+    return f"<style data-design-layer>\n{css}\n</style>"
 
-    tokens.css only ever carries font *names* (--font-body, --font-mono); nothing
-    loads the actual font file, so a project's brand font silently falls through
-    to its CSS fallback in headless Chromium. A project that self-hosts real font
-    files opts in with docs/ux/fonts/fonts.css (plain @font-face rules, relative
-    url() to sibling files — the same shape a package like @fontsource ships).
-    Absent file -> no CSS, same silent degrade as the rest of the token cascade.
-    """
-    css_path = fonts_dir / "fonts.css"
-    if not css_path.is_file():
-        return ""
 
-    def _inline_one(match: re.Match) -> str:
-        rel = match.group(1)
-        font_path = fonts_dir / rel
-        if not font_path.is_file():
-            _fail(f"{css_path} references a missing font file: {font_path}")
-        data = base64.b64encode(font_path.read_bytes()).decode("ascii")
-        mime = "font/woff2" if font_path.suffix == ".woff2" else "font/woff"
-        return f"url(data:{mime};base64,{data})"
+def report_font_css(exceptions: dict) -> str:
+    """The report's text face: --font-body, or --font-report when the run declares it as an exception, which
+    re-faces the release note alone and is listed in the provenance report."""
+    if REPORT_FONT in exceptions:
+        return (f":root {{ {REPORT_FONT}: {exceptions[REPORT_FONT]}; "
+                f"--kit-report-font: var({REPORT_FONT}); }}")
+    return ":root { --kit-report-font: var(--font-body); }"
 
-    print(f"embedding self-hosted fonts from {css_path}")
-    return _FONT_URL_RE.sub(_inline_one, css_path.read_text(encoding="utf-8"))
+
+def page_rule(geometry: dict) -> str:
+    return f"@page {{ size: {geometry['size']}; margin: {geometry['margin_css']}; }}"
+
+
+def warn_old_fonts() -> None:
+    """docs/ux/fonts/fonts.css was read before 2.0.0; say so instead of ignoring it in silence."""
+    if OLD_FONTS_CSS.is_file():
+        print(f"render_pdf.py: WARNING: {OLD_FONTS_CSS} is no longer read; fonts come from the design's "
+              "@font-face rules (put a self-hosted face in the design's type module), and --font-report is "
+              "declared with --exception=--font-report=...", file=sys.stderr)
+
+
+def provenance_summary(design, report: dict) -> str:
+    prov, ident = design.provenance, design.provenance["designSystem"]
+    source = ident["source"] if ident["source"] == "base" else \
+        f"{ident.get('name') or ident.get('path')}{'@' + ident['version'] if ident.get('version') else ''}"
+    lines = [f"design {source}"]
+    for origin in ("design-system", "base"):
+        mods = [m for m, o in prov["modules"].items() if o == origin]
+        if mods:
+            lines.append(f"{origin}: {', '.join(mods)}")
+    lines.append(f"inlined: {', '.join(REPORT_MODULES)}")
+    lines += [f"exception {e['name']}={e['value']}" + ("" if e["known"] else " (not in the design's vocabulary)")
+              for e in report["exceptions"]]
+    lines += [f"warning: {w}" for w in prov.get("warnings", [])]
+    return "\n".join(lines)
+
+
+def write_atomic(path: Path, text: str) -> None:
+    """Write beside the target, then rename into place."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
 
 
 _GITHUB_REMOTE_RE = re.compile(r"github\.com[:/](?P<owner>[^/]+)/(?P<repo>[^/]+?)(?:\.git)?$")
@@ -632,41 +640,60 @@ def _warn_unknown_sections(model: dict) -> None:
           f"Rename the section, or fold its content into one of these.", file=sys.stderr)
 
 
-def build_html(note_path: Path, design_system: str | None, release_url: str | None,
+def build_html(note_path: Path, design, exceptions: dict, release_url: str | None,
                exclude_paths: list[str] | None = None) -> str:
     model = parse_note(note_path.read_text(encoding="utf-8"))
     _warn_unknown_sections(model)
-    today = datetime.date.today().isoformat()
+    # The cartouche names the note relative to its repository root (else by file name) and dates it from the
+    # note (shared/source_date.py), never the clock, so a re-render of an unchanged note changes no byte.
+    stamped = note_date(note_path).date().isoformat()
     url = _github_release_url(note_path, model["version"], release_url)
-    try:
-        note_label = os.path.relpath(note_path)
-    except ValueError:
-        note_label = str(note_path)
+    note_label = display_path(note_path)
     tmpl = (_TEMPLATE_DIR / "report.html.tmpl").read_text(encoding="utf-8")
     title = model["meta"].get("title") or f'{model["version"]}: {model["theme"]}'
-    fonts_css = _embed_fonts(Path("docs/ux/fonts"))
-    design_css = _design_system_css(design_system)
-    all_css = fonts_css + "\n\n" + design_css if fonts_css else design_css
-    tokens = {name: _resolve_token(all_css, name) for name in _TOKEN_DEFAULTS}
     for key, value in {"TITLE": _esc(title),
-                       "DESIGN_SYSTEM_CSS": all_css,
-                       "CONTENT": render_content(model, url, note_label, today,
-                                                 _git_stats(note_path, model["changelog"], exclude_paths),
-                                                 tokens)}.items():
+                       "REPORT_FONT_CSS": report_font_css(exceptions),
+                       "PAGE_RULE": page_rule(print_chrome.print_geometry(design)),
+                       "DESIGN_LAYER": design_layer(design),
+                       "CONTENT": render_content(model, url, note_label, stamped,
+                                                 _git_stats(note_path, model["changelog"], exclude_paths))}.items():
         tmpl = tmpl.replace("{{" + key + "}}", value)
     return tmpl
 
 
+def note_date(note_path: Path) -> "datetime.datetime":
+    """The note's source date: SOURCE_DATE_EPOCH, else its last commit, else its modification time."""
+    try:
+        return source_date.source_datetime([note_path])
+    except source_date.SourceDateError as exc:
+        raise DesignError(str(exc))
+
+
+def checked_html(note_path: Path, design, exceptions: dict, release_url: str | None,
+                 exclude_paths: list[str] | None, label: Path) -> tuple[str, dict]:
+    """Build the report and check it against the design; raise RenderRefused with the findings when it fails."""
+    text = build_html(note_path, design, exceptions, release_url, exclude_paths)
+    report = check_render.check(text, design, exceptions)
+    if not report["ok"]:
+        raise RenderRefused(f"the report breaks the design ({len(report['findings'])} finding(s)); nothing was "
+                            "written:\n" + check_render.format_text(report, label))
+    return text, report
+
+
 # ------------------------------------------------------------- PDF export ----
 
-# Margins for every page.pdf() call (probe and final render alike).
-_PDF_MARGIN = {"top": "14mm", "right": "16mm", "bottom": "18mm", "left": "16mm"}
 _PAGE_COUNT_RE = re.compile(rb"/Type\s*/Page[^s]")
 
 _MIN_SCALE = 0.85  # readability floor: 10.5pt body stays ≥ 8.9pt effective
 
 
-def _fit_scale(page) -> float:
+def _page_args(geometry: dict) -> dict:
+    """The page box every page.pdf() call uses (probe and final render alike): the print module's size and
+    margins, the same values the HTML's @page rule carries, so Chromium paginates against the box it prints."""
+    return {"width": geometry["width"], "height": geometry["height"], "margin": geometry["margin"]}
+
+
+def _fit_scale(page, geometry: dict) -> float:
     """Largest scale in [_MIN_SCALE, 1.0] that needs the fewest pages.
 
     Content ending just past a page boundary — often only the atomic document
@@ -681,7 +708,7 @@ def _fit_scale(page) -> float:
     # reserved margin boxes, so they cannot change the page count (verified — counts
     # match with and without them), and leaving them out keeps each probe cheaper.
     def pages(scale: float) -> int:
-        return len(_PAGE_COUNT_RE.findall(page.pdf(format="A4", scale=scale, margin=_PDF_MARGIN)))
+        return len(_PAGE_COUNT_RE.findall(page.pdf(scale=scale, **_page_args(geometry))))
 
     steps = int(round((1.0 - _MIN_SCALE) * 100)) + 1
     counts = {round(1.0 - step / 100, 2): None for step in range(steps)}
@@ -690,31 +717,15 @@ def _fit_scale(page) -> float:
     fewest = min(counts.values())
     return max(scale for scale, n in counts.items() if n == fewest)
 
-# Chromium renders these into the page-margin boxes. They are a separate document
-# from the report, so design tokens cannot reach them — hence inline styles and a
-# neutral grey rather than var(--muted). Keep them quiet: this is page furniture.
-_CHROME_STYLE = ("width:100%;padding:0 16mm;font-family:ui-monospace,Menlo,monospace;"
-                 "font-size:8px;color:rgba(130,130,130,.95);display:flex;"
-                 "justify-content:space-between;align-items:center;")
 
-
-def _header_template(running_title: str) -> str:
-    """Running head: identifies a page that has been separated from the document."""
-    if not running_title:
-        return "<span></span>"
-    return (f'<div style="{_CHROME_STYLE}padding-bottom:2mm;">'
-            f'<span>{html.escape(running_title)}</span><span></span></div>')
-
-
-def _footer_template(version: str) -> str:
-    """Version on the left, page position on the right."""
-    left = f"Release note · {html.escape(version)}" if version else ""
-    return (f'<div style="{_CHROME_STYLE}">'
-            f'<span>{left}</span>'
-            f'<span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>')
-
-
-def render_pdf(html_path: Path, pdf_path: Path, running_title: str = "", version: str = "") -> None:
+def render_pdf(html_path: Path, pdf_path: Path, design, note_path: Path, running_title: str = "",
+               version: str = "") -> None:
+    geometry = print_chrome.print_geometry(design)
+    side = geometry["margin"]["left"]
+    # Chromium draws the chrome in the page margins as a separate document; the shared print chrome inlines
+    # the design's resolved --muted and --font-mono and carries the brand logo and legal line.
+    header = print_chrome.header_template(design, running_title, side)
+    footer = print_chrome.footer_template(design, f"Release note · {version}" if version else "", side)
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -734,31 +745,37 @@ def render_pdf(html_path: Path, pdf_path: Path, running_title: str = "", version
         page.goto(html_path.resolve().as_uri(), wait_until="networkidle")
         page.evaluate("() => document.fonts.ready")
         # Drop the screen wrapper padding, whose overflow can mint a blank trailing
-        # page. The template's @page margins are left alone: they match _PDF_MARGIN,
-        # so Chromium paginates against the same box it prints into.
+        # page. The template's @page rule is left alone: it carries the same box as
+        # _page_args, so Chromium paginates against the box it prints into.
         page.add_style_tag(content=".report { padding: 0; }")
-        scale = _fit_scale(page)
+        scale = _fit_scale(page, geometry)
         if scale < 1.0:
             print(f"render_pdf.py: scaled to {scale:.2f} to save a page")
         page.pdf(
             path=str(pdf_path),
-            format="A4",
             scale=scale,
             print_background=True,
             display_header_footer=True,
-            header_template=_header_template(running_title),
-            footer_template=_footer_template(version),
-            margin=_PDF_MARGIN,
+            header_template=header,
+            footer_template=footer,
+            **_page_args(geometry),
         )
         browser.close()
+    # Chromium stamps the render time in the Info dictionary; the note's source date replaces it in place.
+    pdf_dates.normalise(pdf_path, note_date(note_path))
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Render a curated release note to an A4 PDF report (HTML intermediate always written)."
+        description="Render a curated release note to a PDF report (HTML intermediate always written)."
     )
     parser.add_argument("note", type=Path, help="Path to the curated release-note Markdown.")
-    parser.add_argument("--design-system", help="Project token sheet (default: auto-detect docs/ux/tokens.css).")
+    parser.add_argument("--design-system", metavar="DIR",
+                        help="A design-system folder with a kit-manifest.json (default: the docs/ux/package.json "
+                             "pin found by walking up from the working directory, else the kit's base theme).")
+    parser.add_argument("--exception", action="append", default=[], metavar="NAME=VALUE",
+                        help="A named local exception the validator allows and the provenance report lists "
+                             "(repeatable). --exception=--font-report=FONTS re-faces the report alone.")
     parser.add_argument("--release-url",
                         help="GitHub Release URL (default: derived from the repo's origin remote + version).")
     parser.add_argument("--output", type=Path,
@@ -775,18 +792,28 @@ def main(argv: list[str] | None = None) -> int:
         _fail(f"note not found: {args.note}")
     pdf_path = args.output or args.note.parent / "pdf" / f"{args.note.stem}.pdf"
     html_path = pdf_path.with_suffix(".html")
-    pdf_path.parent.mkdir(parents=True, exist_ok=True)
+    prov_path = html_path.with_name(html_path.name + ".provenance.json")
 
-    html_path.write_text(
-        build_html(args.note, args.design_system, args.release_url, args.exclude_path),
-        encoding="utf-8")
+    warn_old_fonts()
+    try:
+        design = resolve_design(args.design_system)
+        exceptions = parse_exceptions(args.exception)
+        # Check, then write: a report that breaks the design writes nothing.
+        text, report = checked_html(args.note, design, exceptions, args.release_url, args.exclude_path, html_path)
+    except (DesignError, RenderRefused) as exc:
+        print(f"render_pdf.py: REFUSED: {exc}", file=sys.stderr)
+        return exc.code
+    write_atomic(html_path, text)
+    write_atomic(prov_path, json.dumps(design.provenance, indent=2) + "\n")
+    print("render_pdf.py: check: PASS, the report uses only the design's roles")
+    print("render_pdf.py: provenance: " + provenance_summary(design, report).replace("\n", "; ") + f" ({prov_path})")
     print(f"render_pdf.py: wrote {html_path}")
     if args.html_only:
         return 0
 
     model = parse_note(args.note.read_text(encoding="utf-8"))
     running = model["meta"].get("title") or f'{model["version"]}: {model["theme"]}'
-    render_pdf(html_path, pdf_path, running, model["version"])
+    render_pdf(html_path, pdf_path, design, args.note, running, model["version"])
     print(f"render_pdf.py: wrote {pdf_path} ({pdf_path.stat().st_size / 1024:.1f} KB)")
     return 0
 

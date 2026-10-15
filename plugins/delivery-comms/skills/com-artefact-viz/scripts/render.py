@@ -22,10 +22,13 @@ Options:
     --personas PATH         Persona doc or directory used to derive the line of
                             visibility (front/back-stage). Repeatable.
     --stream VS-N           Limit blueprint phase columns to one value stream.
-    --design-system PATH    Project design-system CSS to inline AFTER the
-                            defaults (its :root tokens win — this is how a
-                            project re-themes every view). Reuse the same
-                            design/styles.css your com-slide-deck project uses.
+    --design-system DIR     A design-system folder (with a kit-manifest.json),
+                            bypassing the docs/ux/package.json pin. Without it
+                            the pin is found by walking up from the working
+                            directory, else the kit's base theme is used. A
+                            single stylesheet (a legacy tokens.css) is refused.
+    --exception NAME=VALUE  A named local exception the validator allows and the
+                            provenance report lists (repeatable).
     --left-axis-label TEXT  Override the capability-map / FBS left-axis label
                             (the directional "arrow" band). Defaults to the
                             artefact's declared L0 axis.
@@ -33,20 +36,40 @@ Options:
     --title TEXT            Override the page title.
     --detect                Print the detected kind and exit (no render).
 
+The design is resolved once per render (shared/design_source.py) and the written
+HTML is checked against it (shared/check_render.py): a view that breaks the
+design writes nothing and exits 1; a refused design exits 2. The provenance
+report is printed and written next to the view as <out>.provenance.json.
+
 Standard library only. Run from the repo root or anywhere — paths are resolved
-relative to the current directory.
+relative to the current directory. The footer names each source relative to its
+repository root (else by file name) and dates it from the sources
+(shared/source_date.py), so the same sources give the same bytes from any folder.
 """
 
 import argparse
-import datetime
+import json
 import os
 import sys
+from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import parsers  # noqa: E402
 import renderers  # noqa: E402
+
+sys.path.insert(0, os.path.join(HERE, "shared"))
+import check_render  # noqa: E402  (the synced copies of the shared resolver, validator and date source)
+import design_source  # noqa: E402
+import source_date  # noqa: E402
+from source_path import display_path  # noqa: E402
+from design_source import DesignError  # noqa: E402
+
+# The modules the views read: core (every colour, font and spacing role), dataviz (the --chart-*
+# scale steps), type (the bold weight) and space-shape (the pill radius). The other modules (document,
+# slide-frame, print, brand) style nothing a view draws, so they are not inlined; guidance is informational.
+VIEW_MODULES = ("core", "dataviz", "type", "space-shape")
 
 SKILL_DIR = os.path.dirname(HERE)
 TEMPLATE_DIR = os.path.join(SKILL_DIR, "templates")
@@ -105,7 +128,9 @@ def build(source_path, args):
         persona_texts = _read_personas(args.personas)
         model = parsers.parse_service_blueprint(proc_texts, vs_text, persona_texts, options)
         rendered = renderers.RENDERERS[kind](model, options)
-        return _emit(model, rendered, kind, args, source_label=", ".join(args.proc))
+        sources = [*args.proc, *([args.value_stream] if args.value_stream else []), *(args.personas or [])]
+        return _emit(model, rendered, kind, args, source_label=", ".join(map(display_path, args.proc)),
+                     sources=sources)
 
     # ---- Single-source path (capability-map | fbs | delivery-roadmap | bmc) -
     if not source_path:
@@ -126,37 +151,89 @@ def build(source_path, args):
 
     model = parsers.PARSERS[kind](text)
     rendered = renderers.RENDERERS[kind](model, options)
-    return _emit(model, rendered, kind, args, source_label=source_path)
+    return _emit(model, rendered, kind, args, source_label=display_path(source_path), sources=[source_path])
 
 
-def _emit(model, rendered, kind, args, source_label):
+class RenderRefused(Exception):
+    """The view breaks the resolved design; nothing was written."""
 
-    # Design system: defaults first, then the project sheet (project tokens win).
-    # Resolution order for the project sheet:
-    # Token layering (same model as com-slide-deck):
-    #   1. shared/base/core.css  — shipped neutral generic contract (zero-config)
-    #   2. docs/ux/tokens.css — project override (explicit --design-system, or
-    #                                auto-detected; project values win)
-    #   3. tokens.domain.css     — viz domain tokens derived from the generics
-    ds = _read(os.path.join(HERE, "shared", "base", "core.css"))
-    project_sheet = args.design_system
-    if not project_sheet:
-        shared = os.path.join("docs", "ux", "tokens.css")
-        if os.path.isfile(shared):
-            project_sheet = shared
-            print(f"using shared design system {shared} (pass --design-system to override)")
-        elif os.path.isfile(os.path.join("docs", "design", "tokens.css")):  # OI-0026: tokens moved docs/design/ -> docs/ux/
-            print("[HINT] Legacy docs/design/tokens.css found but no docs/ux/tokens.css — design tokens moved to docs/ux/; rename the folder.")
-    if project_sheet:
-        ds += "\n\n/* ---- project design system (overrides) ---- */\n" + _read(project_sheet)
-    ds += "\n\n/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))
+    def __init__(self, message, code=1):
+        super().__init__(message)
+        self.code = code
+
+
+def resolve_design(args):
+    """The view's design: the --design-system folder, else the docs/ux/package.json pin found by walking up
+    from the working directory, else the kit's base theme. A single stylesheet is refused."""
+    explicit = None
+    if args.design_system:
+        explicit = Path(args.design_system)
+        if explicit.is_file():
+            raise DesignError("--design-system names a single stylesheet; it must name a design-system folder with "
+                              "a kit-manifest.json.\n" + design_source._legacy_message(explicit))
+        if not explicit.is_dir():
+            raise DesignError(f"--design-system: {explicit} does not exist; name a design-system folder with a "
+                              "kit-manifest.json, or leave it out to use the docs/ux/package.json pin")
+    return design_source.resolve(Path.cwd(), explicit=explicit)
+
+
+def parse_exceptions(items):
+    out = {}
+    for item in items or []:
+        name, sep, value = item.partition("=")
+        if not sep or not name or not value:
+            raise DesignError(f"--exception wants NAME=VALUE, got {item!r}")
+        out[name] = value
+    return out
+
+
+def design_layer(design):
+    """The font faces, then the modules the views read (base first, the design system after it)."""
+    return "\n".join(design.fonts + [design.css[m] for m in VIEW_MODULES if design.css.get(m)])
+
+
+def provenance_summary(design, report):
+    prov, ident = design.provenance, design.provenance["designSystem"]
+    source = ident["source"] if ident["source"] == "base" else \
+        f"{ident.get('name') or ident.get('path')}{'@' + ident['version'] if ident.get('version') else ''}"
+    lines = [f"design {source}"]
+    for origin in ("design-system", "base"):
+        mods = [m for m, o in prov["modules"].items() if o == origin]
+        if mods:
+            lines.append(f"{origin}: {', '.join(mods)}")
+    lines.append(f"inlined: {', '.join(VIEW_MODULES)}")
+    lines += [f"exception {e['name']}={e['value']}" + ("" if e["known"] else " (not in the design's vocabulary)")
+              for e in report["exceptions"]]
+    lines += [f"warning: {w}" for w in prov.get("warnings", [])]
+    return "\n".join(lines)
+
+
+def write_atomic(path, text):
+    """Write beside the target, then rename into place; a bare file name writes in the working directory."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def _emit(model, rendered, kind, args, source_label, sources):
+    # Cascade: the resolved design (font faces, core, dataviz, type, space-shape; marked data-design-layer,
+    # the only place literals may live, and declaring --kit-on-<fill> for text on each fill), then the viz
+    # domain colours (--kit-* on contract roles), the baseline layout and the view CSS (roles only).
+    design = resolve_design(args)
+    exceptions = parse_exceptions(args.exception)
+    domain = "/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))
 
     runtime = _read(os.path.join(TEMPLATE_DIR, "runtime.js"))
     title = args.title or model["title"]
-    today = datetime.date.today().isoformat()
+    try:
+        stamped = source_date.source_date(sources).isoformat()
+    except source_date.SourceDateError as exc:
+        raise DesignError(str(exc))
     footer = (
         f'Generated by com-artefact-viz from '
-        f'<code>{_esc(parsers_relpath(source_label))}</code> on {today}. '
+        f'<code>{_esc(source_label)}</code> on {stamped}. '
         f'Source artefact is the single source of truth — re-render after edits.'
     )
 
@@ -166,24 +243,25 @@ def _emit(model, rendered, kind, args, source_label):
         "META": rendered["meta"],
         "TOOLBAR": rendered["toolbar"],
         "CONTENT": rendered["content"],
-        "DESIGN_SYSTEM_CSS": ds,
+        "DESIGN_LAYER": design_layer(design),
+        "DOMAIN_CSS": domain,
         "VIEW_CSS": rendered["view_css"],
         "RUNTIME_JS": runtime,
         "FOOTER": footer,
     })
 
     out = args.out or default_out(kind)
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    with open(out, "w", encoding="utf-8") as f:
-        f.write(html)
+    # Check, then write: a view that breaks the design writes nothing.
+    report = check_render.check(html, design, exceptions)
+    if not report["ok"]:
+        raise RenderRefused(f"the view breaks the design ({len(report['findings'])} finding(s)); nothing was "
+                            "written:\n" + check_render.format_text(report, out))
+    write_atomic(out, html)
+    prov_file = out + ".provenance.json"
+    write_atomic(prov_file, json.dumps(design.provenance, indent=2) + "\n")
+    print("check: PASS, the view uses only the design's roles")
+    print("provenance: " + provenance_summary(design, report).replace("\n", "; ") + f" ({prov_file})")
     return out
-
-
-def parsers_relpath(path):
-    try:
-        return os.path.relpath(path)
-    except ValueError:
-        return path
 
 
 def _esc(s):
@@ -201,7 +279,10 @@ def main(argv=None):
                     help="Source Markdown artefact (single-source kinds). Omit for --proc.")
     ap.add_argument("--out")
     ap.add_argument("--kind", choices=sorted(parsers.PARSERS) + list(parsers.MULTISOURCE_KINDS))
-    ap.add_argument("--design-system", dest="design_system")
+    ap.add_argument("--design-system", dest="design_system", metavar="DIR",
+                    help="A design-system folder with a kit-manifest.json (bypasses the docs/ux/package.json pin).")
+    ap.add_argument("--exception", action="append", metavar="NAME=VALUE",
+                    help="A named local exception the validator allows (repeatable).")
     ap.add_argument("--left-axis-label", dest="left_axis_label")
     ap.add_argument("--left-axis-arrow", dest="left_axis_arrow", default="▼")
     ap.add_argument("--title")
@@ -220,7 +301,11 @@ def main(argv=None):
     if args.source and not os.path.isfile(args.source):
         sys.exit(f"error: source not found: {args.source}")
 
-    out = build(args.source, args)
+    try:
+        out = build(args.source, args)
+    except (DesignError, RenderRefused) as exc:
+        print(f"com-artefact-viz: REFUSED: {exc}", file=sys.stderr)
+        sys.exit(exc.code)
     if out:
         print(f"wrote {out}")
 

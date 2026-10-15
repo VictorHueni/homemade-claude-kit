@@ -5,22 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{TITLE}}</title>
 <style>
-/* ===== 1. Design-system tokens (fallback first; project docs/ux/tokens.css follows and wins) ===== */
-{{DESIGN_SYSTEM_CSS}}
-
-/* ===== 2. A4 report layout (token-driven; never hard-codes colour) ===== */
+/* ===== 1. Report layout: contract roles and --kit-* properties only, never a literal colour.
+   The resolved design follows in the design-layer style block, so a design's print module can
+   style the report vocabulary (report, section, section-label, ...). ===== */
+{{REPORT_FONT_CSS}}
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
-  font-family: var(--font-report, var(--font-body, var(--font-sans, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif)));
-  color: var(--ink, #1a1a1a);
-  background: var(--surface, #fff);
+  font-family: var(--kit-report-font);
+  color: var(--ink);
+  background: var(--print-bg);
   font-size: 10.5pt;
   line-height: 1.5;
 }
 .report { max-width: 178mm; margin: 0 auto; padding: 2mm 0; }
 .report code {
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-mono);
   font-size: 0.9em;
 }
 /* Prose is justified: the report reads as a document, and at this measure a
@@ -36,79 +36,79 @@ body {
 
 /* --- Title block --- */
 .report-kicker {
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-mono);
   font-size: 8pt; text-transform: uppercase; letter-spacing: 0.14em;
-  color: var(--accent, #3b6ef5); margin-top: 9mm; margin-bottom: 2.5mm;
+  color: var(--accent); margin-top: 9mm; margin-bottom: 2.5mm;
 }
-.report-title { font-size: 21pt; font-weight: 700; line-height: 1.2; margin: 0 0 2mm; }
-.report-framing { font-size: 10.5pt; color: var(--muted, #6b7280); font-style: italic; margin: 0 0 3mm; }
+.report-title { font-size: 21pt; font-weight: var(--font-weight-bold); line-height: 1.2; margin: 0 0 2mm; }
+.report-framing { font-size: 10.5pt; color: var(--muted); font-style: italic; margin: 0 0 3mm; }
 /* --- Cartouche: the title block under the summary. Holds every piece of release
    metadata (period, owner, status, changelog range, release link, provenance), so
    the document needs no separate footer. Neutral surface, same treatment as every
    other card (bucket, recap-card) — reads as one more content block, not a tinted
    callout. --- */
 .cartouche {
-  background: var(--surface, #fff);
-  border: 1px solid var(--border, #d7dce3);
-  border-radius: var(--card-radius, 12px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
   padding: 3mm 4mm; margin: 0 0 6mm;
   font-size: 8.5pt; break-inside: avoid;
 }
 .cart-row { display: grid; grid-template-columns: 30mm 1fr; gap: 3mm; padding: 1.2mm 0; }
-.cart-row + .cart-row { border-top: 1px solid var(--border, #d7dce3); }
+.cart-row + .cart-row { border-top: 1px solid var(--border); }
 .cart-k {
-  font-family: var(--font-mono, ui-monospace, monospace); font-size: 7.5pt;
+  font-family: var(--font-mono); font-size: 7.5pt;
   text-transform: uppercase; letter-spacing: 0.1em; padding-top: 0.3mm;
-  color: var(--accent, #3b6ef5);
+  color: var(--accent);
 }
-.cart-v { color: var(--ink, #1a1a1a); overflow-wrap: anywhere; }
-.cartouche a { color: var(--accent, #3b6ef5); text-decoration: none; font-weight: 700; }
-.cartouche code { font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.95em; }
+.cart-v { color: var(--ink); overflow-wrap: anywhere; }
+.cartouche a { color: var(--accent); text-decoration: none; font-weight: var(--font-weight-bold); }
+.cartouche code { font-family: var(--font-mono); font-size: 0.95em; }
 
 /* --- Recap: donut of the release composition, plus context cards.
    The donut and its legend form one figure and stay adjacent; the cards sit to the
    right and carry only measures the donut does not show, so nothing is repeated.
-   Colour is an ordinal ramp of one hue (see _DONUT_STEPS in render_pdf.py) — the
+   Colour is the design's ordered chart scale, --chart-1 (darkest) first: the
    sections are tiers, and slices are separated by surface-coloured gaps, never a
    stroke. Every slice value is in the legend, so identity is never colour alone. --- */
 .recap { margin: 0 0 6mm; break-inside: avoid; }
 .recap-label {
-  font-family: var(--font-mono, ui-monospace, monospace); font-size: 7.5pt;
+  font-family: var(--font-mono); font-size: 7.5pt;
   text-transform: uppercase; letter-spacing: 0.12em;
-  color: var(--muted, #6b7280); margin-bottom: 3mm;
+  color: var(--muted); margin-bottom: 3mm;
 }
 .recap-body { display: grid; grid-template-columns: max-content 1fr; gap: 10mm; align-items: center; }
 .recap-figure { display: grid; grid-template-columns: 28mm max-content; gap: 4mm; align-items: center; }
 .donut { width: 28mm; height: 28mm; position: relative; }
 .donut-svg { display: block; width: 100%; height: 100%; }
 .donut-hole {
-  position: absolute; inset: 6.5mm; border-radius: 50%; background: var(--surface, #fff);
+  position: absolute; inset: 6.5mm; border-radius: 50%; background: var(--surface);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.donut-total { font-size: 14pt; font-weight: 700; color: var(--ink, #1a1a1a); line-height: 1; }
+.donut-total { font-size: 14pt; font-weight: var(--font-weight-bold); color: var(--ink); line-height: 1; }
 .donut-cap {
-  font-family: var(--font-mono, ui-monospace, monospace); font-size: 6.5pt;
-  color: var(--muted, #6b7280);
+  font-family: var(--font-mono); font-size: 6.5pt;
+  color: var(--muted);
 }
 .donut-legend { display: grid; gap: 1.2mm; }
 .dl-row { display: grid; grid-template-columns: 3mm auto 6mm 8mm; align-items: center; gap: 2.5mm; }
 .dl-sw { width: 3mm; height: 3mm; border-radius: 1px; }
-.dl-k { font-size: 8pt; color: var(--ink, #1a1a1a); white-space: nowrap; }
+.dl-k { font-size: 8pt; color: var(--ink); white-space: nowrap; }
 .dl-v, .dl-p { font-size: 8pt; font-variant-numeric: tabular-nums; text-align: right; }
-.dl-v { color: var(--ink, #1a1a1a); font-weight: 700; }
-.dl-p { color: var(--muted, #6b7280); }
+.dl-v { color: var(--ink); font-weight: var(--font-weight-bold); }
+.dl-p { color: var(--muted); }
 /* Quadrant, not a row: two columns keep the card block roughly as tall as the
    donut beside it, so the two halves of the recap balance. */
 .recap-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
 .recap-card {
-  border: 1px solid var(--border, #d7dce3); border-radius: var(--card-radius, 12px);
+  border: 1px solid var(--border); border-radius: var(--card-radius);
   padding: 2.5mm 3mm; text-align: center;
 }
 /* An odd last card would leave a hole in the two-up grid, which reads as a
    missing measure rather than a deliberate stop. Let it span the row instead. */
 .recap-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
-.rc-k { font-size: 7.5pt; color: var(--muted, #6b7280); margin-bottom: 1mm; }
-.rc-v { font-size: 15pt; font-weight: 700; color: var(--ink, #1a1a1a); line-height: 1; }
+.rc-k { font-size: 7.5pt; color: var(--muted); margin-bottom: 1mm; }
+.rc-v { font-size: 15pt; font-weight: var(--font-weight-bold); color: var(--ink); line-height: 1; }
 /* Added/removed share one card; the signs carry the direction, not colour.
    Sized like every other value — the pair only ever needed to be smaller while
    it was competing for a half-width cell. */
@@ -122,10 +122,10 @@ body {
 .section--page-break { break-before: page; page-break-before: always; }
 .section-label {
   display: block;
-  font-family: var(--font-report, var(--font-body, var(--font-sans, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif)));
-  font-size: 13pt; font-weight: 700; letter-spacing: 0.02em;
-  text-transform: uppercase; color: var(--ink, #1a1a1a);
-  border-bottom: 1.2mm solid var(--accent, #3b6ef5);
+  font-family: var(--kit-report-font);
+  font-size: 13pt; font-weight: var(--font-weight-bold); letter-spacing: 0.02em;
+  text-transform: uppercase; color: var(--ink);
+  border-bottom: 1.2mm solid var(--accent);
   padding-bottom: 2.5mm; margin-bottom: 4mm;
   /* Never strand a section label at the foot of a page, away from its content. */
   break-after: avoid; page-break-after: avoid;
@@ -137,39 +137,39 @@ body {
    by the .entry-list hairline, not by card borders. */
 .product-card,
 .bucket {
-  background: var(--surface-2, #eef1f5);
-  border: 1px solid var(--border, #d7dce3);
-  border-radius: var(--card-radius, 12px);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
   padding: 3.5mm 5mm; margin-bottom: 3.5mm;
   break-inside: avoid;
 }
-.product-name { font-size: 11.5pt; font-weight: 700; margin: 0 0 2.5mm; display: flex; align-items: baseline; gap: 2.5mm; }
+.product-name { font-size: 11.5pt; font-weight: var(--font-weight-bold); margin: 0 0 2.5mm; display: flex; align-items: baseline; gap: 2.5mm; }
 .product-id {
-  font-family: var(--font-mono, ui-monospace, monospace); font-size: 8pt; font-weight: 600;
-  color: var(--accent-ink, #fff); background: var(--accent, #3b6ef5);
-  border-radius: 999px; padding: 0.5mm 2.5mm;
+  font-family: var(--font-mono); font-size: 8pt; font-weight: 600;
+  color: var(--accent-ink); background: var(--accent);
+  border-radius: var(--radius-pill); padding: 0.5mm 2.5mm;
 }
 /* A capability groups its child entries under one heading (shown once), instead
    of repeating the capability name on every entry. Unnamed (flat) groups — a note
    without capability headers — render no heading at all, unchanged from before. */
 .capability-group + .capability-group {
-  margin-top: 4mm; padding-top: 4mm; border-top: 1px solid var(--border, #d7dce3);
+  margin-top: 4mm; padding-top: 4mm; border-top: 1px solid var(--border);
 }
 .capability-label {
-  font-size: 9.5pt; font-weight: 700; margin: 0 0 1.5mm;
+  font-size: 9.5pt; font-weight: var(--font-weight-bold); margin: 0 0 1.5mm;
   display: flex; align-items: baseline; gap: 2mm;
 }
 .entry-list { list-style: none; margin: 0; padding: 0; }
 .entry-list li { padding: 1mm 0; break-inside: avoid; }
-.entry-list li + li { border-top: 1px solid var(--border, #d7dce3); }
+.entry-list li + li { border-top: 1px solid var(--border); }
 .entry-ref {
-  font-family: var(--font-mono, ui-monospace, monospace); font-size: 8pt; font-weight: 600;
-  color: var(--accent, #3b6ef5); margin-right: 1.5mm;
+  font-family: var(--font-mono); font-size: 8pt; font-weight: 600;
+  color: var(--accent); margin-right: 1.5mm;
 }
 .entry-label { font-weight: 600; }
 .entry-audit {
-  font-family: var(--font-mono, ui-monospace, monospace); font-size: 7.5pt;
-  color: var(--muted, #6b7280); margin-left: 1.5mm;
+  font-family: var(--font-mono); font-size: 7.5pt;
+  color: var(--muted); margin-left: 1.5mm;
 }
 
 /* --- Platform and engineering (Tier 2) --- */
@@ -187,30 +187,33 @@ body {
 .entry--titled + .entry--titled { margin-top: 4mm; padding-top: 4mm; }
 
 /* --- Breaking changes --- */
-/* The section heading carries the warning colour; the panel is washed to match.
+/* The section heading carries the breaking accent (--print-breaking, the design's
+   --danger unless it sets its own); the panel is washed to match.
    Each color-mix is preceded by a flat fallback for engines without it. */
 .section--breaking .section-label {
-  color: var(--danger, #d9534f);
-  border-bottom-color: var(--danger, #d9534f);
+  color: var(--print-breaking);
+  border-bottom-color: var(--print-breaking);
 }
 .breaking {
-  border: 1px solid var(--border, #d7dce3);
-  border: 1px solid color-mix(in srgb, var(--danger, #d9534f) 35%, transparent);
-  border-radius: var(--card-radius, 12px);
-  background: var(--surface-2, #eef1f5);
-  background: color-mix(in srgb, var(--danger, #d9534f) 8%, transparent);
+  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--print-breaking) 35%, transparent);
+  border-radius: var(--card-radius);
+  background: var(--surface-2);
+  background: color-mix(in srgb, var(--print-breaking) 8%, transparent);
   padding: 3.5mm 5mm; break-inside: avoid;
 }
-.breaking .entry-list li + li { border-top-color: var(--border, #d7dce3); }
+.breaking .entry-list li + li { border-top-color: var(--border); }
 
 /* --- Print (also drives browser print-to-PDF fallback) --- */
-/* Margins must match render_pdf.py's _PDF_MARGIN, or Chromium paginates
-   against one box and prints into another (content bleeds into the margin). */
-@page { size: A4; margin: 14mm 16mm 18mm; }
+/* The page box is the design's print module (--print-page-size, --print-margin),
+   written here by render_pdf.py from the same values it passes to Chromium, so the
+   two never disagree (an @page rule cannot read a custom property). */
+{{PAGE_RULE}}
 @media print {
   .report { padding: 0; max-width: none; }
 }
 </style>
+{{DESIGN_LAYER}}
 </head>
 <body>
 <div class="report">

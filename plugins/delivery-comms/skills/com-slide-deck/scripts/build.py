@@ -17,6 +17,8 @@ Usage:
 
 import argparse
 import html
+import json
+import os
 import re
 import sys
 import textwrap
@@ -29,10 +31,14 @@ except ImportError:
     print("PyYAML is required. Install it with: pip install pyyaml")
     sys.exit(1)
 
-# Shipped neutral base theme (core module) — inlined before everything so a deck
-# renders correctly with no project design system. One copy for every renderer,
-# synced from plugins/delivery-comms/shared/ by scripts/sync-shared.py.
-FALLBACK_TOKENS = Path(__file__).resolve().parent / "shared" / "base" / "core.css"
+# The design comes from the shared resolver (pinned design system, local folder or the
+# kit's base theme) and every build is checked by the shared validator. One copy for
+# every renderer, synced from plugins/delivery-comms/shared/ by scripts/sync-shared.py.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
+import check_render  # noqa: E402
+import design_source  # noqa: E402
+from design_source import DesignError  # noqa: E402
+from print_chrome import css_string, role_value  # noqa: E402  (shared with the page-margin chrome)
 # Structural defaults for `mode: document` (paginated A4/Letter, flowing partials).
 DOC_BASELINE = Path(__file__).resolve().parent.parent / "templates" / "doc.baseline.css"
 
@@ -60,8 +66,9 @@ def make_document_css(geom: dict) -> str:
     return (
         f"@page {{ size: {geom['size']} {geom['orientation']}; "
         f"margin: {m['top']} {m['right']} {m['bottom']} {m['left']}; }}\n"
-        f":root {{ --doc-page-width: {geom['width_mm']}mm; --doc-margin-top: {m['top']}; "
-        f"--doc-margin-right: {m['right']}; --doc-margin-bottom: {m['bottom']}; --doc-margin-left: {m['left']}; }}\n"
+        f":root {{ --kit-doc-page-width: {geom['width_mm']}mm; --kit-doc-margin-top: {m['top']}; "
+        f"--kit-doc-margin-right: {m['right']}; --kit-doc-margin-bottom: {m['bottom']}; "
+        f"--kit-doc-margin-left: {m['left']}; }}\n"
         + read_file(DOC_BASELINE)
     )
 
@@ -75,6 +82,14 @@ def resolve_path(base: Path, relative: str) -> Path:
     return (base / relative).resolve()
 
 
+def deck_sources(config_path: Path, cfg: dict) -> list:
+    """The files a deck is built from (config, partials folder, styles, script, bibliography), never its
+    outputs: shared/source_date.py dates the PDF from these, so a committed output cannot move the date."""
+    base, paths = config_path.parent, cfg.get("paths") or {}
+    keys = ("slides_dir", "styles_file", "script_file", "bibliography_file")
+    return [config_path, *(resolve_path(base, paths[k]) for k in keys if paths.get(k))]
+
+
 def read_file(path: Path) -> str:
     if not path.exists():
         print(f"  [WARN] File not found: {path}")
@@ -83,48 +98,86 @@ def read_file(path: Path) -> str:
         return f.read()
 
 
-def find_design_tokens(cfg: dict, base: Path) -> tuple:
-    """Locate the shared design-system token sheet (docs/ux/tokens.css).
+class RenderRefused(Exception):
+    """The validator found violations; nothing was written. `code` is the process exit code."""
 
-    The deck's base colour/type tokens are defined once, project-wide, by the
-    `ux-design-system` skill. Resolution order:
-      1. `paths.design_tokens` in config (relative to the config file), if set.
-      2. Auto-detect: walk up from the deck dir to a `docs/ux/tokens.css`.
-    Returns (css_text, source_path), or ("", None) when absent — the deck then
-    builds with its own styles only (fully backwards compatible).
+    def __init__(self, message, code=1):
+        super().__init__(message)
+        self.code = code
+
+
+def resolve_design(cfg: dict, base: Path) -> "design_source.Design":
+    """Resolve the deck's design with the shared resolver.
+
+    `paths.design_tokens` (relative to the config file), when set, names a design-system
+    folder with a kit-manifest.json; a single token file such as docs/ux/tokens.css is
+    refused. Unset, the resolver walks up from the deck to the docs/ux/package.json pin,
+    else the deck renders on the kit's base theme.
     """
-    configured = cfg.get("paths", {}).get("design_tokens")
+    configured = (cfg.get("paths") or {}).get("design_tokens")
+    explicit = None
     if configured:
-        p = resolve_path(base, configured)
-        if p.exists():
-            return p.read_text(encoding="utf-8"), p
-        print(f"  [WARN] Configured design_tokens not found: {p}")
-        return "", None
-    cur = base.resolve()
-    legacy = None
-    for _ in range(8):  # walk up a bounded number of parents
-        candidate = cur / "docs" / "ux" / "tokens.css"
-        if candidate.exists():
-            return candidate.read_text(encoding="utf-8"), candidate
-        if legacy is None and (cur / "docs" / "design" / "tokens.css").exists():
-            legacy = cur / "docs" / "design" / "tokens.css"
-        if cur.parent == cur:
-            break
-        cur = cur.parent
-    if legacy:  # OI-0026: design tokens moved docs/design/ -> docs/ux/ — rename the folder to re-enable shared theming
-        print(f"  [HINT] Legacy {legacy} found but no docs/ux/tokens.css — design tokens moved to docs/ux/; rename the folder.")
-    return "", None
+        explicit = resolve_path(base, configured)
+        if explicit.is_file():
+            raise DesignError("paths.design_tokens names a single token file; it must name a design-system folder "
+                              "with a kit-manifest.json.\n" + design_source._legacy_message(explicit))
+        if not explicit.is_dir():
+            raise DesignError(f"paths.design_tokens: {explicit} does not exist; name a design-system folder with a "
+                              "kit-manifest.json, or remove the key to use the docs/ux/package.json pin")
+    return design_source.resolve(base, explicit=explicit)
 
 
-def build_font_url(fonts: list) -> str:
-    if not fonts:
-        return ""
-    families = []
-    for font in fonts:
-        family = font["family"].replace(" ", "+")
-        weights = ";".join(str(w) for w in font.get("weights", [400]))
-        families.append(f"family={family}:wght@{weights}")
-    return f"https://fonts.googleapis.com/css2?{'&'.join(families)}&display=swap"
+def design_exceptions(cfg: dict) -> dict:
+    """The deck's declared local exceptions, `design.exceptions` in config.yaml: NAME: VALUE (or NAME=VALUE items)."""
+    declared = (cfg.get("design") or {}).get("exceptions") or {}
+    if isinstance(declared, dict):
+        return {str(k): str(v) for k, v in declared.items()}
+    out = {}
+    for item in declared:
+        name, sep, value = str(item).partition("=")
+        if not sep or not name or not value:
+            raise DesignError(f"design.exceptions: expected NAME=VALUE, got {item!r}")
+        out[name] = value
+    return out
+
+
+def check_deck(text: str, design, cfg: dict, label) -> dict:
+    """Run the shared validator on a built deck; raise RenderRefused with the findings when it fails."""
+    report = check_render.check(text, design, design_exceptions(cfg))
+    if not report["ok"]:
+        raise RenderRefused(f"the deck breaks the design ({len(report['findings'])} finding(s)); nothing was written:\n"
+                            + check_render.format_text(report, label))
+    return report
+
+
+def provenance_summary(design, report: dict) -> str:
+    prov = design.provenance
+    ident = prov["designSystem"]
+    source = ident["source"] if ident["source"] == "base" else \
+        f"{ident.get('name') or ident.get('path')}{'@' + ident['version'] if ident.get('version') else ''}"
+    lines = [f"design {source}"]
+    for origin in ("design-system", "base"):
+        mods = [m for m, o in prov["modules"].items() if o == origin]
+        if mods:
+            lines.append(f"{origin}: {', '.join(mods)}")
+    lines += [f"exception {e['name']}={e['value']}" + ("" if e["known"] else " (not in the design's vocabulary)")
+              for e in report["exceptions"]]
+    lines += [f"warning: {w}" for w in prov.get("warnings", [])]
+    return "\n".join(lines)
+
+
+def write_atomic(path: Path, text: str) -> None:
+    """Write next to the target, then rename into place, so a failed run never leaves a half-written file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def write_provenance(output: Path, design) -> Path:
+    target = output.with_name(output.name + ".provenance.json")
+    write_atomic(target, json.dumps(design.provenance, indent=2) + "\n")
+    return target
 
 
 def load_bibliography(config: dict, base: Path) -> dict:
@@ -196,29 +249,75 @@ def inject_before_slide_end(slide_html: str, injection: str) -> str:
     return slide_html  # fallback: return unchanged if invariant not met
 
 
-def make_baseline_css(canvas_w: int, canvas_h: int) -> str:
-    return f"""\
+def canvas_size(cfg: dict, design) -> tuple:
+    """(width, height) in px of the slide canvas: config.yaml `canvas:` when the deck sets it, else the
+    design's slide-frame roles --slide-width and --slide-height. build.py and render.py share it."""
+    canvas = cfg.get("canvas") or {}
+    if canvas.get("width") and canvas.get("height"):
+        return int(canvas["width"]), int(canvas["height"])
+    size = []
+    for role in ("--slide-width", "--slide-height"):
+        value = role_value(design, role)
+        m = re.fullmatch(r"(\d+(?:\.\d+)?)px", value.strip())
+        if not m:
+            raise DesignError(f"the design's slide-frame role {role} is {value!r}; it must be a length in px "
+                              "(or set canvas: width and height in config.yaml)")
+        size.append(round(float(m.group(1))))
+    return size[0], size[1]
+
+
+def has_logo(design) -> bool:
+    return any("url(" in design.brand.get(role, "") for role in ("--brand-logo-on-light", "--brand-logo-on-dark"))
+
+
+def slide_footer(design, number: str) -> str:
+    """The footer row of the slide frame: the brand logo, the legal line and the slide number at the right.
+    The logo image is the design layer's --brand-logo-on-light (one copy, not one per slide); an empty row is
+    not emitted, so a design with no brand and no numbering gets no footer."""
+    cells = []
+    if has_logo(design):
+        cells.append('<span class="slide-logo" data-brand-asset aria-hidden="true"></span>')
+    legal = css_string(design.brand.get("--brand-legal", ""))
+    if legal:
+        cells.append(f'<span class="slide-legal">{html.escape(legal)}</span>')
+    if number:
+        cells.append(f'<span class="slide-number">{html.escape(number)}</span>')
+    return f'<div class="slide-footer">{"".join(cells)}</div>' if cells else ""
+
+
+# The frame owns the number and the footer row: a partial's legacy `<div class="slide-number">`
+# placeholder and a footer row left by split.py are removed before the frame is injected.
+LEGACY_NUMBER = re.compile(r'\s*<div\s+class="slide-number"\s*>.*?</div>', re.S)
+OLD_FOOTER = re.compile(r'\s*<div\s+class="slide-footer"[^>]*>.*?</div>', re.S)
+
+
+def make_baseline_css(canvas_override: tuple = None) -> str:
+    """Deck behaviour CSS. The frame itself (canvas, section label, footer row, source bar) is the
+    design's slide-frame module, inlined in the design layer."""
+    override = (f":root {{ --slide-width: {canvas_override[0]}px; --slide-height: {canvas_override[1]}px; }}\n"
+                if canvas_override else "")
+    return override + f"""\
 /* ── Baseline: controls hint ── */
 .controls-hint {{
   text-align: center;
   padding: 10px 0 6px;
   font-family: system-ui, sans-serif;
   font-size: 12px;
-  color: #888;
+  color: var(--muted);
   user-select: none;
 }}
 .controls-hint kbd {{
   display: inline-block;
   padding: 1px 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 3px;
   font-size: 11px;
-  background: #f5f5f5;
-  color: #444;
+  background: var(--surface-2);
+  color: var(--ink);
 }}
 /* ── Baseline: presentation mode ── */
 body.presenting {{
-  background: #111;
+  background: var(--ink);
   overflow: hidden;
 }}
 body.presenting .controls-hint {{ display: none; }}
@@ -228,31 +327,17 @@ body.presenting .slide.active {{
   top: 50%;
   left: 50%;
 }}
-/* ── Baseline: source bar ── */
-.slide-source-bar {{
-  position: absolute;
-  bottom: 28px;
-  left: 72px;
-  right: 52px;
-  font-family: var(--font-mono, 'SF Mono', monospace);
-  font-size: 10px;
-  color: var(--dim, #8C8C8C);
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-}}
 /* ── Baseline: mobile responsive scaling ── */
+:root {{ --kit-slide-scale: 1; }}
 @media (max-width: 980px) {{
   body:not(.presenting) {{
     padding: 1rem 0;
     gap: 1rem;
   }}
   body:not(.presenting) .slide {{
-    transform: scale(var(--slide-scale, 1));
+    transform: scale(var(--kit-slide-scale));
     transform-origin: top center;
-    margin-bottom: calc({canvas_h}px * (var(--slide-scale, 1) - 1));
+    margin-bottom: calc(var(--slide-height) * (var(--kit-slide-scale) - 1));
   }}
 }}
 """
@@ -265,9 +350,9 @@ def make_baseline_js(canvas_w: int) -> str:
   function setMobileScale() {{
     if (window.innerWidth < 980) {{
       var scale = (window.innerWidth - 16) / {canvas_w};
-      document.documentElement.style.setProperty('--slide-scale', scale);
+      document.documentElement.style.setProperty('--kit-slide-scale', scale);
     }} else {{
-      document.documentElement.style.removeProperty('--slide-scale');
+      document.documentElement.style.removeProperty('--kit-slide-scale');
     }}
   }}
   setMobileScale();
@@ -277,14 +362,11 @@ def make_baseline_js(canvas_w: int) -> str:
 
 
 def build_head(cfg: dict) -> str:
-    font_url = build_font_url(cfg.get("fonts", []))
-    font_tags = ""
-    if font_url:
-        font_tags = textwrap.dedent(f"""\
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="{font_url}" rel="stylesheet">
-        """)
+    """The document head. Fonts come only from the design's @font-face rules, inlined in
+    the design layer; the 1.x `fonts:` key (a Google Fonts link) is read only to warn."""
+    if cfg.get("fonts"):
+        print("  [WARN] config.yaml fonts: is no longer used and loads nothing: fonts come from the design's "
+              "@font-face rules. For a Google face, declare it in the project's design subset `type` module.")
     scripts = "\n".join(
         f'<script src="{url}"></script>'
         for url in cfg.get("external_scripts", [])
@@ -307,18 +389,8 @@ def build_head(cfg: dict) -> str:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{cfg.get("title", "Presentation")}</title>
-    {meta_tags}{font_tags}{scripts}
+    {meta_tags}{scripts}
     """)
-
-
-def update_slide_numbers(html: str, current: int, total: int, fmt: str) -> str:
-    number_text = fmt.format(current=current, total=total)
-    return re.sub(
-        r'(<div\s+class="slide-number">)(.*?)(</div>)',
-        rf"\g<1>{number_text}\g<3>",
-        html,
-        flags=re.DOTALL,
-    )
 
 
 def build(config_path: Path, output_override: str = None):
@@ -336,8 +408,6 @@ def build(config_path: Path, output_override: str = None):
         output_file = Path(output_override).resolve()
         output_dir = output_file.parent
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     # `mode: document` swaps the fixed-canvas slide baseline for a paginated,
     # flowing document (A4 by default) — same partial/stitch model, no canvas.
     is_doc = str(cfg.get("mode", "slides")).lower() == "document"
@@ -353,13 +423,12 @@ def build(config_path: Path, output_override: str = None):
     if bibliography:
         print(f"[BUILD] Sources: {len(bibliography)} entries in bibliography")
 
+    # Design: resolved once (pin, folder or base theme); a refusal raises DesignError.
+    design = resolve_design(cfg, base)
+
     # Head
     parts = [build_head(cfg)]
 
-    # Canvas dimensions (used by baseline CSS/JS)
-    canvas = cfg.get("canvas", {})
-    canvas_w = int(canvas.get("width",  960))
-    canvas_h = int(canvas.get("height", 540))
     if is_doc:
         geom = page_geometry(cfg)
         baseline_css = make_document_css(geom)
@@ -367,21 +436,21 @@ def build(config_path: Path, output_override: str = None):
         print(f"[BUILD] Page:    {geom['size']} {geom['orientation']}, margins "
               f"{geom['margin']['top']} {geom['margin']['right']} {geom['margin']['bottom']} {geom['margin']['left']}")
     else:
-        baseline_css = make_baseline_css(canvas_w, canvas_h)
+        # Canvas: the design's slide-frame module, unless config.yaml sets `canvas:` for this deck
+        canvas_w, canvas_h = canvas_size(cfg, design)
+        overridden = bool((cfg.get("canvas") or {}).get("width") and (cfg.get("canvas") or {}).get("height"))
+        print(f"[BUILD] Canvas:  {canvas_w}x{canvas_h} px ({'config.yaml canvas' if overridden else 'design slide-frame'})")
+        baseline_css = make_baseline_css((canvas_w, canvas_h) if overridden else None)
         baseline_js  = make_baseline_js(canvas_w)
 
-    # Styles — layered so values cascade in the right order (same model as
-    # com-artefact-viz):
-    #   1. shared/base/core.css   — shipped neutral generic contract (zero-config)
-    #   2. docs/ux/tokens.css — project override (the source of truth; wins)
-    #   3. the deck's own styles.css — deck-only tokens + components
-    #   4. baseline CSS           — structural defaults
-    fallback_css = read_file(FALLBACK_TOKENS)
-    tokens_css, tokens_src = find_design_tokens(cfg, base)
-    if tokens_src:
-        print(f"[BUILD] Tokens:  {tokens_src} (shared design system)")
+    # Styles, in cascade order:
+    #   1. the resolved design (fonts, then every module, base first and the design
+    #      system after it), marked data-design-layer: the only place literals may live
+    #   2. the deck's own styles.css (components, roles only) and the baseline CSS
+    design_layer = "\n".join(design.fonts + [c for c in design.css.values() if c])
+    parts.append("<style data-design-layer>\n" + design_layer + "\n</style>")
     css = read_file(styles_path)
-    layers = [c for c in (fallback_css, tokens_css, css, baseline_css) if c]
+    layers = [c for c in (css, baseline_css) if c]
     parts.append("<style>\n" + "\n".join(layers) + "\n</style>")
     parts.append("</head>\n<body>\n")
 
@@ -403,6 +472,7 @@ def build(config_path: Path, output_override: str = None):
     # not page count), so .slide-number rewriting is a slides-only feature.
     num_enabled = numbering.get("enabled", True) and not is_doc
     num_format = numbering.get("format", "{current} / {total}")
+    dropped_numbers = 0
 
     for idx, entry in enumerate(slide_entries, start=1):
         filename = entry["file"] if isinstance(entry, dict) else entry
@@ -415,8 +485,10 @@ def build(config_path: Path, output_override: str = None):
             print(" (MISSING)")
             continue
 
-        if num_enabled:
-            html = update_slide_numbers(html, idx, total, num_format)
+        if not is_doc:
+            html, dropped = LEGACY_NUMBER.subn("", html)
+            dropped_numbers += bool(dropped)
+            html = OLD_FOOTER.sub("", html)
 
         # Inject source bar if the slide declares data-sources and bibliography exists
         if bibliography:
@@ -429,6 +501,12 @@ def build(config_path: Path, output_override: str = None):
                 if source_bar:
                     html = inject_before_slide_end(html, "\n" + source_bar)
 
+        # The slide frame's footer row: logo, legal line, number at the right
+        if not is_doc:
+            footer = slide_footer(design, num_format.format(current=idx, total=total) if num_enabled else "")
+            if footer:
+                html = inject_before_slide_end(html, "\n" + footer)
+
         parts.append(f"\n<!-- slide {idx}: {label} -->\n")
         parts.append(html.strip())
         parts.append("\n")
@@ -436,6 +514,9 @@ def build(config_path: Path, output_override: str = None):
 
     if is_doc:
         parts.append("</div>\n")
+    if dropped_numbers:
+        print(f"  [NOTE] {dropped_numbers} partial(s) carry a <div class=\"slide-number\"> placeholder; the slide "
+              "frame now numbers every slide in its footer row, so the placeholder was left out")
 
     # Script (baseline responsive + project; document mode ships no baseline JS)
     js = read_file(script_path) if script_path.exists() else ""
@@ -444,12 +525,16 @@ def build(config_path: Path, output_override: str = None):
 
     parts.append("</body>\n</html>\n")
 
-    # Write
+    # Check, then write: a deck that breaks the design writes nothing.
     final = "\n".join(parts)
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(final)
+    report = check_deck(final, design, cfg, output_file)
+    write_atomic(output_file, final)
+    prov_file = write_provenance(output_file, design)
 
     size_kb = output_file.stat().st_size / 1024
+    print("\n[CHECK] PASS: the deck uses only the design's roles")
+    print("[PROVENANCE] " + provenance_summary(design, report).replace("\n", "\n             "))
+    print(f"[PROVENANCE] written to {prov_file.name}")
     print(f"\n[DONE] {output_file.name} ({size_kb:.1f} KB, {total} {unit})")
 
 
@@ -468,7 +553,11 @@ def main():
         help="Override output file path",
     )
     args = parser.parse_args()
-    build(Path(args.config).resolve(), args.output)
+    try:
+        build(Path(args.config).resolve(), args.output)
+    except (DesignError, RenderRefused) as exc:
+        print(f"[BUILD] REFUSED: {exc}", file=sys.stderr)
+        sys.exit(exc.code)
 
 
 if __name__ == "__main__":

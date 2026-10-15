@@ -6,6 +6,7 @@
       "roles": {
         "--ink": "Primary text",
         "--muted": "Secondary text",
+        "--tertiary": "Tertiary text: slide footers, legal lines, slide numbers, source lines (optional; defaults to --muted)",
         "--canvas-bg": "Page background",
         "--surface": "Card or panel background",
         "--surface-2": "Recessed or group background",
@@ -87,21 +88,30 @@
       "roles": {
         "--slide-bg": "Slide background",
         "--slide-fg": "Slide text colour",
-        "--slide-padding": "Slide inner padding"
+        "--slide-padding": "Slide inner padding: the inset of the section label and the footer row",
+        "--slide-width": "Slide canvas width, a length in px (config.yaml canvas: overrides it for one deck)",
+        "--slide-height": "Slide canvas height, a length in px (config.yaml canvas: overrides it for one deck)"
       },
       "classes": [
         "slide",
         "active",
         "presenting",
         "controls-hint",
-        "slide-source-bar"
+        "slide-source-bar",
+        "slide-label",
+        "slide-footer",
+        "slide-logo",
+        "slide-legal",
+        "slide-number"
       ]
     },
     "print": {
       "required": false,
       "roles": {
         "--print-bg": "Printed page background",
-        "--print-margin": "Printed page margin"
+        "--print-margin": "Printed page margin: one to four lengths, CSS margin shorthand order",
+        "--print-page-size": "Printed page size: A3, A4, A5, Letter or Legal, optionally followed by landscape, or a width and a height",
+        "--print-breaking": "Accent for breaking changes in printed reports (optional; defaults to --danger)"
       },
       "classes": [
         "report",
@@ -140,6 +150,11 @@
       "use": "Body text on cards"
     },
     {
+      "fg": "--tertiary",
+      "bg": "--canvas-bg",
+      "use": "Footers, legal lines and slide numbers on the page"
+    },
+    {
       "fg": "--muted",
       "bg": "--surface",
       "use": "Secondary text on cards"
@@ -153,6 +168,70 @@
       "fg": "--accent",
       "bg": "--surface",
       "use": "Links and IDs on cards"
+    },
+    {
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
+      "bg": "--success",
+      "use": "Text on a success fill (shipped badge)"
+    },
+    {
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
+      "bg": "--info",
+      "use": "Text on an info fill (planned badge)"
+    },
+    {
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
+      "bg": "--warning",
+      "use": "Text on a warning fill (high-pain badge)"
+    },
+    {
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
+      "bg": "--danger",
+      "use": "Text on a danger fill"
+    },
+    {
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
+      "bg": "--muted",
+      "use": "Text on a muted fill (backlog badge)"
+    },
+    {
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
+      "bg": "--chart-1",
+      "use": "Text on the first chart step (differentiator, validated)"
+    },
+    {
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
+      "bg": "--chart-2",
+      "use": "Text on the second chart step (necessary, tested)"
+    },
+    {
+      "fg": [
+        "--accent-ink",
+        "--ink"
+      ],
+      "bg": "--chart-3",
+      "use": "Text on the third chart step (commodity, assumed)"
     }
   ]
 }

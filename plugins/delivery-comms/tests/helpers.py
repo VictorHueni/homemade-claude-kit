@@ -7,12 +7,13 @@ import unittest
 from pathlib import Path
 
 SKILLS = Path(__file__).resolve().parent.parent / "skills"
-FALLBACK_ACCENT = "#3b6ef5"
+FALLBACK_ACCENT = "#396cf5"
 
 
-def run(script, *args, cwd):
-    """Run a skill script isolated (-I) from a project folder with no docs/ux."""
-    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
+def run(script, *args, cwd, env=None):
+    """Run a skill script isolated (-I) from a project folder with no docs/ux; `env` adds or, with None, unsets."""
+    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1", **(env or {})}
+    env = {k: v for k, v in env.items() if v is not None}
     return subprocess.run(
         [sys.executable, "-I", str(script), *map(str, args)],
         cwd=cwd, env=env, capture_output=True, text=True,

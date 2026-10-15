@@ -1,0 +1,46 @@
+/*
+ * core.css — shipped neutral defaults for the `core` module of the design contract.
+ *
+ * Inlined FIRST so a deck, view or report renders correctly with ZERO project setup;
+ * a project's own design is inlined AFTER and overrides these values. One copy
+ * for every renderer: canonical in plugins/delivery-comms/shared/base/, copied into
+ * each skill by scripts/sync-shared.py. Role list: contract/modules.json.
+ */
+:root {
+  /* ---- Base palette ---- */
+  --ink:        #1a1f29;   /* primary text */
+  --muted:      #6b7280;   /* secondary text */
+  --tertiary:   var(--muted);   /* tertiary text: footers, legal lines; a design may set its own */
+  --canvas-bg:  #f6f7f9;   /* page background */
+  --surface:    #ffffff;   /* card / panel background */
+  --surface-2:  #eef1f5;   /* recessed / group background */
+  --border:     #d7dce3;   /* hairlines, dividers */
+  --accent:     #396cf5;   /* primary action, links, IDs */
+  --accent-ink: #ffffff;   /* text on accent fills */
+
+  /* ---- Semantic state (generic; portable across projects + tools) ---- */
+  --success: #2e9e5b;   /* positive / done / validated */
+  --warning: #f0ad4e;   /* caution / in-progress / tested */
+  --danger:  #d5413d;   /* negative / error / critical */
+  --info:    #396cf5;   /* informational / planned / neutral-active */
+
+  /* ---- Typography ---- */
+  --font-body:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* UI chrome (view titles, group/card headings, badges, toolbar buttons).
+     Deliberately independent of --font-body: a project may theme --font-body
+     with a serif reading face (com-slide-deck decks do), and headings/badges
+     must stay sans unless the project explicitly overrides --font-heading. */
+  --font-heading: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:  ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  --title-size: 1.6rem;
+
+  /* ---- Spacing & shape ---- */
+  --space-sm:    0.5rem;
+  --space-md:    1rem;
+  --space-lg:    2rem;
+  --shell-max:   1400px;
+  --card-radius: 12px;
+  --btn-radius:  8px;
+  --node-radius: 10px;
+  --shadow:      0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.10);
+}

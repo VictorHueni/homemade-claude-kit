@@ -42,13 +42,44 @@ class ModulesTest(unittest.TestCase):
                 self.assertNotIn(role, seen, f"{role} in {seen.get(role)} and {name}")
                 seen[role] = name
 
-    def test_core_keeps_todays_24_roles(self):
-        self.assertEqual(len(modules()["modules"]["core"]["roles"]), 24)
+    def test_core_keeps_todays_24_roles_plus_tertiary(self):
+        # the 24 roles of the old contract, plus the optional --tertiary text role added for 2.0.0
+        roles = modules()["modules"]["core"]["roles"]
+        self.assertEqual(len(roles), 25)
+        self.assertIn("--tertiary", roles)
+
+    def test_tertiary_text_is_a_checked_pair(self):
+        self.assertIn({"fg": "--tertiary", "bg": "--canvas-bg"},
+                      [{"fg": p["fg"], "bg": p["bg"]} for p in modules()["pairs"]])
+
+    def test_slide_footer_and_source_bar_use_tertiary(self):
+        css = (PLUGIN / "shared" / "base" / "slide-frame.css").read_text(encoding="utf-8")
+        for selector in (".slide-footer", ".slide-source-bar"):
+            with self.subTest(selector=selector):
+                block = css[css.index(selector + " {"):]
+                block = block[:block.index("}")]
+                self.assertIn("color: var(--tertiary)", block)
 
     def test_dataviz_roles(self):
         roles = set(modules()["modules"]["dataviz"]["roles"])
         self.assertEqual(roles, {"--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-rest",
                                  "--chart-axis", "--chart-grid", "--chart-highlight"})
+
+    def test_every_filled_badge_has_a_text_pair(self):
+        # owner 2026-10-14: text on every fill the renderers paint text on is a checked pair; either text role
+        # may carry it (a list pair passes when any of its roles reaches AA, the resolver picks that role)
+        fills = ("--success", "--info", "--warning", "--danger", "--muted", "--chart-1", "--chart-2", "--chart-3")
+        pairs = modules()["pairs"]
+        for bg in fills:
+            with self.subTest(fill=bg):
+                named = [p for p in pairs if p["bg"] == bg]
+                self.assertEqual([p["fg"] for p in named], [["--accent-ink", "--ink"]])
+                self.assertIn("text on", named[0]["use"].lower())
+
+    def test_single_role_pairs_stay_single(self):
+        single = {(p["fg"], p["bg"]) for p in modules()["pairs"] if isinstance(p["fg"], str)}
+        self.assertLessEqual({("--ink", "--canvas-bg"), ("--ink", "--surface"), ("--muted", "--surface"),
+                              ("--accent-ink", "--accent"), ("--accent", "--surface")}, single)
 
     def test_class_vocabularies_cover_what_the_renderers_emit(self):
         mods = modules()["modules"]
@@ -64,6 +95,29 @@ class ModulesTest(unittest.TestCase):
         for name in ("core", "dataviz", "brand"):
             self.assertNotIn("classes", mods[name])
 
+    def test_slide_frame_roles_and_classes(self):
+        frame = modules()["modules"]["slide-frame"]
+        self.assertEqual(set(frame["roles"]), {"--slide-bg", "--slide-fg", "--slide-padding",
+                                               "--slide-width", "--slide-height"})
+        self.assertEqual(set(frame["classes"]), {"slide", "active", "presenting", "controls-hint", "slide-source-bar",
+                                                 "slide-label", "slide-footer", "slide-logo", "slide-legal",
+                                                 "slide-number"})
+        base = css_classes((SHARED / "base/slide-frame.css").read_text(encoding="utf-8"))
+        self.assertIn("slide-footer", base)
+        self.assertLessEqual(base, set(frame["classes"]))
+
+    def test_print_roles(self):
+        # Increment 09: the print module gives the page box (size and margin) and the page background
+        # plus --print-breaking, the optional accent of breaking changes in printed reports (defaults to --danger)
+        roles = modules()["modules"]["print"]["roles"]
+        self.assertEqual(set(roles), {"--print-bg", "--print-margin", "--print-page-size", "--print-breaking"})
+        self.assertIn("optional", roles["--print-breaking"])
+        self.assertIn("--danger", roles["--print-breaking"])
+
+    def test_print_breaking_defaults_to_danger_in_the_base_theme(self):
+        css = (SHARED / "base/print.css").read_text(encoding="utf-8")
+        self.assertRegex(css, r"--print-breaking:\s*var\(--danger\);")
+
     def test_brand_roles(self):
         self.assertEqual(set(modules()["modules"]["brand"]["roles"]),
                          {"--brand-logo-on-light", "--brand-logo-on-dark", "--brand-mark", "--brand-legal"})
@@ -74,8 +128,14 @@ class ModulesTest(unittest.TestCase):
         self.assertTrue(pairs)
         for pair in pairs:
             self.assertEqual(set(pair), {"fg", "bg", "use"})
-            self.assertIn(pair["fg"], roles)
+            fg = pair["fg"] if isinstance(pair["fg"], list) else [pair["fg"]]
+            self.assertTrue(fg, pair)
+            self.assertEqual(len(set(fg)), len(fg), pair)
+            for role in fg:
+                self.assertIn(role, roles)
             self.assertIn(pair["bg"], roles)
+            self.assertNotIn(pair["bg"], fg)
+            self.assertTrue(pair["use"].strip())
 
 
 class ManifestCheckTest(unittest.TestCase):
@@ -116,6 +176,10 @@ class ManifestCheckTest(unittest.TestCase):
                 walk(node["additionalProperties"])
         walk(self.schema)
         self.assertIn("2.0.0", self.schema["$id"])
+
+    def test_schema_id_has_no_fragment(self):
+        # JSON Schema 2020-12 forbids a non-empty fragment in $id, and ajv refuses the schema with one
+        self.assertNotIn("#", self.schema["$id"].rstrip("#"))
 
 
 class BaseThemeTest(unittest.TestCase):

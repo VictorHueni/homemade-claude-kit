@@ -4,64 +4,26 @@ Internal guidance for the `ux-design-system` skill.
 
 ## Principles
 
-1. **One design system per project.** `docs/ux/` holds the single visual
-   source of truth. Consumers theme from it; they do not each define their own
-   palette. Two design systems = drift.
+1. **One design per project.** `docs/ux/package.json` pins the single design every renderer uses: a published package or the project's generated subset. Two designs means drift.
 
-2. **Author in Markdown, generate the CSS.** `design-system.md` is the human
-   artefact (rationale + token tables); `tokens.css` is generated and
-   machine-owned. Durable edits go in the `.md`. Mirrors the kit pattern of
-   `com-slide-deck`'s `design-system.md → styles.css`.
+2. **A published design system wins.** When the organisation publishes a design-system package with a `kit-manifest.json`, `point` at it; do not author a subset that copies its values. A subset is for a project with no design system of its own.
 
-3. **Names are the contract; values are the brand.** Every consumer relies on
-   the token *names* in `references/token-contract.md`. Change values freely to
-   re-brand; never rename or drop a token. Extending with extra tokens is fine.
+3. **Author the DESIGN.md, generate the rest.** The DESIGN.md is the human artefact (values in the front matter, guidance in the prose); `design-system/` is generated and machine-owned. Durable edits go in the DESIGN.md.
 
-3a. **Keep the contract generic; consumers derive domain tokens.** The project
-   `tokens.css` carries only portable names — base palette, `--success/--warning/
-   --danger/--info`, typography, spacing. Kit-domain vocabulary (delivery status,
-   pain index, confidence, strategic importance) is **not** in the contract; each
-   consumer defines those in its own stylesheet as aliases to the generics (e.g.
-   `com-artefact-viz/templates/tokens.domain.css`: `--status-shipped: var(--success)`).
-   This keeps a project's
-   design system interoperable across the kit and the project's other tooling —
-   themers touch four generic names, not kit jargon.
+4. **The DESIGN.md is a Google DESIGN.md.** It follows [Google's format](https://github.com/google-labs-code/design.md) so other tools and agents read the same file, and every DESIGN.md the skill writes passes Google's linter with no warning (`make -C plugins/delivery-comms test-design-md`). Colours, rounded and spacing tokens carry the contract role names; the font roles are properties of the typography tokens `body`, `heading`, `mono` and `text-*` (the table in `SKILL.md`); what Google has no key for (the shadow, the border width, local font files, the module omissions with their reasons) lives under the `kit` extension key, whose values the linter does not take for tokens. Keys and tokens the kit does not use are skipped with a note, never refused, so a Google DESIGN.md written elsewhere subsets once it names the kit roles.
 
-4. **Domain-agnostic.** Unlike Anthropic's `brand-guidelines` (which hard-codes
-   Anthropic's palette), the kit is user-global, so this skill ships only
-   neutral defaults and a fillable template. No real brand colour, font, or
-   client name appears on the skill side — only in a project's own
-   `docs/ux/`.
+5. **Declare what is missing.** A subset fills whole modules and names every optional module it leaves out, with the reason, under `kit.omitted` (Google's own `omitted` lists DESIGN.md sections, not modules). The kit's neutral base stands in for an omitted module, and the render's provenance says so.
 
-5. **No IDs, no links.** The design system mints no IDs and carries no FK
-   references to other artefacts. It is a cross-cutting foundation, not a node
-   in the artefact dependency graph. It does not appear in the ER diagram or the
-   cross-doc ID conventions table.
+6. **Roles are the contract; values are the brand.** The front matter tokens are the contract roles (`contract/modules.json`). Renderers derive their domain colours from those roles (`com-artefact-viz`: status and pain on the state roles, importance and confidence on `--chart-1` to `--chart-3`); a project themes the roles, never the renderers' `--kit-*` properties.
 
-## Boundaries — what this skill is NOT
+7. **The owner confirms the chart palette.** Proposed chart colours are a starting point computed from the accent, contrast-checked; the agent shows them, and only the owner removes the top-level `proposed:` mark (a YAML key, since the safe loader drops comments).
 
-- **Not a renderer.** It produces tokens, not HTML. Decks are `com-slide-deck`;
-  artefact views are `com-artefact-viz`.
-- **Not a component library.** It defines tokens (colour/type/space/shape), not
-  reusable HTML/CSS components. Each consumer builds its own components *from*
-  the tokens.
-- **Not per-deck or per-view.** It is project-scoped (`docs/ux/`), not
-  scoped to one deck folder. A deck may still keep deck-specific CSS, but it
-  should source its base tokens here.
+8. **Domain-agnostic.** The skill ships neutral defaults and a fillable template. No real brand colour, font or client name appears on the skill side, only in a project's own `docs/ux/`.
 
-## Relationship to the consumers
+9. **No IDs, no links.** The design mints no IDs and carries no references to other artefacts.
 
-Both `com-*` skills inherit this skill's `tokens.css` directly:
+## Boundaries: what this skill is not
 
-- **`com-artefact-viz`** auto-detects `docs/ux/tokens.css` and inlines it as
-  the theme (override with `--design-system`).
-- **`com-slide-deck`** — `build.py` locates `docs/ux/tokens.css` (config
-  `paths.design_tokens` or auto-detect by walking up) and inlines it **before**
-  the deck's `styles.css`, so base palette + typography + the generic semantic
-  state tokens (`--success/--warning/--danger/--info`) flow from here. The deck
-  adopts the contract names and adds only deck-only tokens. A deck with no shared
-  sheet still builds standalone (backwards compatible). This unification resolved
-  OI-0019.
-
-Because both consumers rely on the contract token **names**, never rename or
-drop a token; change values freely.
+- **Not a renderer.** It produces a design, not HTML. Decks are `com-slide-deck`, artefact views `com-artefact-viz`, release notes `com-release-note`.
+- **Not a design-system builder.** A complete design system (DTCG source, build, adapters, release) from a template is out of scope ([#114](https://github.com/VictorHueni/homemade-claude-kit/issues/114)).
+- **Not per-deck or per-view.** It is project-scoped (`docs/ux/`). A deck may still carry deck-only CSS, which the validator checks against the design.

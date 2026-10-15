@@ -1,28 +1,28 @@
 /*
- * tokens.domain.css — com-artefact-viz domain tokens, DERIVED from the generic
- * contract. Inlined after tokens.fallback.css + the project sheet, so these
- * follow whatever --success/--warning/--danger/--info/--muted resolve to.
+ * tokens.domain.css: com-artefact-viz domain colours, each one --kit-* property
+ * that reads one contract role. Inlined after the design CSS, so these follow
+ * whatever the roles resolve to. A project themes the roles, never these.
  *
- * Renderers reference these domain names (var(--status-shipped) etc.); a project
- * never sets them — it themes the four generics and these follow. Override a
- * domain token directly only for finer control.
+ * Split by meaning (Plan-0005 owner ruling Q-5): status and pain read the core
+ * state roles; importance and confidence are ordered scales on --chart-1 to
+ * --chart-3, darkest first. Red appears only where something is wrong.
  */
 :root {
-  /* strategic importance (capability map) */
-  --differentiator: var(--danger);
-  --necessary:      var(--warning);
-  --commodity:      var(--muted);
   /* delivery status (FBS, roadmap) */
-  --status-shipped: var(--success);
-  --status-planned: var(--info);
-  --status-backlog: var(--muted);
-  /* pain index (delivery roadmap) */
-  --pain-critical:  var(--danger);
-  --pain-high:      var(--warning);
-  --pain-medium:    var(--info);
-  --pain-low:       var(--muted);
-  /* confidence (BMC / Lean Canvas) */
-  --conf-assumed:   var(--muted);
-  --conf-tested:    var(--warning);
-  --conf-validated: var(--success);
+  --kit-status-shipped: var(--success);
+  --kit-status-planned: var(--info);
+  --kit-status-backlog: var(--muted);
+  /* pain index (delivery roadmap, service blueprint) */
+  --kit-pain-critical:  var(--danger);
+  --kit-pain-high:      var(--warning);
+  --kit-pain-medium:    var(--info);
+  --kit-pain-low:       var(--muted);
+  /* strategic importance (capability map), darkest first */
+  --kit-differentiator: var(--chart-1);
+  --kit-necessary:      var(--chart-2);
+  --kit-commodity:      var(--chart-3);
+  /* confidence (BMC / Lean Canvas), darkest first */
+  --kit-conf-validated: var(--chart-1);
+  --kit-conf-tested:    var(--chart-2);
+  --kit-conf-assumed:   var(--chart-3);
 }

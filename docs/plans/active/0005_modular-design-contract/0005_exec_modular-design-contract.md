@@ -27,7 +27,7 @@ Principles:
 5. No silent legacy path. A legacy `docs/ux/tokens.css` (or the older `docs/design/tokens.css`) provides `core` only, so it is refused from the first 2.0.0 release (owner 2026-10-11, Q-1); the error names `ux-design-system point`, `ux-design-system subset` and `ux-design-system subset --from-legacy`. A project with no design source at all renders on the kit's base theme, which provides every module, and its provenance report says so.
 
 **Overall Status:** in-progress
-**Current Increment:** 03
+**Current Increment:** 13
 
 ## Design constraints (owner rulings 2026-10-11, do not re-litigate in increments)
 
@@ -120,7 +120,7 @@ Exit criteria:
 
 ### Increment 03: Shared design resolver
 
-**Status:** pending
+**Status:** done
 
 First increment on `release/2.0` (Q-8).
 
@@ -156,7 +156,7 @@ Exit criteria:
 
 ### Increment 04: Blocking validator
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -166,10 +166,10 @@ Scope:
    - literals inside the resolved design layers the renderer inlined, and inside brand assets (inlined logo SVG, data URIs), pass;
    - a `var(--role, #hex)` fallback is stripped before the check, so it neither passes nor fails a page on its own;
    - an unknown `--name` fails; a `--kit-*` property whose value references only roles or non-colour values passes, and one carrying a literal colour fails;
-   - a declared exception passes and appears in the report; the report notes whether the manifest's `exceptions` vocabulary knows the name, and an unknown name is not refused;
+   - a declared exception passes and appears in the report; the report notes whether the manifest's `exceptions` vocabulary knows the name, and an unknown name is not refused; an exception whose name is a custom property (`--font-report`) allows the page to declare and use that property;
    - an exception that brings a `pairs` text pair below 4.5:1 fails (Q-7);
    - the check reads the resolved design, so the same HTML passes against one design and fails against another;
-   - each skill's current template, with its `var()` fallbacks removed and its renderer-internal properties renamed to `--kit-*`, passes on the base theme (a dry run of what Increments 05 to 09 will do; expected red today).
+   - each skill's current template, with its `var()` fallbacks removed and its renderer-internal properties renamed to `--kit-*`, passes on the base theme (a dry run of what Increments 05 to 09 will do; the test applies that migration itself, so it is red only until the validator exists).
 2. `plugins/delivery-comms/shared/check_render.py`: parse the built HTML and its inlined CSS (stdlib `html.parser` and a small CSS tokenizer), check per constraint 5 and the rules above, return findings as JSON and as text. Exceptions are declared per artefact (deck `config.yaml` `design.exceptions`, viz and release-note `--exception NAME=VALUE`). A command-line entry `check_render.py <file.html> [--exception NAME=VALUE]...` checks any HTML file against the resolved design, for bespoke generators.
 3. `sync-shared.py` run.
 
@@ -188,7 +188,7 @@ Exit criteria:
 
 ### Increment 05: com-slide-deck on the resolver and the validator
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -218,7 +218,7 @@ Exit criteria:
 
 ### Increment 06: com-slide-deck slide frame and brand
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -241,7 +241,7 @@ Exit criteria:
 
 ### Increment 07: com-artefact-viz domain colours on contract roles
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -263,7 +263,7 @@ Exit criteria:
 
 ### Increment 08: com-artefact-viz on the resolver and the validator
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -291,12 +291,13 @@ Exit criteria:
 
 ### Increment 09: com-release-note on the resolver and the validator
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
 1. **Write first, expect red:** fonts come from the resolved design (no hard-coded `docs/ux/fonts/fonts.css`); with `full`, the PDF uses the `print` module (page size, margins), the logo and the legal line; `_resolve_token` reads the resolved values, so a `var()` token no longer falls back silently to defaults; `--font-report` is honoured only as a declared exception; the template has no `var()` fallback; the validator runs; `<output>.provenance.json` is written next to the HTML.
 2. `render_pdf.py` uses the resolver and the validator.
+3. The print chrome (logo as a data URI and the legal line in the Chromium page margin, with the resolved values inlined as Increment 05 does for `--muted` and `--font-mono`) lives in `shared/`, and com-slide-deck's `mode: document` uses it too, so a document deck from `full` carries the logo and the legal line (owner 2026-10-14).
 
 Primary files:
 
@@ -314,7 +315,7 @@ Exit criteria:
 
 ### Increment 10: Reproducible output (closes #106)
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -337,18 +338,18 @@ Exit criteria:
 
 ### Increment 11: ux-design-system `point` and `subset`
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
 1. **Write first, expect red:**
    - `point @scope/name@x.y.z` writes `docs/ux/package.json` with the exact version, validates the package's manifest through the resolver, and prints the `.github/dependabot.yml` entry (`npm`, `directory: /docs/ux`) to add;
-   - `subset docs/ux/DESIGN.md` reads YAML front matter (colours, typography, rounded, spacing) and prose sections, writes `docs/ux/design-system/` with one CSS file per filled module and `kit-manifest.json` with `omitted` taken from the file;
-   - a source without dataviz gets a proposed palette (four steps from the accent towards the neutral, a remainder fill, an axis colour) written into the source as a block marked `proposed`, and generation refuses until the owner removes the mark;
+   - `subset docs/ux/DESIGN.md` reads a Google DESIGN.md (YAML front matter: colours, typography, rounded, spacing, plus the `kit` extension key; prose sections), writes `docs/ux/design-system/` with one CSS file per filled module and `kit-manifest.json` with `omitted` taken from the file (`kit.omitted`);
+   - a source without chart colours gets a proposed palette (four steps from the accent towards the neutral, a remainder fill, an axis colour) written into the source's `colors` with a top-level `proposed` mark listing them, and generation refuses until the owner removes the mark;
    - contrast pairs below AA are refused;
-   - `subset --from-legacy docs/ux/tokens.css` writes a draft `docs/ux/DESIGN.md` with `core` filled from the legacy file and a `proposed` dataviz block, and accepts `docs/design/tokens.css` the same way;
+   - `subset --from-legacy docs/ux/tokens.css` writes a draft `docs/ux/DESIGN.md` with `core` filled from the legacy file and proposed chart colours under the `proposed` mark, and accepts `docs/design/tokens.css` the same way;
    - `scaffold` writes to `docs/ux/` (its documented path; today it writes `docs/design/`).
-2. YAML front matter is parsed with PyYAML's safe loader; a key outside the subset DESIGN.md uses is an explicit error.
+2. YAML front matter is parsed with PyYAML's safe loader; a Google DESIGN.md key or token the kit does not use is skipped with one printed note, and a typo of a key the kit uses is an explicit error.
 3. The old `generate` mode and its `refresh` alias are removed; running either prints the `subset` command that replaces it.
 
 Primary files:
@@ -366,7 +367,7 @@ Exit criteria:
 
 ### Increment 12: Skill evals for delivery-comms
 
-**Status:** pending
+**Status:** done
 
 The unit tests prove the code; these prove that an agent using the rewritten skills follows them. The pattern is the reference design system's own `claude plugin eval` suite and its `skill-evals` Makefile target, which already works around the two WSL sandbox blockers (filtered `PATH`, temporary `HOME`).
 
@@ -376,7 +377,7 @@ Scope:
    - `deck-pinned`: "a three-slide deck on X" in a project pinned to the `full` fixture (local folder pin). Graders: a deck HTML exists; `<output>.provenance.json` lists the design system as the source of `core`, `dataviz`, `slide-frame` and `brand`; the verdict file reads PASS; no literal colour in the deck outside the inlined design layers.
    - `viz-from-subfolder`: "a capability map of this map" asked from `docs/strategy/` in a pinned project. Graders: the view HTML exists; its provenance names the pinned design, not the base; the verdict file reads PASS.
    - `release-note`: "a release note for v0.3.0" from a small changelog in a pinned project. Graders: the note and its provenance exist; the verdict file reads PASS.
-   - `legacy-tokens`: "make a deck" in a project that only has `docs/ux/tokens.css`. Graders: `docs/ux/DESIGN.md` exists (from `subset --from-legacy`) with a `proposed` dataviz block left for the owner, or the run stops and asks; `docs/ux/tokens.css` is not edited; no hand-written CSS replaces the refused design.
+   - `legacy-tokens`: "make a deck" in a project that only has `docs/ux/tokens.css`. Graders: `docs/ux/DESIGN.md` exists (from `subset --from-legacy`) with proposed chart colours under the `proposed` mark left for the owner, or the run stops and asks; `docs/ux/tokens.css` is not edited; no hand-written CSS replaces the refused design.
    - `bespoke-generator`: "write a script that builds an HTML table of these figures in our brand". Graders: the script's output passes `check_render.py`; the script obtains its CSS from `design_source.py css` (its source contains the call) and holds no literal colour.
 2. `check_render.py --record <file>` writes the verdict file the graders read (`PASS: …` or the findings), added to the shared validator with a unit test.
 3. `plugins/delivery-comms/Makefile` target `skill-evals`, copied from the reference design system's: `SKILL_EVAL_MODELS` (default `sonnet`), `SKILL_EVAL_JUDGE`, `SKILL_EVAL_MAX_COST`, each case three times with the plugin and three times without it, results in `plugins/delivery-comms/var/skill-evals/<model>/` (gitignored), `--allow-tools` limited to `Write`, `Edit` and `Bash(python3 *)`, `Bash(mkdir *)`, `Bash(cp *)`. The four SKILL.md files tell the agent to use one plain command per Bash call and write files with the Write tool, since restricted sessions deny compound commands.
@@ -400,13 +401,14 @@ Exit criteria:
 
 ### Increment 13: Documentation and release 2.0.0
 
-**Status:** pending
+**Status:** in-progress (scope items 1 to 3 done; scope item 4's merge to `main`, the marketplace cache refresh and the exit criterion wait for the owner's merge request)
 
 Scope:
 
 1. **Exempt from red (documentation):** a five-line block for a project's `AGENTS.md` (pin file, manifest, validator command, Dependabot entry) goes in `ux-design-system/references/`.
 2. Plugin version per Q-2 in `plugin.json` and the marketplace; skill `metadata.version` bumped where the skill changed.
-3. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-plugins-and-mcp.md`).
+3. The 2.0.0 release notes name the reproducible-output cutover: every delivery-comms PDF changes bytes once, and `util-provenance` tokens over earlier PDFs are superseded per [ADR-0013](../../../architecture/decisions/adr-0013-reproducible-delivery-comms-output.md).
+4. `./scripts/audit-skills.sh` and the full suite green; `release/2.0` merged to `main` at the owner's request (Q-8); the marketplace refresh and `claude plugin update delivery-comms@<marketplace>` verified against the cache (`~/.claude/rules/claude-plugins-and-mcp.md`).
 
 Primary files:
 
@@ -436,8 +438,8 @@ Exit criteria:
 | Milestone | Increments | Status | Coherent Outcome | Standalone Test Gate | Exit Criteria | Commit Guidance |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | M1: Contract on main | 01-02 | done | Test lane, contract 2.0.0, one synced base theme; no output change | `make -C plugins/delivery-comms test` | Characterisation green; fallback copies gone | `test(delivery-comms)`, `feat(delivery-comms)` |
-| M2: Resolve and check | 03-04 | pending | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
-| M3: Renderers moved | 05-09 | pending | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
-| M4: Reproducible | 10 | pending | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
-| M5: Authoring | 11 | pending | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
-| M6: Agents follow the skills, release | 12-13 | pending | Agents using the rewritten skills render on-brand and migrate legacy projects; 2.0.0 released | `make -C plugins/delivery-comms test`, `make -C plugins/delivery-comms skill-evals` (owner-approved run), `./scripts/audit-skills.sh` | Every eval case passes its graders; 2.0.0 in the marketplace cache | `test(delivery-comms)`, `docs(delivery-comms)` |
+| M2: Resolve and check | 03-04 | done | Pinned designs resolve and renders are checked | `make -C plugins/delivery-comms test` | Stub registry, integrity and validator rules green | `feat(delivery-comms)`, PRs into `release/2.0` |
+| M3: Renderers moved | 05-09 | done | Deck, five views and release note render from the resolved design and pass the validator | `make -C plugins/delivery-comms test test-pdf` | All three fixtures render in every renderer | `feat(delivery-comms)`, PRs into `release/2.0` |
+| M4: Reproducible | 10 | done | Unchanged source, unchanged bytes | `make -C plugins/delivery-comms test test-pdf` | #106 closed | `fix(delivery-comms)` |
+| M5: Authoring | 11 | done | Projects can point, subset or migrate | `make -C plugins/delivery-comms test` | A DESIGN.md or a legacy file becomes a validated subset | `feat(delivery-comms)` |
+| M6: Agents follow the skills, release | 12-13 | in-progress | Agents using the rewritten skills render on-brand and migrate legacy projects; 2.0.0 released | `make -C plugins/delivery-comms test`, `make -C plugins/delivery-comms skill-evals` (owner-approved run), `./scripts/audit-skills.sh` | Every eval case passes its graders; 2.0.0 in the marketplace cache | `test(delivery-comms)`, `docs(delivery-comms)` |

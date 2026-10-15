@@ -1,53 +1,46 @@
 # ux-design-system
 
-The project's single visual source of truth. Author the brand once in
-`design-system.md`; generate `tokens.css`, the `:root` variable sheet every
-`com-*` artefact themes from.
+Gives a project the design its decks, views and release notes render with: a published design-system package pinned at an exact version (`point`), or a declared subset generated from a DESIGN.md (`subset`). The three delivery-comms renderers resolve that design themselves; the contract is [`contract/README.md`](../../contract/README.md).
 
 ```
-design-system.md  ──generate──>  tokens.css  ──var(--token)──>  com-slide-deck
- (authored, human)               (:root contract)               com-artefact-viz
+DESIGN.md  --subset-->  docs/ux/design-system/  <--file: pin--  docs/ux/package.json  <--  renderers
+                        (module CSS, manifest)                  (or an exact package version, from point)
 ```
-
-Adapts Anthropic's
-[`brand-guidelines`](https://github.com/anthropics/skills/tree/main/skills/brand-guidelines)
-pattern (design system as a shared, on-demand resource), kept domain-agnostic —
-it scaffolds a fillable design system rather than hard-coding a brand.
 
 ## Usage
 
 ```bash
-# Scaffold docs/ux/{design-system.md, tokens.css} (neutral defaults)
-python scripts/generate_tokens.py scaffold
+# A published design system: pin it, then add the printed Dependabot entry
+python3 scripts/design_system.py point @scope/name@1.2.3
 
-# After editing the token values in design-system.md, regenerate the CSS
-python scripts/generate_tokens.py generate docs/ux/design-system.md
+# No design system: start a DESIGN.md, fill it, generate the subset
+python3 scripts/design_system.py scaffold
+python3 scripts/design_system.py subset docs/ux/DESIGN.md
+
+# A legacy docs/ux/tokens.css the renderers refuse: draft the DESIGN.md from it
+python3 scripts/design_system.py subset --from-legacy docs/ux/tokens.css
 ```
 
-Then the presentation skills theme from it:
-
-```bash
-# com-artefact-viz auto-detects docs/ux/tokens.css
-python ../com-artefact-viz/scripts/render.py docs/business/03a-capability-map.md
-```
+The DESIGN.md is a [Google DESIGN.md](https://github.com/google-labs-code/design.md): it passes Google's linter (`make -C plugins/delivery-comms test-design-md`), and `subset` reads a Google DESIGN.md, skipping the keys and tokens the kit does not use. The first `subset` run on a DESIGN.md without chart colours writes a proposed chart palette into its `colors` and stops; the owner reviews it and removes the `proposed:` line.
 
 ## Layout
 
 ```
 ux-design-system/
-  SKILL.md                       Claude-facing instructions
-  README.md                      This file
-  templates/
-    design-system.template.md    Authored doc skeleton (rationale + token tables)
-    tokens.template.css          Canonical :root defaults (the contract)
+  SKILL.md                    Claude-facing instructions
+  README.md                   This file
   scripts/
-    generate_tokens.py           scaffold + generate/refresh (md -> css)
+    design_system.py          point, subset, subset --from-legacy, scaffold
+    shared/                   The kit resolver and contract, synced from the plugin's shared/
+  templates/
+    DESIGN.template.md        The DESIGN.md scaffold writes
   references/
-    token-contract.md            The canonical token names, grouped
-    discipline.md                Principles and boundaries
+    token-contract.md         Pointer to the plugin's contract/README.md
+    discipline.md             Principles and boundaries
+    agents-md-block.md        The block a project copies into its AGENTS.md
   examples/
-    design-system.sample.md      A filled example
+    DESIGN.sample.md          A filled DESIGN.md
+    legacy.tokens.css         A legacy token file to try --from-legacy on
 ```
 
-Output: `docs/ux/` (the `ux-` category folder; the skill name `ux-design-system`
-follows the standard `<category>-<artefact>` convention). Python 3.8+, stdlib only.
+Output: `docs/ux/`. Python 3.12+ and PyYAML.

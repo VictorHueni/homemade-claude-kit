@@ -11,10 +11,14 @@ in `SKILL.md` and `parsing-contract.md`.
    to "fix" something in a view, the fix belongs in the source artefact.
 
 2. **Style is the project's, not the skill's.** Renderers emit semantic class
-   names and `var(--token)` references only — never a literal colour, font,
-   radius, or shadow. The default token sheet is deliberately neutral so a
-   project's `--design-system` sheet themes every view by overriding `:root`.
-   A renderer that hard-codes `#3b6ef5` is a bug.
+   names and reference only contract roles (`var(--accent)`, `var(--chart-1)`)
+   and renderer-owned `--kit-*` properties, never a literal colour, font,
+   radius, or shadow. The kit's base theme is deliberately neutral; the
+   project's resolved design (its `docs/ux/package.json` pin, or a
+   `--design-system` folder) themes every view. Status and pain take the
+   state roles; importance and confidence take the ordered chart scale,
+   darkest first. A renderer that hard-codes `#396cf5` is a bug, and the
+   validator refuses the view.
 
 3. **One self-contained file.** All CSS and JS are inlined. No build step at
    view-time, no network fetch, no runtime dependency. The output is shareable
@@ -49,14 +53,15 @@ own rendered output is project-specific; the skill side stays neutral.
 
 ## Re-theming recipe (most common request)
 
-A project already using `com-slide-deck` has a design system at
-`docs/communication/slides/{slug}/design/styles.css`. Pass it straight through:
+Views, decks and release notes all theme from the project design, so a view
+already matches the project's decks. To change the look, change the design
+with `ux-design-system` (`point` a published package, or edit
+`docs/ux/DESIGN.md` and run `subset`), then re-render. To preview an
+unreleased design, name its folder:
 
 ```bash
-python scripts/render.py docs/business/03a-capability-map.md \
-  --design-system docs/communication/slides/{slug}/design/styles.css
+python3 scripts/render.py docs/business/03a-capability-map.md --design-system path/to/design-system/
 ```
 
-Any `:root { --accent: …; --font-body: …; }` tokens in that sheet override the
-defaults, so the capability map, roadmap, FBS, and canvas all adopt the deck's
-look without touching the renderers.
+A single stylesheet (a deck's `styles.css`, a legacy `docs/ux/tokens.css`) is
+refused: the design is a folder with a `kit-manifest.json`.

@@ -10,18 +10,19 @@
   /* ---- Base palette ---- */
   --ink:        #1a1f29;   /* primary text */
   --muted:      #6b7280;   /* secondary text */
+  --tertiary:   var(--muted);   /* tertiary text: footers, legal lines; a design may set its own */
   --canvas-bg:  #f6f7f9;   /* page background */
   --surface:    #ffffff;   /* card / panel background */
   --surface-2:  #eef1f5;   /* recessed / group background */
   --border:     #d7dce3;   /* hairlines, dividers */
-  --accent:     #3b6ef5;   /* primary action, links, IDs */
+  --accent:     #396cf5;   /* primary action, links, IDs */
   --accent-ink: #ffffff;   /* text on accent fills */
 
   /* ---- Semantic state (generic; portable across projects + tools) ---- */
   --success: #2e9e5b;   /* positive / done / validated */
   --warning: #f0ad4e;   /* caution / in-progress / tested */
-  --danger:  #d9534f;   /* negative / error / critical */
-  --info:    #3b6ef5;   /* informational / planned / neutral-active */
+  --danger:  #d5413d;   /* negative / error / critical */
+  --info:    #396cf5;   /* informational / planned / neutral-active */
 
   /* ---- Typography ---- */
   --font-body:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-migrate.py — com-slide-deck: migrate a pre-design-system deck onto the shared
-token contract (the `ux-design-system` skill's docs/ux/tokens.css).
+migrate.py — com-slide-deck: migrate a pre-design-system deck onto the design
+contract (plugins/delivery-comms/contract/README.md).
 
-Detects legacy token names in the deck's styles.css and slide partials, maps the
-ones that changed to the generic contract, and either:
+Resolves the deck's design the way build.py does (docs/ux/package.json pin,
+paths.design_tokens folder, else the kit's base theme), reports every hard-coded
+colour in the deck's styles.css and slide partials with the closest resolved role,
+detects legacy token names, maps the ones that changed to the contract, and either:
 
     python migrate.py --config CONFIG            report only (no writes; default)
     python migrate.py --config CONFIG --apply    add a backwards-compatible alias
@@ -38,16 +40,13 @@ RENAME = {
     "--card-bg":   "--surface",
     "--font-sans": "--font-body",
 }
-# Legacy names with no contract equivalent — they stay deck-only (no action;
-# they remain defined in the deck's styles.css and keep working).
-DECK_ONLY = ["--dim", "--accent-lt", "--danger-lt", "--font-heading"]
-# Base/semantic contract tokens whose VALUES belong in the design system, not in
-# styles.css — used to advise moving the palette out.
-CONTRACT_BASE = [
-    "--ink", "--muted", "--canvas-bg", "--surface", "--surface-2", "--border",
-    "--accent", "--accent-ink", "--success", "--warning", "--danger", "--info",
-    "--font-body", "--font-heading", "--font-mono",
-]
+# Legacy deck-only names with no contract role. build.py refuses them: replace each
+# with a role (e.g. --dim -> --muted) or declare it under design.exceptions.
+DECK_ONLY = ["--dim", "--accent-lt", "--danger-lt"]
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from build import DesignError, design_exceptions, resolve_design  # noqa: E402
+import check_render  # noqa: E402  (on the path through build.py)
 
 SHIM_START = "/* >>> com-slide-deck migrate: legacy-token shim >>> */"
 SHIM_END = "/* <<< com-slide-deck migrate <<< */"
@@ -92,34 +91,21 @@ def scan(files):
     return found
 
 
-def find_tokens_css(base, cfg):
-    """Mirror build.py: configured design_tokens, else walk up to docs/ux/tokens.css."""
-    configured = cfg.get("paths", {}).get("design_tokens")
-    if configured:
-        p = resolve(base, configured)
-        return p if p.exists() else None
-    cur = base.resolve()
-    for _ in range(8):
-        cand = cur / "docs" / "ux" / "tokens.css"
-        if cand.exists():
-            return cand
-        if cur.parent == cur:
-            break
-        cur = cur.parent
-    return None
-
-
-def styles_defines_palette(styles):
-    """True if styles.css still defines base/semantic contract values (hex, not var())."""
-    if not styles.exists():
-        return []
-    text = styles.read_text(encoding="utf-8")
-    hits = []
-    for name in CONTRACT_BASE:
-        m = re.search(tok_re(name).pattern + r"\s*:\s*([^;]+);", text)
-        if m and "var(" not in m.group(1):
-            hits.append(name)
-    return hits
+def design_findings(files, design, cfg):
+    """{path: [finding]} from the shared validator, each file checked on its own against the resolved design."""
+    exceptions = design_exceptions(cfg)
+    out = {}
+    for f in files:
+        text = f.read_text(encoding="utf-8")
+        page = f"<style>\n{text}\n</style>" if f.suffix == ".css" else text
+        report = check_render.check(page, design, exceptions)
+        if report["findings"]:
+            offset = 1 if f.suffix == ".css" else 0
+            for item in report["findings"]:
+                if item.get("line"):
+                    item["line"] -= offset
+            out[str(f)] = report["findings"]
+    return out
 
 
 def rel(p, base):
@@ -131,19 +117,36 @@ def rel(p, base):
 
 # --------------------------------------------------------------------------- #
 
-def do_report(base, cfg, found, styles):
+def do_report(base, cfg, found, files):
     print("=== com-slide-deck migrate — report ===\n")
 
-    tokens_css = find_tokens_css(base, cfg)
-    if tokens_css:
-        print(f"[ok]   project design system found: {rel(tokens_css, base)}")
+    try:
+        design = resolve_design(cfg, base)
+    except DesignError as exc:
+        print(f"[todo] the deck's design is refused:\n{exc}")
+        return 2
+    ident = design.provenance["designSystem"]
+    if ident["source"] == "base":
+        print("[todo] no project design system: the deck renders on the kit's base theme.")
+        print("       pin one with  ux-design-system point   or author one with  ux-design-system subset")
     else:
-        print("[todo] no project design system (docs/ux/tokens.css) found.")
-        print("       run first:  ux-design-system scaffold   then fill + generate")
+        print(f"[ok]   design system: {ident.get('name') or ident.get('path')} {ident.get('version', '')}".rstrip())
+
+    findings = design_findings(files, design, cfg)
+    if findings:
+        print("\nValues the build will refuse (closest resolved role shown):\n")
+        for path, items in findings.items():
+            for item in items:
+                line = f":{item['line']}" if item.get("line") else ""
+                hint = f"use var({item['suggest']})" if item.get("suggest") else item["message"]
+                print(f"    {rel(path, base)}{line}  {item['value']}  {hint}")
+        print("\n       replace each with its role, or declare a deliberate value under design.exceptions")
+    else:
+        print("\n[ok]   no hard-coded colour or unknown property: the deck passes the validator.")
 
     if not found:
-        print("\n[ok]   no legacy token names detected — this deck already speaks the contract.")
-        return
+        print("\n[ok]   no legacy token names detected.")
+        return 0
     print("\nLegacy tokens detected:\n")
     renamable = {t: m for t, m in found.items() if t in RENAME}
     keepers = {t: m for t, m in found.items() if t in DECK_ONLY}
@@ -154,21 +157,15 @@ def do_report(base, cfg, found, styles):
             where = ", ".join(f"{rel(p, base)}×{c}" for p, c in m.items())
             print(f"    {t:14s} -> {RENAME[t]:14s}  [{where}]")
     if keepers:
-        print("\n  Deck-only names (no change needed — keep defining them in styles.css):")
+        print("\n  Deck-only names (no contract role: replace with a role or declare under design.exceptions):")
         for t, m in sorted(keepers.items()):
             print(f"    {t}")
 
-    palette = styles_defines_palette(styles)
-    if palette:
-        print("\n  [todo] styles.css still hard-codes base/semantic values for:")
-        print("         " + ", ".join(palette))
-        print("         move these VALUES into docs/ux/design-system.md, then "
-              "`ux-design-system generate`,")
-        print("         and delete them from styles.css so the deck inherits them.")
-
     print("\nNext:")
-    print("  --apply   add a backwards-compatible shim to styles.css (no partial edits)")
-    print("  --rename  rewrite the changed names across styles.css + partials")
+    print("  --rename  rewrite the changed names across styles.css + partials (recommended)")
+    print("  --apply   add an alias shim to styles.css; build.py accepts the aliased names only when")
+    print("            they are declared under design.exceptions")
+    return 0
 
 
 def do_apply(base, found, styles):
@@ -241,7 +238,7 @@ def main(argv=None):
     elif args.rename:
         do_rename(base, found, files)
     else:
-        do_report(base, cfg, found, styles)
+        sys.exit(do_report(base, cfg, found, files))
 
 
 if __name__ == "__main__":

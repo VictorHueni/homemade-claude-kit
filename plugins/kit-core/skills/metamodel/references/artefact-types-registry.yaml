@@ -414,7 +414,7 @@ artefact_types:
     minting_skill: ux-design-system
     id_format: null
     layout: one-per-artefact
-    default_path: "docs/ux/design-system.md"
+    default_path: "docs/ux/DESIGN.md"
     review_interval: 180d
     frontmatter_conditionals: []
     property_schema_ref: null   # TBD until clew defines property schemas
