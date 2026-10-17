@@ -6,7 +6,8 @@ exactly. A grid cell may move by CELL_TOLERANCE per channel: the fixtures use sy
 rasterise differently from one machine to the next, while a role that changes colour moves whole cells.
 
 The goldens run in the browser lane (`make test-pdf` sets DELIVERY_COMMS_GOLDENS=1) and read the PDF pages
-with pypdfium2. To capture them from a kit checkout (run with the interpreter of the test lane):
+with pypdfium2. They were captured with Playwright 1.60.0, which CI pins: a newer Chromium can change user-agent
+defaults (from 1.64 a table's border colour) and so the computed styles. To capture them from a kit checkout (run with the interpreter of the test lane):
     python3 tests/goldens.py capture <checkout>/plugins/delivery-comms/skills tests/goldens
 """
 import hashlib
