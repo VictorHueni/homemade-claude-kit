@@ -13,7 +13,20 @@ CONTRACT = PLUGIN / "contract"
 SHARED = PLUGIN / "shared"
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "design-systems"
 RENDERERS = ("com-slide-deck", "com-artefact-viz", "com-release-note")
-MODULES = ("core", "dataviz", "type", "space-shape", "document", "slide-frame", "print", "brand", "guidance")
+MODULES = ("core", "dataviz", "type", "space-shape", "document", "slide-frame", "dark", "print", "brand", "guidance")
+# the colour roles the dark module mirrors as --dark-<role>, module by module
+MIRRORED = {
+    "core": ("--ink", "--muted", "--tertiary", "--canvas-bg", "--surface", "--surface-2", "--border", "--accent",
+             "--accent-ink", "--success", "--warning", "--danger", "--info", "--shadow"),
+    "dataviz": ("--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-rest", "--chart-axis", "--chart-grid",
+                "--chart-highlight"),
+    "slide-frame": ("--slide-bg", "--slide-fg"),
+    "document": ("--doc-page-bg", "--doc-rule"),
+    "print": ("--print-bg",),
+}
+DARK_EXTRA = ("--dark-key-fill", "--dark-key-base", "--dark-key-edge", "--dark-accent-text")
+DARK_REQUIRED = {"--dark-canvas-bg", "--dark-surface", "--dark-border", "--dark-ink", "--dark-muted", "--dark-accent",
+                 "--dark-accent-ink", "--dark-slide-bg", "--dark-slide-fg"}
 
 sys.path.insert(0, str(SHARED))
 
@@ -28,9 +41,9 @@ def css_classes(css):
 
 
 class ModulesTest(unittest.TestCase):
-    def test_declares_contract_version_and_nine_modules(self):
+    def test_declares_contract_version_and_ten_modules(self):
         data = modules()
-        self.assertEqual(data["contractVersion"], "2.0.0")
+        self.assertEqual(data["contractVersion"], "2.1.0")
         self.assertEqual(tuple(data["modules"]), MODULES)
         required = {name for name, m in data["modules"].items() if m["required"]}
         self.assertEqual(required, {"core", "dataviz"})
@@ -41,6 +54,47 @@ class ModulesTest(unittest.TestCase):
             for role in m["roles"]:
                 self.assertNotIn(role, seen, f"{role} in {seen.get(role)} and {name}")
                 seen[role] = name
+
+    def test_dark_mirrors_every_colour_role(self):
+        # the mirror is generated from modules.json: every role of a mirrored module except the listed ones
+        mods = modules()["modules"]
+        dark = mods["dark"]
+        self.assertEqual(tuple(dark["mirror"]["modules"]), tuple(MIRRORED))
+        generated = [role for name in dark["mirror"]["modules"] for role in mods[name]["roles"]
+                     if role not in dark["mirror"]["except"]]
+        self.assertEqual(generated, [role for roles in MIRRORED.values() for role in roles])
+        import design_source
+        twins = {role: "--dark-" + role[2:] for role in generated}
+        self.assertEqual(design_source.dark_mirror(modules()), twins)
+        self.assertEqual(list(dark["roles"]), list(twins.values()) + list(DARK_EXTRA))
+        self.assertEqual(set(dark["requiredRoles"]), DARK_REQUIRED)
+        self.assertLessEqual(set(dark["requiredRoles"]), set(dark["roles"]))
+        self.assertEqual(set(dark["classes"]), {"dark", "dark-key", "dark-accent"})
+        self.assertFalse(dark["required"])
+
+    def test_dark_pairs_mirror_the_light_pairs(self):
+        data = modules()
+        twins = {role: "--dark-" + role[2:] for roles in MIRRORED.values() for role in roles}
+
+        def key(pair):
+            fg = tuple(pair["fg"]) if isinstance(pair["fg"], list) else (pair["fg"],)
+            return fg, pair["bg"]
+
+        expected = []
+        for pair in data["pairs"]:
+            fg, bg = key(pair)
+            if all(role in twins for role in (*fg, bg)):
+                expected.append((tuple(twins[role] for role in fg), twins[bg]))
+        self.assertEqual(len(expected), len(data["pairs"]))   # every light pair has mirrored roles today
+        expected += [(("--dark-ink",), "--dark-key-base"), (("--dark-accent-text",), "--dark-canvas-bg"),
+                     (("--dark-accent-text",), "--dark-surface")]
+        dark_pairs = data["modules"]["dark"]["pairs"]
+        self.assertEqual([key(p) for p in dark_pairs], expected)
+        roles = set(data["modules"]["dark"]["roles"])
+        for pair in dark_pairs:
+            self.assertEqual(set(pair), {"fg", "bg", "use"})
+            self.assertTrue(pair["use"].strip())
+            self.assertLessEqual({*key(pair)[0], pair["bg"]}, roles)
 
     def test_core_keeps_todays_24_roles_plus_tertiary(self):
         # the 24 roles of the old contract, plus the optional --tertiary text role added for 2.0.0
@@ -154,6 +208,9 @@ class ManifestCheckTest(unittest.TestCase):
     def test_accepts_full_and_subset(self):
         self.assertEqual(self.errors(self.fixture("full")), [])
         self.assertEqual(self.errors(self.fixture("subset")), [])
+        self.assertEqual(self.errors(self.fixture("full-dark")), [])
+        self.assertIn("dark", self.fixture("full-dark")["provides"])
+        self.assertNotIn("dark", self.fixture("full")["provides"])
 
     def test_rejects_missing_dataviz(self):
         self.assertTrue(any("dataviz" in e for e in self.errors(self.fixture("minimal-invalid"))))
@@ -163,6 +220,13 @@ class ManifestCheckTest(unittest.TestCase):
         self.assertTrue(self.errors({**base, "provides": {**base["provides"], "sparkles": "./x.css"}}))
         self.assertTrue(self.errors({**base, "contractVersion": "2.0"}))
         self.assertTrue(self.errors({**base, "colour": "red"}))
+        # a 2.0 manifest still validates under 2.1, and dark may be omitted with a reason
+        self.assertEqual(base["contractVersion"], "2.0.0")
+        self.assertEqual(self.errors(base), [])
+        self.assertEqual(self.errors({**base, "omitted": {**base["omitted"], "dark": "no dark theme"}}), [])
+        for module in MODULES:
+            self.assertEqual(self.errors({**base, "omitted": {module: "reason"}}), [], module)
+        self.assertTrue(self.errors({**base, "omitted": {"night": "reason"}}))
 
     def test_schema_uses_only_implemented_keywords(self):
         annotations = {"$schema", "$id", "title", "description"}
@@ -175,7 +239,8 @@ class ManifestCheckTest(unittest.TestCase):
             if isinstance(node.get("additionalProperties"), dict):
                 walk(node["additionalProperties"])
         walk(self.schema)
-        self.assertIn("2.0.0", self.schema["$id"])
+        self.assertIn("2.1.0", self.schema["$id"])
+        self.assertIn("contract 2.1.0", self.schema["title"])
 
     def test_schema_id_has_no_fragment(self):
         # JSON Schema 2020-12 forbids a non-empty fragment in $id, and ajv refuses the schema with one
@@ -191,6 +256,19 @@ class BaseThemeTest(unittest.TestCase):
             css = (base / f"{name}.css").read_text(encoding="utf-8")
             for role in m["roles"]:
                 self.assertRegex(css, re.escape(role) + r"\s*:", f"{name}.css lacks {role}")
+        # dark: literals on :root only (an alias to a light role would make the remap a cycle), pairs at AA
+        import design_source
+        css = re.sub(r"/\*.*?\*/", "", (base / "dark.css").read_text(encoding="utf-8"), flags=re.S)
+        self.assertEqual([s.strip() for s in re.findall(r"([^{}]+)\{", css)], [":root"])
+        self.assertNotIn("var(", css)
+        dark = modules()["modules"]["dark"]
+        self.assertEqual(set(design_source.role_values(css)), set(dark["roles"]))
+        values = design_source.role_values(css)
+        for pair in dark["pairs"]:
+            with self.subTest(pair=pair["use"]):
+                tried = design_source.pair_ratios(values, pair)
+                self.assertIsNotNone(tried, "every role of a dark pair is a hex colour in the base")
+                self.assertTrue(any(ratio >= 4.5 for _, ratio in tried), tried)
 
     def test_core_has_heading_font_and_no_legacy_alias(self):
         css = (SHARED / "base/core.css").read_text(encoding="utf-8")

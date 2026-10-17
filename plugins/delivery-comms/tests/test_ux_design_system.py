@@ -40,6 +40,7 @@ SPACING = {"space-sm": "0.5rem", "space-md": "1rem", "space-lg": "2rem", "shell-
 CHARTS = {"chart-1": "#1d2939", "chart-2": "#0e7090", "chart-3": "#6ab2c9", "chart-4": "#b7dbe6",
           "chart-rest": "#98a2b3", "chart-axis": "#475467", "chart-grid": "#eaecf0", "chart-highlight": "#b54708"}
 KIT = {"shadow": "none", "omitted": {"brand": "no logo yet", "print": "no printed reports"}}
+DARK_REASON = "DESIGN.md has no dark roles in 2.1"
 PROSE = "\n# Small project design\n\n## Overview\n\nCalm and plain.\n\n## Do's and Don'ts\n\n- Do keep red for errors.\n"
 
 # Google DESIGN.md (github.com/google-labs-code/design.md, docs/spec.md): the top-level schema keys and the
@@ -174,7 +175,8 @@ class SubsetTest(UxCase):
         manifest = json.loads((out / "kit-manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["contractVersion"], CONTRACT["contractVersion"])
         self.assertEqual(set(manifest["provides"]), {"core", "dataviz", "guidance"})
-        self.assertEqual(manifest["omitted"], {"brand": "no logo yet", "print": "no printed reports"})
+        self.assertEqual(manifest["omitted"], {"brand": "no logo yet", "dark": DARK_REASON,
+                                               "print": "no printed reports"})
         for module in ("core", "dataviz"):
             css = (out / f"{module}.css").read_text(encoding="utf-8")
             for role in CONTRACT["modules"][module]["roles"]:
@@ -190,6 +192,18 @@ class SubsetTest(UxCase):
         self.assertEqual(values["--font-body"], "Georgia, serif")          # typography.body.fontFamily
         self.assertEqual(values["--title-size"], "1.8rem")                 # typography.heading.fontSize
         self.assertEqual(values["--shadow"], "none")                       # kit.shadow
+
+    def test_dark_is_left_to_the_base_and_says_why(self):
+        self.write(front())
+        result = self.subset()
+        out = self.ux / "design-system"
+        manifest = json.loads((out / "kit-manifest.json").read_text(encoding="utf-8"))
+        self.assertNotIn("dark", manifest["provides"])
+        self.assertEqual(manifest["omitted"]["dark"], DARK_REASON)
+        self.assertFalse((out / "dark.css").exists())
+        self.assertNotIn("dark", result.stdout.split("note:", 1)[1] if "note:" in result.stdout else "")
+        design = design_source.resolve(self.project, explicit=out)
+        self.assertEqual(design.provenance["modules"]["dark"], "base")
 
     def test_print_breaking_is_neither_required_nor_drafted(self):
         # --print-breaking is optional (the base theme sets it to var(--danger)), like --tertiary
@@ -620,6 +634,23 @@ class PointTest(UxCase):
         self.assertFalse((self.project / ".github").exists())     # printed, not written
         design = design_source.resolve(self.project)
         self.assertEqual(design.provenance["designSystem"]["source"], "registry")
+
+    def test_a_design_providing_dark_is_pinned_and_its_dark_pairs_checked(self):
+        self.publish("full-dark", "@acme-test/design-system-dark")
+        result = self.ds("point", "@acme-test/design-system-dark@1.2.3")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("dark", result.stdout.split("the design provides", 1)[1].splitlines()[0])
+        self.assertEqual(design_source.resolve(self.project).provenance["modules"]["dark"], "design-system")
+        (self.ux / "package.json").unlink()
+        folder = self.project / "dark-preview"
+        shutil.copytree(DESIGNS / "full-dark", folder)
+        css = folder / "css/dark.css"
+        css.write_text(css.read_text(encoding="utf-8").replace("--dark-muted: #9fb7b5", "--dark-muted: #2c4441"),
+                       encoding="utf-8")
+        result = self.ds("point", "dark-preview")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("--dark-muted on --dark-surface", result.stderr)
+        self.assertFalse((self.ux / "package.json").exists())
 
     def test_an_unscoped_name_works(self):
         self.publish("subset", "acme-design")

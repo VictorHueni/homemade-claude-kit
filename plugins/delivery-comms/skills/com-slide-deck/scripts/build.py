@@ -444,10 +444,11 @@ def build(config_path: Path, output_override: str = None):
         baseline_js  = make_baseline_js(canvas_w)
 
     # Styles, in cascade order:
-    #   1. the resolved design (fonts, then every module, base first and the design
-    #      system after it), marked data-design-layer: the only place literals may live
+    #   1. the resolved design (fonts, then every module but `dark`, which no slide uses yet,
+    #      base first and the design system after it), marked data-design-layer: the only
+    #      place literals may live
     #   2. the deck's own styles.css (components, roles only) and the baseline CSS
-    design_layer = "\n".join(design.fonts + [c for c in design.css.values() if c])
+    design_layer = "\n".join(design.fonts + [c for m, c in design.css.items() if c and m != "dark"])
     parts.append("<style data-design-layer>\n" + design_layer + "\n</style>")
     css = read_file(styles_path)
     layers = [c for c in (css, baseline_css) if c]

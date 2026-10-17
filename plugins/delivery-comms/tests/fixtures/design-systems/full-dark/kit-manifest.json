@@ -1,0 +1,15 @@
+{
+  "contractVersion": "2.1.0",
+  "provides": {
+    "core": "./core.css",
+    "dataviz": "./dataviz.css",
+    "type": "./css/type.css",
+    "space-shape": "./css/space-shape.css",
+    "document": "./css/document.css",
+    "slide-frame": "./css/slide-frame.css",
+    "dark": "./css/dark.css",
+    "print": "./css/print.css",
+    "brand": "./css/brand.css",
+    "guidance": "./guidance/README.md"
+  }
+}

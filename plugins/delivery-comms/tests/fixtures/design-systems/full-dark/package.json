@@ -1,0 +1,12 @@
+{
+  "name": "@acme-test/design-system-dark",
+  "version": "1.0.0",
+  "exports": {
+    "./core.css": "./css/core.css",
+    "./dataviz.css": "./css/dataviz.css",
+    "./css/*": "./css/*",
+    "./brand/*": "./brand/*",
+    "./guidance/*": "./guidance/*",
+    "./fonts/*": "./fonts/*"
+  }
+}
