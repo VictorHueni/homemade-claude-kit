@@ -98,3 +98,13 @@ One entry per increment: red run (failing test names), green run, gates, owner a
 - Next: owner merges; then the orchestrator runs scope item 2 and the exit criterion (2.1.0 in the cache rendering the fixtures against full-dark, full, subset and a 2.0 design, each passing check_render.py) and marks Inc 05 and the plan done.
 - Commit: the commit carrying `Refs: Plan-0006 increment 05`
 - Timestamp: 2026-10-17
+
+## Increment 05 release (2026-10-17): merge, cache, exit criterion
+
+- PR #158 (`chore(delivery-comms): release 2.1.0`), CI test, test-pdf and test-design-md green, squash-merged at the owner's word (43c4763).
+- Cache: `claude plugin marketplace update homemade-claude-kit` then `claude plugin update delivery-comms@homemade-claude-kit`: "updated from 2.0.0 to 2.1.0"; the cache lists 2.1.0, and `diff -rq` against `plugins/delivery-comms` shows only the runtime `.in_use` marker and the local `var/`.
+- Exit criterion: with the cached 2.1.0 scripts (standalone Python), the `dark-slides` fixture deck and the `dark-document` fixture, each given `classification: Confidential` and `lang: fr`, built (build.py), checked (check_render.py) and printed (render.py) with exit 0 against `full-dark` (contract 2.1.0), `full` and `subset` (both contract 2.0.0 manifests, so they are the 2.0 design case): 18 runs, all 0.
+- Read back from the PDFs (pypdfium2): every slide page and every document page carries "CONFIDENTIEL"; slide 2 and every document page print dark (top-left pixel `(12, 23, 22)` on full-dark, `(17, 20, 24)` from the base dark theme on full and subset); slides 1 and 3 stay light. Provenance on subset: `dark` from the base.
+- Paid skill evals (`make skill-evals`, including the new `deck-dark-palette` case) were not run; optional, owner-approved.
+- Next, outside this plan: MedQuantis Plan-0003 (design system 1.2.0) provides the first real `dark` module, vendoring contract 2.1.0 from this release.
+- Timestamp: 2026-10-17
