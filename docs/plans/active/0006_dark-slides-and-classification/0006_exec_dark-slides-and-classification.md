@@ -46,7 +46,7 @@ Principles:
 | D-4 | Where does the remap live? | In `build.py`'s own kit layer (review C-1, option a): `make_baseline_css` emits `.slide.dark, .doc.dark { --x: var(--dark-x); ... }` for every mirrored role, the `--kit-on-*` fill-text choices recomputed against the dark roles, the logo on dark, and the `dark-key` and `dark-accent` rules, in role names only. The `dark` module's CSS is inlined only when some slide or the deck is dark. |
 | D-5 | Classification values | A closed list: `Public`, `Internal`, `Confidential`, `Strictly confidential`; any other value exits 2 naming the four; absent prints nothing. Described as a common four-level scheme; GDPR Art. 9 and nFADP Art. 5 lit. c are cited only for "sensitive personal data" (Strictly confidential). |
 | D-6 | Where and in which language | At the right of the footer row, just before the slide number (owner, 2026-10-15), and in the running footer of every `mode: document` page; label in the deck's `lang:` (owner, 2026-10-15): en, fr, de and it built in (fr: Public, Interne, Confidentiel, Strictement confidentiel); another language falls back to English with a warning. Views and release-note reports are out of scope. |
-| D-7 | Q-19's codes C0 to C3 | Not printed: the footer shows the label only. Agent default, open question O-1. |
+| D-7 | Q-19's codes C0 to C3 | Not printed: the footer shows the label only. Owner, 2026-10-17 (O-1). |
 | D-8 | Branching | Increments open PRs into `main`; the 2.1.0 version bump is the last increment and merges at the owner's request. A design's plan vendors the contract from that release merge, never from Inc 01's (L-4). |
 
 ## Increment Plan
@@ -209,12 +209,12 @@ Exit criteria:
 | N-5 exit-code path | `DesignError` from `classification.py` |
 | L-1 unnamed tests | Named in Inc 03 and 04 |
 | L-2 eval wording, logo on dark | Inc 04 says structural only; Inc 02 logo rule |
-| L-3 sourcing, codes, language | D-5 wording; D-6 language (owner); D-7 codes (O-1) |
+| L-3 sourcing, codes, language | D-5 wording; D-6 language (owner); D-7 codes (owner, O-1) |
 | L-4 vendoring commit | D-8 |
 
 ## Open questions
 
-1. **O-1 (owner):** should the footer show Q-19's codes C0 to C3 next to the label? Default: label only.
+None. O-1 (codes C0 to C3 next to the label) was resolved by the owner on 2026-10-17: the footer shows the label only (D-7).
 
 ## Delivery Rules
 

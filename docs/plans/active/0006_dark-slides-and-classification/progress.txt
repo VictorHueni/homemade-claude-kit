@@ -15,3 +15,4 @@ One entry per increment: red run (failing test names), green run, gates, owner a
 - The dark module is now a mechanical mirror (--dark-<role> for every colour role of core, dataviz, slide-frame, document and print, plus key-fill, key-base, key-edge, accent-text); the remap moves into build.py's own layer (review C-1, option a); dark extends to whole decks and documents (theme: dark).
 - Owner rulings applied: no glow (--dark-glow becomes --dark-key-edge), classification at the right before the number, label in the deck's lang. Open: O-1, the C0 to C3 codes.
 - The peer review of 2026-10-15 (var/reports/0006-dark-slides-and-classification-peer-review.md) is answered finding by finding in the plan's "Review findings" table.
+- 2026-10-17: owner resolved O-1, the footer shows the classification label only, no C0 to C3 code (D-7).
