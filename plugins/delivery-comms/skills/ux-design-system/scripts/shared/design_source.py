@@ -71,6 +71,13 @@ def _contract():
     return json.loads(_contract_file("modules.json").read_text(encoding="utf-8"))
 
 
+def dark_mirror(contract):
+    """{light role: its --dark- twin} for every role of the modules the `dark` module mirrors, in contract order."""
+    mirror = contract["modules"]["dark"]["mirror"]
+    return {role: "--dark-" + role[2:] for module in mirror["modules"]
+            for role in contract["modules"][module]["roles"] if role not in mirror["except"]}
+
+
 def _legacy_message(path):
     return (f"{path} is a legacy token file (core only) and is no longer read. Move to a design system with one of:\n"
             "  ux-design-system point               pin a published design-system package in docs/ux/package.json\n"
@@ -332,6 +339,7 @@ def _load_package(root):
     if not manifest_path.is_file():
         raise DesignError(f"{root} has no kit-manifest.json; it is not a delivery-comms design system")
     manifest = _read_json(manifest_path, "manifest")
+    _refuse_newer_minor(manifest.get("contractVersion"))
     schema = _read_json(_contract_file("kit-manifest.schema.json"), "schema")
     errors = manifest_check.check(manifest, schema)
     if errors:
@@ -341,6 +349,33 @@ def _load_package(root):
         raise DesignError(f"kit-manifest.json targets contract {manifest['contractVersion']}; this kit reads {major}.x")
     package = _read_json(root / "package.json", "package.json") if (root / "package.json").is_file() else {}
     return manifest, package
+
+
+def _refuse_newer_minor(version):
+    """Refuse a manifest of this major at a newer minor before the schema check, whose error would name a module
+    or key this kit does not know instead of the kit version to install."""
+    match = re.match(r"(\d+)\.(\d+)\.\d+", version) if isinstance(version, str) else None
+    major, minor = (int(part) for part in _contract()["contractVersion"].split(".")[:2])
+    if match and int(match.group(1)) == major and int(match.group(2)) > minor:
+        raise DesignError(f"this design targets contract {version}; update delivery-comms to "
+                          f"{match.group(1)}.{match.group(2)}.0 or later")
+
+
+_RULE = re.compile(r"([^{}]*)\{([^{}]*)\}")
+_COMMENT = re.compile(r"/\*.*?\*/", re.S)
+
+
+def _refuse_scoped_roles(css, module, roles):
+    """Refuse a contract role declared under any selector but :root: role_values reads every declaration as the
+    design's own value, so a scoped one would replace the role for the whole render."""
+    for selector, body in _RULE.findall(_COMMENT.sub("", css)):
+        selector = selector.strip()
+        if selector == ":root":
+            continue
+        scoped = [role for role in re.findall(r"(--[\w-]+)\s*:", body) if role in roles]
+        if scoped:
+            raise DesignError(f"the {module} module declares {', '.join(scoped)} under `{selector}`; module CSS "
+                              "declares roles on :root only (a dark slide's roles come from the dark module)")
 
 
 def resolve(start_dir, explicit=None):
@@ -376,6 +411,7 @@ def resolve(start_dir, explicit=None):
         identity.setdefault("version", package.get("version", ""))
 
     css, fonts, sources, guidance = {}, [], {}, {"informational": True, "export": None}
+    roles = {role for spec in contract["modules"].values() for role in spec["roles"]}
     raw_brand = role_values(_base_css("brand"))
     for module in modules:
         provided = manifest.get("provides", {}).get(module)
@@ -390,6 +426,11 @@ def resolve(start_dir, explicit=None):
         if provided:
             module_file = _export_path(root, exports, provided)
             own, faces = _split_faces(module_file.read_text(encoding="utf-8"), module_file, root)
+            _refuse_scoped_roles(own, module, roles)
+            if module == "dark":
+                missing = [r for r in contract["modules"]["dark"]["requiredRoles"] if r not in role_values(own)]
+                if missing:
+                    raise DesignError(f"the dark module lacks the required role(s) {', '.join(missing)}")
             if module == "brand":
                 raw_brand = role_values(text + own)
                 own = _inline_brand(own, root, exports)
@@ -398,7 +439,7 @@ def resolve(start_dir, explicit=None):
         css[module] = text
 
     assembled = "".join(css.values())
-    bad = failing_pairs(assembled, contract["pairs"])
+    bad = failing_pairs(assembled, contract["pairs"] + contract["modules"]["dark"]["pairs"])
     if bad:
         lines = ["  " + describe_failure(*failure) for failure in bad]
         raise DesignError("the design's own text pairs fail WCAG AA:\n" + "\n".join(lines))

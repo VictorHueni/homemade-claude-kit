@@ -1,5 +1,5 @@
 {
-  "contractVersion": "2.0.0",
+  "contractVersion": "2.1.0",
   "modules": {
     "core": {
       "required": true,
@@ -103,6 +103,198 @@
         "slide-logo",
         "slide-legal",
         "slide-number"
+      ]
+    },
+    "dark": {
+      "required": false,
+      "mirror": {
+        "modules": [
+          "core",
+          "dataviz",
+          "slide-frame",
+          "document",
+          "print"
+        ],
+        "except": [
+          "--font-body",
+          "--font-heading",
+          "--font-mono",
+          "--title-size",
+          "--space-sm",
+          "--space-md",
+          "--space-lg",
+          "--shell-max",
+          "--card-radius",
+          "--btn-radius",
+          "--node-radius",
+          "--slide-padding",
+          "--slide-width",
+          "--slide-height",
+          "--doc-text-size",
+          "--print-margin",
+          "--print-page-size",
+          "--print-breaking"
+        ]
+      },
+      "requiredRoles": [
+        "--dark-canvas-bg",
+        "--dark-surface",
+        "--dark-border",
+        "--dark-ink",
+        "--dark-muted",
+        "--dark-accent",
+        "--dark-accent-ink",
+        "--dark-slide-bg",
+        "--dark-slide-fg"
+      ],
+      "roles": {
+        "--dark-ink": "On dark: primary text",
+        "--dark-muted": "On dark: secondary text",
+        "--dark-tertiary": "On dark: tertiary text, such as slide footers, legal lines, slide numbers, source lines",
+        "--dark-canvas-bg": "On dark: page background",
+        "--dark-surface": "On dark: card or panel background",
+        "--dark-surface-2": "On dark: recessed or group background",
+        "--dark-border": "On dark: hairlines and dividers",
+        "--dark-accent": "On dark: primary action, links, IDs",
+        "--dark-accent-ink": "On dark: text on accent fills",
+        "--dark-success": "On dark: positive, done, validated",
+        "--dark-warning": "On dark: caution, in progress, tested",
+        "--dark-danger": "On dark: negative, error, critical",
+        "--dark-info": "On dark: informational, planned, neutral-active",
+        "--dark-shadow": "On dark: card elevation",
+        "--dark-chart-1": "On dark: first series",
+        "--dark-chart-2": "On dark: second series",
+        "--dark-chart-3": "On dark: third series",
+        "--dark-chart-4": "On dark: fourth series",
+        "--dark-chart-rest": "On dark: every series past the fourth",
+        "--dark-chart-axis": "On dark: axis and baseline",
+        "--dark-chart-grid": "On dark: gridlines",
+        "--dark-chart-highlight": "On dark: highlighted mark",
+        "--dark-slide-bg": "On dark: slide background",
+        "--dark-slide-fg": "On dark: slide text colour",
+        "--dark-doc-page-bg": "On dark: paper sheet background",
+        "--dark-doc-rule": "On dark: rule between document sections",
+        "--dark-print-bg": "On dark: printed page background",
+        "--dark-key-fill": "Fill of the key element of a dark slide: a colour or a gradient",
+        "--dark-key-base": "Solid colour no lighter than the key fill's lightest point: the background of the key element's text pair",
+        "--dark-key-edge": "Outline of the key element of a dark slide, a box-shadow value",
+        "--dark-accent-text": "Highlighted text on dark"
+      },
+      "classes": [
+        "dark",
+        "dark-key",
+        "dark-accent"
+      ],
+      "pairs": [
+        {
+          "fg": "--dark-ink",
+          "bg": "--dark-canvas-bg",
+          "use": "On dark: body text on the page"
+        },
+        {
+          "fg": "--dark-ink",
+          "bg": "--dark-surface",
+          "use": "On dark: body text on cards"
+        },
+        {
+          "fg": "--dark-tertiary",
+          "bg": "--dark-canvas-bg",
+          "use": "On dark: footers, legal lines and slide numbers on the page"
+        },
+        {
+          "fg": "--dark-muted",
+          "bg": "--dark-surface",
+          "use": "On dark: secondary text on cards"
+        },
+        {
+          "fg": "--dark-accent-ink",
+          "bg": "--dark-accent",
+          "use": "On dark: text on accent fills"
+        },
+        {
+          "fg": "--dark-accent",
+          "bg": "--dark-surface",
+          "use": "On dark: links and IDs on cards"
+        },
+        {
+          "fg": [
+            "--dark-accent-ink",
+            "--dark-ink"
+          ],
+          "bg": "--dark-success",
+          "use": "On dark: text on a success fill (shipped badge)"
+        },
+        {
+          "fg": [
+            "--dark-accent-ink",
+            "--dark-ink"
+          ],
+          "bg": "--dark-info",
+          "use": "On dark: text on an info fill (planned badge)"
+        },
+        {
+          "fg": [
+            "--dark-accent-ink",
+            "--dark-ink"
+          ],
+          "bg": "--dark-warning",
+          "use": "On dark: text on a warning fill (high-pain badge)"
+        },
+        {
+          "fg": [
+            "--dark-accent-ink",
+            "--dark-ink"
+          ],
+          "bg": "--dark-danger",
+          "use": "On dark: text on a danger fill"
+        },
+        {
+          "fg": [
+            "--dark-accent-ink",
+            "--dark-ink"
+          ],
+          "bg": "--dark-muted",
+          "use": "On dark: text on a muted fill (backlog badge)"
+        },
+        {
+          "fg": [
+            "--dark-accent-ink",
+            "--dark-ink"
+          ],
+          "bg": "--dark-chart-1",
+          "use": "On dark: text on the first chart step (differentiator, validated)"
+        },
+        {
+          "fg": [
+            "--dark-accent-ink",
+            "--dark-ink"
+          ],
+          "bg": "--dark-chart-2",
+          "use": "On dark: text on the second chart step (necessary, tested)"
+        },
+        {
+          "fg": [
+            "--dark-accent-ink",
+            "--dark-ink"
+          ],
+          "bg": "--dark-chart-3",
+          "use": "On dark: text on the third chart step (commodity, assumed)"
+        },
+        {
+          "fg": "--dark-ink",
+          "bg": "--dark-key-base",
+          "use": "Text on the key element of a dark slide"
+        },
+        {
+          "fg": "--dark-accent-text",
+          "bg": "--dark-canvas-bg",
+          "use": "Highlighted text on a dark page"
+        },
+        {
+          "fg": "--dark-accent-text",
+          "bg": "--dark-surface",
+          "use": "Highlighted text on a dark card"
+        }
       ]
     },
     "print": {

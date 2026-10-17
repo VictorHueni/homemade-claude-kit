@@ -138,7 +138,7 @@ class ResolutionOrderTest(ResolverCase):
         prov = design.provenance
         self.assertEqual(prov["designSystem"]["source"], "base")
         self.assertTrue(all(src == "base" for src in prov["modules"].values()))
-        self.assertEqual(len(prov["modules"]), 9)
+        self.assertEqual(len(prov["modules"]), 10)
 
     def test_local_folder_pin_needs_no_network(self):
         shutil.copytree(FIXTURES / "full", self.tmp / "design-system")
@@ -349,6 +349,77 @@ class ManifestTest(ResolverCase):
         contract = design_source._contract()
         css = "".join(design_source._base_css(module) for module in contract["modules"])
         self.assertEqual(design_source.failing_pairs(css, contract["pairs"]), [])
+        self.assertEqual(design_source.failing_pairs(css, contract["modules"]["dark"]["pairs"]), [])
+
+    def test_a_newer_minor_contract_is_refused_naming_the_kit_to_install(self):
+        # checked before the schema: a 2.2 manifest may name a module this kit does not know
+        def mutate(folder):
+            path = folder / "kit-manifest.json"
+            data = json.loads(path.read_text())
+            data["contractVersion"] = "2.2.0"
+            data["provides"]["sparkles"] = "./css/core.css"
+            path.write_text(json.dumps(data))
+        resolve = self.resolve_copy("full", mutate)
+        with self.assertRaises(design_source.DesignError) as cm:
+            resolve()
+        self.assertEqual(cm.exception.code, 2)
+        self.assertIn("this design targets contract 2.2.0; update delivery-comms to 2.2.0 or later", str(cm.exception))
+        proc = subprocess.run([sys.executable, "-I", str(SHARED / "design_source.py"), "provenance", "--design-system",
+                               str(self.tmp / "ds")], capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("update delivery-comms to 2.2.0 or later", proc.stderr)
+
+    def test_a_2_0_manifest_still_resolves(self):
+        for fixture in ("full", "subset"):
+            with self.subTest(fixture=fixture):
+                self.assertTrue(json.loads((FIXTURES / fixture / "kit-manifest.json").read_text())
+                                ["contractVersion"].startswith("2.0."))
+                design = design_source.resolve(self.project, explicit=FIXTURES / fixture)
+                self.assertEqual(design.provenance["modules"]["dark"], "base")
+
+    def test_a_selector_scoped_role_declaration_is_refused(self):
+        # module CSS declares roles on :root only; a scoped remap would corrupt every role read of the design
+        for module, rule in (("slide-frame", ".slide.dark { --slide-bg: #000000; }"),
+                             ("core", "body .card { --ink: #222222; }")):
+            with self.subTest(module=module):
+                def mutate(folder, module=module, rule=rule):
+                    css = folder / "css" / f"{module}.css"
+                    css.write_text(css.read_text() + rule + "\n")
+                shutil.rmtree(self.tmp / "ds", ignore_errors=True)
+                with self.assertRaises(design_source.DesignError) as cm:
+                    self.resolve_copy("full", mutate)()
+                message = str(cm.exception)
+                self.assertIn(":root", message)
+                self.assertIn(rule.split(" {")[0], message)
+                self.assertIn(rule.split("{ ")[1].split(":")[0], message)
+
+    def test_full_dark_resolves_dark_from_the_design(self):
+        design = design_source.resolve(self.project, explicit=FIXTURES / "full-dark")
+        self.assertEqual(design.provenance["modules"]["dark"], "design-system")
+        values = design_source.role_values(design.css["dark"])
+        self.assertEqual(values["--dark-canvas-bg"], "#0c1716")
+        self.assertEqual(values["--dark-key-edge"], "0 0 0 1px #2f6b64")
+        for fixture in ("full", "subset"):
+            with self.subTest(fixture=fixture):
+                design = design_source.resolve(self.project, explicit=FIXTURES / fixture)
+                self.assertEqual(design.provenance["modules"]["dark"], "base")
+                self.assertEqual(design.css["dark"], design_source._base_css("dark"))
+
+    def test_a_dark_module_missing_a_required_role_is_refused(self):
+        def mutate(folder):
+            css = folder / "css" / "dark.css"
+            css.write_text(re.sub(r"--dark-slide-fg:\s*#[0-9a-f]+;", "", css.read_text()))
+        with self.assertRaises(design_source.DesignError) as cm:
+            self.resolve_copy("full-dark", mutate)()
+        self.assertIn("--dark-slide-fg", str(cm.exception))
+
+    def test_a_failing_dark_pair_is_refused_at_resolve_time(self):
+        def mutate(folder):
+            css = folder / "css" / "dark.css"
+            css.write_text(css.read_text().replace("--dark-muted: #9fb7b5", "--dark-muted: #2c4441"))
+        with self.assertRaises(design_source.DesignError) as cm:
+            self.resolve_copy("full-dark", mutate)()
+        self.assertIn("--dark-muted on --dark-surface", str(cm.exception))
 
 
 KIT_ON = re.compile(r"(--kit-on-[\w-]+)\s*:\s*var\((--[\w-]+)\)")
@@ -435,7 +506,7 @@ class AssemblyTest(ResolverCase):
         mods = design.provenance["modules"]
         self.assertEqual(mods["core"], "design-system")
         self.assertEqual(mods["dataviz"], "design-system")
-        for name in ("type", "brand", "print", "document", "slide-frame", "space-shape", "guidance"):
+        for name in ("type", "brand", "print", "document", "slide-frame", "dark", "space-shape", "guidance"):
             self.assertEqual(mods[name], "base")
         self.assertIn("--font-size-md", design.css["type"])
 

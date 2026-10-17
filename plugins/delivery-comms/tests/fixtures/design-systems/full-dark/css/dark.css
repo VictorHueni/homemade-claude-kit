@@ -1,0 +1,11 @@
+:root {
+  --dark-ink: #e4f1f0; --dark-muted: #9fb7b5; --dark-tertiary: #8fa9a7; --dark-canvas-bg: #0c1716; --dark-surface: #13211f;
+  --dark-surface-2: #1a2b29; --dark-border: #2c4441; --dark-accent: #4fd1c5; --dark-accent-ink: #06100f;
+  --dark-success: #5fd39a; --dark-warning: #f5b75c; --dark-danger: #ff8a80; --dark-info: #6cc4ff; --dark-shadow: none;
+  --dark-chart-1: #9ee8e0; --dark-chart-2: #4fd1c5; --dark-chart-3: #2aa69b; --dark-chart-4: #1d6f68;
+  --dark-chart-rest: #5d7573; --dark-chart-axis: #9fb7b5; --dark-chart-grid: #1f3230; --dark-chart-highlight: #f5b75c;
+  --dark-slide-bg: #0c1716; --dark-slide-fg: #e4f1f0; --dark-doc-page-bg: #0c1716; --dark-doc-rule: #2c4441;
+  --dark-print-bg: #0c1716;
+  --dark-key-fill: linear-gradient(135deg, #173a36, #1f4a45); --dark-key-base: #173a36;
+  --dark-key-edge: 0 0 0 1px #2f6b64; --dark-accent-text: #8be9df;
+}

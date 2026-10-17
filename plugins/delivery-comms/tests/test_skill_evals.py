@@ -161,7 +161,9 @@ class ScaffoldTest(unittest.TestCase):
             with self.subTest(case=case):
                 design = design_source.resolve(self.staged(case))
                 self.assertEqual(design.provenance["designSystem"]["name"], FICTITIOUS_DESIGN)
-                self.assertEqual(set(design.provenance["modules"].values()), {"design-system"})
+                modules = dict(design.provenance["modules"])
+                self.assertEqual(modules.pop("dark"), "base")    # the full design has no dark module
+                self.assertEqual(set(modules.values()), {"design-system"})
 
     def test_the_legacy_project_is_refused(self):
         cwd = self.staged("legacy-tokens")
