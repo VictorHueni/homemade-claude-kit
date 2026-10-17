@@ -1,0 +1,22 @@
+title: "Fixture deck"
+author: "Fixture Author"
+date_label: ""
+lang: "en"
+mode: slides
+external_scripts: []
+slides:
+  - file: "01-cover.html"
+    label: "Cover"
+  - file: "02-cards.html"
+    label: "Cards"
+  - file: "03-chart.html"
+    label: "Chart"
+paths:
+  slides_dir:      "slides"
+  styles_file:     "design/styles.css"
+  script_file:     "design/script.js"
+  output_dir:      "output"
+  output_filename: "deck.html"
+numbering:
+  enabled: true
+  format: "{current} / {total}"

@@ -1,0 +1,18 @@
+title: "Fixture dark document"
+author: "Fixture Author"
+date_label: ""
+lang: "en"
+mode: document
+theme: dark
+external_scripts: []
+pages:
+  - file: "01-intro.html"
+    label: "Intro"
+  - file: "02-table.html"
+    label: "Table"
+paths:
+  slides_dir:      "../document/pages"
+  styles_file:     "../document/design/styles.css"
+  script_file:     "../document/design/script.js"
+  output_dir:      "output"
+  output_filename: "document.html"

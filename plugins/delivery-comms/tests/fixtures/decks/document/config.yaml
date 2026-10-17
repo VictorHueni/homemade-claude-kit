@@ -1,0 +1,17 @@
+title: "Fixture document"
+author: "Fixture Author"
+date_label: ""
+lang: "en"
+mode: document
+external_scripts: []
+pages:
+  - file: "01-intro.html"
+    label: "Intro"
+  - file: "02-table.html"
+    label: "Table"
+paths:
+  slides_dir:      "pages"
+  styles_file:     "design/styles.css"
+  script_file:     "design/script.js"
+  output_dir:      "output"
+  output_filename: "document.html"

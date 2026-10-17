@@ -285,6 +285,61 @@ def slide_footer(design, number: str) -> str:
     return f'<div class="slide-footer">{"".join(cells)}</div>' if cells else ""
 
 
+THEMES = ("light", "dark")
+# A partial's root tag (after any leading comments) and its class attribute.
+ROOT_CLASS = re.compile(r'^(\s*(?:<!--.*?-->\s*)*<(?:div|section|article)\b[^>]*?\bclass=")([^"]*)(")', re.S)
+
+
+def deck_theme(cfg: dict) -> str:
+    """config.yaml `theme:`, light when absent; `dark` marks every slide, or every page of a document, dark."""
+    theme = str(cfg.get("theme") or "light").strip().lower()
+    if theme not in THEMES:
+        raise DesignError(f"config.yaml theme: {cfg.get('theme')!r} is not a theme; use light or dark")
+    return theme
+
+
+def is_dark(partial: str) -> bool:
+    """True when the partial's root element carries the `dark` class."""
+    m = ROOT_CLASS.match(partial)
+    return bool(m) and "dark" in m.group(2).split()
+
+
+def mark_dark(partial: str) -> str:
+    """The partial with `dark` added to its root element's classes."""
+    if is_dark(partial):
+        return partial
+    return ROOT_CLASS.sub(lambda m: m.group(1) + f"{m.group(2)} dark".strip() + m.group(3), partial, count=1)
+
+
+def make_dark_css(design, document: bool = False) -> str:
+    """The kit's dark layer, emitted only when a slide or the deck is dark. Inside `.slide.dark` and `.doc.dark`
+    every role the dark module mirrors reads its --dark- twin, and each --kit-on-<fill> is chosen again against
+    the dark pairs (a custom property inherits its value computed on :root, so the light choice would stay).
+    `document` adds the dark page: the screen around the sheet and the printed page background."""
+    contract = design_source._contract()
+    mirror = design_source.dark_mirror(contract)
+    light = {twin: role for role, twin in mirror.items()}
+    chosen = design_source.fill_text("".join(design.css.values()), contract["modules"]["dark"]["pairs"])
+    remap = [f"  {role}: var({twin});" for role, twin in mirror.items()]
+    remap += [f"  {design_source.kit_on(light[fill])}: var({text});" for fill, text in chosen.items() if fill in light]
+    css = ("/* ── Kit: dark slides and pages, every mirrored role read from its dark twin ── */\n"
+           ".slide.dark, .doc.dark {\n" + "\n".join(remap) + "\n}\n"
+           ".slide.dark .slide-logo { background-image: var(--brand-logo-on-dark); }\n"
+           ".dark .dark-key { background: var(--dark-key-fill); box-shadow: var(--dark-key-edge); "
+           "color: var(--dark-ink); }\n"
+           ".dark .dark-accent { color: var(--dark-accent-text); }\n")
+    if document:
+        # Chromium paints a PDF page's margins, where the running header and footer sit, from @page only
+        css += (".doc.dark { color: var(--ink); }\n"
+                "html, body { background: var(--dark-canvas-bg); }\n"
+                "@page { background: var(--dark-print-bg); }\n"
+                "@media print {\n"
+                "  html, body { background: var(--dark-print-bg); }\n"
+                "  .doc.dark { background: var(--print-bg); }\n"
+                "}\n")
+    return css
+
+
 # The frame owns the number and the footer row: a partial's legacy `<div class="slide-number">`
 # placeholder and a footer row left by split.py are removed before the frame is injected.
 LEGACY_NUMBER = re.compile(r'\s*<div\s+class="slide-number"\s*>.*?</div>', re.S)
@@ -443,27 +498,9 @@ def build(config_path: Path, output_override: str = None):
         baseline_css = make_baseline_css((canvas_w, canvas_h) if overridden else None)
         baseline_js  = make_baseline_js(canvas_w)
 
-    # Styles, in cascade order:
-    #   1. the resolved design (fonts, then every module but `dark`, which no slide uses yet,
-    #      base first and the design system after it), marked data-design-layer: the only
-    #      place literals may live
-    #   2. the deck's own styles.css (components, roles only) and the baseline CSS
-    design_layer = "\n".join(design.fonts + [c for m, c in design.css.items() if c and m != "dark"])
-    parts.append("<style data-design-layer>\n" + design_layer + "\n</style>")
+    theme = deck_theme(cfg)
     css = read_file(styles_path)
-    layers = [c for c in (css, baseline_css) if c]
-    parts.append("<style>\n" + "\n".join(layers) + "\n</style>")
-    parts.append("</head>\n<body>\n")
-
-    # Controls hint (slides only — a document has no presentation mode)
-    if not is_doc:
-        parts.append(textwrap.dedent("""\
-        <div class="controls-hint">
-          Press <kbd>F</kbd> for fullscreen presentation &middot; <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate &middot; <kbd>Esc</kbd> to exit
-        </div>
-        """))
-    else:
-        parts.append('<div class="doc">\n')
+    body = []
 
     # Slides / pages (`pages:` is accepted as an alias of `slides:` in document mode)
     slide_entries = cfg.get("slides") or cfg.get("pages") or []
@@ -475,6 +512,7 @@ def build(config_path: Path, output_override: str = None):
     num_format = numbering.get("format", "{current} / {total}")
     dropped_numbers = 0
 
+    dark_slides = 0
     for idx, entry in enumerate(slide_entries, start=1):
         filename = entry["file"] if isinstance(entry, dict) else entry
         label = entry.get("label", "") if isinstance(entry, dict) else ""
@@ -490,6 +528,9 @@ def build(config_path: Path, output_override: str = None):
             html, dropped = LEGACY_NUMBER.subn("", html)
             dropped_numbers += bool(dropped)
             html = OLD_FOOTER.sub("", html)
+            if theme == "dark":
+                html = mark_dark(html)
+            dark_slides += is_dark(html)
 
         # Inject source bar if the slide declares data-sources and bibliography exists
         if bibliography:
@@ -508,11 +549,34 @@ def build(config_path: Path, output_override: str = None):
             if footer:
                 html = inject_before_slide_end(html, "\n" + footer)
 
-        parts.append(f"\n<!-- slide {idx}: {label} -->\n")
-        parts.append(html.strip())
-        parts.append("\n")
+        body.append(f"\n<!-- slide {idx}: {label} -->\n")
+        body.append(html.strip())
+        body.append("\n")
         print(" OK")
 
+    # Styles, in cascade order:
+    #   1. the resolved design (fonts, then every module, base first and the design system after it;
+    #      `dark` only when a slide or the deck is dark), marked data-design-layer: the only place
+    #      literals may live
+    #   2. the deck's own styles.css (components, roles only), the baseline CSS and, for a dark slide
+    #      or page, the kit's dark layer
+    dark = dark_slides > 0 or (is_doc and theme == "dark")
+    design_layer = "\n".join(design.fonts + [c for m, c in design.css.items() if c and (m != "dark" or dark)])
+    parts.append("<style data-design-layer>\n" + design_layer + "\n</style>")
+    layers = [c for c in (css, baseline_css, make_dark_css(design, is_doc) if dark else "") if c]
+    parts.append("<style>\n" + "\n".join(layers) + "\n</style>")
+    parts.append("</head>\n<body>\n")
+
+    # Controls hint (slides only: a document has no presentation mode)
+    if not is_doc:
+        parts.append(textwrap.dedent("""\
+        <div class="controls-hint">
+          Press <kbd>F</kbd> for fullscreen presentation &middot; <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate &middot; <kbd>Esc</kbd> to exit
+        </div>
+        """))
+    else:
+        parts.append('<div class="doc dark">\n' if dark else '<div class="doc">\n')
+    parts += body
     if is_doc:
         parts.append("</div>\n")
     if dropped_numbers:

@@ -1,0 +1,15 @@
+/* Fixture deck styles: contract roles only. */
+.slide h1, .slide h2 { font-family: var(--font-heading); margin: 72px var(--slide-padding) 16px; }
+.slide p { margin: 0 var(--slide-padding) 12px; color: var(--muted); }
+.slide a { color: var(--accent); }
+.cards { display: flex; gap: var(--space-md); margin: 0 var(--slide-padding); }
+.card { flex: 1; padding: var(--space-md); background: var(--surface); border: 1px solid var(--border);
+        border-radius: var(--card-radius); box-shadow: var(--shadow); color: var(--ink); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: var(--btn-radius);
+         background: var(--success); color: var(--kit-on-success); font-family: var(--font-mono); }
+.bars { display: flex; align-items: flex-end; gap: 12px; height: 200px; margin: 0 var(--slide-padding);
+        border-bottom: 2px solid var(--chart-axis); }
+.bar { width: 80px; }
+.bar-1 { height: 180px; background: var(--chart-1); }
+.bar-2 { height: 120px; background: var(--chart-2); }
+.bar-3 { height: 60px; background: var(--chart-rest); }

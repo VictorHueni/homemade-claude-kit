@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import re
+import shutil
 import sys
 import unittest
 from pathlib import Path
@@ -12,6 +13,7 @@ from helpers import SKILLS, RenderCase, run
 
 DECK = SKILLS / "com-slide-deck" / "scripts"
 DESIGNS = Path(__file__).resolve().parent / "fixtures" / "design-systems"
+FIXTURE_DECKS = Path(__file__).resolve().parent / "fixtures" / "decks"
 FULL_ACCENT = "#0e7090"
 SUBSET_ACCENT = "#7a3ea8"
 LITERAL = re.compile(r"#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?)\([^)]*\)")
@@ -446,6 +448,155 @@ class FrameRenderTest(DeckCase):
                 self.assertEqual(self.render.canvas_size(cfg, design), expected)
                 self.assertEqual(self.render.canvas_size({**cfg, "canvas": {"width": 800, "height": 600}}, design),
                                  (800, 600))
+
+class DarkDeckTest(DeckCase):
+    """Dark slides, decks and documents: the remap lives in build.py's kit layer, the dark module is inlined only
+    when a slide or the deck is dark, and nothing the light render reads moves."""
+
+    def setUp(self):
+        super().setUp()
+        sys.path.insert(0, str(DECK / "shared"))
+        import design_source
+        self.ds = design_source
+        self.contract = design_source._contract()
+        self.mirror = design_source.dark_mirror(self.contract)
+
+    def fixture(self, name, design=None, **config):
+        if not (self.tmp / "decks").exists():
+            shutil.copytree(FIXTURE_DECKS, self.tmp / "decks")
+        self.deck = self.tmp / "decks" / name
+        path = self.deck / "config.yaml"
+        cfg = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if design:
+            cfg["paths"]["design_tokens"] = str(DESIGNS / design)
+        cfg.update(config)
+        path.write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
+        self.cfg = cfg
+
+    @property
+    def output(self):
+        return self.deck / "output" / self.cfg["paths"]["output_filename"]
+
+    def build(self):
+        return run(DECK / "build.py", "-c", self.deck / "config.yaml", cwd=self.tmp)
+
+    def layers(self, html):
+        design = re.search(r"<style data-design-layer>(.*?)</style>", html, re.S).group(1)
+        kit = re.findall(r"<style>(.*?)</style>", html, re.S)[-1]
+        return design, kit
+
+    def roots(self, html):
+        return re.findall(r'<(?:div|section) class="(slide [^"]*|slide|doc[^"]*)"', html)
+
+    def test_a_dark_slide_carries_the_remap_in_the_kit_layer(self):
+        self.fixture("dark-slides", "full-dark")
+        result = self.assertBuilds()
+        self.assertIn("PASS", result.stdout)
+        design_layer, kit = self.layers(self.html())
+        rule = re.search(r"\.slide\.dark,\s*\.doc\.dark\s*\{([^}]*)\}", kit)
+        self.assertIsNotNone(rule, "the remap rule is missing from the kit layer")
+        for role, twin in self.mirror.items():
+            self.assertIn(f"{role}: var({twin});", rule.group(1))
+        self.assertIn("--slide-fg: var(--dark-slide-fg);", rule.group(1))
+        # the fill-text choices recomputed against the dark roles
+        design = self.ds.resolve(self.tmp, explicit=DESIGNS / "full-dark")
+        chosen = self.ds.fill_text("".join(design.css.values()), self.contract["modules"]["dark"]["pairs"])
+        light = {twin: role for role, twin in self.mirror.items()}
+        self.assertTrue(chosen)
+        for fill, text in chosen.items():
+            self.assertIn(f"{self.ds.kit_on(light[fill])}: var({text});", rule.group(1))
+        self.assertRegex(kit, r"\.slide\.dark \.slide-logo\s*\{[^}]*var\(--brand-logo-on-dark\)")
+        key = re.search(r"\.dark \.dark-key\s*\{([^}]*)\}", kit).group(1)
+        self.assertIn("var(--dark-key-fill)", key)
+        self.assertIn("var(--dark-key-edge)", key)
+        self.assertRegex(kit, r"\.dark \.dark-accent\s*\{[^}]*var\(--dark-accent-text\)")
+        self.assertIsNone(LITERAL.search(re.sub(r"/\*.*?\*/", "", kit, flags=re.S)))
+        # the dark module is inlined: the base defaults, then the design's own dark roles
+        self.assertIn("dark.css, neutral defaults", design_layer)
+        self.assertIn("--dark-accent: #4fd1c5", design_layer)
+        self.assertEqual(self.roots(self.html()), ["slide s-1", "slide s-2 dark", "slide s-3"])
+        self.assertEqual(self.provenance()["modules"]["dark"], "design-system")
+
+    def test_a_deck_without_a_dark_slide_inlines_no_dark_css(self):
+        for design in ("full-dark", "full", None):
+            with self.subTest(design=design or "base"):
+                self.setUp()
+                self.fixture("slides", design)
+                self.assertBuilds()
+                html = self.html()
+                self.assertNotIn("--dark-", html)
+                self.assertNotIn("dark", " ".join(self.roots(html)))
+
+    def test_theme_dark_marks_every_slide_and_every_page(self):
+        self.fixture("slides", "full-dark", theme="dark")
+        self.assertBuilds()
+        html = self.html()
+        self.assertEqual(self.roots(html), ["slide s-1 dark", "slide s-2 dark", "slide s-3 dark"])
+        self.assertIn("--ink: var(--dark-ink);", self.layers(html)[1])
+        self.setUp()
+        self.fixture("dark-document", "full-dark")
+        self.assertBuilds()
+        html = self.html()
+        self.assertIn('<div class="doc dark">', html)
+        self.assertIn("--ink: var(--dark-ink);", self.layers(html)[1])
+        self.assertIn("--dark-accent: #4fd1c5", self.layers(html)[0])
+
+    def test_an_unknown_theme_is_refused(self):
+        self.fixture("slides", theme="night")
+        result = self.build()
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("theme", result.stderr)
+        self.assertIn("dark", result.stderr)
+        self.assertFalse(self.output.exists())
+
+    def test_subset_renders_the_dark_slide_from_the_base(self):
+        self.fixture("dark-slides", "subset")
+        result = self.assertBuilds()
+        self.assertIn("PASS", result.stdout)
+        design_layer, kit = self.layers(self.html())
+        self.assertIn("dark.css, neutral defaults", design_layer)
+        self.assertIn("--ink: var(--dark-ink);", kit)
+        self.assertEqual(self.provenance()["modules"]["dark"], "base")
+        check = run(DECK / "shared/check_render.py", self.output, "--design-system", DESIGNS / "subset", cwd=self.tmp)
+        self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
+
+    def test_dark_leaves_what_the_light_render_reads_unchanged(self):
+        # a dark module never touches the core --kit-on-* block, a light role's value or the core pair check
+        from print_chrome import role_value
+        full = self.ds.resolve(self.tmp, explicit=DESIGNS / "full")
+        dark = self.ds.resolve(self.tmp, explicit=DESIGNS / "full-dark")
+        on_block = re.compile(r":root \{\n(?:  --kit-on-[^\n]*\n)+\}\n")
+        self.assertEqual(on_block.findall(dark.css["core"]), on_block.findall(full.css["core"]))
+        self.assertTrue(on_block.findall(full.css["core"]))
+        for role in ("--muted", "--ink", "--accent", "--slide-fg", "--slide-bg", "--print-bg"):
+            self.assertEqual(role_value(dark, role), role_value(full, role), role)
+        broken = self.tmp / "broken"
+        shutil.copytree(DESIGNS / "full-dark", broken)
+        core = broken / "css/core.css"
+        core.write_text(core.read_text(encoding="utf-8").replace("--accent-ink: #ffffff", "--accent-ink: #0e7090"),
+                        encoding="utf-8")
+        with self.assertRaises(self.ds.DesignError) as refused:
+            self.ds.resolve(self.tmp, explicit=broken)
+        self.assertIn("--accent-ink on --accent", str(refused.exception))
+
+    def test_a_dark_document_chrome_reads_the_dark_roles(self):
+        render = load("slide_deck_render", DECK / "render.py")
+        self.fixture("dark-document", "full-dark")
+        design = render.resolve_design(self.cfg, self.deck)
+        header, footer = render.document_chrome(self.cfg, "2026-10-17", None, design)
+        dark_muted = self.ds.role_values(design.css["dark"])["--dark-muted"]
+        self.assertIn(dark_muted, footer)
+        self.assertIn(dark_muted, header)
+        self.assertNotIn("#475467", header + footer)       # the light --muted
+        from print_chrome import logo_uri
+        self.assertIn(logo_uri(design, "--brand-logo-on-dark"), footer)
+        self.assertNotIn(logo_uri(design), footer)
+        self.setUp()
+        self.fixture("document", "full-dark")
+        design = render.resolve_design(self.cfg, self.deck)
+        _, light = render.document_chrome(self.cfg, "2026-10-17", None, design)
+        self.assertIn("#475467", light)
+        self.assertIn(logo_uri(design), light)
 
 
 if __name__ == "__main__":

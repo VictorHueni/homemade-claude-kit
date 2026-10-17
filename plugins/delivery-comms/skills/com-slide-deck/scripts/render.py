@@ -31,7 +31,7 @@ import yaml  # PyYAML — already a com-slide-deck dependency
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 # Page geometry, the design and the validator come from build.py, so the PDF prints
 # exactly what the build checked.
-from build import (DesignError, RenderRefused, canvas_size, check_deck, deck_sources,  # noqa: E402
+from build import (DesignError, RenderRefused, canvas_size, check_deck, deck_sources, deck_theme,  # noqa: E402
                    page_geometry, provenance_summary, resolve_design, write_provenance)
 import pdf_dates  # noqa: E402  (shared: the source date replaces Chromium's render time in the PDF)
 import print_chrome  # noqa: E402  (shared: the page-margin chrome com-release-note draws too)
@@ -132,7 +132,8 @@ def _fill(template: str, cfg: dict, date: str) -> str:
 def document_chrome(cfg: dict, date: str, recipient: str | None, design) -> tuple[str, str]:
     """(header, footer) templates of a paginated document. Chromium draws them in the page margins as a
     separate document the deck's CSS cannot reach, so the shared print chrome inlines the design's resolved
-    --muted and --font-mono values and carries the brand logo (a data URI) and the legal line."""
+    --muted (--dark-muted for `theme: dark`) and --font-mono values and carries the brand logo (a data URI,
+    on-dark for `theme: dark`) and the legal line."""
     geom = page_geometry(cfg)
     page_cfg = cfg.get("page", {}) or {}
     side = geom["margin"]["left"]
@@ -141,8 +142,9 @@ def document_chrome(cfg: dict, date: str, recipient: str | None, design) -> tupl
                                                        cfg, date)
     numbering = bool(page_cfg.get("numbering", True))
     try:
-        return (print_chrome.header_template(design, running, side),
-                print_chrome.footer_template(design, footer_left, side, numbering))
+        dark = deck_theme(cfg) == "dark"
+        return (print_chrome.header_template(design, running, side, dark),
+                print_chrome.footer_template(design, footer_left, side, numbering, dark))
     except DesignError as exc:
         fail(str(exc), exc.code)
 

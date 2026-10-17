@@ -30,7 +30,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install pyyaml playwright
+      # playwright is pinned to the version the goldens were captured with: a newer Chromium changes
+      # user-agent defaults (a table's border colour from 1.64) and the computed-style goldens with them
+      - run: pip install pyyaml playwright==1.60.0 pypdfium2==5.9.0
       - run: python -m playwright install --with-deps chromium
       - run: make -C plugins/delivery-comms test-pdf
 
