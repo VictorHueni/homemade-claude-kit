@@ -34,7 +34,7 @@ Principles:
 5. Shared code stays in sync: every change under `shared/` runs `scripts/sync-shared.py` in the same commit.
 
 **Overall Status:** in-progress
-**Current Increment:** 04
+**Current Increment:** 05
 
 ## Plan-level decisions
 
@@ -172,7 +172,7 @@ Exit criteria:
 
 ### Increment 05: release 2.1.0
 
-**Status:** pending
+**Status:** in-progress
 
 Scope:
 
