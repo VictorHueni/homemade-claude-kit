@@ -1,0 +1,23 @@
+title: "Board update"
+author: "Operations"
+date_label: ""
+lang: "en"
+mode: slides
+external_scripts: []
+slides:
+  - file: "01-title.html"
+    label: "Title"
+  - file: "02-section.html"
+    label: "Section"
+  - file: "03-next.html"
+    label: "Next steps"
+paths:
+  slides_dir:        "output/slides"
+  styles_file:       "design/styles.css"
+  script_file:       "design/script.js"
+  bibliography_file: "context/bibliography.yaml"
+  output_dir:        "output/slide-deck"
+  output_filename:   "presentation.html"
+numbering:
+  enabled: true
+  format: "{current} / {total}"
