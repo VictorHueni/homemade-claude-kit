@@ -85,3 +85,16 @@ One entry per increment: red run (failing test names), green run, gates, owner a
 - For Inc 05: the skills that changed and need a minor metadata.version bump are com-slide-deck (SKILL.md, config template; 2.0.0, also scripts in Inc 02 and 03) and ux-design-system (SKILL.md, token-contract.md; 2.0.0, also design_system.py in Inc 01). com-artefact-viz and com-release-note changed only through their synced scripts/shared/ copies (Inc 01 to 03); bump them too if the kit's rule counts a shared-copy change as a skill change.
 - Commit: the commit carrying `Refs: Plan-0006 increment 04`
 - Timestamp: 2026-10-17
+
+## Iteration 5
+
+- Increment: 05, release 2.1.0
+- Status: in-progress (scope item 1 done; scope item 2, the merge to main, `claude plugin marketplace update` and `claude plugin update delivery-comms@<marketplace>` verified against the cache, awaits the owner's merge and is the orchestrator's)
+- Files changed: plugins/delivery-comms/.claude-plugin/plugin.json (2.0.0 to 2.1.0); metadata.version 2.0.0 to 2.1.0 in skills/{com-slide-deck,ux-design-system,com-artefact-viz,com-release-note}/SKILL.md; plugins/delivery-comms/CHANGELOG.md (new `## 2.1.0 - 2026-10-17` section above 2.0.0); this plan (Current Increment 05, Inc 05 in-progress).
+- Red: exempt from red-first (versions and release notes, scope item 1).
+- Versions: com-slide-deck and ux-design-system changed directly (Inc 01 to 04); com-artefact-viz and com-release-note changed only through their synced scripts/shared/ copies, bumped too by the owner's choice. The root .claude-plugin/marketplace.json carries no per-plugin version (only `metadata.version` 1.0.0 of the marketplace itself), so it is unchanged. contract/modules.json was already at contractVersion 2.1.0 (Inc 01).
+- CHANGELOG: lead paragraph and "What you get" bullets linking #154 to #157 (the Playwright 1.60.0 pin in CI cited with #155, where it landed); additive release, no "Breaking changes" section: nothing found breaking for 2.0 designs or decks.
+- Test gate: `mise exec -- make -C plugins/delivery-comms test test-pdf` 302 tests OK (skipped=1) and 17 tests OK; `./scripts/audit-skills.sh` 0 errors, 0 warnings. Passed on the first run.
+- Next: owner merges; then the orchestrator runs scope item 2 and the exit criterion (2.1.0 in the cache rendering the fixtures against full-dark, full, subset and a 2.0 design, each passing check_render.py) and marks Inc 05 and the plan done.
+- Commit: the commit carrying `Refs: Plan-0006 increment 05`
+- Timestamp: 2026-10-17
