@@ -567,7 +567,7 @@ def build(config_path: Path, output_override: str = None):
     parts.append("<style>\n" + "\n".join(layers) + "\n</style>")
     parts.append("</head>\n<body>\n")
 
-    # Controls hint (slides only — a document has no presentation mode)
+    # Controls hint (slides only: a document has no presentation mode)
     if not is_doc:
         parts.append(textwrap.dedent("""\
         <div class="controls-hint">
