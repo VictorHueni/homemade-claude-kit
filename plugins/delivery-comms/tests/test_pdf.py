@@ -8,11 +8,14 @@ import sys
 import unittest
 from pathlib import Path
 
+import goldens
+import yaml
 from helpers import SKILLS, RenderCase, run
 from pdf_helpers import require_browser
 
 PLUGIN = Path(__file__).resolve().parent.parent
 DESIGNS = PLUGIN / "tests/fixtures/design-systems"
+DECKS = PLUGIN / "tests/fixtures/decks"
 
 
 class ReleaseNotePdfTest(RenderCase):
@@ -280,6 +283,105 @@ class ReproduciblePdfTest(RenderCase):
                          env={"SOURCE_DATE_EPOCH": None, "GIT_CEILING_DIRECTORIES": str(self.tmp)})
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertReproducible("rn-a.pdf", "rn-b.pdf", stamp=b"D:20010203120000+00'00'")
+
+class DarkPdfTest(RenderCase):
+    """Chromium paints a dark slide, and every page of a dark document, on the design's dark roles."""
+
+    EPOCH = {"SOURCE_DATE_EPOCH": "31536000"}
+
+    def setUp(self):
+        super().setUp()
+        sys.path.insert(0, str(PLUGIN / "shared"))
+        import design_source
+        self.ds = design_source
+
+    def fixture(self, name, design):
+        shutil.copytree(DECKS, self.tmp / "decks")
+        config = self.tmp / "decks" / name / "config.yaml"
+        cfg = yaml.safe_load(config.read_text(encoding="utf-8"))
+        cfg["paths"]["design_tokens"] = str(DESIGNS / design)
+        config.write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
+        build = run(SKILLS / "com-slide-deck/scripts/build.py", "-c", config, cwd=self.tmp, env=self.EPOCH)
+        self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
+        built = config.parent / "output" / cfg["paths"]["output_filename"]
+        check = run(SKILLS / "com-slide-deck/scripts/shared/check_render.py", built,
+                    "--design-system", DESIGNS / design, cwd=self.tmp)
+        self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
+        return config, built
+
+    @staticmethod
+    def rgb(hex_colour):
+        h = hex_colour.lstrip("#")
+        return "rgb({}, {}, {})".format(*(int(h[i:i + 2], 16) for i in (0, 2, 4)))
+
+    def test_a_dark_slide_takes_every_mirrored_role_and_the_light_slides_keep_theirs(self):
+        require_browser(self)
+        _, built = self.fixture("dark-slides", "full-dark")
+        design = self.ds.resolve(self.tmp, explicit=DESIGNS / "full-dark")
+        values = self.ds.role_values("".join(design.css.values()))
+        mirror = self.ds.dark_mirror(self.ds._contract())
+        outside = [r for r in ("--slide-padding", "--font-body", "--card-radius", "--print-breaking") if r in values]
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page(viewport={"width": 1440, "height": 900})
+            page.goto(built.as_uri())
+            got = page.evaluate("""(roles) => Array.from(document.querySelectorAll('.slide')).map((s) => {
+                const cs = getComputedStyle(s);
+                const out = {};
+                for (const r of roles) out[r] = cs.getPropertyValue(r).trim();
+                return out;
+            })""", list(mirror) + outside)
+            painted = page.evaluate("""() => {
+                const cs = (sel) => getComputedStyle(document.querySelector(sel));
+                return {bg: cs('.slide.dark').backgroundColor, fg: cs('.slide.dark').color,
+                        keyImage: cs('.dark .dark-key').backgroundImage, keyEdge: cs('.dark .dark-key').boxShadow,
+                        accentText: cs('.dark .dark-accent').color, badge: cs('.dark .badge').color,
+                        footer: cs('.slide.dark .slide-footer').color,
+                        darkLogo: cs('.slide.dark .slide-logo').backgroundImage,
+                        lightLogo: cs('.slide.s-1 .slide-logo').backgroundImage,
+                        lightBg: cs('.slide.s-1').backgroundColor};
+            }""")
+            browser.close()
+        norm = lambda v: " ".join(v.split())  # noqa: E731
+        light, dark, last = got
+        for role, twin in mirror.items():
+            self.assertEqual(norm(dark[role]), norm(values[twin]), f"{role} on the dark slide")
+            self.assertEqual(norm(light[role]), norm(last[role]), role)
+            if role in values and not values[role].startswith("var("):
+                self.assertEqual(norm(light[role]), norm(values[role]), f"{role} on a light slide")
+        for role in outside:
+            self.assertEqual(dark[role], light[role], f"{role} is outside the mirror")
+        self.assertEqual(painted["bg"], self.rgb(values["--dark-slide-bg"]))
+        self.assertEqual(painted["fg"], self.rgb(values["--dark-slide-fg"]))
+        self.assertEqual(painted["lightBg"], self.rgb(values["--slide-bg"]))
+        self.assertIn("linear-gradient", painted["keyImage"])
+        self.assertEqual(painted["keyEdge"], "rgb(47, 107, 100) 0px 0px 0px 1px")
+        self.assertEqual(painted["accentText"], self.rgb(values["--dark-accent-text"]))
+        self.assertEqual(painted["badge"], self.rgb(values["--dark-accent-ink"]))
+        self.assertEqual(painted["footer"], self.rgb(values["--dark-tertiary"]))
+        self.assertIn("data:image/svg+xml", painted["darkLogo"])
+        self.assertNotEqual(painted["darkLogo"], painted["lightLogo"])
+
+    def test_a_dark_document_prints_dark_pages(self):
+        require_browser(self)
+        goldens.require_rasteriser(self)
+        config, _ = self.fixture("dark-document", "full-dark")
+        result = run(SKILLS / "com-slide-deck/scripts/render.py", "--config", config, "--output", "doc.pdf",
+                     cwd=self.tmp, env=self.EPOCH)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        page_bg = bytes.fromhex(self.ds.role_values(
+            (DESIGNS / "full-dark/css/dark.css").read_text(encoding="utf-8"))["--dark-print-bg"].lstrip("#"))
+        pages = goldens.pdf_cells(self.tmp / "doc.pdf")
+        self.assertEqual(len(pages), 2)
+        for number, page in enumerate(pages, start=1):
+            cells = bytes.fromhex(page["cells"])
+            columns, rows = page["grid"]
+            # the margins (top row, bottom row, both sides) and the page body are the dark page background
+            for cell in (0, columns - 1, (rows - 1) * columns, rows * columns - 1, (rows // 2) * columns + 1):
+                rgb = cells[cell * 3: cell * 3 + 3]
+                self.assertLessEqual(max(abs(a - b) for a, b in zip(rgb, page_bg)), goldens.CELL_TOLERANCE,
+                                     f"page {number} cell {cell} is {rgb.hex()}, not {page_bg.hex()}")
 
 
 if __name__ == "__main__":

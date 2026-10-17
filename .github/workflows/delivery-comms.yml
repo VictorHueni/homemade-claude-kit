@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install pyyaml playwright
+      - run: pip install pyyaml playwright pypdfium2==5.9.0
       - run: python -m playwright install --with-deps chromium
       - run: make -C plugins/delivery-comms test-pdf
 

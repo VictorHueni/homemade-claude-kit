@@ -4,7 +4,8 @@
 Chromium renders `header_template` and `footer_template` as a separate document that the page's CSS
 cannot reach, so the chrome inlines the resolved values of the design's `--muted` and `--font-mono`
 roles (var() chains followed; a role that resolves to nothing is an error, never a silent default),
-shows the brand logo as a data URI and the legal line as text. Used by com-release-note and by
+shows the brand logo as a data URI and the legal line as text. On a dark document it reads `--dark-muted`
+and the on-dark logo instead. Used by com-release-note and by
 com-slide-deck's `mode: document`, so both brand their page margins the same way.
 
 `print_geometry` reads the page box from the `print` module: `--print-page-size` (a named size, optionally
@@ -102,24 +103,25 @@ def print_geometry(design):
     return {"size": size, "width": width, "height": height, "margin": margins(margin_css), "margin_css": margin_css}
 
 
-def _style(design, side):
+def _style(design, side, dark=False):
+    muted = "--dark-muted" if dark else "--muted"
     return (f"width:100%;padding:0 {side};font-family:{resolved_role(design, '--font-mono')};font-size:8px;"
-            f"color:{resolved_role(design, '--muted')};display:flex;justify-content:space-between;"
+            f"color:{resolved_role(design, muted)};display:flex;justify-content:space-between;"
             "align-items:center;gap:4mm;")
 
 
-def header_template(design, text, side):
+def header_template(design, text, side, dark=False):
     """Running head on the left of the top margin; an empty span when there is no text."""
     if not text:
         return "<span></span>"
-    style = html.escape(_style(design, side) + "padding-bottom:2mm;")
+    style = html.escape(_style(design, side, dark) + "padding-bottom:2mm;")
     return f'<div style="{style}"><span>{html.escape(text)}</span><span></span></div>'
 
 
-def footer_template(design, left, side, numbering=True):
+def footer_template(design, left, side, numbering=True, dark=False):
     """Footer row: the brand logo and `left` text, the legal line, then the page position at the right.
-    A design without a logo or a legal line simply leaves those cells out."""
-    uri = logo_uri(design)
+    A design without a logo or a legal line simply leaves those cells out; `dark` takes the on-dark logo."""
+    uri = logo_uri(design, "--brand-logo-on-dark" if dark else "--brand-logo-on-light")
     logo = (f'<img src="{uri}" alt="" data-brand-asset style="height:{LOGO_HEIGHT};width:auto;display:block">'
             if uri else "")
     start = f'<span style="display:flex;align-items:center;gap:2mm">{logo}<span>{html.escape(left or "")}</span></span>'
@@ -127,4 +129,4 @@ def footer_template(design, left, side, numbering=True):
     middle = f"<span>{html.escape(legal)}</span>" if legal else "<span></span>"
     right = ('<span><span class="pageNumber"></span> / <span class="totalPages"></span></span>' if numbering
              else "<span></span>")
-    return f'<div style="{html.escape(_style(design, side))}">{start}{middle}{right}</div>'
+    return f'<div style="{html.escape(_style(design, side, dark))}">{start}{middle}{right}</div>'

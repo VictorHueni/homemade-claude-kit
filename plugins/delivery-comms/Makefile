@@ -1,4 +1,4 @@
-# delivery-comms test lane. Needs Python 3.12+ and PyYAML; test-pdf also needs Playwright and Chromium;
+# delivery-comms test lane. Needs Python 3.12+ and PyYAML; test-pdf also needs Playwright, Chromium and pypdfium2;
 # test-design-md also needs Node.js 18+ (npx) and the network.
 PYTHON ?= python3
 UNITTEST = cd tests && PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -B -m unittest
@@ -16,9 +16,10 @@ check-python:
 test: check-python
 	$(UNITTEST) -v test_characterisation test_contract test_resolver test_validator test_slide_deck test_artefact_viz test_release_note test_reproducible test_ux_design_system test_skill_evals
 
-# PDF renders. A missing browser skips locally and fails when CI=true.
+# PDF renders and the goldens (tests/goldens.py: computed styles and PDF pixels of every fixture render, read
+# with pypdfium2). A missing browser or pypdfium2 skips locally and fails when CI=true.
 test-pdf: check-python
-	$(UNITTEST) -v test_pdf
+	cd tests && DELIVERY_COMMS_GOLDENS=1 PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -B -m unittest -v test_pdf test_characterisation.GoldenTest
 
 # Google's DESIGN.md linter on every DESIGN.md ux-design-system writes (template, sample, scaffold, proposal,
 # --from-legacy draft): exit 0, no error, no warning. Not in `test`: it fetches the linter with npx.

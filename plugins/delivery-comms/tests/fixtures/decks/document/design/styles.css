@@ -1,0 +1,10 @@
+/* Fixture document styles: contract roles only. */
+h1, h2 { font-family: var(--font-heading); color: var(--ink); }
+.doc-label { font-family: var(--font-mono); color: var(--accent); text-transform: uppercase; }
+p { color: var(--ink); }
+.note { padding: var(--space-md); background: var(--surface-2); border-left: 3px solid var(--accent); }
+.badge { display: inline-block; padding: 1px 6px; border-radius: var(--btn-radius);
+         background: var(--info); color: var(--kit-on-info); }
+table { border-top: 1px solid var(--doc-rule); }
+th, td { padding: 4px; border-bottom: 1px solid var(--border); text-align: left; }
+th { color: var(--muted); }

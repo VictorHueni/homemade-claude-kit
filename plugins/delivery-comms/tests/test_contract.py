@@ -143,6 +143,17 @@ class ModulesTest(unittest.TestCase):
         build = (SKILLS / "com-slide-deck/scripts/build.py").read_text(encoding="utf-8")
         body = build.split("def make_baseline_css", 1)[1].split("\ndef ", 1)[0]
         self.assertLessEqual(css_classes(body), set(mods["slide-frame"]["classes"]))
+        # the dark layer build.py emits for a dark slide or page: the frame, dark and document vocabularies
+        import importlib.util
+        import design_source
+        sys.path.insert(0, str(SKILLS / "com-slide-deck/scripts"))
+        spec = importlib.util.spec_from_file_location("slide_deck_build", SKILLS / "com-slide-deck/scripts/build.py")
+        deck = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(deck)
+        dark = deck.make_dark_css(design_source.resolve(FIXTURES, explicit=FIXTURES / "full-dark"))
+        self.assertIn(".dark-key", dark)
+        self.assertLessEqual(css_classes(dark), set(mods["slide-frame"]["classes"]) | set(mods["dark"]["classes"])
+                             | set(mods["document"]["classes"]))
         report = (SKILLS / "com-release-note/templates/report.html.tmpl").read_text(encoding="utf-8")
         page = {c for c in css_classes(report) if re.match(r"(report|section)(-|$)|section--", c)}
         self.assertLessEqual(page, set(mods["print"]["classes"]))

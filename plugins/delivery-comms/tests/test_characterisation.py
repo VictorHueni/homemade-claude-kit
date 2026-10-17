@@ -2,10 +2,12 @@
 
 Pins the behaviour before the modular design contract moves it (Plan-0005
 increment 01): each renderer builds, links every CSS layer in today's order and
-falls back to the shipped accent.
+falls back to the shipped accent. GoldenTest holds every fixture render to the
+computed styles and PDF pixels of 2.0.0 (tests/goldens.py).
 """
 import unittest
 
+import goldens
 from helpers import FALLBACK_ACCENT, SKILLS, RenderCase, run
 
 FALLBACK_MARKER = "core.css — shipped neutral defaults"
@@ -43,6 +45,21 @@ class ReleaseNoteTest(RenderCase):
         html = (self.tmp / "rn.html").read_text(encoding="utf-8")
         self.assertIn(FALLBACK_MARKER, html)
         self.assertIn(FALLBACK_ACCENT, html)
+
+
+class GoldenTest(RenderCase):
+    """Every fixture deck, document, view and report renders the computed styles and PDF pixels of 2.0.0."""
+
+    def test_fixture_renders_match_the_goldens(self):
+        goldens.require_lane(self)
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            for name in goldens.CASES:
+                with self.subTest(case=name):
+                    actual = goldens.capture(name, SKILLS, self.tmp / name, browser)
+                    self.assertEqual(goldens.differences(goldens.load(name), actual), [])
+            browser.close()
 
 
 if __name__ == "__main__":
