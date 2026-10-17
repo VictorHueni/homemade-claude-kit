@@ -1,49 +1,53 @@
 ---
 type: Implementation Plan
-title: "Plan-0006: dark slides and a deck classification for delivery-comms (2.1.0)"
-description: Adds an optional dark module to the modular design contract, so a slide marked dark switches every core role to the design's dark roles instead of declaring a deck-local dark palette, and a per-deck data classification (Public, Internal, Confidential, Strictly confidential) that com-slide-deck prints in the footer row next to the design's legal line; released as delivery-comms 2.1.0, contract 2.1.0.
+title: "Plan-0006: dark slides and documents, and a deck classification, for delivery-comms (2.1.0)"
+description: Adds an optional dark module to the modular design contract that mirrors every colour role as --dark-<role>, so a slide or a whole deck or document marked dark gets every role remapped by the kit's own layer, and a per-deck data classification printed at the right of the footer, before the number, in the deck's language; released as delivery-comms 2.1.0, contract 2.1.0.
 tags: [delivery-comms, design-system, com-slide-deck, contract, dark-theme, classification]
-timestamp: 2026-10-15T19:30:00+02:00
+timestamp: 2026-10-15T23:30:00+02:00
 status: draft
 owner: Victor Hueni
 last_reviewed: 2026-10-15
 review_interval: 30d
 ---
 
-# Implementation Plan: dark slides and a deck classification
+# Implementation Plan: dark slides and documents, and a deck classification
 
 ## Summary
 
 Kit 2.0.0 (Plan-0005) renders decks from a pinned design system and refuses every custom property that is not a contract role. Two needs surfaced when the first real consumer planned its migration (Paracel Plan 0190, Q-17 and Q-19, owner decisions of 2026-10-15):
 
-1. **Dark slides.** Paracel's six decks have dark section slides drawn with a deck-local palette (`--dark-bg`, `--dark-surface`, `--dark-text` and others). Under 2.0 each deck would copy the same literals into its exceptions, and nothing in the contract lets a slide switch roles: mapping the dark surface alone left accent text, icon fills and meters invisible until every core role was switched too. This plan adds an optional `dark` module: a design names its dark roles once, and a slide that carries the `dark` class gets every core role remapped by the kit's frame.
-2. **Classification.** Kit 2.0.0 builds the slide footer itself (`build.py` `slide_footer`: logo, legal line, number) and strips any deck footer (`OLD_FOOTER`), so a deck can no longer print its own "Confidential" marking. This plan adds `classification:` to `config.yaml`, printed in the footer row on every slide and page, on the four-level scheme used with GDPR and the Swiss nFADP.
+1. **Dark.** Paracel's decks have dark section slides drawn with a deck-local palette (`--dark-bg`, `--dark-text` and others). Nothing in the contract lets a slide switch roles. This plan adds an optional `dark` module that mirrors every colour role: for each remappable role `--x` the design declares `--dark-x`, and a slide carrying `dark`, or a whole deck or document built with `theme: dark`, gets every role remapped.
+2. **Classification.** Kit 2.0.0 builds the slide footer itself and strips any deck footer (`OLD_FOOTER`), so a deck can no longer print its own "Confidential" marking. This plan adds `classification:` to `config.yaml`, printed at the right of the footer row, before the number, in the deck's language.
 
-Both are additive and optional: contract 2.1.0 (same major, so every 2.0 manifest still resolves, `design_source.py` compares the major only), plugin 2.1.0. The first design to provide `dark` is `@medquantis/design-system` 1.2.0 (its own Plan 0003), whose values start from the dark slide the owner chose in Paracel Plan 0190 Q-17.
+This is a rework of the plan merged in #152. Its peer review (2026-10-15, verdict "not ready to start") found that a selector-scoped remap in any module CSS corrupts the resolver, the fill-text choice, the print chrome and the validator for every render (C-1), and that a hand-picked dark role list missed `--slide-fg` and left the effective accent pair unchecked (M-3). This rework moves the remap into `build.py`'s own layer and replaces the hand-picked list with a mechanical mirror, the same shape as the first consumer's theme (MedQuantis ADR-0007: the semantic roles re-valued under `.dark`). Every finding is answered in "Review findings".
 
-Source: Paracel Plan 0190 (Q-17, Q-19, Prerequisite 3) and its progress log of 2026-10-15; kit precedents #148 (optional `--tertiary`) and #149 (optional `--print-breaking`), which this plan follows for every new role: `contract/modules.json`, a neutral default in `shared/base/`, `scripts/sync-shared.py`, and the tests in `test_contract.py`, `test_resolver.py` and `test_ux_design_system.py`. No PRD.
+Additive for designs and decks: contract 2.1.0, plugin 2.1.0; every 2.0 manifest still resolves (`design_source.py` compares the major only). A design that provides `dark` requires kit 2.1.0, and 2.1.0 refuses a newer-minor manifest with a message naming the version to install (M-5). The first design to provide `dark` is `@medquantis/design-system` 1.2.0 (its Plan-0003).
+
+Source: Paracel Plan 0190 (Q-17, Q-19, Prerequisite 3); MedQuantis ADR-0007 and its design-pass rulings of 2026-10-15 (no glow, accent ink near-black on the lifted accent, charts allowed on dark, documents dark by the author's choice, the classification at the right before the number and in the deck's language); kit precedents #148 and #149 for optional roles. No PRD.
 
 Principles:
 
 1. One increment equals one coherent change set and one commit.
 2. Every increment is test-driven: write-first tests observed red, then a green test gate.
-3. Additive only: a 2.0 manifest, a 2.0 deck and every existing fixture render byte-identical under 2.1.0 unless they opt in (a `dark` slide class with a design that provides `dark`, or a `classification:` key).
-4. Roles, never literals: the dark remap is written in role names only; the base theme gives the module neutral defaults like every optional module, so a design without `dark` still renders a dark slide.
+3. Rendering unchanged for everything that does not opt in: an existing deck, view or report renders the same computed styles and the same PDF pixels as at c43a29a (the 2.0.0 merge); the byte changes each `Prediction:` names are allowed, nothing else.
+4. Roles, never literals, and module CSS declares roles on `:root` only. The remap is generated by the kit in role names; no module file carries a selector-scoped role declaration (C-1).
 5. Shared code stays in sync: every change under `shared/` runs `scripts/sync-shared.py` in the same commit.
 
 **Overall Status:** pending
 **Current Increment:** --
 
-## Plan-level decisions (agent defaults, for owner review)
+## Plan-level decisions
 
-| ID | Question | Default |
+| ID | Question | Decision |
 | :-- | :-- | :-- |
-| D-1 | A module or roles inside `slide-frame`? | A new optional module `dark`: a design may provide a slide frame without a dark theme, and the provenance report says where the dark roles came from. |
-| D-2 | Which roles? | `--dark-canvas-bg`, `--dark-surface`, `--dark-surface-2`, `--dark-border`, `--dark-ink`, `--dark-muted`, `--dark-tertiary`, `--dark-accent` (marks, lines, meters, frames), `--dark-accent-text` (highlighted text), `--dark-accent-fill` and `--dark-accent-ink` (a filled mark and its text), `--dark-key-fill` (the key element's fill, a colour or gradient), `--dark-glow` (the key element's shadow). |
-| D-3 | Which classes? | `dark` on a slide (the class Paracel's decks already use) and `dark-key` for the one key element of a dark slide; both join the `dark` module's class vocabulary. |
-| D-4 | Classification values | A closed list: `Public`, `Internal`, `Confidential`, `Strictly confidential`; any other value exits 2 naming the four; absent prints nothing. A design styles `.slide-classification`; the label text is not translated in this plan. |
-| D-5 | Where the classification prints | Every slide's footer row (between the legal line and the number) and, for `mode: document`, the running footer of every page. Views and release-note reports are out of scope (follow-up if a consumer needs it). |
-| D-6 | Branching | Increments open PRs into `main` (no release branch: the release is additive); the 2.1.0 version bump is the last increment and merges at the owner's request. |
+| D-1 | A module or roles inside `slide-frame`? | A new optional module `dark`: a design may provide a frame without a dark theme, and the provenance says where the dark roles came from. Agent default, unchanged. |
+| D-2 | Which roles? | A mirror: `--dark-<role>` for every colour role of `core` (ink, muted, tertiary, canvas-bg, surface, surface-2, border, accent, accent-ink, success, warning, danger, info, shadow), `dataviz` (chart-1 to chart-4, chart-rest, chart-axis, chart-grid, chart-highlight), `slide-frame` (slide-bg, slide-fg), `document` (doc-page-bg, doc-rule) and `print` (print-bg); plus four roles with no light counterpart: `--dark-key-fill` (the key element's fill, a colour or gradient), `--dark-key-base` (a solid colour no lighter than the fill's lightest point, the background of the key element's text pair), `--dark-key-edge` (its outline, a shadow value), `--dark-accent-text` (highlighted text). Required when a design provides `dark`: canvas-bg, surface, border, ink, muted, accent, accent-ink, slide-bg, slide-fg; every other dark role has a neutral literal default in the base (never an alias to a light role, which would make the remap a cycle). The mirror list is generated from `modules.json`, so a role added later to a mirrored module gets its dark twin by the same rule. |
+| D-3 | Which classes and switches? | `dark` on a slide partial's root `<div class="slide ... dark">` (where Paracel's decks already put it; a `class:` key in `config.yaml` is not read by `build.py`, M-2); `theme: dark` in `config.yaml` marks every slide, or every page of a `mode: document`, dark; `dark-key` for the one key element of a dark slide; `dark-accent` for highlighted text on dark. |
+| D-4 | Where does the remap live? | In `build.py`'s own kit layer (review C-1, option a): `make_baseline_css` emits `.slide.dark, .doc.dark { --x: var(--dark-x); ... }` for every mirrored role, the `--kit-on-*` fill-text choices recomputed against the dark roles, the logo on dark, and the `dark-key` and `dark-accent` rules, in role names only. The `dark` module's CSS is inlined only when some slide or the deck is dark. |
+| D-5 | Classification values | A closed list: `Public`, `Internal`, `Confidential`, `Strictly confidential`; any other value exits 2 naming the four; absent prints nothing. Described as a common four-level scheme; GDPR Art. 9 and nFADP Art. 5 lit. c are cited only for "sensitive personal data" (Strictly confidential). |
+| D-6 | Where and in which language | At the right of the footer row, just before the slide number (owner, 2026-10-15), and in the running footer of every `mode: document` page; label in the deck's `lang:` (owner, 2026-10-15): en, fr, de and it built in (fr: Public, Interne, Confidentiel, Strictement confidentiel); another language falls back to English with a warning. Views and release-note reports are out of scope. |
+| D-7 | Q-19's codes C0 to C3 | Not printed: the footer shows the label only. Owner, 2026-10-17 (O-1). |
+| D-8 | Branching | Increments open PRs into `main`; the 2.1.0 version bump is the last increment and merges at the owner's request. A design's plan vendors the contract from that release merge, never from Inc 01's (L-4). |
 
 ## Increment Plan
 
@@ -54,18 +58,19 @@ Principles:
 Scope:
 
 1. **Write first, expect red:**
-   - extend `tests/test_contract.py::test_declares_contract_version_and_nine_modules` (adapt: contract `2.1.0`, ten modules, `dark` optional) and `::test_no_role_in_two_modules`; new `::test_dark_roles_and_classes` (the D-2 roles, the D-3 classes); extend `::test_pairs_name_existing_roles` with the dark pairs: `--dark-ink` on `--dark-canvas-bg` and on `--dark-surface`, `--dark-muted` on `--dark-surface`, `--dark-tertiary` on `--dark-canvas-bg`, `--dark-accent-text` on `--dark-canvas-bg`, `--dark-accent-ink` on `--dark-accent-fill`; extend `::test_base_defines_every_role_of_every_module` (the base `dark.css` defines every dark role and its own pairs pass AA).
-   - extend `tests/test_contract.py::test_accepts_full_and_subset` (the `full` fixture now provides `dark`) and `::test_rejects_unknown_module_bad_semver_and_unknown_key` (a 2.0 manifest naming `dark` still validates under 2.1; a module name outside the ten is still refused).
-   - extend `tests/test_resolver.py`: `full` resolves `dark` from the design; `subset` resolves it from the base; the provenance report lists `dark`.
-   - extend `tests/test_ux_design_system.py`: `point` accepts a manifest providing `dark` and checks its pairs; `subset` leaves `dark` to the base.
-2. `contract/modules.json`: `contractVersion` 2.1.0 and the `dark` module (roles, classes, pairs); `contract/kit-manifest.schema.json` gains `dark` in the module enum; `contract/README.md` gains the module row.
-3. `shared/base/dark.css`: neutral dark defaults (a near-black canvas, light text, a mid-blue accent), each base pair at AA; `tests/fixtures/design-systems/full/` gains a fictitious `dark` module and its manifest entry.
-4. `scripts/sync-shared.py` run; every skill copy updated.
+   - extend `tests/test_contract.py`: `::test_declares_contract_version_and_nine_modules` (adapt: contract `2.1.0`, ten modules, `dark` optional; `MODULES` tuple at line 16 gains `dark` after `slide-frame`); `::test_no_role_in_two_modules`; new `::test_dark_mirrors_every_colour_role` (the D-2 mirror equals the generated list, the four extra roles, the required set); new `::test_dark_pairs_mirror_the_light_pairs` (every core, dataviz, slide-frame, document and print pair whose roles are mirrored appears with the dark roles, plus `--dark-ink` on `--dark-key-base` and `--dark-accent-text` on `--dark-canvas-bg` and `--dark-surface`); `::test_base_defines_every_role_of_every_module` (the base `dark.css` defines every dark role on `:root`, literals only, and its pairs pass AA); the schema `$id` test at line 178 moves to 2.1.0.
+   - extend `::test_accepts_full_and_subset` (the new `full-dark` fixture provides `dark`; `full` unchanged) and `::test_rejects_unknown_module_bad_semver_and_unknown_key` (a 2.0 manifest validates under 2.1; a module outside the ten is refused).
+   - extend `tests/test_resolver.py`: `full-dark` resolves `dark` from the design; `full` and `subset` from the base; a manifest at contract 2.2.0 is refused, exit 2, with "this design targets contract 2.2.0; update delivery-comms to 2.2.0 or later" (M-5); a module CSS holding a selector-scoped role declaration is refused (Principle 4).
+   - extend `tests/test_ux_design_system.py`: `point` accepts a manifest providing `dark` and checks its pairs; `subset` leaves `dark` to the base and says why ("DESIGN.md has no dark roles in 2.1").
+2. `contract/modules.json`: `contractVersion` 2.1.0, the `dark` module (roles, required set, classes, pairs). `contract/kit-manifest.schema.json`: `dark` under `provides.properties` and `omitted.properties`; `$id` and `title` at 2.1.0. `contract/README.md`: the module row and the mirror rule.
+3. `shared/design_source.py`: the newer-minor guard in `_load_package`, before the schema check; the selector-scoped role refusal.
+4. `shared/base/dark.css`: neutral dark literals on `:root`, every base pair at AA. New fixture `tests/fixtures/design-systems/full-dark/` (full plus a fictitious `dark` module).
+5. `scripts/sync-shared.py` run.
 
 Primary files:
 
-1. `plugins/delivery-comms/contract/{modules.json,kit-manifest.schema.json,README.md}`, `plugins/delivery-comms/shared/base/dark.css` and the skill copies
-2. `plugins/delivery-comms/tests/{test_contract.py,test_resolver.py,test_ux_design_system.py}`, `plugins/delivery-comms/tests/fixtures/design-systems/full/`
+1. `plugins/delivery-comms/contract/{modules.json,kit-manifest.schema.json,README.md}`, `plugins/delivery-comms/shared/{design_source.py,base/dark.css}` and the skill copies
+2. `plugins/delivery-comms/tests/{test_contract.py,test_resolver.py,test_ux_design_system.py}`, `plugins/delivery-comms/tests/fixtures/design-systems/full-dark/`
 
 Test gate:
 
@@ -74,27 +79,30 @@ Test gate:
 
 Exit criteria:
 
-1. The contract declares ten modules at 2.1.0; a 2.0 manifest and the `subset` fixture resolve unchanged; `dark` comes from the base when a design omits it.
+1. The contract declares ten modules at 2.1.0; a 2.0 manifest, `full` and `subset` resolve unchanged; `dark` comes from the base when a design omits it.
 
-### Increment 02: a dark slide switches every core role
+Prediction:
+
+1. Changed outputs: every `provenance.json` gains `"dark": "base"` (or `design-system` for `full-dark`); nothing else.
+
+### Increment 02: dark slides and dark documents
 
 **Status:** pending
 
 Scope:
 
 1. **Write first, expect red:**
-   - extend `tests/test_slide_deck.py`: a fixture deck with one slide whose `config.yaml` entry has `class: "dark"` builds against `full`; inside that slide the computed `--canvas-bg`, `--slide-bg`, `--surface`, `--surface-2`, `--border`, `--ink`, `--muted`, `--tertiary`, `--accent` and `--accent-ink` equal the `full` fixture's dark roles, and the logo uses `--brand-logo-on-dark`; an element with class `dark-key` takes `--dark-key-fill` and `--dark-glow`; the other slides keep the light roles; `check_render.py` passes on the output and the provenance lists `dark` as `design-system`.
-   - extend `tests/test_slide_deck.py`: the same deck against `subset` renders the dark slide from the base `dark.css` and passes the validator.
-   - extend `tests/test_characterisation.py` (or `test_reproducible.py`): every existing fixture deck, view and report renders byte-identical to its 2.0.0 output (no `dark` class, no change).
-   - extend `tests/test_contract.py::test_class_vocabularies_cover_what_the_renderers_emit` with `dark` and `dark-key`.
-2. `shared/base/dark.css` (or `slide-frame.css`, whichever the module layering requires): `.slide.dark { --canvas-bg: var(--dark-canvas-bg); --slide-bg: var(--dark-canvas-bg); ... }` remapping every core role in role names only, the logo on dark, and `.slide.dark .dark-key { background: var(--dark-key-fill); box-shadow: var(--dark-glow); }`.
-3. `com-slide-deck/scripts/build.py`: inlines the `dark` module with the other deck modules (after `slide-frame`, before the deck's `styles.css`); views and reports do not inline it.
-4. `scripts/sync-shared.py` run.
+   - new helper `tests/goldens.py` and goldens captured from c43a29a (the 2.0.0 merge) for every fixture deck, view and report: computed styles of every slide and the PDF pages as pixels; extend `tests/test_characterisation.py` to compare against them (M-1).
+   - extend `tests/test_slide_deck.py` (emitted text, no browser): a fixture deck whose second partial root is `<div class="slide s-2 dark">`, built against `full-dark`, carries the remap rule for every mirrored role, the recomputed `--kit-on-*`, the logo on dark and the `dark-key` and `dark-accent` rules in the kit layer, and inlines the `dark` module; the same deck without a dark slide inlines no `dark` CSS; `theme: dark` marks every slide; with `dark` present, the core `--kit-on-*` block, `print_chrome.role_value(design, "--muted")` and the resolver's refusal of a failing core pair are unchanged for `full` and `full-dark` (C-1); `test_class_vocabularies_cover_what_the_renderers_emit` checks the union of the `slide-frame` and `dark` classes.
+   - extend `tests/test_pdf.py` (computed values, Playwright): inside the dark slide every mirrored role, `--slide-fg` included, equals the fixture's dark value; a role outside the mirror keeps its light value; `.dark-key` takes `--dark-key-fill` and `--dark-key-edge`; the light slides keep the light roles; a `mode: document` with `theme: dark` prints dark pages with a footer in `--dark-muted`; `check_render.py` passes.
+   - the same deck against `subset` renders the dark slide from the base `dark.css` and passes the validator.
+2. `com-slide-deck/scripts/build.py`: `make_baseline_css` emits the remap (D-4), generated from the mirror list; reads `theme:`; inlines the `dark` module only when used. `com-slide-deck/scripts/render.py` `document_chrome`: a dark document's footer reads the dark roles. `shared/base/slide-frame.css`: `.slide.dark .slide-logo` uses `background-image: var(--brand-logo-on-dark)`; a design without an on-dark logo shows none on a dark slide (L-2).
+3. `scripts/sync-shared.py` run.
 
 Primary files:
 
-1. `plugins/delivery-comms/shared/base/dark.css`, `plugins/delivery-comms/skills/com-slide-deck/scripts/build.py`
-2. `plugins/delivery-comms/tests/{test_slide_deck.py,test_characterisation.py,test_contract.py}` and a fixture deck under `tests/fixtures/`
+1. `plugins/delivery-comms/skills/com-slide-deck/scripts/{build.py,render.py}`, `plugins/delivery-comms/shared/{print_chrome.py,base/slide-frame.css}`
+2. `plugins/delivery-comms/tests/{goldens.py,test_slide_deck.py,test_pdf.py,test_characterisation.py,test_contract.py}`, a fixture deck and a dark document fixture under `tests/fixtures/`
 
 Test gate:
 
@@ -102,11 +110,11 @@ Test gate:
 
 Exit criteria:
 
-1. A slide marked `dark` renders on the design's dark roles (or the base's) with no deck-local property, passes the validator, and nothing else changes.
+1. A dark slide, deck or document renders on the design's dark roles (or the base's) with no deck-local property, passes the validator, and every existing fixture renders the same computed styles and pixels as at c43a29a.
 
 Prediction:
 
-1. Changed outputs: only the new dark fixture deck's output. Every existing characterisation output stays byte-identical.
+1. New: the dark fixture deck and document outputs. Changed bytes: none in existing decks (the `dark` CSS is inlined only when used), apart from the provenance entry of Inc 01.
 
 ### Increment 03: the deck classification in the footer
 
@@ -115,14 +123,16 @@ Prediction:
 Scope:
 
 1. **Write first, expect red:**
-   - extend `tests/test_slide_deck.py`: with `classification: Confidential` in `config.yaml`, every slide's footer row holds `<span class="slide-classification">Confidential</span>` between the legal line and the number; with no key, the footer is byte-identical to 2.0.0; `classification: Secret` exits 2 and names the four allowed values; a `mode: document` deck prints the classification in the running footer of every PDF page (`test_pdf.py`, extend the document fixture case).
+   - extend `tests/test_slide_deck.py`: with `classification: Confidential` and `lang: fr`, every slide's footer row holds `<span class="slide-classification">Confidentiel</span>` just before the number; `lang: en` prints "Confidential"; `lang: es` prints English and warns; with no key, the footer is byte-identical to 2.0.0; `classification: Secret` exits 2 (a `DesignError`, which `main` already maps to 2) and names the four values; `test_the_kit_emits_only_the_slide_frame_vocabulary` (line 413) gains `slide-classification`.
+   - extend `tests/test_slide_deck.py` (no browser, the pattern at line 229): `document_chrome(...)` with a classification holds the cell; a classification alone turns the footer on; `footer_template` with no classification is byte-identical; the release-note footer is unchanged.
+   - extend `tests/test_pdf.py`: one rendered `mode: document` smoke run with the classification on every page.
    - extend `tests/test_contract.py::test_slide_frame_roles_and_classes` and `::test_class_vocabularies_cover_what_the_renderers_emit` with `slide-classification`.
-2. `com-slide-deck/scripts/build.py`: read and check `classification:`, add the cell in `slide_footer`; `shared/print_chrome.py` `footer_template` takes an optional classification for `mode: document`; `shared/base/slide-frame.css` styles `.slide-classification` in roles only (the tertiary text role, mono, uppercase, like the label).
+2. `shared/classification.py` (new): the closed list, the labels per language and the check, called by `build.py` and `render.py` (M-4, N-5). `build.py` `slide_footer`: the cell before the number. `render.py` `document_chrome` and `display_header_footer`. `shared/print_chrome.py` `footer_template`: an optional classification, default none. `shared/base/slide-frame.css`: `.slide-classification` in roles only (the tertiary role, mono, uppercase), grouped with the number at the right.
 3. `contract/modules.json`: `slide-classification` joins the `slide-frame` classes; `scripts/sync-shared.py` run.
 
 Primary files:
 
-1. `plugins/delivery-comms/skills/com-slide-deck/scripts/build.py`, `plugins/delivery-comms/shared/{print_chrome.py,base/slide-frame.css}`, `plugins/delivery-comms/contract/modules.json`
+1. `plugins/delivery-comms/skills/com-slide-deck/scripts/{build.py,render.py}`, `plugins/delivery-comms/shared/{classification.py,print_chrome.py,base/slide-frame.css}`, `plugins/delivery-comms/contract/modules.json`
 2. `plugins/delivery-comms/tests/{test_slide_deck.py,test_pdf.py,test_contract.py}`
 
 Test gate:
@@ -131,25 +141,25 @@ Test gate:
 
 Exit criteria:
 
-1. A deck that declares a classification shows it on every slide and page; a deck that does not is unchanged.
+1. A deck that declares a classification shows it on every slide and page in its language; a deck that does not is unchanged.
 
 Prediction:
 
-1. Changed outputs: only the fixture decks that gain a `classification:` key in this increment.
+1. Changed outputs: only the fixture decks and documents that gain a `classification:` key.
 
-### Increment 04: the skills teach dark slides and classification
+### Increment 04: the skills teach dark and classification
 
 **Status:** pending
 
 Scope:
 
-1. **Exempt from red-first (documentation):** `com-slide-deck` SKILL.md and its references: mark a dark slide with `class: "dark"` and use the key element class, never a deck-local dark palette; declare `classification:` with the four levels and when each applies (Strictly confidential for sensitive personal data, GDPR Art. 9). `ux-design-system` SKILL.md and `references/`: the `dark` module, its roles and pairs, what `point` and `subset` do with it; `references/agents-md-block.md` gains no line (the block stays five lines). `contract/README.md` final pass.
-2. **Write first, expect red:** extend `tests/test_skill_evals.py` (or the eval case list under `evals/`) with one case: migrating a deck whose styles define `--dark-bg` and friends ends with the slide carrying `class: "dark"` and no `--dark-*` property in `styles.css`. The owner-approved eval run is optional, as in Plan-0005 increment 12.
+1. **Exempt from red-first (documentation):** `com-slide-deck` SKILL.md and references: mark a dark slide on its partial root, or a whole deck or document with `theme: dark`; the key element and highlighted text classes; never a deck-local dark palette; `classification:` with the four levels, the language rule, and when Strictly confidential applies. `ux-design-system` SKILL.md and `references/`: the `dark` module, the mirror rule, its required roles and pairs, what `point` and `subset` do with it; `references/token-contract.md` says ten modules (L-1); `references/agents-md-block.md` gains no line. `contract/README.md` final pass.
+2. **Write first, expect red (structural only):** `tests/test_skill_evals.py` gains one case, and `test_the_five_cases_and_nothing_else` (line 82) becomes six, with the Makefile comment: migrating a deck whose styles define `--dark-bg` and friends ends with `dark` on the partial root and no `--dark-*` property in `styles.css`. The test checks the case files; whether an agent does it needs the paid eval run, optional and owner-approved as in Plan-0005 increment 12 (L-2).
 
 Primary files:
 
-1. `plugins/delivery-comms/skills/com-slide-deck/SKILL.md`, `plugins/delivery-comms/skills/ux-design-system/SKILL.md` and `references/`, `plugins/delivery-comms/contract/README.md`
-2. `plugins/delivery-comms/evals/`, `plugins/delivery-comms/tests/test_skill_evals.py`
+1. `plugins/delivery-comms/skills/com-slide-deck/SKILL.md` and references, `plugins/delivery-comms/skills/ux-design-system/SKILL.md` and `references/`, `plugins/delivery-comms/contract/README.md`
+2. `plugins/delivery-comms/evals/`, `plugins/delivery-comms/tests/test_skill_evals.py`, `plugins/delivery-comms/Makefile`
 
 Test gate:
 
@@ -158,7 +168,7 @@ Test gate:
 
 Exit criteria:
 
-1. An agent following the skills marks dark slides and classifications through the contract, never with deck-local properties.
+1. An agent following the skills marks dark slides, dark decks and classifications through the contract, never with deck-local properties.
 
 ### Increment 05: release 2.1.0
 
@@ -166,7 +176,7 @@ Exit criteria:
 
 Scope:
 
-1. **Exempt from red-first (versions and notes):** `plugin.json` 2.0.0 to 2.1.0; skill `metadata.version` bumped where the skill changed (minor); `CHANGELOG.md` `## 2.1.0 - <date>` naming the `dark` module, the `dark` and `dark-key` classes, `classification:`, and that 2.0 manifests and decks render unchanged.
+1. **Exempt from red-first (versions and notes):** `plugin.json` 2.0.0 to 2.1.0; skill `metadata.version` bumped where the skill changed (minor); `CHANGELOG.md` `## 2.1.0 - <date>` naming the `dark` module and its mirror rule, `theme: dark`, the `dark`, `dark-key` and `dark-accent` classes, `classification:` and its languages, that 2.0 manifests and decks render unchanged, and that a design providing `dark` needs 2.1.0.
 2. Merge to `main` at the owner's request; `claude plugin marketplace update` and `claude plugin update delivery-comms@<marketplace>` verified against the cache.
 
 Primary files:
@@ -180,7 +190,31 @@ Test gate:
 
 Exit criteria:
 
-1. 2.1.0 is in the marketplace cache; its scripts render the fixture deck with a dark slide and a classification against `full`, `subset` and a 2.0 design, each passing `check_render.py`.
+1. 2.1.0 is in the marketplace cache; its scripts render the fixture deck with a dark slide and a classification, and the dark document, against `full-dark`, `full`, `subset` and a 2.0 design, each passing `check_render.py`.
+
+## Review findings (peer review of 2026-10-15)
+
+| Finding | Where it is answered |
+| :-- | :-- |
+| C-1 remap in module CSS breaks the resolver | D-4: the remap lives in `build.py`'s layer; Principle 4; Inc 01 refuses selector-scoped roles; Inc 02 regression tests |
+| M-1 byte identity and goldens | Principle 3 redefined; `dark` CSS inlined only when used; goldens from c43a29a (Inc 02); `full-dark` fixture instead of changing `full` |
+| M-2 `class:` key ignored | D-3: the class goes on the partial root; `theme: dark` for a whole deck |
+| M-3 role list, `--slide-fg`, accent pairs | D-2 mirror generated from `modules.json`; pairs mirrored mechanically; `--dark-accent-text` has a class and pairs |
+| M-4 document footer in `render.py` | Inc 02 and 03 scope `render.py`; shared check in `classification.py` |
+| M-5 2.0 kit refuses a 2.1 manifest | Summary; newer-minor guard (Inc 01); CHANGELOG (Inc 05) |
+| N-1 schema facts | Inc 01 scope 2 and the `$id` test |
+| N-2 plans disagree, `subset` | One mirror rule shared with MedQuantis Plan-0003; `subset` does not read dark roles in 2.1 and says so |
+| N-3 computed values need a browser | Inc 02 splits `test_slide_deck.py` (text) from `test_pdf.py` (computed) |
+| N-4 text on the key element | `--dark-key-base` paired with `--dark-ink` |
+| N-5 exit-code path | `DesignError` from `classification.py` |
+| L-1 unnamed tests | Named in Inc 03 and 04 |
+| L-2 eval wording, logo on dark | Inc 04 says structural only; Inc 02 logo rule |
+| L-3 sourcing, codes, language | D-5 wording; D-6 language (owner); D-7 codes (owner, O-1) |
+| L-4 vendoring commit | D-8 |
+
+## Open questions
+
+None. O-1 (codes C0 to C3 next to the label) was resolved by the owner on 2026-10-17: the footer shows the label only (D-7).
 
 ## Delivery Rules
 
@@ -189,14 +223,14 @@ Exit criteria:
 3. Each increment must be independently runnable and reversible.
 4. Tests named in Scope are written or extended first and observed failing before the implementation lands; `progress.txt` records the red run (failing test names) and the green run. A write-first test that already passes is wrong or redundant: fix it, or log why. An increment whose tests were written after its code is not done.
 5. Every increment that changes a file under `shared/` runs `scripts/sync-shared.py` in the same commit.
-6. Additive only (Principle 3): a change to an existing fixture's output blocks the increment unless its `Prediction:` names it.
-7. No real client material in fixtures; the `full` fixture's dark module is a fictitious brand.
+6. Principle 3: a change to an existing fixture's computed styles or pixels blocks the increment; a byte change blocks it unless its `Prediction:` names it.
+7. No real client material in fixtures; the `full-dark` fixture's dark module is a fictitious brand.
 8. Foreground gates only; every iteration ends with a definitive state.
 
 ## Milestone Chunks (Standalone Delivery Groups)
 
 | Milestone | Increments | Status | Coherent Outcome | Standalone Test Gate | Exit Criteria | Commit Guidance |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
-| M1: Dark module | 01-02 | pending | A design names its dark roles once; a `dark` slide switches every core role | `make -C plugins/delivery-comms test test-pdf` | Dark slide renders on design or base roles; existing outputs byte-identical | `feat(delivery-comms)` |
-| M2: Classification | 03 | pending | Every slide and page shows the deck's classification | `make -C plugins/delivery-comms test test-pdf` | Four levels, closed list, unchanged when absent | `feat(delivery-comms)` |
+| M1: Dark module | 01-02 | pending | A design mirrors its colour roles once; a dark slide, deck or document switches every role | `make -C plugins/delivery-comms test test-pdf` | Dark renders on design or base roles; existing fixtures render the same as at c43a29a | `feat(delivery-comms)` |
+| M2: Classification | 03 | pending | Every slide and page shows the deck's classification in its language | `make -C plugins/delivery-comms test test-pdf` | Four levels, closed list, unchanged when absent | `feat(delivery-comms)` |
 | M3: Skills and release | 04-05 | pending | Agents use both through the contract; 2.1.0 in the cache | `make -C plugins/delivery-comms test`, `./scripts/audit-skills.sh` | 2.1.0 renders the fixtures from the cache | `docs(delivery-comms)`, `chore(delivery-comms)` |

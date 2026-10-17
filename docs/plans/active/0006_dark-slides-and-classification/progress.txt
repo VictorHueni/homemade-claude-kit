@@ -8,3 +8,11 @@ One entry per increment: red run (failing test names), green run, gates, owner a
 - Source: Paracel Plan 0190 Q-17 (dark slides on a design-owned dark theme; the owner chose a near-black with a navy cast, a lifted navy for marks, a light navy for highlighted text and a navy glow on the key element) and Q-19 (a classification per deck in the footer, four levels used with GDPR and the Swiss nFADP).
 - Evidence: build.py slide_footer and OLD_FOOTER (deck footers stripped); design_source.py compares the contract major only, so 2.1.0 is additive; precedents #148 and #149 for optional roles.
 - Consumer: @medquantis/design-system 1.2.0 (its Plan 0003) provides the first dark module; Paracel Plan 0190 Inc 04 onward waits for both releases.
+
+## Plan reworked (2026-10-15)
+
+- Reworked on branch docs/rework-dark-slides-and-classification-plan after MedQuantis ADR-0007 and the owner's design pass of 2026-10-15.
+- The dark module is now a mechanical mirror (--dark-<role> for every colour role of core, dataviz, slide-frame, document and print, plus key-fill, key-base, key-edge, accent-text); the remap moves into build.py's own layer (review C-1, option a); dark extends to whole decks and documents (theme: dark).
+- Owner rulings applied: no glow (--dark-glow becomes --dark-key-edge), classification at the right before the number, label in the deck's lang. Open: O-1, the C0 to C3 codes.
+- The peer review of 2026-10-15 (var/reports/0006-dark-slides-and-classification-peer-review.md) is answered finding by finding in the plan's "Review findings" table.
+- 2026-10-17: owner resolved O-1, the footer shows the classification label only, no C0 to C3 code (D-7).
