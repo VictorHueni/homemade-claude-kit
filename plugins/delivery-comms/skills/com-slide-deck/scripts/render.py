@@ -33,6 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 # exactly what the build checked.
 from build import (DesignError, RenderRefused, canvas_size, check_deck, deck_sources, deck_theme,  # noqa: E402
                    page_geometry, provenance_summary, resolve_design, write_provenance)
+import classification  # noqa: E402  (shared: the closed list of levels and their labels)
 import pdf_dates  # noqa: E402  (shared: the source date replaces Chromium's render time in the PDF)
 import print_chrome  # noqa: E402  (shared: the page-margin chrome com-release-note draws too)
 import source_date  # noqa: E402
@@ -129,11 +130,19 @@ def _fill(template: str, cfg: dict, date: str) -> str:
                            date_label=cfg.get("date_label", "") or date, date=date)
 
 
+def chrome_shown(cfg: dict, recipient: str | None) -> bool:
+    """Whether a paginated document prints its running header and footer: any of their texts, the page
+    numbers or a classification turns them on."""
+    page_cfg = cfg.get("page", {}) or {}
+    return bool(page_cfg.get("running_header", "{title}") or page_cfg.get("footer_left", "{author} · {date_label}")
+                or recipient or page_cfg.get("numbering", True) or cfg.get("classification"))
+
+
 def document_chrome(cfg: dict, date: str, recipient: str | None, design) -> tuple[str, str]:
     """(header, footer) templates of a paginated document. Chromium draws them in the page margins as a
     separate document the deck's CSS cannot reach, so the shared print chrome inlines the design's resolved
     --muted (--dark-muted for `theme: dark`) and --font-mono values and carries the brand logo (a data URI,
-    on-dark for `theme: dark`) and the legal line."""
+    on-dark for `theme: dark`), the legal line and the deck's classification label."""
     geom = page_geometry(cfg)
     page_cfg = cfg.get("page", {}) or {}
     side = geom["margin"]["left"]
@@ -143,8 +152,9 @@ def document_chrome(cfg: dict, date: str, recipient: str | None, design) -> tupl
     numbering = bool(page_cfg.get("numbering", True))
     try:
         dark = deck_theme(cfg) == "dark"
+        level = classification.label(cfg.get("classification"), cfg.get("lang", "en"))
         return (print_chrome.header_template(design, running, side, dark),
-                print_chrome.footer_template(design, footer_left, side, numbering, dark))
+                print_chrome.footer_template(design, footer_left, side, numbering, dark, level))
     except DesignError as exc:
         fail(str(exc), exc.code)
 
@@ -152,10 +162,6 @@ def document_chrome(cfg: dict, date: str, recipient: str | None, design) -> tupl
 def render_document(cfg: dict, built_html: Path, pdf_path: Path, recipient: str | None, date: str, design) -> None:
     """Paginated document: real print media, @page from the config, header/footer chrome."""
     geom = page_geometry(cfg)
-    page_cfg = cfg.get("page", {}) or {}
-    running = page_cfg.get("running_header", "{title}")
-    footer_left = page_cfg.get("footer_left", "{author} · {date_label}")
-    numbering = bool(page_cfg.get("numbering", True))
     header_tpl, footer_tpl = document_chrome(cfg, date, recipient, design)
 
     sync_playwright = require_playwright()
@@ -185,7 +191,7 @@ def render_document(cfg: dict, built_html: Path, pdf_path: Path, recipient: str 
             format=geom["size"],
             landscape=geom["orientation"] == "landscape",
             print_background=True,
-            display_header_footer=bool(running or footer_left or recipient or numbering),
+            display_header_footer=chrome_shown(cfg, recipient),
             header_template=header_tpl,
             footer_template=footer_tpl,
             margin=geom["margin"],

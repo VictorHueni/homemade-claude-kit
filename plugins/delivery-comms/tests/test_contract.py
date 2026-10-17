@@ -154,6 +154,10 @@ class ModulesTest(unittest.TestCase):
         self.assertIn(".dark-key", dark)
         self.assertLessEqual(css_classes(dark), set(mods["slide-frame"]["classes"]) | set(mods["dark"]["classes"])
                              | set(mods["document"]["classes"]))
+        # the classification cell's rule, emitted only for a deck that declares one
+        cell = deck.make_classification_css()
+        self.assertIn(".slide-classification", cell)
+        self.assertLessEqual(css_classes(cell), set(mods["slide-frame"]["classes"]))
         report = (SKILLS / "com-release-note/templates/report.html.tmpl").read_text(encoding="utf-8")
         page = {c for c in css_classes(report) if re.match(r"(report|section)(-|$)|section--", c)}
         self.assertLessEqual(page, set(mods["print"]["classes"]))
@@ -166,7 +170,7 @@ class ModulesTest(unittest.TestCase):
                                                "--slide-width", "--slide-height"})
         self.assertEqual(set(frame["classes"]), {"slide", "active", "presenting", "controls-hint", "slide-source-bar",
                                                  "slide-label", "slide-footer", "slide-logo", "slide-legal",
-                                                 "slide-number"})
+                                                 "slide-classification", "slide-number"})
         base = css_classes((SHARED / "base/slide-frame.css").read_text(encoding="utf-8"))
         self.assertIn("slide-footer", base)
         self.assertLessEqual(base, set(frame["classes"]))

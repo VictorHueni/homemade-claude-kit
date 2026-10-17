@@ -118,9 +118,10 @@ def header_template(design, text, side, dark=False):
     return f'<div style="{style}"><span>{html.escape(text)}</span><span></span></div>'
 
 
-def footer_template(design, left, side, numbering=True, dark=False):
+def footer_template(design, left, side, numbering=True, dark=False, classification=None):
     """Footer row: the brand logo and `left` text, the legal line, then the page position at the right.
-    A design without a logo or a legal line simply leaves those cells out; `dark` takes the on-dark logo."""
+    A design without a logo or a legal line simply leaves those cells out; `dark` takes the on-dark logo;
+    a `classification` label prints in capitals just before the page position."""
     uri = logo_uri(design, "--brand-logo-on-dark" if dark else "--brand-logo-on-light")
     logo = (f'<img src="{uri}" alt="" data-brand-asset style="height:{LOGO_HEIGHT};width:auto;display:block">'
             if uri else "")
@@ -129,4 +130,8 @@ def footer_template(design, left, side, numbering=True, dark=False):
     middle = f"<span>{html.escape(legal)}</span>" if legal else "<span></span>"
     right = ('<span><span class="pageNumber"></span> / <span class="totalPages"></span></span>' if numbering
              else "<span></span>")
+    if classification:
+        position = right if numbering else ""
+        right = (f'<span style="display:flex;align-items:center;gap:4mm"><span style="text-transform:uppercase">'
+                 f'{html.escape(classification)}</span>{position}</span>')
     return f'<div style="{html.escape(_style(design, side, dark))}">{start}{middle}{right}</div>'

@@ -34,7 +34,7 @@ Principles:
 5. Shared code stays in sync: every change under `shared/` runs `scripts/sync-shared.py` in the same commit.
 
 **Overall Status:** in-progress
-**Current Increment:** 02
+**Current Increment:** 03
 
 ## Plan-level decisions
 
@@ -118,7 +118,7 @@ Prediction:
 
 ### Increment 03: the deck classification in the footer
 
-**Status:** pending
+**Status:** done
 
 Scope:
 
@@ -232,5 +232,5 @@ None. O-1 (codes C0 to C3 next to the label) was resolved by the owner on 2026-1
 | Milestone | Increments | Status | Coherent Outcome | Standalone Test Gate | Exit Criteria | Commit Guidance |
 | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
 | M1: Dark module | 01-02 | done | A design mirrors its colour roles once; a dark slide, deck or document switches every role | `make -C plugins/delivery-comms test test-pdf` | Dark renders on design or base roles; existing fixtures render the same as at c43a29a | `feat(delivery-comms)` |
-| M2: Classification | 03 | pending | Every slide and page shows the deck's classification in its language | `make -C plugins/delivery-comms test test-pdf` | Four levels, closed list, unchanged when absent | `feat(delivery-comms)` |
+| M2: Classification | 03 | done | Every slide and page shows the deck's classification in its language | `make -C plugins/delivery-comms test test-pdf` | Four levels, closed list, unchanged when absent | `feat(delivery-comms)` |
 | M3: Skills and release | 04-05 | pending | Agents use both through the contract; 2.1.0 in the cache | `make -C plugins/delivery-comms test`, `./scripts/audit-skills.sh` | 2.1.0 renders the fixtures from the cache | `docs(delivery-comms)`, `chore(delivery-comms)` |
