@@ -289,7 +289,8 @@ class InitTest(DeckCase):
 
 FULL_LEGAL = "Acme Test is a fictitious brand."
 SLIDE_FRAME_CLASSES = {"slide", "active", "presenting", "controls-hint", "slide-source-bar",
-                       "slide-label", "slide-footer", "slide-logo", "slide-legal", "slide-number"}
+                       "slide-label", "slide-footer", "slide-logo", "slide-legal", "slide-classification",
+                       "slide-number"}
 
 
 def classes_in(text):
@@ -419,10 +420,11 @@ class SlideFrameTest(DeckCase):
         base_frame = (DECK / "shared" / "base" / "slide-frame.css").read_text(encoding="utf-8")
         self.assertLessEqual(classes_in(f"<style>{base_frame}</style>"), vocabulary)
         self.pin("full")
-        self.scaffold()
+        self.scaffold(classification="Internal")
         self.add_slides(2)
         self.assertBuilds()
         html = self.html()
+        self.assertIn('class="slide-classification"', html)
         body = html.split("</head>", 1)[1]
         emitted = classes_in(self.kit_style(html)) | classes_in(body)
         emitted -= {"s-1", "s-2"}  # the partials' own slide classes
@@ -449,17 +451,8 @@ class FrameRenderTest(DeckCase):
                 self.assertEqual(self.render.canvas_size({**cfg, "canvas": {"width": 800, "height": 600}}, design),
                                  (800, 600))
 
-class DarkDeckTest(DeckCase):
-    """Dark slides, decks and documents: the remap lives in build.py's kit layer, the dark module is inlined only
-    when a slide or the deck is dark, and nothing the light render reads moves."""
-
-    def setUp(self):
-        super().setUp()
-        sys.path.insert(0, str(DECK / "shared"))
-        import design_source
-        self.ds = design_source
-        self.contract = design_source._contract()
-        self.mirror = design_source.dark_mirror(self.contract)
+class FixtureDeckCase(DeckCase):
+    """A copy of tests/fixtures/decks, one deck of it configured by the test (the fixture configs back the goldens)."""
 
     def fixture(self, name, design=None, **config):
         if not (self.tmp / "decks").exists():
@@ -487,6 +480,19 @@ class DarkDeckTest(DeckCase):
 
     def roots(self, html):
         return re.findall(r'<(?:div|section) class="(slide [^"]*|slide|doc[^"]*)"', html)
+
+
+class DarkDeckTest(FixtureDeckCase):
+    """Dark slides, decks and documents: the remap lives in build.py's kit layer, the dark module is inlined only
+    when a slide or the deck is dark, and nothing the light render reads moves."""
+
+    def setUp(self):
+        super().setUp()
+        sys.path.insert(0, str(DECK / "shared"))
+        import design_source
+        self.ds = design_source
+        self.contract = design_source._contract()
+        self.mirror = design_source.dark_mirror(self.contract)
 
     def test_a_dark_slide_carries_the_remap_in_the_kit_layer(self):
         self.fixture("dark-slides", "full-dark")
@@ -597,6 +603,133 @@ class DarkDeckTest(DeckCase):
         _, light = render.document_chrome(self.cfg, "2026-10-17", None, design)
         self.assertIn("#475467", light)
         self.assertIn(logo_uri(design), light)
+
+
+LABELS = {
+    "en": ("Public", "Internal", "Confidential", "Strictly confidential"),
+    "fr": ("Public", "Interne", "Confidentiel", "Strictement confidentiel"),
+    "de": ("Öffentlich", "Intern", "Vertraulich", "Streng vertraulich"),
+    "it": ("Pubblico", "Interno", "Confidenziale", "Strettamente confidenziale"),
+}
+# print_chrome.footer_template with no classification, as in 2.0.0 (the release note's footer): sha256 prefixes
+FOOTER_SHA = {("full", True): "b37173225b1a9b74", ("full", False): "dc1397e36b0c7bfa",
+              ("subset", True): "48f95f0972b2e4fd", ("subset", False): "1cea1607df6c1908"}
+
+
+class ClassificationTest(FixtureDeckCase):
+    """config.yaml `classification:` prints the deck's level in its language at the right of the footer row, just
+    before the number, and in the running footer of every document page; absent, nothing changes."""
+
+    def setUp(self):
+        super().setUp()
+        sys.path.insert(0, str(DECK / "shared"))
+        import classification
+        self.classification = classification
+
+    def test_the_four_levels_in_each_built_in_language(self):
+        for lang, labels in LABELS.items():
+            for value, label in zip(LABELS["en"], labels):
+                with self.subTest(lang=lang, value=value):
+                    self.assertEqual(self.classification.label(value, lang), label)
+        self.assertEqual(self.classification.label("Confidential", "fr-CH"), "Confidentiel")
+        self.assertEqual(self.classification.label(None, "fr"), "")
+
+    def test_every_slide_shows_the_label_in_the_deck_language_before_the_number(self):
+        for lang, label in (("fr", "Confidentiel"), ("en", "Confidential"), ("de", "Vertraulich"),
+                            ("it", "Confidenziale")):
+            with self.subTest(lang=lang):
+                self.setUp()
+                self.fixture("slides", "full", classification="Confidential", lang=lang)
+                result = self.assertBuilds()
+                self.assertNotIn("WARN", result.stderr)
+                rows = footers(self.html())
+                self.assertEqual(len(rows), 3)
+                for i, row in enumerate(rows, start=1):
+                    self.assertTrue(row.rstrip().endswith(
+                        f'<span class="slide-classification">{label}</span><span class="slide-number">{i} / 3</span>'),
+                        row)
+
+    def test_the_cell_style_is_in_the_kit_layer_in_roles_only(self):
+        self.fixture("slides", "full", classification="Internal")
+        self.assertBuilds()
+        design_layer, kit = self.layers(self.html())
+        rule = re.search(r"\.slide-classification\s*\{([^}]*)\}", kit)
+        self.assertIsNotNone(rule, "the classification rule is missing from the kit layer")
+        for value in ("var(--tertiary)", "var(--font-mono)", "uppercase"):
+            self.assertIn(value, rule.group(1))
+        self.assertRegex(kit, r"\.slide-classification\s*\+\s*\.slide-number\s*\{")
+        self.assertIsNone(LITERAL.search(rule.group(1)))
+        self.assertNotIn("slide-classification", design_layer)
+
+    def test_a_classification_alone_makes_a_footer_row(self):
+        self.fixture("slides", None, classification="Public", numbering={"enabled": False})
+        self.assertBuilds()
+        self.assertEqual([r.strip() for r in footers(self.html())],
+                         ['<span class="slide-classification">Public</span>'] * 3)
+
+    def test_another_language_prints_english_and_warns(self):
+        self.fixture("slides", "full", classification="Strictly confidential", lang="es")
+        result = self.assertBuilds()
+        self.assertIn('<span class="slide-classification">Strictly confidential</span>', self.html())
+        self.assertIn("es", result.stderr)
+        self.assertIn("English", result.stderr)
+
+    def test_no_classification_leaves_the_deck_unchanged(self):
+        for design in ("full", "subset", None):
+            with self.subTest(design=design or "base"):
+                self.setUp()
+                self.fixture("slides", design)
+                self.assertBuilds()
+                plain = self.output.read_bytes()
+                self.assertNotIn(b"classification", plain)
+                self.fixture("slides", design, classification=None)
+                self.assertBuilds()
+                self.assertEqual(self.output.read_bytes(), plain)
+
+    def test_an_unknown_classification_is_refused_naming_the_four(self):
+        for name in ("slides", "document"):
+            with self.subTest(deck=name):
+                self.setUp()
+                self.fixture(name, classification="Secret")
+                result = self.build()
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                for level in LABELS["en"]:
+                    self.assertIn(level, result.stderr)
+                self.assertIn("Secret", result.stderr)
+                self.assertFalse(self.output.exists())
+
+    def test_document_chrome_holds_the_classification_before_the_page_number(self):
+        render = load("slide_deck_render", DECK / "render.py")
+        self.fixture("document", "full", classification="Strictly confidential", lang="de")
+        design = render.resolve_design(self.cfg, self.deck)
+        header, footer = render.document_chrome(self.cfg, "2026-10-17", None, design)
+        self.assertNotIn("Streng vertraulich", header)
+        self.assertRegex(footer, r">Streng vertraulich</span><span><span class=\"pageNumber\">")
+        self.assertIn("text-transform:uppercase", footer)
+        self.cfg["page"] = {"numbering": False}
+        _, unnumbered = render.document_chrome(self.cfg, "2026-10-17", None, design)
+        self.assertIn(">Streng vertraulich</span>", unnumbered)
+        self.assertNotIn("pageNumber", unnumbered)
+
+    def test_a_classification_alone_turns_the_document_footer_on(self):
+        render = load("slide_deck_render", DECK / "render.py")
+        bare = {"mode": "document", "page": {"running_header": "", "footer_left": "", "numbering": False}}
+        self.assertFalse(render.chrome_shown(bare, None))
+        self.assertTrue(render.chrome_shown(bare, "Partner Co"))
+        self.assertTrue(render.chrome_shown({**bare, "classification": "Internal"}, None))
+        self.assertTrue(render.chrome_shown({"mode": "document"}, None))
+
+    def test_footer_template_without_a_classification_is_unchanged(self):
+        import hashlib
+        import design_source
+        import print_chrome
+        for (name, numbering), sha in FOOTER_SHA.items():
+            with self.subTest(design=name, numbering=numbering):
+                design = design_source.resolve(self.tmp, explicit=DESIGNS / name)
+                footer = print_chrome.footer_template(design, "Release note · 2.1.0", "18mm", numbering=numbering)
+                self.assertEqual(hashlib.sha256(footer.encode()).hexdigest()[:16], sha)
+                self.assertEqual(print_chrome.footer_template(design, "Release note · 2.1.0", "18mm",
+                                                              numbering=numbering, classification=""), footer)
 
 
 if __name__ == "__main__":

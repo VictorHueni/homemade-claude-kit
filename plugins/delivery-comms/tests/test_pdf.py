@@ -384,5 +384,34 @@ class DarkPdfTest(RenderCase):
                                      f"page {number} cell {cell} is {rgb.hex()}, not {page_bg.hex()}")
 
 
+class ClassificationPdfTest(RenderCase):
+    """A `mode: document` with a classification prints it, in the deck's language, in every page's footer."""
+
+    def test_every_page_footer_carries_the_classification(self):
+        require_browser(self)
+        goldens.require_rasteriser(self)
+        import pypdfium2
+        shutil.copytree(DECKS, self.tmp / "decks")
+        config = self.tmp / "decks/document/config.yaml"
+        cfg = yaml.safe_load(config.read_text(encoding="utf-8"))
+        cfg.update(classification="Confidential", lang="fr")
+        config.write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
+        env = {"SOURCE_DATE_EPOCH": "31536000"}
+        build = run(SKILLS / "com-slide-deck/scripts/build.py", "-c", config, cwd=self.tmp, env=env)
+        self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
+        result = run(SKILLS / "com-slide-deck/scripts/render.py", "--config", config, "--output", "doc.pdf",
+                     cwd=self.tmp, env=env)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        pdf = pypdfium2.PdfDocument(str(self.tmp / "doc.pdf"))
+        try:
+            texts = [page.get_textpage().get_text_range() for page in pdf]
+        finally:
+            pdf.close()
+        self.assertEqual(len(texts), 2)
+        for number, text in enumerate(texts, start=1):
+            self.assertIn("CONFIDENTIEL", text.upper(), f"page {number}")
+            self.assertNotIn("CONFIDENTIAL", text.upper(), f"page {number}")
+
+
 if __name__ == "__main__":
     unittest.main()

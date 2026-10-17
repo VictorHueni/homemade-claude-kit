@@ -102,6 +102,7 @@
         "slide-footer",
         "slide-logo",
         "slide-legal",
+        "slide-classification",
         "slide-number"
       ]
     },

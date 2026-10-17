@@ -36,6 +36,7 @@ except ImportError:
 # every renderer, synced from plugins/delivery-comms/shared/ by scripts/sync-shared.py.
 sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
 import check_render  # noqa: E402
+import classification  # noqa: E402
 import design_source  # noqa: E402
 from design_source import DesignError  # noqa: E402
 from print_chrome import css_string, role_value  # noqa: E402  (shared with the page-margin chrome)
@@ -270,16 +271,19 @@ def has_logo(design) -> bool:
     return any("url(" in design.brand.get(role, "") for role in ("--brand-logo-on-light", "--brand-logo-on-dark"))
 
 
-def slide_footer(design, number: str) -> str:
-    """The footer row of the slide frame: the brand logo, the legal line and the slide number at the right.
-    The logo image is the design layer's --brand-logo-on-light (one copy, not one per slide); an empty row is
-    not emitted, so a design with no brand and no numbering gets no footer."""
+def slide_footer(design, number: str, level: str = "") -> str:
+    """The footer row of the slide frame: the brand logo, the legal line, then at the right the deck's
+    classification label `level` and the slide number. The logo image is the design layer's
+    --brand-logo-on-light (one copy, not one per slide); an empty row is not emitted, so a design with no brand,
+    no classification and no numbering gets no footer."""
     cells = []
     if has_logo(design):
         cells.append('<span class="slide-logo" data-brand-asset aria-hidden="true"></span>')
     legal = css_string(design.brand.get("--brand-legal", ""))
     if legal:
         cells.append(f'<span class="slide-legal">{html.escape(legal)}</span>')
+    if level:
+        cells.append(f'<span class="slide-classification">{html.escape(level)}</span>')
     if number:
         cells.append(f'<span class="slide-number">{html.escape(number)}</span>')
     return f'<div class="slide-footer">{"".join(cells)}</div>' if cells else ""
@@ -338,6 +342,21 @@ def make_dark_css(design, document: bool = False) -> str:
                 "  .doc.dark { background: var(--print-bg); }\n"
                 "}\n")
     return css
+
+
+def make_classification_css() -> str:
+    """The classification cell of the footer row, emitted only for a deck that declares one: grouped with the
+    number at the right, in the frame's tertiary role, mono and in capitals. It comes before the deck's
+    styles.css, so a deck can restyle it."""
+    return ("/* Kit: the deck's classification, at the right of the footer row before the number */\n"
+            ".slide-classification {\n"
+            "  margin-left: auto;\n"
+            "  flex: none;\n"
+            "  font-family: var(--font-mono);\n"
+            "  text-transform: uppercase;\n"
+            "  color: var(--tertiary);\n"
+            "}\n"
+            ".slide-classification + .slide-number { margin-left: 0; }\n")
 
 
 # The frame owns the number and the footer row: a partial's legacy `<div class="slide-number">`
@@ -499,6 +518,7 @@ def build(config_path: Path, output_override: str = None):
         baseline_js  = make_baseline_js(canvas_w)
 
     theme = deck_theme(cfg)
+    level = classification.label(cfg.get("classification"), cfg.get("lang", "en"))
     css = read_file(styles_path)
     body = []
 
@@ -543,9 +563,9 @@ def build(config_path: Path, output_override: str = None):
                 if source_bar:
                     html = inject_before_slide_end(html, "\n" + source_bar)
 
-        # The slide frame's footer row: logo, legal line, number at the right
+        # The slide frame's footer row: logo, legal line, then the classification and the number at the right
         if not is_doc:
-            footer = slide_footer(design, num_format.format(current=idx, total=total) if num_enabled else "")
+            footer = slide_footer(design, num_format.format(current=idx, total=total) if num_enabled else "", level)
             if footer:
                 html = inject_before_slide_end(html, "\n" + footer)
 
@@ -558,12 +578,13 @@ def build(config_path: Path, output_override: str = None):
     #   1. the resolved design (fonts, then every module, base first and the design system after it;
     #      `dark` only when a slide or the deck is dark), marked data-design-layer: the only place
     #      literals may live
-    #   2. the deck's own styles.css (components, roles only), the baseline CSS and, for a dark slide
-    #      or page, the kit's dark layer
+    #   2. for a classified deck the classification cell, then the deck's own styles.css (components, roles
+    #      only), the baseline CSS and, for a dark slide or page, the kit's dark layer
     dark = dark_slides > 0 or (is_doc and theme == "dark")
     design_layer = "\n".join(design.fonts + [c for m, c in design.css.items() if c and (m != "dark" or dark)])
     parts.append("<style data-design-layer>\n" + design_layer + "\n</style>")
-    layers = [c for c in (css, baseline_css, make_dark_css(design, is_doc) if dark else "") if c]
+    cell_css = make_classification_css() if level and not is_doc else ""
+    layers = [c for c in (cell_css, css, baseline_css, make_dark_css(design, is_doc) if dark else "") if c]
     parts.append("<style>\n" + "\n".join(layers) + "\n</style>")
     parts.append("</head>\n<body>\n")
 
