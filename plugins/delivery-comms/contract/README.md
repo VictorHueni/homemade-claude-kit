@@ -43,7 +43,11 @@ The `dark` module mirrors the colour roles mechanically. `mirror` in `modules.js
 
 A design that provides `dark` declares at least the roles in `requiredRoles` (canvas-bg, surface, border, ink, muted, accent, accent-ink, slide-bg, slide-fg as `--dark-*`); every other dark role takes its value from the base `dark.css`, which holds literals only, never an alias to a light role. The module's `pairs` mirror every light pair onto the dark roles, plus `--dark-ink` on `--dark-key-base` and `--dark-accent-text` on `--dark-canvas-bg` and `--dark-surface`; the resolver checks them like the light pairs, whether the dark roles come from the design or the base.
 
-The module CSS declares the `--dark-*` roles on `:root`; the renderer, never the module, remaps `--x: var(--dark-x)` on a slide or page marked dark.
+The module CSS declares the `--dark-*` roles on `:root`; the renderer, never the module, remaps `--x: var(--dark-x)` on a slide or page marked dark, and chooses each `--kit-on-<fill>` again against the dark pairs.
+
+The classes: `dark` marks a slide (on a partial's root `.slide`) or, with `theme: dark` in a deck's `config.yaml`, every slide or document page; `dark-key` is the one key element of a dark slide (fill `--dark-key-fill`, outline `--dark-key-edge`, text checked on `--dark-key-base`); `dark-accent` is highlighted text (`--dark-accent-text`). A deck never declares a `--dark-*` role itself.
+
+A design that provides `dark` declares `contractVersion` `2.1.0` and needs delivery-comms 2.1.0 or later (a 2.0 kit refuses the unknown module). A design that omits it gets the base `dark.css`; a subset generated from a DESIGN.md always omits it in 2.1.
 
 ## Shared files
 

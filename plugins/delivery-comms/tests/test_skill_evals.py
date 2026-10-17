@@ -1,4 +1,4 @@
-"""Skill eval suite structure (Plan-0005 increment 12). Loads every case in evals/ without running a model.
+"""Skill eval suite structure (Plan-0005 increment 12; the deck-dark-palette case, Plan-0006 increment 04). Loads every case in evals/ without running a model.
 
 The suite runs only through `make skill-evals` (`claude plugin eval`, paid). This test checks what can be checked
 for free: each case folder has the files the CLI reads (prompt.md, case.yaml, graders/*.md) with the keys its
@@ -23,9 +23,12 @@ sys.path.insert(0, str(PLUGIN / "shared"))
 
 import design_source  # noqa: E402
 
-CASES = ("deck-pinned", "viz-from-subfolder", "release-note", "legacy-tokens", "bespoke-generator")
+CASES = ("deck-pinned", "viz-from-subfolder", "release-note", "legacy-tokens", "bespoke-generator",
+         "deck-dark-palette")
 PINNED = ("deck-pinned", "viz-from-subfolder", "release-note", "bespoke-generator")
 FICTITIOUS_DESIGN = "@acme-test/design-system"
+FICTITIOUS_DARK_DESIGN = "@acme-test/design-system-dark"
+DARK_DECK = Path("docs/communication/slides/board-update")
 
 # Keys `claude plugin eval` accepts (2.1.300): prompt.md front matter, case.yaml, grader front matter by type.
 PROMPT_KEYS = {"schema_version", "name", "description", "tags", "plugins", "runs", "expected_outcome", "model",
@@ -40,7 +43,11 @@ GRADER_KEYS = {
     "llm": {"type", "criteria", "focus", "weight", "arm"},
 }
 # Graders whose file is in the staged project before the run: they check the run left it alone.
-PRESENT_BEFORE_THE_RUN = {("legacy-tokens", "tokens-untouched")}
+PRESENT_BEFORE_THE_RUN = {("legacy-tokens", "tokens-untouched"),
+                          ("deck-dark-palette", "section-dark-on-root"),
+                          ("deck-dark-palette", "highlight-is-dark-accent"),
+                          ("deck-dark-palette", "styles-no-dark-palette"),
+                          ("deck-dark-palette", "config-no-dark-exception")}
 # The prompt states the task; how to validate and report it is the skill's job.
 SKILL_WORDS = ("check_render", "verdict", "provenance", "design_source", "--record", "subset", "kit-manifest")
 
@@ -79,7 +86,7 @@ def stage(case, cwd):
 
 
 class CaseFilesTest(unittest.TestCase):
-    def test_the_five_cases_and_nothing_else(self):
+    def test_the_six_cases_and_nothing_else(self):
         found = sorted(p.name for p in EVALS.iterdir()
                        if p.is_dir() and ((p / "prompt.md").is_file() or (p / "case.yaml").is_file()))
         self.assertEqual(found, sorted(CASES))
@@ -171,6 +178,19 @@ class ScaffoldTest(unittest.TestCase):
             design_source.resolve(cwd)
         self.assertEqual(caught.exception.code, 2)
         self.assertFalse((cwd / "docs" / "ux" / "package.json").exists())
+
+    def test_the_dark_palette_deck_resolves_to_the_dark_design_and_is_refused_as_staged(self):
+        cwd = self.staged("deck-dark-palette")
+        design = design_source.resolve(cwd)
+        self.assertEqual(design.provenance["designSystem"]["name"], FICTITIOUS_DARK_DESIGN)
+        self.assertEqual(design.provenance["modules"]["dark"], "design-system")
+        styles = (cwd / DARK_DECK / "design" / "styles.css").read_text(encoding="utf-8")
+        self.assertRegex(styles, r"--dark-[\w-]+\s*:", "the case starts from a deck-local dark palette")
+        build = PLUGIN / "skills" / "com-slide-deck" / "scripts" / "build.py"
+        result = subprocess.run([sys.executable, str(build), "--config", str(DARK_DECK / "config.yaml")],
+                                cwd=cwd, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("--dark-bg", result.stdout + result.stderr)
 
     def test_graders_read_files_the_run_writes(self):
         for case in CASES:

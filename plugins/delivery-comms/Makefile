@@ -30,7 +30,7 @@ test-design-md: check-python
 # plugin.json experimental.evals), each case three times with the plugin and three times without it, and
 # writes report.html and aggregate-result.json to var/skill-evals/<model>/ (gitignored). Each run calls a
 # model on your account and costs money: never part of `test`, run it only when you mean to pay for it.
-#   mise exec -- make -C plugins/delivery-comms skill-evals          full suite (5 cases x 3 runs x 2 arms)
+#   mise exec -- make -C plugins/delivery-comms skill-evals          full suite (6 cases x 3 runs x 2 arms)
 #   mise exec -- make -C plugins/delivery-comms skill-evals-smoke    one case, one run, no baseline arm
 # --scaffold runs each case's scaffold.sh (author-supplied bash, run as you) to stage its scratch project;
 # --keep-temp keeps each run's sandbox (/tmp/claude-eval-*: home/cwd and out/trace.jsonl) so the traces can

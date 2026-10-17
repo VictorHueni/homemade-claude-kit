@@ -1,0 +1,19 @@
+/* Deck styles, written before the design system had a dark theme. */
+:root {
+  --dark-bg: #0b1a2b;
+  --dark-text: #f2f5f8;
+  --dark-highlight: #7cc4ff;
+}
+
+.s-section {
+  background: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+.s-section .highlight {
+  color: var(--dark-highlight);
+}
+
+.s-next ul {
+  margin-top: var(--space-md);
+}

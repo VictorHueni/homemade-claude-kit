@@ -12,6 +12,16 @@ date_label: ""
 # Document language (<html lang>) — e.g. "en", "fr"
 lang: "en"
 
+# Dark: "light" (default) or "dark". dark makes every slide, or every page of a
+# document, dark on the design's dark roles. For one dark slide, put `dark` on that
+# partial's root instead: <div class="slide s-example dark">.
+# theme: dark
+
+# Data classification, printed at the right of every footer before the number, in
+# this deck's lang (en, fr, de, it; English otherwise): Public, Internal,
+# Confidential or Strictly confidential (sensitive personal data). Omit for none.
+# classification: Internal
+
 # Output shape: "slides" (fixed 16:9 canvas, presentation mode) or "document"
 # (paginated A4/Letter, flowing partials, running header + page numbers in the PDF).
 mode: slides
