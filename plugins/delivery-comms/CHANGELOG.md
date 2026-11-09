@@ -2,6 +2,17 @@
 
 All notable changes to the `delivery-comms` plugin. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The release date is set when the release merges to `main`.
 
+## 2.2.0 - 2026-11-09
+
+A cover, a closing slide or a section divider can now sit on your design's own brand ground, such as a deep navy, instead of the plain dark slide background. Nothing changes for a design or deck that does not ask for it: 2.0 and 2.1 manifests and decks render as they did with 2.1.0.
+
+### What you get
+
+- **A brand ground in the `dark` module.** Two optional roles: `--dark-brand-bg`, the ground of a brand slide (a colour or a gradient), and `--dark-brand-base`, the solid colour no lighter than its lightest point. The text, secondary text, footer and highlighted words of a brand slide are checked at WCAG AA on `--dark-brand-base`, like every other pair. A design that leaves the roles out gets the kit's base value. ([#172](https://github.com/VictorHueni/homemade-claude-kit/pull/172))
+- **The `brand` class.** Put `dark brand` on a slide partial's root (`<div class="slide s-cover dark brand">`) and the slide takes `--dark-brand-bg` as its ground; everything else on it stays a normal dark slide. `brand` without `dark` is ignored with a build warning. Never paint a slide's ground in `styles.css` instead. ([#172](https://github.com/VictorHueni/homemade-claude-kit/pull/172))
+- **A design that declares the brand ground needs kit 2.2.0.** Such a design declares contract 2.2.0, which a 2.1 kit refuses with a message naming the delivery-comms version to install. ([#172](https://github.com/VictorHueni/homemade-claude-kit/pull/172))
+- **Agents learn the brand ground.** `com-slide-deck` and `ux-design-system` now teach `dark brand` and the two roles. ([#172](https://github.com/VictorHueni/homemade-claude-kit/pull/172))
+
 ## 2.1.0 - 2026-10-17
 
 Slides, whole decks and documents can now go dark in your design's own dark colours, and a deck can print its data classification in the footer. Nothing changes for a design or deck that asks for neither: 2.0 manifests and decks render as they did with 2.0.0.
