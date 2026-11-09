@@ -308,6 +308,12 @@ def is_dark(partial: str) -> bool:
     return bool(m) and "dark" in m.group(2).split()
 
 
+def is_brand(partial: str) -> bool:
+    """True when the partial's root element carries the `brand` class (the brand ground of a dark slide)."""
+    m = ROOT_CLASS.match(partial)
+    return bool(m) and "brand" in m.group(2).split()
+
+
 def mark_dark(partial: str) -> str:
     """The partial with `dark` added to its root element's classes."""
     if is_dark(partial):
@@ -331,7 +337,8 @@ def make_dark_css(design, document: bool = False) -> str:
            ".slide.dark .slide-logo { background-image: var(--brand-logo-on-dark); }\n"
            ".dark .dark-key { background: var(--dark-key-fill); box-shadow: var(--dark-key-edge); "
            "color: var(--dark-ink); }\n"
-           ".dark .dark-accent { color: var(--dark-accent-text); }\n")
+           ".dark .dark-accent { color: var(--dark-accent-text); }\n"
+           ".slide.dark.brand { --slide-bg: var(--dark-brand-bg); }\n")
     if document:
         # Chromium paints a PDF page's margins, where the running header and footer sit, from @page only
         css += (".doc.dark { color: var(--ink); }\n"
@@ -551,6 +558,8 @@ def build(config_path: Path, output_override: str = None):
             if theme == "dark":
                 html = mark_dark(html)
             dark_slides += is_dark(html)
+            if is_brand(html) and not is_dark(html):
+                print(f"\n  [WARN] {filename}: `brand` needs `dark` on the same slide; it is ignored", end="")
 
         # Inject source bar if the slide declares data-sources and bibliography exists
         if bibliography:

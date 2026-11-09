@@ -352,22 +352,22 @@ class ManifestTest(ResolverCase):
         self.assertEqual(design_source.failing_pairs(css, contract["modules"]["dark"]["pairs"]), [])
 
     def test_a_newer_minor_contract_is_refused_naming_the_kit_to_install(self):
-        # checked before the schema: a 2.2 manifest may name a module this kit does not know
+        # checked before the schema: a 2.3 manifest may name a module this kit does not know
         def mutate(folder):
             path = folder / "kit-manifest.json"
             data = json.loads(path.read_text())
-            data["contractVersion"] = "2.2.0"
+            data["contractVersion"] = "2.3.0"
             data["provides"]["sparkles"] = "./css/core.css"
             path.write_text(json.dumps(data))
         resolve = self.resolve_copy("full", mutate)
         with self.assertRaises(design_source.DesignError) as cm:
             resolve()
         self.assertEqual(cm.exception.code, 2)
-        self.assertIn("this design targets contract 2.2.0; update delivery-comms to 2.2.0 or later", str(cm.exception))
+        self.assertIn("this design targets contract 2.3.0; update delivery-comms to 2.3.0 or later", str(cm.exception))
         proc = subprocess.run([sys.executable, "-I", str(SHARED / "design_source.py"), "provenance", "--design-system",
                                str(self.tmp / "ds")], capture_output=True, text=True)
         self.assertEqual(proc.returncode, 2)
-        self.assertIn("update delivery-comms to 2.2.0 or later", proc.stderr)
+        self.assertIn("update delivery-comms to 2.3.0 or later", proc.stderr)
 
     def test_a_2_0_manifest_still_resolves(self):
         for fixture in ("full", "subset"):
@@ -399,6 +399,7 @@ class ManifestTest(ResolverCase):
         values = design_source.role_values(design.css["dark"])
         self.assertEqual(values["--dark-canvas-bg"], "#0c1716")
         self.assertEqual(values["--dark-key-edge"], "0 0 0 1px #2f6b64")
+        self.assertEqual(values["--dark-brand-base"], "#0f3d38")
         for fixture in ("full", "subset"):
             with self.subTest(fixture=fixture):
                 design = design_source.resolve(self.project, explicit=FIXTURES / fixture)

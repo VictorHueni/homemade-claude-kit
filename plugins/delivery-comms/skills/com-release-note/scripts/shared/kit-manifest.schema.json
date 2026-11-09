@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/VictorHueni/homemade-claude-kit/plugins/delivery-comms/contract/2.1.0/kit-manifest.schema.json",
-  "title": "delivery-comms design-system manifest (contract 2.1.0)",
+  "$id": "https://github.com/VictorHueni/homemade-claude-kit/plugins/delivery-comms/contract/2.2.0/kit-manifest.schema.json",
+  "title": "delivery-comms design-system manifest (contract 2.2.0)",
   "type": "object",
   "properties": {
     "contractVersion": {
