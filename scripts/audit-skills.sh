@@ -67,8 +67,9 @@ while IFS= read -r skill_dir; do
     success "Description: $desc_len chars (limit: 1024)"
   fi
 
-  # 3. Check YAML frontmatter validity
-  if ! ruby -e "require 'yaml'; YAML.unsafe_load_file('$skill_path/SKILL.md')" 2>/dev/null; then
+  # 3. Check YAML frontmatter validity: the file's first YAML document, parsed with the PyYAML the kit already needs
+  if ! python3 -c 'import sys, yaml; next(yaml.safe_load_all(open(sys.argv[1], encoding="utf-8")))' \
+       "$skill_path/SKILL.md" 2>/dev/null; then
     error "$skill_name: invalid YAML in SKILL.md"
   else
     success "YAML: valid"
