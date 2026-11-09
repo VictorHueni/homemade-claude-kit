@@ -22,7 +22,10 @@ jobs:
       - run: make -C plugins/delivery-comms test
 
   test-pdf:
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: the pinned playwright 1.60.0 installs no browser on ubuntu 26.04
+    # ("Playwright does not support chromium on ubuntu26.04-x64"), which ubuntu-latest became in
+    # November 2026. Move it with playwright, when the goldens are recaptured.
+    runs-on: ubuntu-24.04
     env:
       CI: 'true'
     steps:
