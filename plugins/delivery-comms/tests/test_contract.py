@@ -24,7 +24,8 @@ MIRRORED = {
     "document": ("--doc-page-bg", "--doc-rule"),
     "print": ("--print-bg",),
 }
-DARK_EXTRA = ("--dark-key-fill", "--dark-key-base", "--dark-key-edge", "--dark-accent-text")
+DARK_EXTRA = ("--dark-key-fill", "--dark-key-base", "--dark-key-edge", "--dark-accent-text", "--dark-brand-bg",
+              "--dark-brand-base")
 DARK_REQUIRED = {"--dark-canvas-bg", "--dark-surface", "--dark-border", "--dark-ink", "--dark-muted", "--dark-accent",
                  "--dark-accent-ink", "--dark-slide-bg", "--dark-slide-fg"}
 
@@ -43,7 +44,7 @@ def css_classes(css):
 class ModulesTest(unittest.TestCase):
     def test_declares_contract_version_and_ten_modules(self):
         data = modules()
-        self.assertEqual(data["contractVersion"], "2.1.0")
+        self.assertEqual(data["contractVersion"], "2.2.0")
         self.assertEqual(tuple(data["modules"]), MODULES)
         required = {name for name, m in data["modules"].items() if m["required"]}
         self.assertEqual(required, {"core", "dataviz"})
@@ -69,7 +70,7 @@ class ModulesTest(unittest.TestCase):
         self.assertEqual(list(dark["roles"]), list(twins.values()) + list(DARK_EXTRA))
         self.assertEqual(set(dark["requiredRoles"]), DARK_REQUIRED)
         self.assertLessEqual(set(dark["requiredRoles"]), set(dark["roles"]))
-        self.assertEqual(set(dark["classes"]), {"dark", "dark-key", "dark-accent"})
+        self.assertEqual(set(dark["classes"]), {"dark", "dark-key", "dark-accent", "brand"})
         self.assertFalse(dark["required"])
 
     def test_dark_pairs_mirror_the_light_pairs(self):
@@ -87,7 +88,10 @@ class ModulesTest(unittest.TestCase):
                 expected.append((tuple(twins[role] for role in fg), twins[bg]))
         self.assertEqual(len(expected), len(data["pairs"]))   # every light pair has mirrored roles today
         expected += [(("--dark-ink",), "--dark-key-base"), (("--dark-accent-text",), "--dark-canvas-bg"),
-                     (("--dark-accent-text",), "--dark-surface")]
+                     (("--dark-accent-text",), "--dark-surface"),
+                     # a brand slide: its text, footer and highlighted words on the brand ground
+                     (("--dark-ink",), "--dark-brand-base"), (("--dark-muted",), "--dark-brand-base"),
+                     (("--dark-tertiary",), "--dark-brand-base"), (("--dark-accent-text",), "--dark-brand-base")]
         dark_pairs = data["modules"]["dark"]["pairs"]
         self.assertEqual([key(p) for p in dark_pairs], expected)
         roles = set(data["modules"]["dark"]["roles"])
@@ -254,8 +258,8 @@ class ManifestCheckTest(unittest.TestCase):
             if isinstance(node.get("additionalProperties"), dict):
                 walk(node["additionalProperties"])
         walk(self.schema)
-        self.assertIn("2.1.0", self.schema["$id"])
-        self.assertIn("contract 2.1.0", self.schema["title"])
+        self.assertIn("2.2.0", self.schema["$id"])
+        self.assertIn("contract 2.2.0", self.schema["title"])
 
     def test_schema_id_has_no_fragment(self):
         # JSON Schema 2020-12 forbids a non-empty fragment in $id, and ajv refuses the schema with one

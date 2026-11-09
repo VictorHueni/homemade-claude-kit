@@ -8,4 +8,5 @@
   --dark-print-bg: #0c1716;
   --dark-key-fill: linear-gradient(135deg, #173a36, #1f4a45); --dark-key-base: #173a36;
   --dark-key-edge: 0 0 0 1px #2f6b64; --dark-accent-text: #8be9df;
+  --dark-brand-bg: linear-gradient(160deg, #0f3d38, #0a2a27); --dark-brand-base: #0f3d38;
 }

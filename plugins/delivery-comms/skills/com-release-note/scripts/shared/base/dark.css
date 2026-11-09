@@ -45,4 +45,6 @@
   --dark-key-base:    #232a35;               /* solid, no lighter than the fill: the key text's background */
   --dark-key-edge:    0 0 0 1px #3a4556;     /* the key element's outline, a shadow value */
   --dark-accent-text: #a8c1ff;               /* highlighted text on dark */
+  --dark-brand-bg:    #232a35;               /* a brand slide's ground (cover, closing), a colour or a gradient */
+  --dark-brand-base:  #232a35;               /* solid, no lighter than the ground: the brand text's background */
 }

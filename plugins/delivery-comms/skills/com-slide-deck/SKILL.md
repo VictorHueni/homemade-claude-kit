@@ -40,6 +40,7 @@ This skill is a **portable toolkit**. It lives in its own versioned folder and g
 | Re-theme the brand (palette, fonts, logo) | Change the project design, never the deck: `ux-design-system` (`point` a package, or edit `docs/ux/DESIGN.md` and run `subset`) |
 | Restyle this deck only | Edit the project's `design/styles.css` (components, contract roles only) |
 | Make one slide dark | Add `dark` to the partial's root: `<div class="slide s-example dark">`; see **Dark slides, decks and documents** |
+| Give the cover or closing slide the brand ground | Add `dark brand` to the partial's root: `<div class="slide s-cover dark brand">` |
 | Make the whole deck or document dark | `theme: dark` in `config.yaml` |
 | Print the deck's classification in the footer | `classification: Confidential` in `config.yaml` (Public, Internal, Confidential, Strictly confidential); see **Classification** |
 | Live preview while editing | `python3 <skill-dir>/scripts/dev_server.py --config {deck}/config.yaml --port 3000` |
@@ -217,6 +218,7 @@ The design's `dark` module holds a dark twin `--dark-<role>` of every colour rol
 - **What the kit does**: inside a dark slide or page, `build.py`'s own layer remaps every mirrored role to its twin (`--ink` reads `--dark-ink`, `--slide-bg` reads `--dark-slide-bg`, and so on), chooses the text on each fill again against the dark roles, and swaps the footer logo to `--brand-logo-on-dark` (a design without an on-dark logo shows no logo on a dark slide). So the deck's components keep their light rules (`var(--ink)`, `var(--surface)`, `var(--chart-1)`) and turn dark with the slide; charts are allowed on dark. The dark CSS is inlined only when a slide or the deck is dark.
 - **The key element** of a dark slide (the one card or figure the slide is about) takes `class="dark-key"`: its fill is `--dark-key-fill`, its outline `--dark-key-edge`, and its text is checked on `--dark-key-base`. One per slide.
 - **Highlighted words** on a dark slide take `class="dark-accent"` (`--dark-accent-text`).
+- **A brand slide** (the cover, the closing slide, a section divider) adds `brand` beside `dark` on the partial's root, `<div class="slide s-cover dark brand">`: its ground is the design's `--dark-brand-bg` instead of `--dark-slide-bg`, and its text is checked on `--dark-brand-base`. `brand` without `dark` is ignored with a build warning. Never paint a slide's ground in `design/styles.css` instead.
 - **Never a deck-local dark palette.** No `--dark-bg`, `--dark-text` or any other `--dark-*` property in `design/styles.css`, no `.dark { --ink: ... }` remap of your own and no exception for one: the validator refuses a property outside the contract, and the remap is the kit's. A dark value the design lacks belongs in the project design (`ux-design-system`).
 - A document's running header and footer follow `theme: dark` (the dark `--muted`, the on-dark logo); the printed page background is the design's `--dark-print-bg`.
 

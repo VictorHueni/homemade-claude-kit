@@ -523,6 +523,25 @@ class DarkDeckTest(FixtureDeckCase):
         self.assertEqual(self.roots(self.html()), ["slide s-1", "slide s-2 dark", "slide s-3"])
         self.assertEqual(self.provenance()["modules"]["dark"], "design-system")
 
+    def test_a_brand_slide_takes_the_brand_ground(self):
+        self.fixture("dark-slides", "full-dark")
+        slide = self.deck / "slides" / "02-dark.html"
+        slide.write_text(slide.read_text().replace('class="slide s-2 dark"', 'class="slide s-2 dark brand"'))
+        result = self.assertBuilds()
+        self.assertNotIn("needs `dark`", result.stdout)
+        _, kit = self.layers(self.html())
+        self.assertRegex(kit, r"\.slide\.dark\.brand\s*\{\s*--slide-bg:\s*var\(--dark-brand-bg\);\s*\}")
+        self.assertEqual(self.roots(self.html()), ["slide s-1", "slide s-2 dark brand", "slide s-3"])
+
+    def test_brand_without_dark_warns(self):
+        self.fixture("dark-slides", "full-dark")
+        slide = self.deck / "slides" / "01-cover.html"
+        text = slide.read_text()
+        root = re.search(r'class="(slide [^"]*)"', text).group(1)
+        slide.write_text(text.replace(f'class="{root}"', f'class="{root} brand"', 1))
+        result = self.assertBuilds()
+        self.assertIn("[WARN] 01-cover.html: `brand` needs `dark` on the same slide", result.stdout)
+
     def test_a_deck_without_a_dark_slide_inlines_no_dark_css(self):
         for design in ("full-dark", "full", None):
             with self.subTest(design=design or "base"):

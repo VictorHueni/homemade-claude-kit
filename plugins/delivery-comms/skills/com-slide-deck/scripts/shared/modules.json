@@ -1,5 +1,5 @@
 {
-  "contractVersion": "2.1.0",
+  "contractVersion": "2.2.0",
   "modules": {
     "core": {
       "required": true,
@@ -179,12 +179,15 @@
         "--dark-key-fill": "Fill of the key element of a dark slide: a colour or a gradient",
         "--dark-key-base": "Solid colour no lighter than the key fill's lightest point: the background of the key element's text pair",
         "--dark-key-edge": "Outline of the key element of a dark slide, a box-shadow value",
-        "--dark-accent-text": "Highlighted text on dark"
+        "--dark-accent-text": "Highlighted text on dark",
+      "--dark-brand-bg": "Ground of a brand slide (cover, closing, section divider): a colour or a gradient",
+      "--dark-brand-base": "Solid colour no lighter than the brand ground's lightest point: the background of a brand slide's text pairs"
       },
       "classes": [
         "dark",
         "dark-key",
-        "dark-accent"
+        "dark-accent",
+        "brand"
       ],
       "pairs": [
         {
@@ -295,6 +298,26 @@
           "fg": "--dark-accent-text",
           "bg": "--dark-surface",
           "use": "Highlighted text on a dark card"
+        },
+        {
+          "fg": "--dark-ink",
+          "bg": "--dark-brand-base",
+          "use": "Text on a brand slide"
+        },
+        {
+          "fg": "--dark-muted",
+          "bg": "--dark-brand-base",
+          "use": "Secondary text on a brand slide"
+        },
+        {
+          "fg": "--dark-tertiary",
+          "bg": "--dark-brand-base",
+          "use": "Footer, legal line and slide number on a brand slide"
+        },
+        {
+          "fg": "--dark-accent-text",
+          "bg": "--dark-brand-base",
+          "use": "Highlighted text on a brand slide"
         }
       ]
     },
