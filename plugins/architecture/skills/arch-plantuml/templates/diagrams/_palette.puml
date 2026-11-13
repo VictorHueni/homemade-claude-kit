@@ -1,0 +1,29 @@
+' PlantUML palette of the kit base theme: the diagram colours, in a light and a dark variant.
+' Written by `design_source.py plantuml`. Regenerate it; do not edit it.
+!ifdef DARK
+!$canvas = "#1A1E24"
+!$panel = "#23282F"
+!$border = "#353C46"
+!$head = "#232A35"
+!$head_ink = "#E6E9EF"
+!$ink = "#E6E9EF"
+!$muted = "#A3ACB9"
+!$accent = "#7AA2FF"
+!$success = "#4CC38A"
+!$warning = "#F0B45A"
+!$danger = "#F2726E"
+!$info = "#7AA2FF"
+!else
+!$canvas = "#FFFFFF"
+!$panel = "#EEF1F5"
+!$border = "#D7DCE3"
+!$head = "#396CF5"
+!$head_ink = "#FFFFFF"
+!$ink = "#1A1F29"
+!$muted = "#6B7280"
+!$accent = "#396CF5"
+!$success = "#2E9E5B"
+!$warning = "#F0AD4E"
+!$danger = "#D5413D"
+!$info = "#396CF5"
+!endif

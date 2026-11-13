@@ -57,6 +57,11 @@ python3 scripts/check-rules.py          # rule budgets: 3k per always-on rule, 6
 python3 -B scripts/test-hooks.py        # kit-core hook tables
 bash scripts/test-install-rules.sh      # installer rule handling, against a throwaway kit
 
+# arch-plantuml pipeline, against throwaway folders: two variants, palette, folder argument.
+# Needs Docker and skips without it, so the pre-commit hook does not run it: run it by hand
+# after touching plugins/architecture/skills/arch-plantuml/templates/
+bash scripts/test-arch-plantuml.sh
+
 # Audit skill naming, frontmatter validity, length constraints (closest thing to a linter)
 ./scripts/audit-skills.sh
 
