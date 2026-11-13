@@ -25,6 +25,7 @@ sys.path.insert(0, str(PLUGIN / "shared"))
 DESIGNS = PLUGIN / "tests/fixtures/design-systems"
 VIZ = SKILLS / "com-artefact-viz/scripts/render.py"
 VIZ_SOURCE = SKILLS / "com-artefact-viz/examples/fbs.sample.md"
+SLICE = SKILLS / "com-artefact-viz/examples/slice-design"
 NOTE_RENDER = SKILLS / "com-release-note/scripts/render_pdf.py"
 NOTE = SKILLS / "com-release-note/examples/release-note.complete.md"
 DECK = SKILLS / "com-slide-deck/scripts"
@@ -156,6 +157,18 @@ class WorkingDirectoryTest(ReproCase):
         self.assertIn(f"from <code>{repo_relative(VIZ_SOURCE)}</code>", text)
         for out in (outs[0], outs[0].with_name(outs[0].name + ".provenance.json")):
             self.assertNoMachinePath(out)
+
+    def test_slice_design_sheet(self):
+        outs = []
+        for cwd in self.cwds():
+            out = cwd / "sheet.html"
+            self.ok(run(VIZ, "--kind", "slice-design", "--slice", SLICE, "--design-system", DESIGNS / "full-dark",
+                        "--out", out, cwd=cwd))
+            outs.append(out)
+        self.assertSameBytes(*outs)
+        self.assertSameBytes(*(o.with_name(o.name + ".provenance.json") for o in outs))
+        self.assertIn(f"from <code>{repo_relative(SLICE)}</code>", outs[0].read_text(encoding="utf-8"))
+        self.assertNoMachinePath(outs[0])
 
     def test_release_note_cartouche_path(self):
         outs = []

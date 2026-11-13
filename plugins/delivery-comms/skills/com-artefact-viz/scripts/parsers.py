@@ -11,6 +11,7 @@ Source shapes (see references/parsing-contract.md for the full contract):
   fbs             -> spec-functional-breakdown-structure (docs/product-specs/07a-fbs.md)
   delivery roadmap-> plan-delivery-roadmap     (docs/plans/delivery-roadmap.md)
   bmc / lean      -> business-model-canvas      (docs/business/02a-bmc.md | 02a-lean-canvas.md)
+  slice design    -> a slice folder: README frontmatter, tab partials, OpenAPI document, diagrams
 
 Standard library only.
 """
@@ -950,6 +951,115 @@ def parse_service_blueprint(proc_texts, vs_text=None, persona_texts=None, option
 # Dispatch by source path / content
 # --------------------------------------------------------------------------- #
 
+# --------------------------------------------------------------------------- #
+# Slice design sheet (a folder: README frontmatter, one HTML partial per tab,
+# an OpenAPI document, rendered diagrams)
+# --------------------------------------------------------------------------- #
+
+# (key and partial name, the layer it belongs to, its tab name), from the outside in.
+SLICE_TABS = (("screens", "Presentation", "Screens"), ("api", "Presentation", "API and contracts"),
+              ("code", "Logic", "Code organisation"), ("database", "Data", "Database"))
+SLICE_SUMMARY = re.compile(r"\A\s*<!--\s*summary:\s*(.*?)\s*-->\s*")
+SLICE_FIGURE = re.compile(r"\{\{FIGURE:([^|{}]+)\|([^|{}]*)(?:\|([^{}]*))?\}\}")
+SLICE_SLOT = re.compile(r"\{\{[^{}]*\}\}")
+SLICE_OPENAPI = "{{OPENAPI}}"
+FRONTMATTER_LINE = re.compile(r"^([A-Za-z_][\w-]*):\s*(.*?)\s*$")
+
+
+class SliceError(Exception):
+    """The slice folder cannot be rendered; the message names the file and what to change."""
+
+
+def frontmatter(text):
+    """The scalar `key: value` lines of a leading frontmatter block, quotes removed."""
+    if not text.startswith("---"):
+        return {}
+    end = text.find("\n---", 3)
+    values = {}
+    for line in text[3:end if end != -1 else len(text)].splitlines():
+        match = FRONTMATTER_LINE.match(line)
+        if match:
+            value = match.group(2)
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+                value = value[1:-1]
+            values[match.group(1)] = value
+    return values
+
+
+def parse_slice_design(folder, options=None):
+    """Read a slice folder into the model the slice-design renderer draws.
+
+    README.md gives the title and the lead (frontmatter `title`, `description`). Each of screens.html,
+    api.html, code.html and database.html is the content of one tab; a missing or empty one is a layer the
+    slice does not touch. A partial may open with `<!-- summary: ... -->`, shown on its tab. Its slots are
+    {{FIGURE:name|alt|caption}} (views/name.svg and views/dark/name.svg) and {{OPENAPI}} (openapi.json, or
+    openapi.yaml with PyYAML)."""
+    import base64
+    import os
+    import openapi_view
+
+    options = options or {}
+    if not os.path.isdir(folder):
+        raise SliceError(f"slice folder not found: {folder}")
+    readme = os.path.join(folder, "README.md")
+    if not os.path.isfile(readme):
+        raise SliceError(f"{folder} has no README.md; its frontmatter gives the page its title and lead")
+    with open(readme, "r", encoding="utf-8") as fh:
+        meta = frontmatter(fh.read())
+    title = options.get("title") or meta.get("title")
+    if not title:
+        raise SliceError("README.md has no `title:` in its frontmatter; the page needs a title")
+
+    sources, tabs, figures, wants_openapi = [readme], [], {}, False
+    for key, layer, name in SLICE_TABS:
+        path = os.path.join(folder, key + ".html")
+        body, summary = "", ""
+        if os.path.isfile(path):
+            with open(path, "r", encoding="utf-8") as fh:
+                body = fh.read()
+            found = SLICE_SUMMARY.match(body)
+            if found:
+                summary, body = found.group(1), body[found.end():]
+            if body.strip():
+                sources.append(path)
+        body = body if body.strip() else ""
+        for slot in SLICE_SLOT.findall(body):
+            if slot != SLICE_OPENAPI and not SLICE_FIGURE.fullmatch(slot):
+                raise SliceError(f"{key}.html has an unknown slot {slot}; the slots are "
+                                 "{{FIGURE:name|alt|caption}} and {{OPENAPI}}")
+        wants_openapi = wants_openapi or SLICE_OPENAPI in body
+        for figure in SLICE_FIGURE.finditer(body):
+            figure_name = figure.group(1).strip()
+            if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", figure_name):
+                raise SliceError(f"{key}.html names the figure {figure_name!r}; a figure is the stem of a diagram "
+                                 "of the folder, lower case, digits and hyphens")
+            if figure_name in figures:
+                continue
+            uris = []
+            for variant in ("views", "views/dark"):
+                svg = os.path.join(folder, *variant.split("/"), figure_name + ".svg")
+                if not os.path.isfile(svg):
+                    raise SliceError(f"{key}.html shows the figure {figure_name}, but {variant}/{figure_name}.svg "
+                                     "is not in the slice folder; render the diagrams (arch-plantuml render.sh)")
+                with open(svg, "rb") as fh:
+                    uris.append("data:image/svg+xml;base64," + base64.b64encode(fh.read()).decode("ascii"))
+                sources.append(svg)
+            figures[figure_name] = tuple(uris)
+        tabs.append({"key": key, "layer": layer, "name": name, "summary": summary, "html": body})
+
+    openapi = None
+    if wants_openapi:
+        try:
+            doc, source, file_name = openapi_view.load(folder)
+        except openapi_view.OpenApiError as exc:
+            raise SliceError(str(exc))
+        openapi = {"doc": doc, "source": source, "name": file_name}
+        sources.append(os.path.join(folder, file_name))
+
+    return {"title": title, "lead": meta.get("description", ""), "tabs": tabs, "figures": figures,
+            "openapi": openapi, "sources": sources}
+
+
 PARSERS = {
     "capability-map": parse_capability_map,
     "fbs": parse_fbs,
@@ -960,7 +1070,7 @@ PARSERS = {
 # Multi-source kinds are handled directly by render.py (they take several files),
 # so they live outside the single-text PARSERS map but are still valid --kind
 # values and renderer keys.
-MULTISOURCE_KINDS = ("service-blueprint",)
+MULTISOURCE_KINDS = ("service-blueprint", "slice-design")
 
 
 def detect_kind(path, text):

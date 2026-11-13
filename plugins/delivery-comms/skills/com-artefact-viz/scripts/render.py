@@ -8,12 +8,14 @@ from several source artefacts (multi-source; see --proc below).
 
     python render.py SOURCE.md [options]
     python render.py --kind service-blueprint --proc PROC.md [--value-stream VS.md] [--personas PATH]
+    python render.py --kind slice-design --slice FOLDER
 
 Options:
     --out PATH              Output HTML path. Default:
                             docs/communication/visualisations/<kind>.html
     --kind KIND             Force the artefact kind (capability-map | fbs |
-                            delivery-roadmap | bmc | service-blueprint).
+                            delivery-roadmap | bmc | service-blueprint |
+                            slice-design).
                             Auto-detected from path/content when omitted.
     --proc FILE             A business-process doc to compose into a service
                             blueprint (repeatable). Implies --kind service-blueprint.
@@ -22,6 +24,10 @@ Options:
     --personas PATH         Persona doc or directory used to derive the line of
                             visibility (front/back-stage). Repeatable.
     --stream VS-N           Limit blueprint phase columns to one value stream.
+    --slice FOLDER          A slice folder to render as a slice design sheet: README.md
+                            (title, description), one HTML partial per tab, an
+                            OpenAPI document and the rendered diagrams. Implies
+                            --kind slice-design.
     --design-system DIR     A design-system folder (with a kit-manifest.json),
                             bypassing the docs/ux/package.json pin. Without it
                             the pin is found by walking up from the working
@@ -132,6 +138,26 @@ def build(source_path, args):
         return _emit(model, rendered, kind, args, source_label=", ".join(map(display_path, args.proc)),
                      sources=sources)
 
+    # ---- A slice folder (slice design sheet) --------------------------------
+    if args.slice or args.kind == "slice-design":
+        kind = "slice-design"
+        if not args.slice:
+            sys.exit("error: --kind slice-design needs --slice FOLDER.")
+        if args.detect:
+            print(kind)
+            return None
+        try:
+            model = parsers.parse_slice_design(args.slice, options)
+        except parsers.SliceError as exc:
+            sys.exit(f"error: {exc}")
+        # the roles the page remaps under a dark theme: those of the modules it inlines that have a dark twin
+        contract = design_source._contract()
+        inlined = {role for module in VIEW_MODULES for role in contract["modules"][module]["roles"]}
+        options["dark_remap"] = {light: dark for light, dark in design_source.dark_mirror(contract).items()
+                                 if light in inlined}
+        rendered = renderers.RENDERERS[kind](model, options)
+        return _emit(model, rendered, kind, args, source_label=display_path(args.slice), sources=model["sources"])
+
     # ---- Single-source path (capability-map | fbs | delivery-roadmap | bmc) -
     if not source_path:
         sys.exit("error: provide a SOURCE.md (or use --proc for a service blueprint).")
@@ -187,12 +213,12 @@ def parse_exceptions(items):
     return out
 
 
-def design_layer(design):
-    """The font faces, then the modules the views read (base first, the design system after it)."""
-    return "\n".join(design.fonts + [design.css[m] for m in VIEW_MODULES if design.css.get(m)])
+def design_layer(design, modules=VIEW_MODULES):
+    """The font faces, then the modules the view reads (base first, the design system after it)."""
+    return "\n".join(design.fonts + [design.css[m] for m in modules if design.css.get(m)])
 
 
-def provenance_summary(design, report):
+def provenance_summary(design, report, modules=VIEW_MODULES):
     prov, ident = design.provenance, design.provenance["designSystem"]
     source = ident["source"] if ident["source"] == "base" else \
         f"{ident.get('name') or ident.get('path')}{'@' + ident['version'] if ident.get('version') else ''}"
@@ -201,7 +227,7 @@ def provenance_summary(design, report):
         mods = [m for m, o in prov["modules"].items() if o == origin]
         if mods:
             lines.append(f"{origin}: {', '.join(mods)}")
-    lines.append(f"inlined: {', '.join(VIEW_MODULES)}")
+    lines.append(f"inlined: {', '.join(modules)}")
     lines += [f"exception {e['name']}={e['value']}" + ("" if e["known"] else " (not in the design's vocabulary)")
               for e in report["exceptions"]]
     lines += [f"warning: {w}" for w in prov.get("warnings", [])]
@@ -225,7 +251,8 @@ def _emit(model, rendered, kind, args, source_label, sources):
     exceptions = parse_exceptions(args.exception)
     domain = "/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))
 
-    runtime = _read(os.path.join(TEMPLATE_DIR, "runtime.js"))
+    runtime = _read(os.path.join(TEMPLATE_DIR, "runtime.js")) + rendered.get("script", "")
+    modules = VIEW_MODULES + tuple(rendered.get("modules", ()))
     title = args.title or model["title"]
     try:
         stamped = source_date.source_date(sources).isoformat()
@@ -243,7 +270,7 @@ def _emit(model, rendered, kind, args, source_label, sources):
         "META": rendered["meta"],
         "TOOLBAR": rendered["toolbar"],
         "CONTENT": rendered["content"],
-        "DESIGN_LAYER": design_layer(design),
+        "DESIGN_LAYER": design_layer(design, modules),
         "DOMAIN_CSS": domain,
         "VIEW_CSS": rendered["view_css"],
         "RUNTIME_JS": runtime,
@@ -260,7 +287,7 @@ def _emit(model, rendered, kind, args, source_label, sources):
     prov_file = out + ".provenance.json"
     write_atomic(prov_file, json.dumps(design.provenance, indent=2) + "\n")
     print("check: PASS, the view uses only the design's roles")
-    print("provenance: " + provenance_summary(design, report).replace("\n", "; ") + f" ({prov_file})")
+    print("provenance: " + provenance_summary(design, report, modules).replace("\n", "; ") + f" ({prov_file})")
     return out
 
 
@@ -296,6 +323,9 @@ def main(argv=None):
                     help="Persona doc or directory; classifies front/back-stage (repeatable).")
     ap.add_argument("--stream", metavar="VS-N",
                     help="Limit phase columns to one value stream (e.g. VS-1).")
+    # slice design sheet (a folder)
+    ap.add_argument("--slice", metavar="FOLDER",
+                    help="A slice folder to render as a slice design sheet.")
     args = ap.parse_args(argv)
 
     if args.source and not os.path.isfile(args.source):

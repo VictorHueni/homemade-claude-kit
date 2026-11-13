@@ -1,0 +1,38 @@
+<!-- summary: 1 operation · 1 event -->
+<div class="block">
+  <h2>Operations and contracts</h2>
+  <p class="note">How a client reaches the booking service in this slice, and what the service tells the rest of the system.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Name</th><th>What it does</th><th>Direction</th><th>Carrier</th></tr></thead>
+      <tbody>
+        <tr><td class="key">POST /bookings/{bookingId}/rebook</td><td>Moves a booking to another free slot and answers with the booking as it now stands.</td><td>Client calls the service</td><td>HTTP, JSON</td></tr>
+        <tr><td class="key">BookingMoved</td><td>Says which booking moved, from which slot to which.</td><td>Service to subscribers</td><td>Event</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="block">
+  <h2>HTTP API</h2>
+  {{OPENAPI}}
+</div>
+
+<div class="block">
+  <h2>Decisions on this layer</h2>
+  <div class="decisions">
+    <section>
+      <span class="chip solid">Settled</span>
+      <ul>
+        <li>The target slot is held before the old one is released, so a booking never loses both.<span class="refs"><span class="chip ref">US-03</span></span></li>
+        <li>A slot that is no longer free answers 409 and changes nothing.</li>
+      </ul>
+    </section>
+    <section class="open">
+      <span class="chip open">Left to the implementation</span>
+      <ul>
+        <li>The wording of the 409 detail.</li>
+      </ul>
+    </section>
+  </div>
+</div>

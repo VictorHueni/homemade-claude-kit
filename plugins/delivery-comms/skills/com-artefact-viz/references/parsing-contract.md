@@ -97,6 +97,49 @@ personas + value stream).
 
 ---
 
+## slice-design — a slice folder
+
+Not one Markdown file: a folder, read by `parse_slice_design(folder)`.
+
+```text
+<slice folder>/
+├── README.md                      frontmatter: title (required), description (the lead)
+├── screens.html                   one HTML partial per tab, each optional
+├── api.html
+├── code.html
+├── database.html
+├── openapi.json | openapi.yaml    needed only when a partial has the OpenAPI slot
+└── views/<name>.svg, views/dark/<name>.svg    the rendered diagrams a partial shows
+```
+
+| What | Read from | Rule |
+|---|---|---|
+| Title, lead | `README.md` frontmatter `title`, `description` | Scalar `key: value` lines, quotes removed. No `title` stops the render. `--title` overrides it. |
+| Tab content | `screens.html`, `api.html`, `code.html`, `database.html` | The inner HTML of one tab. A missing file, or one that is empty once its summary is removed, is a layer the slice does not touch: the tab says so. |
+| Tab summary | A first-line comment `<!-- summary: ... -->` in the partial | Shown on the tab. Optional. |
+| Figure | The slot `{{FIGURE:name|alt|caption}}` | `name` is the stem of a diagram (lower case, digits, hyphens). Both `views/<name>.svg` and `views/dark/<name>.svg` must exist; either missing stops the render naming the file. `alt` is plain text; `caption` is optional HTML. |
+| OpenAPI viewer | The slot `{{OPENAPI}}` | Renders `openapi.json`; `openapi.yaml` or `.yml` when PyYAML is importable, else a refusal naming both remedies. No document stops the render. |
+
+Any other `{{...}}` in a partial stops the render naming it. The slots are expanded by the renderer; the diagrams are inlined as data URIs, so the page stays one file.
+
+**Classes a partial may use.** The partial holds content only: no `<style>`, no `<script>`, no literal colour (the validator refuses one, as in every view).
+
+| Class | On | Effect |
+|---|---|---|
+| `block` | a `<div>` wrapping one heading and what follows it | A section of the tab |
+| `note` | a `<p>` | Secondary text under a heading |
+| `scroll` | a `<div>` around a `<table>` | The table's frame; the table becomes cards on a phone |
+| `key`, `num`, `quiet`, `nw` | a `<td>` | An identifier, a right-aligned number, a muted cell, a cell that does not wrap |
+| `chip`, with `ref`, `solid` or `open` | a `<span>` | A label: a reference, a filled label, a dashed "open" label |
+| `mono` | any inline element | Monospace |
+| `decisions` | a `<div>` holding two `<section>`s, the second with class `open` | The block that closes a tab: what is settled, and what is left to the implementation. Each `<section>` is a chip then a `<ul>`; a `<span class="refs">` in an `<li>` holds reference chips. |
+| `msgs`, `msg` | a `<div>` grid and its items | Messages or examples side by side, each a heading and a `<pre>` |
+| `empty` | a `<div>` | A dashed frame for something deliberately absent |
+
+A fixture lives in `examples/slice-design/`.
+
+---
+
 ## Adding a new artefact type
 
 1. Add `parse_<kind>(text) -> model` to `scripts/parsers.py`; register it in

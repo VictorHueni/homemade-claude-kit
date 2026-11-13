@@ -1,0 +1,30 @@
+@startuml
+!include _theme.puml
+skinparam linetype ortho
+title Rebook a slot: tables
+
+entity "booking" as booking {
+  *id : bigint
+  --
+  *slot_id : bigint
+  *customer_ref : text
+  moved_at : timestamptz
+}
+entity "slot" as slot {
+  *id : bigint
+  --
+  *starts_at : timestamptz
+  *state : text
+}
+entity "booking_move" as move {
+  *id : bigint
+  --
+  *booking_id : bigint
+  *from_slot_id : bigint
+  *to_slot_id : bigint
+  *moved_at : timestamptz
+}
+
+booking }o--|| slot
+move }o--|| booking
+@enduml
