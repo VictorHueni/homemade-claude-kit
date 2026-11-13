@@ -1,6 +1,6 @@
 # Docker render pipeline
 
-Single-image pipeline that turns `diagrams/*.puml` into committed SVGs using the **official [`plantuml/plantuml`](https://hub.docker.com/r/plantuml/plantuml) image** (bundles `plantuml.jar` + a JRE + Graphviz).
+Single-image pipeline that turns `diagrams/*.puml` into committed SVGs, a light and a dark variant of each, using the **official [`plantuml/plantuml`](https://hub.docker.com/r/plantuml/plantuml) image** (bundles `plantuml.jar` + a JRE + Graphviz).
 
 ---
 
@@ -37,18 +37,19 @@ One entry point, deliberately simple so the same flow works in dev + CI + an age
 ./docs/architecture/diagrams/render.sh [diagram-name]
 ```
 
-Without `diagram-name`, every renderable `.puml` renders. With it, only the matching diagram renders (faster — one file instead of all).
+Without `diagram-name`, every renderable `.puml` renders. With it, only the matching diagram renders (faster — one file instead of all). The path above is the default folder; a diagram set scaffolded elsewhere (`arch-plantuml init <folder>`) has its own copy of `render.sh`, which renders the diagrams of the folder it sits in.
 
 ### Steps (in order)
 
 1. **Collect renderable files** — every `*.puml` in `diagrams/` **except** `_*.puml` (includes). If a `diagram-name` argument is given, narrow to that one file.
 2. **Validate** — `docker run plantuml/plantuml -checkonly -failfast2 <files>`. Exit non-zero if any file fails to parse. Print the offending filename.
-3. **Render to SVG** — `docker run plantuml/plantuml -tsvg -failfast2 -o <abs>/views <files>`. One `.svg` per `.puml`.
-4. **List rendered views** — show the user what was produced.
+3. **Render to SVG, light** — `docker run plantuml/plantuml -tsvg -failfast2 -o <abs>/views <files>`. One `.svg` per `.puml`.
+4. **Render to SVG, dark** — the same call with `-DDARK=1 -o <abs>/views/dark`. The flag defines the preprocessor variable `DARK`, which selects the dark branch of `_palette.puml`; nothing else differs between the two passes.
+5. **List rendered views** — show the user what was produced.
 
 ### Volume mounts
 
-Mount the **repo root** to `/work` inside the container. Use `/work/docs/architecture/diagrams/...` paths inside the container. This keeps the script portable regardless of where in the tree the user invokes it from.
+Mount the **repo root** to `/work` inside the container. Use `/work/docs/architecture/diagrams/...` paths inside the container. This keeps the script portable regardless of where in the tree the user invokes it from. Outside a git repository the script mounts its own folder instead, so a diagram set works wherever it lives.
 
 ```bash
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -59,7 +60,7 @@ docker run --rm --user "$(id -u):$(id -g)" -v "${REPO_ROOT}:/work" \
 
 ### The `-o` output flag
 
-`-o /work/docs/architecture/diagrams/views` sends every SVG to `views/`. Use an **absolute** container path so output lands in one place regardless of which `.puml` is processed (a relative `-o` is resolved per-input-file directory).
+`-o /work/docs/architecture/diagrams/views` sends every SVG to `views/` (and `…/views/dark` for the dark pass). Use an **absolute** container path so output lands in one place regardless of which `.puml` is processed (a relative `-o` is resolved per-input-file directory).
 
 ### Why `--user`
 
@@ -74,7 +75,8 @@ Docker volume mounts default to running as root, producing root-owned SVGs the h
 | `-failfast2` | Exit non-zero on the first syntax error (do not silently emit a broken diagram) |
 | `-o <dir>` | Output directory |
 | `-tpng` / `-tpdf` | Alternate formats — edit `render.sh` if a consumer needs them |
-| `-darkmode` | Dark theme render — not surfaced by default |
+| `-DDARK=1` | Defines the preprocessor variable `DARK`: the dark pass of `render.sh`, answered by the `!ifdef DARK` branch of `_palette.puml` |
+| `-darkmode` | PlantUML's own dark skin — not used: it ignores the palette |
 
 ### Exit codes
 
@@ -120,6 +122,8 @@ For CI performance, cache the Docker image layer (`actions/cache` on `/var/lib/d
 | Empty / clipped SVG | Diagram too large or `skinparam dpi` too high | Split the diagram (see `puml-conventions.md` §5); check the theme |
 | `Permission denied` on render.sh | Missing executable bit after a fresh clone | `chmod +x docs/architecture/diagrams/render.sh` |
 | Different SVG output across machines | Pin drift (someone is on `:latest` or another tag) | Confirm both machines use the pin in this table |
+| Both variants have the same colours | `_theme.puml` predates the palette and carries its own colours | `arch-plantuml upgrade` (it never overwrites a hand-edited theme without asking) |
+| A mark is black on the dark canvas | A PlantUML element the theme does not style yet | Style it in `_theme.puml` with a palette variable; `scripts/test-arch-plantuml.sh` in the kit shows the check |
 
 ---
 

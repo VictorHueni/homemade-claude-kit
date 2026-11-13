@@ -1,21 +1,21 @@
 ---
 name: arch-uml
 license: MIT
-description: "The kit's tool for every UML diagram, arc42 §6 runtime sequences included. Author and refresh UML diagrams with PlantUML — sequence, class, state-machine, activity, entity-relationship, and use-case — rendered to committed SVG via the arch-plantuml Docker pipeline. Writes one docs/architecture/diagrams/<type>-NN-<slug>.puml per diagram (each !includes the shared _theme.puml and titles the upstream ID it visualises), runs render.sh, and embeds the SVG into the consuming markdown. Six modes, one per diagram type. Prerequisite: arch-plantuml init. Mints no IDs — diagrams visualise IDs owned by spec-use-case (UC-NN), domain-model (BC-NN.AGG-NN), business-process (PROC-NN). Triggers on: sequence diagram, class diagram, state machine diagram, activity diagram, ER diagram, use case diagram, UML diagram, plantuml diagram, draw sequence, draw class diagram. NOT for C4 (arch-c4) nor non-UML diagrams such as flowcharts (Mermaid)."
+description: "The kit's tool for every UML diagram, arc42 §6 runtime sequences included. Author and refresh UML diagrams with PlantUML — sequence, class, state-machine, activity, entity-relationship, and use-case — rendered to committed SVG, light and dark, via the arch-plantuml Docker pipeline. Writes one <type>-NN-<slug>.puml per diagram in docs/architecture/diagrams/ or the diagram folder given (each !includes the shared _theme.puml and titles the upstream ID it visualises), runs render.sh, and embeds the SVG into the consuming markdown. Six modes, one per diagram type. Prerequisite: arch-plantuml init. Mints no IDs — diagrams visualise IDs owned by spec-use-case (UC-NN), domain-model (BC-NN.AGG-NN), business-process (PROC-NN). Triggers on: sequence diagram, class diagram, state machine diagram, activity diagram, ER diagram, use case diagram, UML diagram, plantuml diagram, draw sequence, draw class diagram. NOT for C4 (arch-c4) nor non-UML diagrams such as flowcharts (Mermaid)."
 user-invocable: true
 metadata:
   category: "architecture"
   complexity: "high"
-  version: "1.0.0"
+  version: "1.1.0"
   status: active
-  last_reviewed: 2026-06-09
+  last_reviewed: 2026-11-13
   review_interval: 365d
   impact: "low"
 ---
 
 # UML diagram authoring with PlantUML
 
-Single skill, six modes — one per UML diagram type. Each diagram is an independent `.puml` file under `docs/architecture/diagrams/`; this skill writes it, renders it to SVG via `render.sh`, and (optionally) embeds the SVG into the consuming markdown.
+Single skill, six modes — one per UML diagram type. Each diagram is an independent `.puml` file in a diagram folder, `docs/architecture/diagrams/` unless another is given; this skill writes it, renders it to a light and a dark SVG via `render.sh`, and (optionally) embeds the SVG into the consuming markdown.
 
 This is the authoring twin of `arch-c4`:
 
@@ -24,7 +24,9 @@ This is the authoring twin of `arch-c4`:
 | `arch-structurizr` | `arch-plantuml` | One-time scaffold: folder, pinned Docker version, render script, shared theme. |
 | `arch-c4` | **`arch-uml`** *(this skill)* | Per-diagram authoring: writes `.puml`, runs `render.sh`, embeds SVGs. |
 
-**Prerequisite:** `arch-plantuml init` must have run. If `docs/architecture/diagrams/render.sh` doesn't exist, this skill aborts and points the user there.
+**Prerequisite:** `arch-plantuml init` must have run for the diagram folder. If its `render.sh` doesn't exist, this skill aborts and points the user there (`arch-plantuml init`, or `arch-plantuml init <folder>` for a set that lives elsewhere).
+
+**The diagram folder.** `docs/architecture/diagrams/` holds the project's diagrams. A set that belongs to one document and is kept with it (a design sheet, a plan) lives in that document's folder, with its own pipeline; when the caller names such a folder, every path below is in it: `<folder>/<name>.puml`, `<folder>/render.sh`, `<folder>/views/`.
 
 ---
 
@@ -55,7 +57,7 @@ Each mode follows the **same authoring workflow** below; the per-type syntax and
 
 ## Authoring workflow (every mode)
 
-1. **Pre-flight.** Confirm `docs/architecture/diagrams/render.sh` + `_theme.puml` exist. If not, stop and point the user at `arch-plantuml init`.
+1. **Pre-flight.** Confirm `render.sh`, `_theme.puml` and `_palette.puml` exist in the diagram folder. If not, stop and point the user at `arch-plantuml init` (or `upgrade`, when only the palette is missing).
 2. **Read the upstream artefact** if present (the "Reads upstream" column). Carry its IDs forward — they go in the diagram `title` and on the relevant elements. If the upstream artefact doesn't exist yet, proceed (soft-reference) and note it in the closing report.
 3. **Pick the filename.** `<prefix>-NN-<slug>.puml`. Find the next `NN` by listing existing files of that prefix (e.g. `ls diagrams/seq-*.puml`). Two-digit, zero-padded. Slug is kebab-case.
 4. **Write the `.puml`.** Always in this shape:
@@ -68,8 +70,8 @@ Each mode follows the **same authoring workflow** below; the per-type syntax and
 
    @enduml
    ```
-   Do **not** write a name after `@startuml` (it overrides the output filename). Apply the layout discipline in `references/diagram-discipline.md` — fewest crossings, one concern per diagram, left-to-right or top-down deliberately.
-5. **Validate + render.** Run `./docs/architecture/diagrams/render.sh <prefix>-NN-<slug>`. It runs `-checkonly` first; if the `.puml` doesn't parse, fix it before continuing. On success it writes `views/<prefix>-NN-<slug>.svg`.
+   Do **not** write a name after `@startuml` (it overrides the output filename). Apply the layout discipline in `references/diagram-discipline.md` — fewest crossings, one concern per diagram, left-to-right or top-down deliberately. **Never type a colour**: the theme colours every element in both variants, and a literal colour is right in one at most; for emphasis use a palette variable (`$accent`, `$success`, `$warning`, `$danger`, `$info`). The theme hides the spot icon of a class, so say the kind with the keyword (`interface`, `enum`, `abstract class`).
+5. **Validate + render.** Run `./docs/architecture/diagrams/render.sh <prefix>-NN-<slug>`. It runs `-checkonly` first; if the `.puml` doesn't parse, fix it before continuing. On success it writes `views/<prefix>-NN-<slug>.svg` (light) and `views/dark/<prefix>-NN-<slug>.svg` (dark).
 6. **Embed (if there's a consuming doc).** Add the SVG to the markdown that needs it, by relative path. Typical consumers:
    - use-case diagram → `docs/product-specs/use-cases/` (alongside the `spec-use-case` file or its `index.md`)
    - class / state / ER → `docs/domain/` (the `domain-model` artefacts), **or arc42 §8** cross-cutting concepts
@@ -82,6 +84,8 @@ Each mode follows the **same authoring workflow** below; the per-type syntax and
    ```
 
    **arc42 consumers are pull-side (ADR-0004).** When the consumer is an arc42 §6 or §8 section, **`arch-arc42` owns the embed** — it writes the `<!-- arch-figure … -->` declared-dependency block and the surrounding prose. In that case `arch-uml` does **not** edit the arc42 file: render the SVG, then report its path (and the `SCN-NN`/`CC-NN`/`UC-NN` it was given) back to `arch-arc42`, which wires it in.
+
+   **Which variant.** Markdown embeds the light variant, `views/<name>.svg`: it is read on a white page. A page that follows the viewer's theme takes both and shows the one that matches. Say in the report which variant was embedded.
 
    If there is no obvious consumer, leave the SVG in `views/` and report its path — the user wires it in.
 7. **Report** (see §Closing report).
@@ -115,21 +119,22 @@ After authoring a diagram, deliver:
 
 - Mode + diagram type
 - File written: `docs/architecture/diagrams/<name>.puml`
-- Render result: `views/<name>.svg` (or the validation error)
+- Render result: `views/<name>.svg` and `views/dark/<name>.svg` (or the validation error)
 - Upstream IDs visualised (`UC-NN`, `BC-NN.AGG-NN`, `PROC-NN`, `P-NN`) — and any that were missing
-- Where the SVG was embedded (or "left in views/ — wire it into <doc>")
+- Where the SVG was embedded and which variant (or "left in views/ — wire it into <doc>")
 - Next step: another diagram, or re-render all via `./render.sh`
 
 ---
 
 ## Checklist
 
-- [ ] `arch-plantuml init` has run (`render.sh` + `_theme.puml` present); else aborted with a pointer
+- [ ] `arch-plantuml init` has run for the diagram folder (`render.sh`, `_theme.puml`, `_palette.puml` present); else aborted with a pointer
 - [ ] Filename follows `<type>-NN-<slug>.puml`; `NN` is the next free number for that type
 - [ ] `.puml` opens `@startuml` → `!include _theme.puml` → `title` with the upstream ID
 - [ ] No name written after `@startuml` (filename drives the output)
 - [ ] One concern per diagram; layout discipline applied (see `diagram-discipline.md`)
-- [ ] `render.sh <name>` validated (`-checkonly`) and produced the SVG
+- [ ] `render.sh <name>` validated (`-checkonly`) and produced the light and the dark SVG
+- [ ] No colour typed in the `.puml`; emphasis uses a palette variable
 - [ ] `grep -c line-through views/*.svg` is 0 (no creole strikethrough in message text)
 - [ ] SVG embedded into the consuming markdown by relative path (or its path reported)
 - [ ] No new ID scheme invented; upstream IDs carried verbatim

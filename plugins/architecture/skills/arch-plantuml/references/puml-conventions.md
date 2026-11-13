@@ -1,6 +1,6 @@
 # PlantUML conventions
 
-The `docs/architecture/diagrams/` folder is the **single source of truth** for every PlantUML diagram in the project. These conventions keep multi-skill authoring (`arch-uml` writes; consuming skills embed) consistent and grep-friendly.
+The `docs/architecture/diagrams/` folder is the **single source of truth** for every PlantUML diagram in the project. A diagram set that belongs to one document and is kept with it may live in that document's folder instead, with its own copy of the pipeline; the same conventions apply there. These conventions keep multi-skill authoring (`arch-uml` writes; consuming skills embed) consistent and grep-friendly.
 
 Authoritative grammar: [plantuml.com](https://plantuml.com). This file lists the **kit-specific rules** layered on top of the official syntax.
 
@@ -21,7 +21,7 @@ One diagram per file. The filename encodes the diagram type, an ordering number,
 | Component / object *(rare — prefer C4)* | `comp-` / `obj-` | `comp-01-...` | `views/comp-01-...svg` |
 
 - **`NN`** is a two-digit, zero-padded ordering counter **per type** (`seq-01`, `seq-02`, …). It is **not** a metamodel ID — it only orders diagrams of the same type. `arch-uml` finds the next number by listing existing files of that prefix.
-- **The view key is the filename stem.** PlantUML writes `views/<stem>.svg`, so the filename *is* the embed path. Keep filenames stable — the consuming markdown references them by relative path.
+- **The view key is the filename stem.** PlantUML writes `views/<stem>.svg` (light) and `views/dark/<stem>.svg` (dark), so the filename *is* the embed path. Keep filenames stable — the consuming markdown references them by relative path.
 - Slugs are kebab-case, lowercase, no spaces.
 
 ---
@@ -30,7 +30,8 @@ One diagram per file. The filename encodes the diagram type, an ordering number,
 
 Any file whose name starts with `_` is an **include fragment, not a renderable diagram**:
 
-- `_theme.puml` — the shared skinparam theme.
+- `_theme.puml` — the shared skinparam theme. It holds shape (fonts, sizes, corners) and no colour.
+- `_palette.puml` — the colours, as twelve variables with a light and a dark branch; the theme includes it. It comes from the project's design system, or is the kit's neutral one.
 - `_<name>.puml` — any other shared fragment (reusable participant lists, macros).
 
 `render.sh` **never renders `_*.puml`** (they have no `@startuml`/`@enduml` and would error). Includes are pulled into a diagram with `!include`.
@@ -54,6 +55,8 @@ Rules:
 2. **`!include _theme.puml` is the first line after `@startuml`.** It pulls in the shared theme so every diagram looks consistent. The path is relative to the `.puml` file, so a bare `_theme.puml` works (both live in `diagrams/`).
 3. **`title` carries the upstream ID + a human name.** See §4.
 4. Do **not** put a filename after `@startuml` (e.g. `@startuml foo`) — it overrides the output name and breaks the view-key convention. Let the filename drive the output.
+5. **Never type a colour in a diagram.** The theme colours every element in both variants; a literal colour is right in one variant at most. For emphasis use a palette variable (`$accent`, `$success`, `$warning`, `$danger`, `$info`), which has a value in each branch.
+6. **The spot icon of a class is hidden** (the circled C, I or E). Say the kind with the keyword (`interface`, `enum`, `abstract class`), which prints it as a stereotype.
 
 ---
 

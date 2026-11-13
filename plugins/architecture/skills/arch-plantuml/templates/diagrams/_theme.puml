@@ -1,5 +1,5 @@
 ' ─────────────────────────────────────────────────────────────────────
-' _theme.puml — shared PlantUML theme for docs/architecture/diagrams/
+' _theme.puml — shared PlantUML theme for the diagrams of this folder
 '
 ' This is an INCLUDE FRAGMENT, not a diagram. It has no start/end markers
 ' of its own and is never rendered on its own (render.sh skips _*.puml).
@@ -12,86 +12,167 @@
 ' the leading comment quote and would treat them as real diagram
 ' delimiters, breaking every diagram that includes this file.
 '
-' Edit this one file to re-theme every diagram in the project — the
-' analog of Structurizr's styles{} block.
+' The theme holds no colour of its own. Every colour is a variable of
+' _palette.puml, which has a light and a dark branch: render.sh renders
+' each diagram once per branch. Change the colours by regenerating
+' _palette.puml from the project's design system, never by typing a
+' colour here. Edit this file for shape: fonts, sizes, corners.
 ' ─────────────────────────────────────────────────────────────────────
 
+!include _palette.puml
+
 ' ── Canvas ──
-skinparam backgroundColor #FFFFFF
+skinparam backgroundColor $canvas
 skinparam shadowing false
 skinparam roundCorner 8
 skinparam defaultFontName "Helvetica"
 skinparam defaultFontSize 13
+skinparam defaultFontColor $ink
 skinparam dpi 150
 
 ' ── Arrows / lines ──
-skinparam ArrowColor #4A4A4A
+skinparam ArrowColor $muted
+skinparam ArrowFontColor $muted
 skinparam ArrowThickness 1
 
-' ── Generic node palette (kit blue, echoing the C4 styles) ──
-skinparam roundCorner 8
-
+' ── Nodes: the head of a class, a participant, a state or an activity is the
+'    head fill with its own text colour; what sits on the canvas uses the ink ──
 skinparam class {
-    BackgroundColor #438DD5
-    BorderColor #2C6FB0
-    FontColor #FFFFFF
-    AttributeFontColor #1A1A1A
-    ArrowColor #4A4A4A
+    BackgroundColor $canvas
+    HeaderBackgroundColor $head
+    BorderColor $muted
+    FontColor $head_ink
+    AttributeFontColor $ink
+    StereotypeFontColor $head_ink
+    ArrowColor $muted
 }
 
 skinparam usecase {
-    BackgroundColor #85BBF0
-    BorderColor #2C6FB0
-    FontColor #1A1A1A
+    BackgroundColor $panel
+    BorderColor $muted
+    FontColor $ink
 }
 
 skinparam actor {
-    BackgroundColor #08427B
-    BorderColor #062E56
-    FontColor #1A1A1A
+    BackgroundColor $panel
+    BorderColor $muted
+    FontColor $ink
 }
 
 skinparam state {
-    BackgroundColor #438DD5
-    BorderColor #2C6FB0
-    FontColor #FFFFFF
-    AttributeFontColor #1A1A1A
-    StartColor #08427B
-    EndColor #08427B
+    BackgroundColor $head
+    BorderColor $head
+    FontColor $head_ink
+    AttributeFontColor $head_ink
+    StartColor $ink
+    EndColor $ink
 }
 
 skinparam sequence {
-    ParticipantBackgroundColor #438DD5
-    ParticipantBorderColor #2C6FB0
-    ParticipantFontColor #FFFFFF
-    ActorBackgroundColor #08427B
-    ActorFontColor #1A1A1A
-    LifeLineBorderColor #B0B0B0
-    LifeLineBackgroundColor #EAF2FB
-    ArrowColor #4A4A4A
-    GroupBackgroundColor #EAF2FB
-    GroupBorderColor #2C6FB0
+    ParticipantBackgroundColor $head
+    ParticipantBorderColor $head
+    ParticipantFontColor $head_ink
+    ActorBackgroundColor $panel
+    ActorBorderColor $muted
+    ActorFontColor $ink
+    LifeLineBorderColor $muted
+    LifeLineBackgroundColor $panel
+    ArrowColor $muted
+    GroupBackgroundColor $head
+    GroupHeaderFontColor $head_ink
+    GroupFontColor $accent
+    GroupBorderColor $muted
+    GroupBodyBackgroundColor $canvas
+    DividerBackgroundColor $panel
+    DividerBorderColor $border
+    DividerFontColor $ink
 }
 
 skinparam activity {
-    BackgroundColor #438DD5
-    BorderColor #2C6FB0
-    FontColor #FFFFFF
-    DiamondBackgroundColor #85BBF0
-    DiamondFontColor #1A1A1A
-    StartColor #08427B
-    EndColor #08427B
-    ArrowColor #4A4A4A
+    BackgroundColor $head
+    BorderColor $head
+    FontColor $head_ink
+    DiamondBackgroundColor $panel
+    DiamondBorderColor $muted
+    DiamondFontColor $ink
+    StartColor $ink
+    EndColor $ink
+    BarColor $ink
+    ArrowColor $muted
 }
 
 skinparam entity {
-    BackgroundColor #438DD5
-    BorderColor #2C6FB0
-    FontColor #FFFFFF
+    BackgroundColor $canvas
+    BorderColor $muted
+    FontColor $head_ink
+}
+
+' ── Containers and annotations ──
+skinparam package {
+    BackgroundColor $panel
+    BorderColor $border
+    FontColor $accent
+}
+
+skinparam rectangle {
+    BackgroundColor $panel
+    BorderColor $border
+    FontColor $accent
+}
+
+skinparam note {
+    BackgroundColor $panel
+    BorderColor $border
+    FontColor $ink
 }
 
 ' ── Title / legend ──
 skinparam TitleFontSize 16
-skinparam TitleFontColor #08427B
-skinparam legendBackgroundColor #F4F8FC
-skinparam legendBorderColor #2C6FB0
+skinparam TitleFontColor $accent
+skinparam legendBackgroundColor $panel
+skinparam legendBorderColor $border
+skinparam legendFontColor $ink
+
+' The spot icon of a class (the circled C, I or E) has colours of its own, which
+' no palette reaches: the kind of a class is said by its stereotype instead.
+hide circle
+
+' Some marks follow no skinparam and keep PlantUML's own dark defaults,
+' unreadable on a dark canvas, unless a style names them: the name in the head
+' of a class, the bullet of a mandatory attribute, the outline of an activation
+' bar, and the start, stop and end circles.
+<style>
+classDiagram {
+  class {
+    header {
+      FontColor $head_ink
+    }
+  }
+}
+visibilityIcon {
+  IEMandatory {
+    LineColor $ink
+    BackgroundColor $ink
+  }
+}
+sequenceDiagram {
+  activationBox {
+    LineColor $muted
+    BackgroundColor $panel
+  }
+}
+circle {
+  start {
+    LineColor $ink
+    BackgroundColor $ink
+  }
+  stop {
+    LineColor $ink
+    BackgroundColor $ink
+  }
+  end {
+    LineColor $ink
+    BackgroundColor $ink
+  }
+}
+</style>

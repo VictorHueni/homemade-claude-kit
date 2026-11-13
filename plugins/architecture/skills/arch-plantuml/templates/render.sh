@@ -1,23 +1,25 @@
 #!/usr/bin/env bash
 #
-# Render PlantUML diagrams from docs/architecture/diagrams/*.puml
-# to docs/architecture/diagrams/views/*.svg
+# Render the PlantUML diagrams of this folder (*.puml) to SVG, in a light
+# and a dark variant: views/*.svg and views/dark/*.svg.
 #
 # Single-image pipeline using the official plantuml/plantuml CLI image
 # (https://hub.docker.com/r/plantuml/plantuml — bundles plantuml.jar +
 # a JRE + Graphviz):
 #
 #   1. validate every .puml with -checkonly (parse, no output)
-#   2. render each to SVG with -tsvg
+#   2. render each to SVG with -tsvg, light
+#   3. render each again with -DDARK=1, which selects the dark branch
+#      of _palette.puml
 #
-# Files whose name starts with `_` (e.g. _theme.puml) are INCLUDE
-# fragments, not diagrams — they are never rendered.
+# Files whose name starts with `_` (e.g. _theme.puml, _palette.puml) are
+# INCLUDE fragments, not diagrams — they are never rendered.
 #
 # Pinned version is kit-maintained — bump via `arch-plantuml upgrade`.
 # Do NOT use `:latest` — reproducibility matters.
 #
 # Usage:
-#   ./render.sh                  Render all diagrams
+#   ./render.sh                  Render all diagrams, both variants
 #   ./render.sh <diagram-name>   Render a single diagram (stem or filename)
 #   ./render.sh --dry-run        Validate (-checkonly) + confirm Docker; no render
 #
@@ -40,10 +42,12 @@ DOCKER_USER="$(id -u):$(id -g)"
 
 # ─── Paths ────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# The mount is the git repository when there is one, else this folder itself,
+# so the script works wherever the diagrams live.
 if REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel 2>/dev/null)" && [[ -n "${REPO_ROOT}" ]]; then
     :
 else
-    REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+    REPO_ROOT="${SCRIPT_DIR}"
 fi
 DIAGRAMS_DIR_REL="$(realpath --relative-to="${REPO_ROOT}" "${SCRIPT_DIR}")"
 VIEWS_DIR_CONTAINER="/work/${DIAGRAMS_DIR_REL}/views"
@@ -54,7 +58,7 @@ for arg in "$@"; do
     case "${arg}" in
         --dry-run) DRY_RUN=1 ;;
         --help|-h)
-            sed -n '3,30p' "${BASH_SOURCE[0]}" | sed 's/^# \?//'
+            sed -n '3,31p' "${BASH_SOURCE[0]}" | sed 's/^# \?//'
             exit 0
             ;;
         *) DIAGRAM_NAME="${arg}" ;;
@@ -107,20 +111,25 @@ if [[ "${DRY_RUN}" == "1" ]]; then
     exit 0
 fi
 
-# ─── 3. Render to SVG ─────────────────────────────────────────────────
-mkdir -p "${SCRIPT_DIR}/views"
+# ─── 3. Render to SVG, light then dark ────────────────────────────────
+mkdir -p "${SCRIPT_DIR}/views/dark"
 
-echo "→ Rendering to SVG → ${DIAGRAMS_DIR_REL}/views/"
+echo "→ Rendering to SVG → ${DIAGRAMS_DIR_REL}/views/ (light) and views/dark/"
 if ! docker run --rm --user "${DOCKER_USER}" -v "${REPO_ROOT}:/work" "${IMAGE}" \
         -tsvg -failfast2 -o "${VIEWS_DIR_CONTAINER}" "${CONTAINER_FILES[@]}"; then
     echo "ERROR: render failed." >&2
     exit 3
 fi
+if ! docker run --rm --user "${DOCKER_USER}" -v "${REPO_ROOT}:/work" "${IMAGE}" \
+        -tsvg -failfast2 -DDARK=1 -o "${VIEWS_DIR_CONTAINER}/dark" "${CONTAINER_FILES[@]}"; then
+    echo "ERROR: dark render failed." >&2
+    exit 3
+fi
 
 # ─── 4. Report ────────────────────────────────────────────────────────
 echo
-echo "✓ Rendered views:"
+echo "✓ Rendered views (each also in views/dark/):"
 find "${SCRIPT_DIR}/views" -maxdepth 1 -name '*.svg' -printf '  %f\n' | sort
 
 echo
-echo "Embed in markdown via:  ![diagram-name](diagrams/views/<diagram-name>.svg)"
+echo "Embed in markdown via:  ![diagram-name](views/<diagram-name>.svg)  (dark: views/dark/<diagram-name>.svg)"

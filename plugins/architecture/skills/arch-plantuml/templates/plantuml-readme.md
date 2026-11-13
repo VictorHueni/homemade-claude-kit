@@ -1,13 +1,15 @@
 # PlantUML diagrams workspace
 
-This folder is the **single source of truth** for every PlantUML (UML) diagram in the project. Each diagram is one `.puml` file; they render to committed SVGs via `./render.sh`.
+This folder is the **single source of truth** for every PlantUML (UML) diagram in the project. Each diagram is one `.puml` file; they render to committed SVGs, a light and a dark variant of each, via `./render.sh`.
 
 | File / folder | What it is |
 |---|---|
 | `*.puml` | Individual UML diagrams (sequence, class, state, activity, ER, use-case). Edit these; never edit the SVGs directly. |
-| `_theme.puml` | Shared skinparam theme **`!include`d** by every diagram. Edit it to re-theme every diagram at once. Starts with `_` → never rendered on its own. |
+| `_theme.puml` | Shared skinparam theme **`!include`d** by every diagram. It holds shape (fonts, sizes, corners) and no colour. Starts with `_` → never rendered on its own. |
+| `_palette.puml` | The colours: twelve variables with a light and a dark branch, included by the theme. Generated from the project's design system, or the kit's neutral palette. Regenerate it; never type a colour into it. |
 | `render.sh` | Single-image Docker render pipeline (`plantuml/plantuml` — `-checkonly` validate + `-tsvg` render). |
-| `views/*.svg` | Rendered diagrams. **Committed.** Embedded by the consuming markdown. |
+| `views/*.svg` | Rendered diagrams, light. **Committed.** Embedded by the consuming markdown. |
+| `views/dark/*.svg` | The same diagrams, dark. **Committed.** For a page that follows the viewer's theme. |
 
 This is the foundation scaffolded by **`arch-plantuml`**. Diagrams are authored by the **`arch-uml`** skill. For C4 architecture diagrams use `arch-c4` instead; for non-UML diagrams such as flowcharts use Mermaid.
 
@@ -16,7 +18,7 @@ This is the foundation scaffolded by **`arch-plantuml`**. Diagrams are authored 
 ## Quick start
 
 ```bash
-# Render every diagram
+# Render every diagram, light and dark
 ./render.sh
 
 # Render a single diagram (stem or filename)
@@ -48,6 +50,7 @@ To bump this, invoke the **`arch-plantuml upgrade`** skill. Do not edit the pin 
 
 - **Filenames:** `<type>-NN-<slug>.puml` (e.g. `seq-01-claim-submission.puml`, `class-01-claims-domain.puml`, `state-01-claim-lifecycle.puml`, `uc-01-claims-portal.puml`). The filename stem *is* the SVG name and the embed path.
 - **The `_` prefix means "include, not diagram."** `_theme.puml` (and any `_*.puml`) is pulled in via `!include` and is never rendered.
+- **No colour is typed in a diagram.** The theme colours every element in both variants; for emphasis use a palette variable (`$accent`, `$success`, `$warning`, `$danger`, `$info`).
 - **Every diagram** opens with `@startuml`, then `!include _theme.puml`, then a `title` that carries the upstream ID (e.g. `UC-01`, `BC-01.AGG-02`) so diagrams cross-reference the artefacts they visualise.
 
 Full conventions: the kit's `arch-plantuml/references/puml-conventions.md`.
@@ -83,5 +86,6 @@ Then run `./render.sh <type>-NN-<slug>` (single) or `./render.sh` (all).
 | Empty / clipped SVG | Diagram too large — split it (one concern per file). |
 | `Permission denied` running `render.sh` | `chmod +x render.sh` (some Git configs strip the executable bit). |
 | Different SVG output between machines | Confirm both use the pinned version above. Bump via `arch-plantuml upgrade` to converge. |
+| The colours are not the project's | Regenerate `_palette.puml` from the design system (the `ux-design-system` skill, "Diagram palette"), then `./render.sh`. |
 
 CI integration, exit codes, and the full pipeline contract live in the kit's `arch-plantuml/references/docker-pipeline.md`.
