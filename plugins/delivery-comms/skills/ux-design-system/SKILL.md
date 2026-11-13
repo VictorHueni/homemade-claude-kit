@@ -36,6 +36,7 @@ It mints no IDs and links to no other artefact. A complete design system from a 
 | Migrate a refused legacy token file | `python3 <skill-dir>/scripts/design_system.py subset --from-legacy docs/ux/tokens.css` |
 | See which design renders will use | `python3 <skill-dir>/scripts/shared/design_source.py provenance` |
 | The design's CSS for a bespoke generator | `python3 <skill-dir>/scripts/shared/design_source.py css` (see **Bespoke generators**) |
+| The design's colours for PlantUML diagrams | `python3 <skill-dir>/scripts/shared/design_source.py plantuml` (see **Diagram palette**) |
 | Record the verdict on any built HTML | `python3 <skill-dir>/scripts/shared/check_render.py --record OUT.html.verdict.txt OUT.html` |
 
 Every refusal exits 2 with a message naming what to change. `generate` and its `refresh` alias were removed in 2.0.0: running either exits 2 and prints the `subset` commands above.
@@ -135,6 +136,22 @@ A script or page outside the three renderers (a table, a dashboard, an email) th
 1. In the script, run `<skill-dir>/scripts/shared/design_source.py` with the same Python, once with `fonts` and once with `css` (`subprocess.run([sys.executable, DESIGN_SOURCE, "css"], capture_output=True, text=True, check=True)`, `DESIGN_SOURCE` the absolute path written out), and read their standard output: the design's `@font-face` rules (fonts inlined as data URIs), then its CSS, every module in contract order, including the `--kit-on-<fill>` text roles. It resolves the design like a render (the `docs/ux/package.json` pin found by walking up from the working directory, else the base theme) and exits 2 when the design is refused; let that error stop the script.
 2. Put the two outputs, unchanged and fonts first, in one `<style data-design-layer>` block, then the page's own rules in a plain `<style>` that uses contract roles only (`var(--ink)`, `var(--surface)`, `var(--border)`, `var(--accent)`, `var(--font-body)`; text on `--accent` with `var(--accent-ink)`, text on a state or chart fill with `var(--kit-on-<fill>)`). No literal colour (hex, `rgb()`, `hsl()`, a named colour) anywhere in the script or its output, and no custom property outside the contract.
 3. Run the script, then `python3 <skill-dir>/scripts/shared/check_render.py --record <output>.verdict.txt <output>`, and report the verdict's first line. On a `FAIL`, fix the script to use the role each finding names and run both again.
+
+## Diagram palette
+
+PlantUML diagrams take the project's colours from the resolved design, never from values copied into a theme file. `python3 <skill-dir>/scripts/shared/design_source.py plantuml` prints an include fragment that defines twelve variables, the dark values under `!ifdef DARK` and the light ones otherwise. Write its standard output, unchanged, to the `_palette.puml` the diagrams' theme includes, and run it again when the pin changes. It resolves the design like a render and takes `--design-system DIR` and `--from DIR`.
+
+| Variable | Light role | Dark role | Use in a diagram |
+|---|---|---|---|
+| `$canvas` | `--surface` | `--dark-surface` | The background: a diagram sits on a card |
+| `$panel` | `--surface-2` | `--dark-surface-2` | Groups, packages, notes |
+| `$border` | `--border` | `--dark-border` | Outlines and dividers |
+| `$head`, `$head_ink` | `--accent`, `--accent-ink` | `--dark-key-base`, `--dark-ink` | The head of a class or a participant and its name, two pairs the contract checks |
+| `$ink`, `$muted` | `--ink`, `--muted` | `--dark-ink`, `--dark-muted` | Text, secondary text and arrows |
+| `$accent` | `--accent` | `--dark-accent` | A title or an identifier on the canvas |
+| `$success`, `$warning`, `$danger`, `$info` | the same-named roles | their `--dark-` twins | States |
+
+PlantUML draws opaque colours, so a translucent `rgb()` or `rgba()` value is blended over the canvas of its variant. A value that is neither that nor a hex colour (a gradient, a `var()` alias) exits 2 naming the role and prints nothing: stop and report it, never type a colour in its place.
 
 ## Verification checklist
 

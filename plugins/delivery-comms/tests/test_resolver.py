@@ -567,5 +567,93 @@ class CliTest(ResolverCase):
         self.assertIn("#396cf5", proc.stdout)
 
 
+PALETTE_VARIABLES = ("canvas", "panel", "border", "head", "head_ink", "ink", "muted", "accent",
+                     "success", "warning", "danger", "info")
+
+
+def palette(fragment):
+    """(light, dark) variable maps of a PlantUML palette fragment: dark under `!ifdef DARK`, light under `!else`."""
+    dark, light = fragment.split("!ifdef DARK")[1].split("!endif")[0].split("!else")
+    read = lambda branch: dict(re.findall(r'^!\$(\w+) = "(#[0-9A-F]{6})"$', branch, re.M))  # noqa: E731
+    return read(light), read(dark)
+
+
+class PlantumlPaletteTest(ResolverCase):
+    def cli(self, *args, cwd=None):
+        return subprocess.run([sys.executable, "-I", str(SHARED / "design_source.py"), *map(str, args)],
+                              capture_output=True, text=True, env={**os.environ}, cwd=cwd)
+
+    def copy(self, fixture, old, new):
+        folder = self.tmp / "ds"
+        shutil.copytree(FIXTURES / fixture, folder)
+        hits = 0
+        for sheet in sorted((folder / "css").glob("*.css")):
+            text = sheet.read_text(encoding="utf-8")
+            hits += text.count(old)
+            sheet.write_text(text.replace(old, new), encoding="utf-8")
+        self.assertEqual(hits, 1, f"{old!r} must occur once in the fixture")
+        return folder
+
+    def test_the_base_theme_gives_both_branches(self):
+        proc = self.cli("plantuml", "--from", self.project)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertNotIn("@startuml", proc.stdout)
+        self.assertNotIn("@enduml", proc.stdout)
+        light, dark = palette(proc.stdout)
+        self.assertEqual(tuple(light), PALETTE_VARIABLES)
+        self.assertEqual(tuple(dark), PALETTE_VARIABLES)
+        self.assertEqual((light["canvas"], light["panel"], light["border"]), ("#FFFFFF", "#EEF1F5", "#D7DCE3"))
+        self.assertEqual((light["head"], light["head_ink"], light["accent"]), ("#396CF5", "#FFFFFF", "#396CF5"))
+        self.assertEqual((light["ink"], light["muted"]), ("#1A1F29", "#6B7280"))
+        self.assertEqual((dark["canvas"], dark["panel"], dark["border"]), ("#1A1E24", "#23282F", "#353C46"))
+        self.assertEqual((dark["head"], dark["head_ink"], dark["accent"]), ("#232A35", "#E6E9EF", "#7AA2FF"))
+        self.assertEqual((dark["success"], dark["warning"], dark["danger"], dark["info"]),
+                         ("#4CC38A", "#F0B45A", "#F2726E", "#7AA2FF"))
+
+    def test_a_design_with_a_dark_module_gives_its_own_values(self):
+        proc = self.cli("plantuml", "--design-system", FIXTURES / "full-dark")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        light, dark = palette(proc.stdout)
+        self.assertEqual((light["canvas"], light["head"], light["head_ink"]), ("#FFFFFF", "#0E7090", "#FFFFFF"))
+        self.assertEqual((dark["canvas"], dark["head"], dark["head_ink"]), ("#13211F", "#173A36", "#E4F1F0"))
+        self.assertEqual((dark["border"], dark["accent"]), ("#2C4441", "#4FD1C5"))
+
+    def test_a_design_without_a_dark_module_takes_the_base_dark_values(self):
+        light, dark = palette(self.cli("plantuml", "--design-system", FIXTURES / "full").stdout)
+        self.assertEqual(light["head"], "#0E7090")
+        self.assertEqual((dark["canvas"], dark["head"]), ("#1A1E24", "#232A35"))
+
+    def test_the_pin_is_found_from_the_start_folder(self):
+        shutil.copytree(FIXTURES / "full-dark", self.tmp / "design-system")
+        self.pin("file:../../../design-system")
+        proc = self.cli("plantuml", "--from", self.project)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(palette(proc.stdout)[1]["head"], "#173A36")
+
+    def test_a_translucent_colour_is_blended_over_the_canvas_of_its_variant(self):
+        folder = self.copy("full-dark", "--dark-border: #2c4441", "--dark-border: rgba(255, 255, 255, 0.14)")
+        proc = self.cli("plantuml", "--design-system", folder)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(palette(proc.stdout)[1]["border"], "#34403E")  # 14% white over #13211f
+
+    def test_a_three_digit_hex_is_written_in_full(self):
+        folder = self.copy("full-dark", "--dark-border: #2c4441", "--dark-border: #abc")
+        self.assertEqual(palette(self.cli("plantuml", "--design-system", folder).stdout)[1]["border"], "#AABBCC")
+
+    def test_a_value_that_is_not_a_colour_is_refused_naming_the_role(self):
+        folder = self.copy("full", "--surface-2: #f2f4f7", "--surface-2: linear-gradient(90deg, #fff, #eee)")
+        proc = self.cli("plantuml", "--design-system", folder)
+        self.assertEqual(proc.returncode, 2)
+        self.assertEqual(proc.stdout, "")
+        self.assertIn("--surface-2", proc.stderr)
+        self.assertIn("linear-gradient(90deg, #fff, #eee)", proc.stderr)
+
+    def test_the_output_is_the_same_from_any_folder(self):
+        here = self.cli("plantuml", "--design-system", FIXTURES / "full-dark")
+        elsewhere = self.cli("plantuml", "--design-system", FIXTURES / "full-dark", cwd=self.tmp)
+        self.assertEqual(here.returncode, 0, here.stderr)
+        self.assertEqual(here.stdout, elsewhere.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()

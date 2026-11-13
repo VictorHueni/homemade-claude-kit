@@ -13,6 +13,7 @@ CSS of the module that owns the fill role, so renderers paint that text with `va
 As a command, for generators outside the kit:
     design_source.py css [--module core,dataviz] [--design-system DIR | --from DIR]
     design_source.py fonts | provenance  [same selection]
+    design_source.py plantuml            [same selection]  a `_palette.puml` for the PlantUML theme
 """
 import argparse
 import base64
@@ -459,9 +460,72 @@ def resolve(start_dir, explicit=None):
                   provenance=provenance, root=root)
 
 
+# --- PlantUML palette -----------------------------------------------------------------------------
+
+# variable -> (light role, dark role), the canvas first. A diagram sits on a card, so its canvas is the
+# surface. The head of a class or a participant is the accent fill in light and the key element in dark,
+# each with the text role the contract checks on it.
+PLANTUML = {
+    "canvas": ("--surface", "--dark-surface"),
+    "panel": ("--surface-2", "--dark-surface-2"),
+    "border": ("--border", "--dark-border"),
+    "head": ("--accent", "--dark-key-base"),
+    "head_ink": ("--accent-ink", "--dark-ink"),
+    "ink": ("--ink", "--dark-ink"),
+    "muted": ("--muted", "--dark-muted"),
+    "accent": ("--accent", "--dark-accent"),
+    "success": ("--success", "--dark-success"),
+    "warning": ("--warning", "--dark-warning"),
+    "danger": ("--danger", "--dark-danger"),
+    "info": ("--info", "--dark-info"),
+}
+_RGB = re.compile(r"rgba?\(\s*(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})(?:\s*[,/]\s*(\d*\.?\d+)(%?))?\s*\)")
+
+
+def _rgba(value):
+    """(red, green, blue, alpha) of a hex colour or an rgb()/rgba() value, else None."""
+    if _HEX.fullmatch(value):
+        h = value[1:] if len(value) == 7 else "".join(c * 2 for c in value[1:])
+        return [int(h[i: i + 2], 16) for i in (0, 2, 4)] + [1.0]
+    m = _RGB.fullmatch(value)
+    if not m:
+        return None
+    alpha = 1.0 if m.group(4) is None else float(m.group(4)) / (100 if m.group(5) else 1)
+    return [min(int(c), 255) for c in m.group(1, 2, 3)] + [min(alpha, 1.0)]
+
+
+def plantuml_palette(design):
+    """A PlantUML include fragment with the diagram colours of `design`: the dark variant under `!ifdef DARK`,
+    the light one otherwise. PlantUML draws opaque colours, so a translucent one is blended over the canvas
+    of its variant."""
+    # comments out first: one that quotes a declaration would swallow the role declared after it
+    values = role_values(re.sub(r"/\*.*?\*/", "", "".join(design.css.values()), flags=re.S))
+
+    def branch(variant):
+        lines, canvas = [], None
+        for name, roles in PLANTUML.items():
+            role = roles[variant]
+            value = values.get(role, "").strip()
+            colour = _rgba(value)
+            if colour is None or (canvas is None and colour[3] < 1):
+                need = "an opaque colour" if colour else "a hex colour or an rgb() or rgba() value"
+                raise DesignError(f"{role} is `{value}`: a PlantUML palette needs {need} there")
+            *rgb, alpha = colour
+            canvas = canvas or rgb
+            blended = (int(alpha * c + (1 - alpha) * under + 0.5) for c, under in zip(rgb, canvas))
+            lines.append(f'!${name} = "#{"".join(f"{c:02X}" for c in blended)}"\n')
+        return "".join(lines)
+
+    identity = design.provenance["designSystem"]
+    label = " ".join(filter(None, (identity.get("name"), identity.get("version")))) or "the kit base theme"
+    return (f"' PlantUML palette of {label}: the diagram colours, in a light and a dark variant.\n"
+            "' Written by `design_source.py plantuml`. Regenerate it; do not edit it.\n"
+            f"!ifdef DARK\n{branch(1)}!else\n{branch(0)}!endif\n")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=("css", "fonts", "provenance"))
+    ap.add_argument("command", choices=("css", "fonts", "provenance", "plantuml"))
     ap.add_argument("--module", help="comma-separated modules for `css` (default: all, in contract order)")
     ap.add_argument("--design-system", help="a design-system folder, bypassing the pin")
     ap.add_argument("--from", dest="start", default=".", help="folder to start the pin search from")
@@ -476,6 +540,8 @@ def main(argv=None):
             sys.stdout.write("".join(design.css[m] for m in chosen))
         elif args.command == "fonts":
             sys.stdout.write("".join(face + "\n" for face in design.fonts))
+        elif args.command == "plantuml":
+            sys.stdout.write(plantuml_palette(design))
         else:
             print(json.dumps(design.provenance, indent=2))
     except DesignError as exc:
