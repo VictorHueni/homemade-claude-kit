@@ -19,7 +19,7 @@ This skill guides you through creating a high-quality, structured implementation
 
 ## Workflow
 
-1. **Deconstruct Requirement:** Read the PRD or feature request. Identify the core architectural components and the order of operations.
+1. **Deconstruct Requirement:** Read the PRD or feature request. Identify the core architectural components and the order of operations. If a Slice Design Sheet exists for the slice being planned (a folder under `docs/plans/active/` whose `README.md` has `type: Slice Design Sheet`), read its `README.md` and its tab partials first, and cite the folder by its path in the Summary. Where the sheet and the PRD differ, the PRD decides: say so, and have the sheet corrected.
 2. **Define Summary:** State the purpose, reference the source PRD, and list the guiding principles (e.g., isolation, small steps, test gates).
 3. **Draft Increments:** Break the implementation into small, coherent increments. Each increment MUST be a standalone changeset with a test gate.
 4. **Define Delivery Rules:** Include project-wide constraints (e.g., "one increment per commit", "no live API keys"), and **declare the `Commit scope:`** — resolve it from the source PRD's product/capability (`P-NN` → product slug, `C-N.M` → capability slug) so the ralph loop and `dev-git-commit` emit a capability scope, not the plan number. See the kit's `git` rule (commit and PR-title scope).

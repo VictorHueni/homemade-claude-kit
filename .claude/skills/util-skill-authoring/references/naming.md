@@ -9,7 +9,7 @@ Folder name and `name:` field follow `<category>-<artifact-singular>[-<verb>]`. 
 | `business-` | `docs/business/` | `business-persona`, `business-capability-map`, `business-value-stream`, `business-process`, `business-model-canvas`, `business-quantitative-model` |
 | `discovery-` | `docs/discovery/` (pre-formal evidence: ideation, interviews, workshops; feeds every downstream artefact) | `discovery-idea` (→ `ideation/`), `discovery-research` (→ `interviews/`), `discovery-workshop` (→ `workshops/`) |
 | `spec-` | `docs/product-specs/` | `spec-prd`, `spec-functional-breakdown-structure`, `spec-quality-attributes`, `spec-use-case` |
-| `plan-` | `docs/plans/` (intended build sequence) | `plan-delivery-roadmap` (epics `E-NN`), `plan-implementation` (`Plan-NNNN`) |
+| `plan-` | `docs/plans/` (intended build sequence) | `plan-delivery-roadmap` (epics `E-NN`), `plan-slice-design` (one folder per slice, no ID), `plan-implementation` (`Plan-NNNN`) |
 | `arch-` | `docs/architecture/` (subfolder per artefact type) | `arch-adr` (→ `decisions/`), `arch-c4`, `arch-uml` |
 | `domain-` | `docs/domain/` (DDD: the shared language between business and tech) | `domain-bounded-context`, `domain-glossary`, `domain-model` |
 | `ops-` | `docs/ops/`, or no doc folder for infra automation | `ops-runbook` (→ `runbooks/`), `ops-bug-rca` (→ `rcas/`), `ops-terraform-exoscale` (scaffolds into `infra/`) |
