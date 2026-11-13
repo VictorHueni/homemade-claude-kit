@@ -1,0 +1,36 @@
+<!-- summary: 1 new table · 2 read -->
+<div class="block">
+  <h2>Tables and relationships</h2>
+  {{FIGURE:er-01-rebooking|Entity-relationship diagram: a booking points at a slot, and a booking move points at its booking.}}
+</div>
+
+<div class="block">
+  <h2>Tables</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Table</th><th>Change</th><th>Rows</th></tr></thead>
+      <tbody>
+        <tr><td class="key">booking_move</td><td>New. One row per move, never updated.</td><td class="num">1 per move</td></tr>
+        <tr><td class="key">booking</td><td>Gains <code>moved_at</code>.</td><td class="num">unchanged</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="block">
+  <h2>Decisions on this layer</h2>
+  <div class="decisions">
+    <section>
+      <span class="chip solid">Settled</span>
+      <ul>
+        <li>A move is recorded as a row of its own, so the history of a booking is never rewritten.</li>
+      </ul>
+    </section>
+    <section class="open">
+      <span class="chip open">Left to the implementation</span>
+      <ul>
+        <li>The index that serves "moves of one booking".</li>
+      </ul>
+    </section>
+  </div>
+</div>

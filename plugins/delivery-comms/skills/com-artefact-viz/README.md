@@ -17,6 +17,7 @@ Markdown artefact ──parser──> model ──renderer──> one HTML file 
 | `delivery-roadmap` | `plan-delivery-roadmap` | Phase-column timeline + walking skeleton + expandable epic features |
 | `bmc` | `business-model-canvas` | 9-block canvas grid (BMC + Lean), confidence colour-coding |
 | `service-blueprint` | `business-process` + `business-value-stream` + `business-persona` *(composition)* | Swimlane grid with the line of visibility, phase columns, pain overlays + cross-actor handoff spine |
+| `slice-design` | a slice folder *(README, tab partials, OpenAPI document, diagrams)* | A document page: header, four tabs from the outside in, diagrams in both themes, an OpenAPI viewer |
 
 ## Usage
 
@@ -59,6 +60,9 @@ python3 scripts/render.py --kind service-blueprint \
   --value-stream examples/service-blueprint/value-stream.md \
   --personas examples/service-blueprint/personas.md \
   --out /tmp/service-blueprint.html
+
+# the slice design sheet fixture is a folder
+python3 scripts/render.py --kind slice-design --slice examples/slice-design --out /tmp/slice-design.html
 ```
 
 ## Layout

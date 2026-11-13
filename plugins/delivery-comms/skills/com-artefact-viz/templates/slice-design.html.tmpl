@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{TITLE}}</title>
+<style data-design-layer>
+/* ===== The resolved design: font faces, then the modules the sheet reads, the dark one included ===== */
+{{DESIGN_LAYER}}
+</style>
+<style>
+{{VIEW_CSS}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="head">
+    <span class="eyebrow">{{KIND}}</span>
+    <h1>{{TITLE}}</h1>
+    <p class="lead">{{META}}</p>
+{{HEADER}}
+  </header>
+  {{TOOLBAR}}
+  <main>
+{{CONTENT}}
+  </main>
+  <footer class="foot">
+{{FOOT}}
+    <p>{{FOOTER}}</p>
+  </footer>
+</div>
+<script>
+{{RUNTIME_JS}}
+</script>
+</body>
+</html>

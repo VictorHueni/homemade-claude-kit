@@ -1,7 +1,7 @@
 ---
 name: com-artefact-viz
 license: MIT
-description: "Render canonical kit artefacts into single-file, self-contained interactive HTML views via a shared Python pipeline, themed by the project's resolved design system and checked by a blocking validator. Five pluggable renderers: capability map, delivery roadmap timeline (walking-skeleton band + per-epic features), FBS collapsible tree, Business Model / Lean Canvas grid, and service blueprint (swimlane composition over process + value-stream + persona docs, with the line of visibility and pain overlays). Use when the user wants a web view, visualisation, board, timeline, canvas, swimlane, or shareable HTML of a capability map, FBS, delivery roadmap, BMC, Lean Canvas, or service blueprint. Triggers on: visualise capability map, render FBS tree, roadmap timeline view, BMC canvas HTML, service blueprint, swimlane view, line of visibility, artefact visualisation, com-artefact-viz. Do NOT use for slide decks (com-slide-deck) or C4 diagrams (arch-c4)."
+description: "Render canonical kit artefacts into single-file, self-contained interactive HTML views via a shared Python pipeline, themed by the project's resolved design system and checked by a blocking validator. Six pluggable renderers: capability map, delivery roadmap timeline, FBS collapsible tree, Business Model / Lean Canvas grid, service blueprint (swimlane composition over process + value-stream + persona docs, with the line of visibility and pain overlays), and slice design sheet (a slice folder's four layers, with diagrams and an OpenAPI viewer). Use when the user wants a web view, visualisation, board, timeline, canvas, swimlane, or shareable HTML of a capability map, FBS, delivery roadmap, BMC, Lean Canvas, or service blueprint. Triggers on: visualise capability map, render FBS tree, roadmap timeline view, BMC canvas HTML, service blueprint, swimlane view, line of visibility, slice design sheet, artefact visualisation, com-artefact-viz. Do NOT use for slide decks (com-slide-deck) or C4 diagrams (arch-c4)."
 allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/render.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/dev_server.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/shared/design_source.py *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/shared/check_render.py *)
 user-invocable: true
 metadata:
@@ -46,6 +46,7 @@ Markdown artefact ──(parser)──> normalized model ──(renderer)──>
 | `delivery-roadmap` | `plan-delivery-roadmap` | `docs/plans/delivery-roadmap.md` | Phase-column timeline, walking-skeleton band, pain-coded epic cards with expandable features/stories |
 | `bmc` | `business-model-canvas` | `docs/business/02a-bmc.md` / `02a-lean-canvas.md` | Classic 9-block canvas grid (BMC + Lean variants), confidence colour-coding |
 | `service-blueprint` | `business-process` + `business-value-stream` + `business-persona` *(composition)* | `docs/communication/visualisations/service-blueprint.html` | Swimlane grid (evidence · customer · frontstage · backstage · systems) with the **line of visibility**, value-stream phase columns, pain overlays, and a cross-actor handoff spine |
+| `slice-design` | a slice folder *(README, tab partials, OpenAPI document, diagrams)* | the slice's folder, for example `docs/plans/active/<slice>/` | A document page of its own, not a dashboard: a header (the line above the title, the title, the lead, labels), four tabs from the outside in (screens · API and contracts · code organisation · database), diagrams in a light and a dark variant, an OpenAPI viewer, the decisions that close each tab, and a foot |
 
 It produces **communication artefacts** (the `com-` prefix → `docs/communication/`),
 mints no IDs, and is not a step in the strategic-architecture build order — it is
@@ -86,6 +87,7 @@ worked multi-file fixture lives in `examples/service-blueprint/`.
 | Render an artefact (auto-detect kind) | `python3 <skill-dir>/scripts/render.py docs/business/03a-capability-map.md` |
 | Force the kind | `python3 <skill-dir>/scripts/render.py SRC.md --kind fbs` |
 | Compose a service blueprint | `python3 <skill-dir>/scripts/render.py --kind service-blueprint --proc PROC.md --value-stream VS.md --personas PERSONAS/` |
+| Render a slice design sheet | `python3 <skill-dir>/scripts/render.py --kind slice-design --slice docs/plans/active/SLICE/ --out OUT.html` |
 | Choose the output path | `python3 <skill-dir>/scripts/render.py SRC.md --out docs/strategy/capability-map.html` |
 | Record the verdict (after every render) | `python3 <skill-dir>/scripts/shared/check_render.py --record OUT.html.verdict.txt OUT.html` |
 | Theme with a specific design system | `python3 <skill-dir>/scripts/render.py SRC.md --design-system path/to/design-system/` (a folder with a `kit-manifest.json`; a single stylesheet is refused) |
@@ -173,6 +175,28 @@ or design-system change is needed.
   their `Phase` column (falling back to the phase-plan epic list). Epic cards
   carry a pain-coded left stripe and an expandable list of FBS scope rows
   (features/stories). The walking-skeleton band shows hypothesis + can/cannot.
+- **Slice design sheet.** A page of its own: it has its own shell
+  (`templates/slice-design.html.tmpl`), a centred document column and not the
+  dashboard header of the other kinds. Fed by a folder, not by one Markdown
+  file: `README.md` gives the title, the lead and the line above the title
+  (frontmatter `title`, `description`, `eyebrow`), the optional `header.html`
+  the labels under the lead (the specification it follows, its stories), the
+  optional `footer.html` the paragraphs of the foot (its sources, its
+  authority), and each of `screens.html`, `api.html`, `code.html` and
+  `database.html` is the content of one tab. A tab with no partial, or an empty one, says the slice does not touch
+  that layer; the first tab with content opens. Partials hold content only (the
+  shell, tabs, styles and script are the renderer's) and two slots:
+  `{{FIGURE:name|alt|caption}}` inlines `views/name.svg` and
+  `views/dark/name.svg`, as the `arch-plantuml` pipeline writes them, fitted to
+  the page and enlarged on selection; `{{OPENAPI}}` renders `openapi.json` (or
+  `openapi.yaml` when PyYAML is installed) as one card per operation, then the
+  document itself. What the viewer does not render (parameters, composed
+  schemas) is said on the operation. The page follows the viewer's theme in the
+  design's light and dark roles, and tables become cards on a phone. A missing
+  diagram, a missing document or an unknown slot stops the render with a message
+  naming the file. This skill renders the sheet; it does not write its sources
+  or draw its diagrams. The folder, the slots and the classes a partial may use:
+  `references/parsing-contract.md`.
 - **BMC / Lean Canvas.** Blocks are placed into the classic canvas grid via
   `grid-template-areas`, with separate layouts for BMC and Lean variants; the
   alternate variant's blocks are dropped. Confidence (Assumed/Tested/Validated)
@@ -191,6 +215,7 @@ or design-system change is needed.
 7. [ ] Interactive controls work (FBS orientation + collapse; epic feature disclosure; capability-card disclosure + expand/collapse-all).
 8. [ ] Re-rendering after a source edit reflects the change (no stale authored content).
 9. [ ] *(service-blueprint)* `--proc` resolves; ≥1 customer and ≥1 frontstage/backstage lane; the three control lines sit between the right bands; any **Unclassified** actor is one whose `Persona type` is missing in the source persona doc (fix there, not in the view); phase columns match the value stream (or note the §6 fallback); handoff spine lists the cross-actor data objects.
+10. [ ] *(slice-design)* The four tabs are there in order; a layer the slice does not touch says so; every figure shows in both themes; the OpenAPI card of each operation is there with its note of what is not shown; no sideways scroll at phone width.
 
 ---
 

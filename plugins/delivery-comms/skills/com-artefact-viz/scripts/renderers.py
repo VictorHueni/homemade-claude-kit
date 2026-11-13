@@ -7,6 +7,12 @@ Each renderer returns a dict with:
   toolbar    : HTML for the toolbar controls (may be "")
   view_css   : CSS scoped to this view (token-driven; never hard-codes colour)
   content    : the main HTML fragment
+and, for a view that is a page of its own and not a dashboard:
+  template   : its shell in templates/, in place of base.html.tmpl
+  modules    : design modules to inline beside the ones every view reads
+  header     : HTML placed under the lead, in the shell's {{HEADER}} slot
+  foot       : HTML placed in the foot, before the generated line
+  runtime_js : its script, in place of the shared runtime
 
 render.py drops these into templates/base.html.tmpl. All visual styling flows
 through CSS custom properties: contract roles (contract/modules.json)
@@ -609,10 +615,104 @@ def render_service_blueprint(model, options):
     }
 
 
+# --------------------------------------------------------------------------- #
+# Slice design sheet
+# --------------------------------------------------------------------------- #
+
+# What a tab says when the slice does not touch its layer: a headline, then what the tab holds when it does.
+SLICE_EMPTY = {
+    "screens": ("No screen in this slice", (
+        "one mock-up per screen, with the states that matter (empty, loading, error, filled);",
+        "the components the slice adds or changes, and those it reuses;",
+        "for each screen, the operations of the next tab that it calls.")),
+    "api": ("No operation or contract in this slice", (
+        "the operations the slice adds or changes, with their OpenAPI document;",
+        "the contracts each side reads, and the messages exchanged;",
+        "the shapes of the results and the decision tables behind them.")),
+    "code": ("No code organisation in this slice", (
+        "what each module gains;",
+        "a class diagram of the types the slice adds and the sequence of one run;",
+        "how the slice is tested.")),
+    "database": ("No database change in this slice", (
+        "an entity-relationship diagram of the tables the slice touches;",
+        "the tables it adds or changes;",
+        "the column conventions it follows.")),
+}
+
+
+def _template(name):
+    import os
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "templates", name)
+    with open(path, "r", encoding="utf-8") as fh:
+        return fh.read()
+
+
+def _slice_figure(figures):
+    def expand(match):
+        light, dark = figures[match.group(1).strip()]
+        caption = f"<figcaption>{match.group(3)}</figcaption>" if match.group(3) else ""
+        return ('<figure><div class="scroll"><button class="zoom" type="button" aria-pressed="false" '
+                'title="Enlarge or fit the diagram">'
+                f'<img class="fig-light" src="{light}" alt="{esc(match.group(2).strip())}">'
+                f'<img class="fig-dark" src="{dark}" alt=""></button></div>{caption}</figure>')
+    return expand
+
+
+def render_slice_design(model, options):
+    import openapi_view
+    from parsers import SLICE_FIGURE, SLICE_OPENAPI
+
+    tabs = model["tabs"]
+    first = next((t["key"] for t in tabs if t["html"]), tabs[0]["key"])
+    buttons, panels = [], []
+    for tab in tabs:
+        key, on = tab["key"], tab["key"] == first
+        summary = tab["summary"] or ("" if tab["html"] else SLICE_EMPTY[key][0])
+        buttons.append(
+            f'<button class="tab" role="tab" id="tab-{key}" aria-controls="panel-{key}" '
+            f'aria-selected="{"true" if on else "false"}" data-tab="{key}">'
+            f'<span class="eyebrow">{esc(tab["layer"])}</span><span class="name">{esc(tab["name"])}</span>'
+            f'<span class="sum">{esc(summary)}</span></button>')
+        if tab["html"]:
+            body = SLICE_FIGURE.sub(_slice_figure(model["figures"]), tab["html"])
+            if SLICE_OPENAPI in body:
+                api = model["openapi"]
+                body = body.replace(SLICE_OPENAPI, openapi_view.render(api["doc"], api["source"], api["name"]))
+        else:
+            headline, holds = SLICE_EMPTY[key]
+            body = (f'<div class="empty"><h2>{esc(headline)}</h2><p>When a slice touches this layer, this tab holds:</p>'
+                    f'<ul>{"".join(f"<li>{esc(item)}</li>" for item in holds)}</ul></div>')
+        panels.append(f'<section class="panel" role="tabpanel" id="panel-{key}" aria-labelledby="tab-{key}"'
+                      f'{"" if on else " hidden"}>\n{body}\n</section>')
+
+    # The page follows the viewer's theme: under a dark system setting, or an explicit dark choice on the
+    # root, every mirrored role of the inlined modules takes the value of its dark twin.
+    remap = " ".join(f"{light}: var({dark});" for light, dark in options["dark_remap"].items())
+    theme_css = (":root { color-scheme: light; }\n"
+                 "@media (prefers-color-scheme: dark) {\n"
+                 f'  :root:not([data-theme="light"]) {{ color-scheme: dark; {remap} }}\n'
+                 "}\n"
+                 f':root[data-theme="dark"] {{ color-scheme: dark; {remap} }}\n')
+    return {
+        "template": "slice-design.html.tmpl",
+        "kind_label": model["eyebrow"],
+        "meta": esc(model["lead"]),
+        "header": model["header"],
+        "toolbar": (f'<nav class="tabs" role="tablist" aria-label="Layers of the slice" data-default="{first}">'
+                    + "".join(buttons) + "</nav>"),
+        "view_css": theme_css + _template("slice-design.css"),
+        "content": "\n".join(panels),
+        "foot": model["footer"],
+        "modules": ("dark",),
+        "runtime_js": _template("slice-design.js"),
+    }
+
+
 RENDERERS = {
     "capability-map": render_capability_map,
     "fbs": render_fbs,
     "delivery-roadmap": render_roadmap,
     "bmc": render_bmc,
     "service-blueprint": render_service_blueprint,
+    "slice-design": render_slice_design,
 }

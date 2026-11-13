@@ -1,0 +1,65 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Booking service",
+    "version": "0.1.0",
+    "description": "The one operation this slice adds."
+  },
+  "paths": {
+    "/bookings/{bookingId}/rebook": {
+      "post": {
+        "summary": "Move a booking to another slot",
+        "description": "Holds the target slot, moves the booking, then releases the old slot.",
+        "parameters": [
+          { "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RebookRequest" },
+              "examples": {
+                "move": { "summary": "Move to slot 42", "value": { "targetSlotId": "42", "reason": "customer request" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The booking as it now stands.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Booking" },
+                "examples": {
+                  "moved": { "value": { "id": "b-7", "slotId": "42", "movedAt": "2030-01-01T09:00:00Z" } }
+                }
+              }
+            }
+          },
+          "409": { "description": "The target slot is no longer free; nothing changed." }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RebookRequest": {
+        "type": "object",
+        "required": ["targetSlotId"],
+        "properties": {
+          "targetSlotId": { "type": "string", "description": "The slot to move to." },
+          "reason": { "type": "string", "enum": ["customer request", "provider change"], "description": "Why the booking moves." }
+        }
+      },
+      "Booking": {
+        "type": "object",
+        "required": ["id", "slotId"],
+        "properties": {
+          "id": { "type": "string" },
+          "slotId": { "type": "string" },
+          "movedAt": { "type": "string", "description": "When the booking last moved." }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+<!-- summary: 1 module · 1 test seam -->
+<div class="block">
+  <h2>What each module gains</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Module</th><th>Gains</th><th>Tested by</th></tr></thead>
+      <tbody>
+        <tr><td class="key">booking</td><td>The rebooking use case and the move on a booking.</td><td>The booking seam: a prepared calendar, one call, the booking read back.</td></tr>
+        <tr><td class="key">calendar</td><td>Nothing: its hold and release are reused.</td><td class="quiet">Unchanged</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="block">
+  <h2>Classes</h2>
+  {{FIGURE:class-01-rebooking|Class diagram: the rebooking use case moves a booking and asks the slot calendar to hold and release slots.|What the booking module gains. <span class="mono">class-01-rebooking</span>}}
+</div>
+
+<div class="block">
+  <h2>Decisions on this layer</h2>
+  <div class="decisions">
+    <section>
+      <span class="chip solid">Settled</span>
+      <ul>
+        <li>The calendar is reached through one interface, with an in-memory twin for the tests.</li>
+      </ul>
+    </section>
+    <section class="open">
+      <span class="chip open">Left to the implementation</span>
+      <ul>
+        <li>Where the hold expires when the move fails half-way.</li>
+      </ul>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,24 @@
+@startuml
+!include _theme.puml
+skinparam linetype ortho
+title Rebook a slot: what the booking module gains
+
+package "booking" {
+  class RebookSlot {
+    +handle(command): Booking
+  }
+  class Booking {
+    +id: BookingId
+    +slot: SlotId
+    +moveTo(slot): Booking
+  }
+  interface SlotCalendar {
+    +isFree(slot): boolean
+    +hold(slot)
+    +release(slot)
+  }
+}
+
+RebookSlot --> Booking : moves
+RebookSlot --> SlotCalendar : asks and holds
+@enduml
