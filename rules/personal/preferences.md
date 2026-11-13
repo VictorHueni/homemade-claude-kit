@@ -6,3 +6,4 @@ type: rule
 
 - **Naming**: prefer consistent suffix-based file naming across packages within a project (Java-style suffix discipline).
 - **Code language**: all code artefacts (file names, components, variables, tests) in English; reserve French (and other languages) for user-facing UI content only.
+- **Conversation language**: answer in the language the owner writes in (French in chat), while every committed or published document (docs, issues, PR bodies, artifacts) stays in English unless it is user-facing UI copy.

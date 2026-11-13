@@ -165,7 +165,7 @@ The rules marked *(→ AGENTS.md adapter)* also feed the generated AGENTS.md ada
 | `rules/personal/bang-prefix-is-for-the-claude-prompt.md` | Say that a `! command` goes in the Claude prompt |
 | `rules/personal/decisions-in-prose-not-forms.md` | Owner decisions discussed in prose |
 | `rules/personal/diagramming-layout.md` | Orthogonal edges, fewest elbows (path-scoped) |
-| `rules/personal/preferences.md` | Naming, code language |
+| `rules/personal/preferences.md` | Naming, code language, conversation language |
 | `rules/personal/python-docstring-policy.md` | Google §3.8 docstrings as written (path-scoped) |
 | `rules/personal/subagent-orchestration.md` | Pointer to chat-driven Ralph orchestration |
 | `rules/personal/ui-copy-no-em-dash.md` | No em dash in user-facing copy (path-scoped) |
