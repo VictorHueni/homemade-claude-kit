@@ -319,6 +319,15 @@ artefact_types:
     review_interval: 30d
     frontmatter_conditionals: []
     property_schema_ref: null   # TBD until clew defines property schemas
+  - type: slice_design
+    okf_type: "Slice Design Sheet"
+    minting_skill: plan-slice-design
+    id_format: null
+    layout: one-per-artefact
+    default_path: "docs/plans/active/{slug}/README.md"
+    review_interval: 30d
+    frontmatter_conditionals: []
+    property_schema_ref: null   # TBD until clew defines property schemas
   - type: implementation_plan
     okf_type: "Implementation Plan"
     minting_skill: plan-implementation

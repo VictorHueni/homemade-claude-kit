@@ -1,7 +1,7 @@
 ---
 name: metamodel
 license: MIT
-description: "Canonical metamodel of the strategic-architecture documentation stack: the 19-artefact build order, the artefact-type registry (ID formats, canonical paths, review intervals, OKF type names), the artefact frontmatter schema, and open-items governance — plus the stack lifecycle as modes: Audit (health check), Scaffold (canonical folder tree + CLAUDE.md wiring), Migrate (bring existing docs onto the metamodel). Every doc-producing kit skill reads this skill's references; consult it directly for stack-level work. Triggers on: build the documentation stack, do the strategic docs, start the project documentation, documentation plan, build order, what artefact comes next, where does an artefact live, which ID format, artefact frontmatter, docs folder structure, audit my docs stack, metamodel audit, artefact stack health, scaffold the docs folder, docs folder setup, migrate my docs, docs migration report."
+description: "Canonical metamodel of the strategic-architecture documentation stack: the 20-artefact build order, the artefact-type registry (ID formats, canonical paths, review intervals, OKF type names), the artefact frontmatter schema, and open-items governance — plus the stack lifecycle as modes: Audit (health check), Scaffold (canonical folder tree + CLAUDE.md wiring), Migrate (bring existing docs onto the metamodel). Every doc-producing kit skill reads this skill's references; consult it directly for stack-level work. Triggers on: build the documentation stack, do the strategic docs, start the project documentation, documentation plan, build order, what artefact comes next, where does an artefact live, which ID format, artefact frontmatter, docs folder structure, audit my docs stack, metamodel audit, artefact stack health, scaffold the docs folder, docs folder setup, migrate my docs, docs migration report."
 user-invocable: true
 metadata:
   category: "metamodel"
@@ -59,7 +59,7 @@ facts — none carries its own copy. Their long-term future is thin wrappers ove
 
 ---
 
-## The build-order spine — 19 artefacts
+## The build-order spine — 20 artefacts
 
 | # | Artefact | Skill | Mints |
 |---|---|---|---|
@@ -81,6 +81,7 @@ facts — none carries its own copy. Their long-term future is thin wrappers ove
 | 9 | **Quality Attributes** (how well — NFRs) | `spec-quality-attributes` | `QA-XXNN` |
 | 9.5 | **Use Cases** (actor↔system scenarios) | `spec-use-case` | `UC-NN` |
 | 10 | **PRDs** (feature specs — Build by Feature) | `spec-prd` | `PRD-NNNN` · `PRD-NNNN.US-NN` |
+| 10.5 | **Slice Design Sheet** (architectural view of one slice, when the slice warrants one) | `plan-slice-design` | — |
 | 11 | **Implementation plans** (atomic increments) | `plan-implementation` | `Plan-NNNN` |
 
 > The number is build order, not a strict linear chain — several artefacts are parallelisable

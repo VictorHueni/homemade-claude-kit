@@ -164,6 +164,15 @@ Not in the main build order (the numbered spine lives in [`metamodel.md`](metamo
    └──────────────────┬───────────────────────┘
                       │
                       ▼
+   ┌──────────────────────────────────────────┐
+   │ plan-slice-design (Step 10.5 — opt.)     │
+   │ (architectural view of one slice)        │
+   │ Output: a slice folder, no ID            │
+   │ Follows: the specification of the slice  │
+   │ Cited by: the plan or tickets, by path   │
+   └──────────────────┬───────────────────────┘
+                      │
+                      ▼
    ┌──────────────────────┐
    │ spec-implementation- │
    │   plan               │
@@ -278,6 +287,10 @@ erDiagram
         string PRD_NNNN FK
         string UC_NN FK
     }
+    SLICE_DESIGN {
+        string folder PK
+        string PRD_NNNN FK
+    }
     IMPLEMENTATION_PLAN {
         string Plan_NNNN PK
         string PRD_NNNN FK
@@ -336,6 +349,8 @@ erDiagram
     PRD ||--o{ USER_STORY : "mints delivery slices"
     USER_STORY }o..o| USE_CASE : "covers (proposed soft edge)"
     PRD ||--|| IMPLEMENTATION_PLAN : "one plan per PRD"
+    PRD ||..o{ SLICE_DESIGN : "designed in (soft, by path)"
+    SLICE_DESIGN }o..o{ IMPLEMENTATION_PLAN : "cited by (soft, by path)"
     INTERFACE_CONTRACT }o--o{ ADR : "versioning and auth decisions"
     INTERFACE_CONTRACT }o--o{ QUALITY_ATTRIBUTES : "SLA per CTR-NN"
     INTERFACE_CONTRACT }o--o{ PRD : "acceptance criteria reference CTR-NN"
@@ -569,10 +584,21 @@ moving on.
 - User stories are minted **with the PRD** as `PRD-NNNN.US-NN` children (`inherits-from-parent`, clew ADR-0017 D1) — delivery slices born and retired with their PRD; each may carry an optional `Covers: UC-NN` soft link (a declared absence when use cases aren't enabled)
 **Output verification:** ≥1 PRD per active epic (E-NN); each PRD references its E-NN, FBS IDs, and QA IDs; FBS functionality status promoted ⬜ → 🔄; Delivery Roadmap PRD link filled.
 
+### Step 10.5 — Slice Design Sheets (architectural view of one slice)
+
+**Skill:** `plan-slice-design`
+**Prerequisites:** Step 10 (the specification of the slice: a PRD, or the stories of one). Optional: write one when a slice is large or new enough that its design should be read before the work is cut.
+**Process:**
+- One folder per slice: `docs/plans/active/{slug}/`, whose `README.md` carries the artefact frontmatter. The sheet mints no ID and is cited by its path.
+- Four layers from the outside in (screens · API and contracts · code organisation · database), each closed by its decisions: settled, and left to the implementation.
+- Diagrams come from `arch-uml`, drawn in the slice folder; the page is built by `com-artefact-viz` (kind `slice-design`).
+- The specification decides where the two differ, and the sheet is corrected.
+**Output verification:** the folder holds `README.md` with `type: Slice Design Sheet`; every tab with content ends with its decisions; the recorded verdict of the built page reads `PASS: no findings`; the plan or the tickets of the slice cite the folder.
+
 ### Step 11 — Implementation Plans (atomic increments)
 
 **Skill:** `plan-implementation`
-**Prerequisites:** Step 10 (PRDs).
+**Prerequisites:** Step 10 (PRDs); Step 10.5 when the slice has a sheet (the plan reads it and cites it).
 **Process:**
 - One plan per PRD: `docs/plans/active/{NNNN}_exec_{slug}.md`
 - Each plan: numbered increments (Inc-1, Inc-2, …), each small + testable + reversible.
@@ -681,6 +707,11 @@ docs/
 ├── plans/                                               ← Build planning (plan-)
 │   ├── delivery-roadmap.md                              ← epics (E-NN)
 │   └── active/
+│       ├── {slug}/                                      ← one folder per slice design sheet
+│       │   ├── README.md                                ← artefact frontmatter; how to rebuild
+│       │   ├── screens.html · api.html · code.html · database.html  ← one partial per tab
+│       │   ├── *.puml · render.sh · views/              ← diagram sources, pipeline, rendered SVGs (committed)
+│       │   └── out/                                     ← built page + verdict (generated, ignored)
 │       └── {NNNN}_exec_{slug}.md  (one per implementation plan)
 ├── architecture/                                        ← Architecture
 │   ├── decisions/                                       ← ADRs
@@ -764,7 +795,7 @@ docs/
 | `business-` | `docs/business/` | All BIZBOK Business Architecture artefacts. **Exception:** `business-vision` outputs to `docs/VISION.md` (project root level) for agent-context visibility — the only `business-` skill whose output is not under `docs/business/`. |
 | `discovery-` | `docs/discovery/` | Pre-formal evidence layer — ideation, 1:1 research, group workshops. Cross-cutting; feeds every downstream artefact. Subfolders per artefact (`ideation/`, `interviews/`, `workshops/`). |
 | `spec-` | `docs/product-specs/` | Product specs — FBS, quality attributes, use cases, PRDs (what the product does and how well). |
-| `plan-` | `docs/plans/` | Build planning — delivery roadmap (epics `E-NN`) + implementation plans (`Plan-NNNN`). Split from `spec-` (clew ADR-0009): these specify *intended build sequence*, not the product. |
+| `plan-` | `docs/plans/` | Build planning — delivery roadmap (epics `E-NN`), slice design sheets (no ID, one folder per slice) + implementation plans (`Plan-NNNN`). Split from `spec-` (clew ADR-0009): these specify *intended build sequence*, not the product. |
 | `arch-` | `docs/architecture/` | Subfolders per artefact (e.g., `decisions/` for ADRs) |
 | `domain-` | `docs/domain/` | DDD artefacts — the shared language between business and tech (bounded contexts, glossary, domain model) |
 | `ops-` | `docs/ops/` | Subfolders per artefact (`runbooks/`, `rcas/`) |
