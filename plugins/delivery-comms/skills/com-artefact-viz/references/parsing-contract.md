@@ -134,6 +134,7 @@ Any other `{{...}}` in a partial stops the render naming it. The slots are expan
 | `note` | a `<p>` | Secondary text under a heading |
 | `scroll` | a `<div>` around a `<table>` | The table's frame; the table becomes cards on a phone |
 | `key`, `num`, `quiet`, `nw` | a `<td>` | An identifier, a right-aligned number, a muted cell, a cell that does not wrap |
+| `ops`, `cols` | a `<table>` of operations, of columns | Every cell in the heading font, a `mono` cell included, so a type column stays narrow |
 | `chip`, with `ref`, `solid` or `open` | a `<span>` | A label: a reference, a filled label, a dashed "open" label |
 | `meta`, `stories` | a `<div>` of chips in `header.html` | A row of labels, a row of story references |
 | `mono` | any inline element | Monospace |
