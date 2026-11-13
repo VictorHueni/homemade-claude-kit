@@ -989,11 +989,12 @@ def frontmatter(text):
 def parse_slice_design(folder, options=None):
     """Read a slice folder into the model the slice-design renderer draws.
 
-    README.md gives the title and the lead (frontmatter `title`, `description`). Each of screens.html,
-    api.html, code.html and database.html is the content of one tab; a missing or empty one is a layer the
-    slice does not touch. A partial may open with `<!-- summary: ... -->`, shown on its tab. Its slots are
-    {{FIGURE:name|alt|caption}} (views/name.svg and views/dark/name.svg) and {{OPENAPI}} (openapi.json, or
-    openapi.yaml with PyYAML)."""
+    README.md gives the title, the lead and the line above the title (frontmatter `title`, `description`,
+    `eyebrow`). Each of screens.html, api.html, code.html and database.html is the content of one tab; a
+    missing or empty one is a layer the slice does not touch. A partial may open with
+    `<!-- summary: ... -->`, shown on its tab. Its slots are {{FIGURE:name|alt|caption}} (views/name.svg and
+    views/dark/name.svg) and {{OPENAPI}} (openapi.json, or openapi.yaml with PyYAML). header.html and
+    footer.html, both optional, hold the labels under the lead and the paragraphs of the page's foot."""
     import base64
     import os
     import openapi_view
@@ -1011,6 +1012,17 @@ def parse_slice_design(folder, options=None):
         raise SliceError("README.md has no `title:` in its frontmatter; the page needs a title")
 
     sources, tabs, figures, wants_openapi = [readme], [], {}, False
+    chrome = {}
+    for part in ("header", "footer"):
+        path = os.path.join(folder, part + ".html")
+        chrome[part] = ""
+        if os.path.isfile(path):
+            with open(path, "r", encoding="utf-8") as fh:
+                chrome[part] = fh.read().strip()
+            slot = SLICE_SLOT.search(chrome[part])
+            if slot:
+                raise SliceError(f"{part}.html has the slot {slot.group(0)}; slots belong to the tab partials")
+            sources.append(path)
     for key, layer, name in SLICE_TABS:
         path = os.path.join(folder, key + ".html")
         body, summary = "", ""
@@ -1056,8 +1068,9 @@ def parse_slice_design(folder, options=None):
         openapi = {"doc": doc, "source": source, "name": file_name}
         sources.append(os.path.join(folder, file_name))
 
-    return {"title": title, "lead": meta.get("description", ""), "tabs": tabs, "figures": figures,
-            "openapi": openapi, "sources": sources}
+    return {"title": title, "lead": meta.get("description", ""),
+            "eyebrow": meta.get("eyebrow") or "Slice design sheet", "header": chrome["header"],
+            "footer": chrome["footer"], "tabs": tabs, "figures": figures, "openapi": openapi, "sources": sources}
 
 
 PARSERS = {

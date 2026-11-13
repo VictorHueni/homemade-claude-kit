@@ -86,8 +86,8 @@ def _read(path):
         return f.read()
 
 
-def fill_template(slots):
-    tmpl = _read(os.path.join(TEMPLATE_DIR, "base.html.tmpl"))
+def fill_template(slots, name="base.html.tmpl"):
+    tmpl = _read(os.path.join(TEMPLATE_DIR, name))
     for key, value in slots.items():
         tmpl = tmpl.replace("{{" + key + "}}", value)
     return tmpl
@@ -251,7 +251,8 @@ def _emit(model, rendered, kind, args, source_label, sources):
     exceptions = parse_exceptions(args.exception)
     domain = "/* ---- viz domain tokens (derived) ---- */\n" + _read(os.path.join(TEMPLATE_DIR, "tokens.domain.css"))
 
-    runtime = _read(os.path.join(TEMPLATE_DIR, "runtime.js")) + rendered.get("script", "")
+    # a view that is a page of its own brings its shell and its script; the others share the dashboard's
+    runtime = rendered["runtime_js"] if "runtime_js" in rendered else _read(os.path.join(TEMPLATE_DIR, "runtime.js"))
     modules = VIEW_MODULES + tuple(rendered.get("modules", ()))
     title = args.title or model["title"]
     try:
@@ -275,7 +276,9 @@ def _emit(model, rendered, kind, args, source_label, sources):
         "VIEW_CSS": rendered["view_css"],
         "RUNTIME_JS": runtime,
         "FOOTER": footer,
-    })
+        "HEADER": rendered.get("header", ""),
+        "FOOT": rendered.get("foot", ""),
+    }, rendered.get("template", "base.html.tmpl"))
 
     out = args.out or default_out(kind)
     # Check, then write: a view that breaks the design writes nothing.

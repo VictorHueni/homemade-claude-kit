@@ -46,7 +46,7 @@ Markdown artefact ──(parser)──> normalized model ──(renderer)──>
 | `delivery-roadmap` | `plan-delivery-roadmap` | `docs/plans/delivery-roadmap.md` | Phase-column timeline, walking-skeleton band, pain-coded epic cards with expandable features/stories |
 | `bmc` | `business-model-canvas` | `docs/business/02a-bmc.md` / `02a-lean-canvas.md` | Classic 9-block canvas grid (BMC + Lean variants), confidence colour-coding |
 | `service-blueprint` | `business-process` + `business-value-stream` + `business-persona` *(composition)* | `docs/communication/visualisations/service-blueprint.html` | Swimlane grid (evidence · customer · frontstage · backstage · systems) with the **line of visibility**, value-stream phase columns, pain overlays, and a cross-actor handoff spine |
-| `slice-design` | a slice folder *(README, tab partials, OpenAPI document, diagrams)* | the slice's folder, for example `docs/plans/active/<slice>/` | A document page with four tabs, from the outside in (screens · API and contracts · code organisation · database), diagrams in a light and a dark variant, an OpenAPI viewer, and the decisions that close each tab |
+| `slice-design` | a slice folder *(README, tab partials, OpenAPI document, diagrams)* | the slice's folder, for example `docs/plans/active/<slice>/` | A document page of its own, not a dashboard: a header (the line above the title, the title, the lead, labels), four tabs from the outside in (screens · API and contracts · code organisation · database), diagrams in a light and a dark variant, an OpenAPI viewer, the decisions that close each tab, and a foot |
 
 It produces **communication artefacts** (the `com-` prefix → `docs/communication/`),
 mints no IDs, and is not a step in the strategic-architecture build order — it is
@@ -175,10 +175,15 @@ or design-system change is needed.
   their `Phase` column (falling back to the phase-plan epic list). Epic cards
   carry a pain-coded left stripe and an expandable list of FBS scope rows
   (features/stories). The walking-skeleton band shows hypothesis + can/cannot.
-- **Slice design sheet.** Fed by a folder, not by one Markdown file: `README.md`
-  gives the title and the lead (frontmatter `title`, `description`), and each of
-  `screens.html`, `api.html`, `code.html` and `database.html` is the content of
-  one tab. A tab with no partial, or an empty one, says the slice does not touch
+- **Slice design sheet.** A page of its own: it has its own shell
+  (`templates/slice-design.html.tmpl`), a centred document column and not the
+  dashboard header of the other kinds. Fed by a folder, not by one Markdown
+  file: `README.md` gives the title, the lead and the line above the title
+  (frontmatter `title`, `description`, `eyebrow`), the optional `header.html`
+  the labels under the lead (the specification it follows, its stories), the
+  optional `footer.html` the paragraphs of the foot (its sources, its
+  authority), and each of `screens.html`, `api.html`, `code.html` and
+  `database.html` is the content of one tab. A tab with no partial, or an empty one, says the slice does not touch
   that layer; the first tab with content opens. Partials hold content only (the
   shell, tabs, styles and script are the renderer's) and two slots:
   `{{FIGURE:name|alt|caption}}` inlines `views/name.svg` and

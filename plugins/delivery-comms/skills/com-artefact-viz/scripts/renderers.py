@@ -7,9 +7,12 @@ Each renderer returns a dict with:
   toolbar    : HTML for the toolbar controls (may be "")
   view_css   : CSS scoped to this view (token-driven; never hard-codes colour)
   content    : the main HTML fragment
-and, when the view needs them:
+and, for a view that is a page of its own and not a dashboard:
+  template   : its shell in templates/, in place of base.html.tmpl
   modules    : design modules to inline beside the ones every view reads
-  script     : JavaScript appended to the shared runtime
+  header     : HTML placed under the lead, in the shell's {{HEADER}} slot
+  foot       : HTML placed in the foot, before the generated line
+  runtime_js : its script, in place of the shared runtime
 
 render.py drops these into templates/base.html.tmpl. All visual styling flows
 through CSS custom properties: contract roles (contract/modules.json)
@@ -664,7 +667,7 @@ def render_slice_design(model, options):
     buttons, panels = [], []
     for tab in tabs:
         key, on = tab["key"], tab["key"] == first
-        summary = tab["summary"] or ("" if tab["html"] else "None in this slice")
+        summary = tab["summary"] or ("" if tab["html"] else SLICE_EMPTY[key][0])
         buttons.append(
             f'<button class="tab" role="tab" id="tab-{key}" aria-controls="panel-{key}" '
             f'aria-selected="{"true" if on else "false"}" data-tab="{key}">'
@@ -691,14 +694,17 @@ def render_slice_design(model, options):
                  "}\n"
                  f':root[data-theme="dark"] {{ color-scheme: dark; {remap} }}\n')
     return {
-        "kind_label": "slice design sheet",
+        "template": "slice-design.html.tmpl",
+        "kind_label": model["eyebrow"],
         "meta": esc(model["lead"]),
+        "header": model["header"],
         "toolbar": (f'<nav class="tabs" role="tablist" aria-label="Layers of the slice" data-default="{first}">'
                     + "".join(buttons) + "</nav>"),
         "view_css": theme_css + _template("slice-design.css"),
         "content": "\n".join(panels),
+        "foot": model["footer"],
         "modules": ("dark",),
-        "script": _template("slice-design.js"),
+        "runtime_js": _template("slice-design.js"),
     }
 
 

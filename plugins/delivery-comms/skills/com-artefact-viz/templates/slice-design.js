@@ -32,7 +32,7 @@
     });
   });
   // The phone layout prints each cell under the name of its column: copy the header onto the cell.
-  Array.prototype.forEach.call(document.querySelectorAll(".viz-content table"), function (table) {
+  Array.prototype.forEach.call(document.querySelectorAll("main table"), function (table) {
     var heads = Array.prototype.map.call(table.querySelectorAll("thead th"), function (th) { return th.textContent; });
     Array.prototype.forEach.call(table.querySelectorAll("tbody tr"), function (row) {
       var column = 0;
