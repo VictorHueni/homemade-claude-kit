@@ -18,12 +18,12 @@ The split is deliberate: the agent (the judgement) is shared and lives here, the
 ```make
 loc-audit: loc-audit-scan
 	@OUT=$(LOC_AUDIT_DIR)/scan-$$(date +%F) && \
-	claude -p --agent loc-auditor --allowedTools "Read,Grep,Glob" \
+	claude -p --agent loc-auditor \
 	  "Run in review mode. Diff file: $$OUT/diff.json. Taxonomy file: <path>. Reviewed file: <path>. Context file: $$OUT/context.json." \
-	  < /dev/null > $(LOC_AUDIT_DIR)/$$(date +%F)-auditor.md
+	  --allowedTools "Read,Grep,Glob" < /dev/null > $(LOC_AUDIT_DIR)/$$(date +%F)-auditor.md
 ```
 
-The name is `loc-auditor` when the kit is installed through `install.sh` (the symlink channel, or a project install). On the marketplace channel a plugin agent can carry its plugin's prefix: `/agents` in a session shows the name to use. Without `< /dev/null`, `claude -p` waits three seconds for standard input before it starts.
+The name is `loc-auditor` when the kit is installed through `install.sh` (the symlink channel, or a project install). It is `quality-assurance:loc-auditor` on the marketplace channel, where plugin agents carry their plugin's name. The request comes before `--allowedTools`, which takes every argument after it as a tool name. Without `< /dev/null`, `claude -p` waits three seconds for standard input before it starts.
 
 For full-tree mode, give the findings file instead of the diff file and name the categories to judge in the request.
 

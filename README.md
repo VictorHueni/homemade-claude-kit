@@ -18,7 +18,7 @@ Three design pillars (kit [ADR-0006](docs/architecture/decisions/adr-0006-plugin
 | `strategy` | Business architecture + discovery evidence | `business-vision` · `business-persona` · `business-model-canvas` · `business-capability-map` · `business-value-stream` · `business-objective` · `business-process` · `business-quantitative-model` · `business-competitive-landscape` · `discovery-idea` · `discovery-research` · `discovery-workshop` |
 | `domain-modeling` | Strategic + tactical DDD | `domain-bounded-context` · `domain-glossary` · `domain-model` |
 | `product-spec` | Specs + build planning | `spec-functional-breakdown-structure` · `spec-prd` · `spec-use-case` · `plan-delivery-roadmap` · `plan-slice-design` · `plan-implementation` |
-| `quality-assurance` | Test strategy, scenarios, cases — the validate/test stage (+ `loc-auditor` agent) | `spec-quality-attributes` · `qa-test-strategy` · `qa-test-scenario` |
+| `quality-assurance` | Test strategy, scenarios, cases — the validate/test stage (+ `loc-auditor` and `test-auditor` agents) | `spec-quality-attributes` · `qa-test-strategy` · `qa-test-scenario` |
 | `architecture` | Decisions, contracts, diagrams, arc42 | `arch-adr` · `arch-research` · `arch-service-contract` · `arch-cli-contract` · `arch-structurizr` · `arch-c4` · `arch-plantuml` · `arch-uml` · `arch-arc42` |
 | `dev-flow` | Developer workflow (+ `branch-cleanup-audit` command) | `dev-git-init` · `dev-git-commit` · `dev-pr` · `dev-git-worktree` · `dev-release-init` · `dev-stack-guide` · `dev-getting-started` |
 | `agent-loop` | Guide → Verify → Solve agent cycle (+ `ralph-audit` command) | `agent-config` · `agent-grill-me` · `agent-handoff` · `agent-issue-loop` · `agent-peer-review` · `agent-ralph-loop` |
