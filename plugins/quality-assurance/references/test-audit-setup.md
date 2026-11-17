@@ -89,7 +89,7 @@ Markdown, committed, handed to the agent on every run. It holds:
 
 - per stack: the scanner and the folders it reads; per category: its severity, what the scan established and what it cannot tell;
 - what the scan leaves out on purpose, the idioms it drops, and which stacks or categories are pass-through;
-- a section **"What the auditor needs to know about this project"**: the test tiers and their folders, the gates that already enforce a rule (a type checker over the tests, layout or architecture tests), the names the scanners allowlist, where plans, decisions and the release record live, how long a tombstone lives, the table of test subjects if there is one, the capabilities the scan does not have yet, and the project's own checklist items, tied to its golden fixtures.
+- a section **"What the auditor needs to know about this project"**: the test tiers and their folders, the gates that already enforce a rule (a type checker over the tests, layout or architecture tests), the names the scanners allowlist, where plans, decisions and the release record live, where the owner's recorded rulings on the suite are (the tests an earlier review kept or deleted, and why), how long a tombstone lives, the table of test subjects if there is one, the capabilities the scan does not have yet, and the project's own checklist items, tied to its golden fixtures.
 
 The more of the project's false-positive shapes it names, the fewer findings the agent has to argue from scratch.
 
