@@ -70,6 +70,7 @@ plugins/<set>/
   .claude-plugin/plugin.json
   skills/<skill-name>/…              # git-moved from skills/
   commands/<name>.md                 # where applicable
+  agents/<name>.md                   # Claude Code subagents, where applicable (added 2026-11-17)
   .mcp.json                          # generated from mcp/registry.json
 ```
 
@@ -92,11 +93,13 @@ consolidation, 2 commands):
 ### 2. Flattening contract & global name uniqueness
 
 `install.sh` projects `plugins/*/skills/*` into one **flat** directory per harness
-(`~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`; commands → `~/.claude/commands`).
-Plugin structure is invisible outside Claude. Consequently **skill names must be globally
+(`~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`; commands → `~/.claude/commands`;
+agents → `~/.claude/agents`). Plugin structure is invisible outside Claude. Consequently **skill names must be globally
 unique across all plugins** — guaranteed today by the category-prefix naming convention,
 now an explicit constraint. Cross-skill references are **name-first** (see ADR-0007), never
 cross-plugin relative paths.
+
+Commands and agents are Claude-only: their formats (a slash command; a subagent's `tools` and `model` frontmatter) have no native equivalent the kit projects into Codex or OpenCode, so they are linked for Claude Code alone, follow the same channel rule as skills (§3) and are pruned from `~/.claude` on the marketplace channel. Agent names are globally unique, like skill names. (Agents added 2026-11-17, for the `quality-assurance` auditors.)
 
 ### 3. Activation: harness-native, no kit-side state
 

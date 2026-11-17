@@ -31,10 +31,10 @@ Options:
   -v, --verbose  Print per-item actions.
   -q, --quiet    Suppress normal output; only errors are shown.
   --claude-channel <marketplace|symlink>
-                 Record how THIS machine serves skills/commands to Claude Code
-                 (persisted in var/claude-channel; read by every later run, incl.
+                 Record how THIS machine serves skills/commands/agents to Claude
+                 Code (persisted in var/claude-channel; read by every later run, incl.
                  flag-less chezmoi runs). "marketplace": the kit is consumed via
-                 /plugin — skip ~/.claude/skills + ~/.claude/commands, prune
+                 /plugin — skip ~/.claude/skills, commands and agents, prune
                  kit-owned links there, and refresh the plugin marketplace +
                  installed kit plugins so the /plugin cache tracks the kit's
                  main (one channel per machine, kit ADR-0006 §3).
@@ -133,6 +133,7 @@ else
     log_verbose "Installing globally:"
     log_verbose "  skills   -> $CLAUDE_BASE, $CODEX_BASE, $AGENTS_BASE"
     log_verbose "  commands -> $CLAUDE_BASE"
+    log_verbose "  agents   -> $CLAUDE_BASE"
     log_verbose "  rules    -> $CLAUDE_BASE"
 fi
 
@@ -140,6 +141,8 @@ CLAUDE_SKILLS_TARGET="$CLAUDE_BASE/skills"
 CODEX_SKILLS_TARGET="$CODEX_BASE/skills"
 AGENTS_SKILLS_TARGET="$AGENTS_BASE/skills"
 COMMANDS_TARGET="$CLAUDE_BASE/commands"
+# Claude Code subagents (plugins/*/agents/*.md); Claude-only, like commands (ADR-0006 §2).
+CLAUDE_AGENTS_TARGET="$CLAUDE_BASE/agents"
 RULES_TARGET="$CLAUDE_BASE/rules"
 
 # ── Kit pre-commit gate: point this checkout at .githooks, unless the owner set
@@ -184,7 +187,7 @@ if [[ "$PERSONAL_RULES" == "on" ]]; then
     done
 fi
 
-mkdir -p "$COMMANDS_TARGET" "$RULES_TARGET"
+mkdir -p "$COMMANDS_TARGET" "$CLAUDE_AGENTS_TARGET" "$RULES_TARGET"
 for skills_target in "$CLAUDE_SKILLS_TARGET" "$CODEX_SKILLS_TARGET" "$AGENTS_SKILLS_TARGET"; do
     mkdir -p "$skills_target"
 done
@@ -428,7 +431,7 @@ unchanged_skills=0
 updated_plugins=0
 
 if [[ "$CLAUDE_CHANNEL" == "marketplace" ]]; then
-    log_verbose "Claude channel = marketplace: skipping ~/.claude skills/commands (served by /plugin)"
+    log_verbose "Claude channel = marketplace: skipping ~/.claude skills/commands/agents (served by /plugin)"
     prune_kit_links "$CLAUDE_SKILLS_TARGET" "skill" pruned_skills
     refresh_claude_marketplace
 else
@@ -439,16 +442,22 @@ sync_skills "$CODEX_SKILLS_TARGET" changed_skills pruned_skills unchanged_skills
 prune_legacy_repo_container "$AGENTS_BASE/skills" "$(basename "$SCRIPT_DIR")" pruned_skills
 sync_skills "$AGENTS_SKILLS_TARGET" changed_skills pruned_skills unchanged_skills
 
-# ── Commands and Rules: *.md files symlinked from their source subdir
+# ── Commands, agents and rules: *.md files symlinked from their source subdir
 changed_commands=0; pruned_commands=0; unchanged_commands=0
+changed_agents=0;   pruned_agents=0;   unchanged_agents=0
 changed_rules=0;    pruned_rules=0;    unchanged_rules=0
 
 if [[ "$CLAUDE_CHANNEL" == "marketplace" ]]; then
     prune_kit_links "$COMMANDS_TARGET" "command" pruned_commands
+    prune_kit_links "$CLAUDE_AGENTS_TARGET" "agent" pruned_agents
 else
     for cmd_dir in "$SCRIPT_DIR"/plugins/*/commands; do
         [[ -d "$cmd_dir" ]] || continue
         sync_files "$cmd_dir" "$COMMANDS_TARGET" "command" changed_commands pruned_commands unchanged_commands
+    done
+    for agent_dir in "$SCRIPT_DIR"/plugins/*/agents; do
+        [[ -d "$agent_dir" ]] || continue
+        sync_files "$agent_dir" "$CLAUDE_AGENTS_TARGET" "agent" changed_agents pruned_agents unchanged_agents
     done
 fi
 sync_files "$SCRIPT_DIR/rules"    "$RULES_TARGET"    "rule"    changed_rules    pruned_rules    unchanged_rules
@@ -478,10 +487,10 @@ if [[ -z "$TARGET_ROOT" ]] && command -v python3 >/dev/null 2>&1; then
 fi
 
 if (( !QUIET )); then
-    total_changes=$(( changed_skills + pruned_skills + changed_commands + pruned_commands + changed_rules + pruned_rules + updated_plugins ))
+    total_changes=$(( changed_skills + pruned_skills + changed_commands + pruned_commands + changed_agents + pruned_agents + changed_rules + pruned_rules + updated_plugins ))
     if (( total_changes == 0 )); then
         echo "No changes."
     else
-        echo "Sync complete. skills: $changed_skills changed, $pruned_skills pruned; commands: $changed_commands changed, $pruned_commands pruned; rules: $changed_rules changed, $pruned_rules pruned; plugins: $updated_plugins updated."
+        echo "Sync complete. skills: $changed_skills changed, $pruned_skills pruned; commands: $changed_commands changed, $pruned_commands pruned; agents: $changed_agents changed, $pruned_agents pruned; rules: $changed_rules changed, $pruned_rules pruned; plugins: $updated_plugins updated."
     fi
 fi

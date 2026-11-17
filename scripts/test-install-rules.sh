@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Exercises install.sh's rule layers against a throwaway mini-kit, so no real
+# Exercises install.sh's rule layers and agent links against a throwaway mini-kit, so no real
 # ~/.claude, var/ state or kit file is touched. Run: scripts/test-install-rules.sh
 set -uo pipefail
 
@@ -10,12 +10,15 @@ trap 'rm -rf "$WORK"' EXIT
 KIT="$WORK/kit"
 PROJ="$WORK/proj"
 RULES="$PROJ/.claude/rules"
-mkdir -p "$KIT/rules/personal" "$KIT/plugins/demo/skills/demo-skill" "$PROJ"
+AGENTS="$PROJ/.claude/agents"
+mkdir -p "$KIT/rules/personal" "$KIT/plugins/demo/skills/demo-skill" "$KIT/plugins/demo/agents" "$PROJ"
 cp "$KIT_SRC/install.sh" "$KIT/"
 printf -- '---\ntype: rule\n---\nshared\n' > "$KIT/rules/shared-a.md"
 printf -- '---\ntype: rule\n---\nshared\n' > "$KIT/rules/shared-b.md"
 printf -- '---\ntype: rule\n---\npersonal\n' > "$KIT/rules/personal/mine.md"
 printf -- '---\nname: demo-skill\n---\n' > "$KIT/plugins/demo/skills/demo-skill/SKILL.md"
+printf -- '---\nname: demo-agent\n---\n' > "$KIT/plugins/demo/agents/demo-agent.md"
+printf -- '---\nname: old-agent\n---\n' > "$KIT/plugins/demo/agents/old-agent.md"
 
 failures=0
 check() {
@@ -61,6 +64,13 @@ cp "$KIT/rules/personal/mine.md" "$KIT/rules/mine.md"
 run --personal-rules on > /dev/null; rc=$?
 check "install refuses (non-zero exit)"         test "$rc" -ne 0
 rm "$KIT/rules/mine.md"
+
+echo "agents"
+check "plugin agent linked into .claude/agents" is_link_to "$AGENTS/demo-agent.md" "$KIT/plugins/demo/agents/demo-agent.md"
+rm "$KIT/plugins/demo/agents/old-agent.md"
+run > /dev/null
+check "retired agent's link pruned"             test ! -L "$AGENTS/old-agent.md"
+check "remaining agent still linked"            is_link_to "$AGENTS/demo-agent.md" "$KIT/plugins/demo/agents/demo-agent.md"
 
 echo "invalid value"
 run --personal-rules maybe > /dev/null; rc=$?
