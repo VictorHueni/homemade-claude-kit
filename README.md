@@ -18,7 +18,7 @@ Three design pillars (kit [ADR-0006](docs/architecture/decisions/adr-0006-plugin
 | `strategy` | Business architecture + discovery evidence | `business-vision` · `business-persona` · `business-model-canvas` · `business-capability-map` · `business-value-stream` · `business-objective` · `business-process` · `business-quantitative-model` · `business-competitive-landscape` · `discovery-idea` · `discovery-research` · `discovery-workshop` |
 | `domain-modeling` | Strategic + tactical DDD | `domain-bounded-context` · `domain-glossary` · `domain-model` |
 | `product-spec` | Specs + build planning | `spec-functional-breakdown-structure` · `spec-prd` · `spec-use-case` · `plan-delivery-roadmap` · `plan-slice-design` · `plan-implementation` |
-| `quality-assurance` | Test strategy, scenarios, cases — the validate/test stage | `spec-quality-attributes` · `qa-test-strategy` · `qa-test-scenario` |
+| `quality-assurance` | Test strategy, scenarios, cases — the validate/test stage (+ `loc-auditor` agent) | `spec-quality-attributes` · `qa-test-strategy` · `qa-test-scenario` |
 | `architecture` | Decisions, contracts, diagrams, arc42 | `arch-adr` · `arch-research` · `arch-service-contract` · `arch-cli-contract` · `arch-structurizr` · `arch-c4` · `arch-plantuml` · `arch-uml` · `arch-arc42` |
 | `dev-flow` | Developer workflow (+ `branch-cleanup-audit` command) | `dev-git-init` · `dev-git-commit` · `dev-pr` · `dev-git-worktree` · `dev-release-init` · `dev-stack-guide` · `dev-getting-started` |
 | `agent-loop` | Guide → Verify → Solve agent cycle (+ `ralph-audit` command) | `agent-config` · `agent-grill-me` · `agent-handoff` · `agent-issue-loop` · `agent-peer-review` · `agent-ralph-loop` |
@@ -47,13 +47,13 @@ Per-skill purpose lives in each `plugins/<set>/skills/<name>/SKILL.md` frontmatt
 # then enable the sets you want in /plugin
 ```
 
-Each plugin bundles its skills, commands, hooks and MCP servers (`plugins/<set>/.mcp.json`), so a set toggle carries all of them. **One channel per machine:** after adopting the marketplace, record it once:
+Each plugin bundles its skills, commands, agents, hooks and MCP servers (`plugins/<set>/.mcp.json`), so a set toggle carries all of them. **One channel per machine:** after adopting the marketplace, record it once:
 
 ```bash
 cd ~/projects/homemade-claude-kit && ./install.sh --claude-channel marketplace
 ```
 
-Every later `install.sh` run (including chezmoi's) then skips and prunes the `~/.claude/skills` and `~/.claude/commands` links, and refreshes the plugin cache instead: `claude plugin marketplace update homemade-claude-kit`, then `claude plugin update <set>@homemade-claude-kit` for each installed kit plugin. Without that, a `git pull` never reaches the cache that Claude Code serves. Codex/OpenCode, rules, adapters and MCP are still served. Revert with `--claude-channel symlink`. The choice persists in `var/claude-channel` (per machine, gitignored); `util-toolkit-doctor` warns if both channels end up live.
+Every later `install.sh` run (including chezmoi's) then skips and prunes the `~/.claude/skills`, `~/.claude/commands` and `~/.claude/agents` links, and refreshes the plugin cache instead: `claude plugin marketplace update homemade-claude-kit`, then `claude plugin update <set>@homemade-claude-kit` for each installed kit plugin. Without that, a `git pull` never reaches the cache that Claude Code serves. Codex/OpenCode, rules, adapters and MCP are still served. Revert with `--claude-channel symlink`. The choice persists in `var/claude-channel` (per machine, gitignored); `util-toolkit-doctor` warns if both channels end up live.
 
 ### All harnesses — symlink channel
 
@@ -64,14 +64,14 @@ cd ~/projects/homemade-claude-kit && ./install.sh
 
 A global run:
 
-- symlinks all skills (flat) into `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills` (OpenCode discovers the latter two natively) and commands into `~/.claude/commands`;
+- symlinks all skills (flat) into `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills` (OpenCode discovers the latter two natively) commands into `~/.claude/commands` and agents (Claude Code subagents) into `~/.claude/agents`;
 - symlinks the Claude rules into `~/.claude/rules` (the personal layer only after `--personal-rules on`, see [Rules](#rules));
 - renders the **AGENTS.md adapter** (metamodel routing + behavioural rules, marker-delimited) into `~/.codex/AGENTS.md` and `~/.config/opencode/AGENTS.md`;
 - projects **`mcp/registry.json`** into `~/.codex/config.toml` (`[mcp_servers.*]` marker block) and `opencode.json`'s `mcp` key;
 - enables the official `pyright-lsp`, `typescript-lsp` and `jdtls-lsp` plugins in `~/.claude/settings.json` (only those `enabledPlugins` keys);
 - sets `core.hooksPath` to `.githooks` on the kit checkout unless it already has one (also on project runs).
 
-`./install.sh /path/to/project` installs into a single project instead: skills, commands and rules (the personal layer when it is on), always through symlinks whatever the recorded channel. Re-run after `git pull`: it is idempotent, prunes retired skills, rules and commands, and never touches your content outside its marker blocks.
+`./install.sh /path/to/project` installs into a single project instead: skills, commands, agents and rules (the personal layer when it is on), always through symlinks whatever the recorded channel. Re-run after `git pull`: it is idempotent, prunes retired skills, rules, commands and agents, and never touches your content outside its marker blocks.
 
 ## Update
 
@@ -79,7 +79,7 @@ A global run:
 cd ~/projects/homemade-claude-kit && git pull && ./install.sh   # chezmoi machines do this automatically
 ```
 
-Symlinked skills see the pull at once; the re-run links new skills, rules and commands, prunes retired ones, regenerates the adapters and MCP, and on the marketplace channel refreshes the plugin cache. Start a new session afterwards.
+Symlinked skills see the pull at once; the re-run links new skills, rules, commands and agents, prunes retired ones, regenerates the adapters and MCP, and on the marketplace channel refreshes the plugin cache. Start a new session afterwards.
 
 ---
 
@@ -110,6 +110,10 @@ build the deferred `--sets` activation layer (see the open-items ledger).
 4. A new or removed skill changes the count in this README, `.claude-plugin/marketplace.json`, `index.md` and `AGENTS.md`.
 5. Run `./install.sh` and `bash scripts/audit-skills.sh`.
 6. Commit and push.
+
+## Adding an agent
+
+Claude Code subagents live in `plugins/<set>/agents/<name>.md`, Claude-only like commands (ADR-0006 §2). A file there is loaded as an agent, so an agent's setup guide or contract goes in `plugins/<set>/references/`. Bump the set's version, run `./install.sh`, and check the agent appears in `/agents` in a fresh session.
 
 ## Backlog
 
