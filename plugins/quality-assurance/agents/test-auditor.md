@@ -55,6 +55,7 @@ If a file you were told to read does not exist, say which one and tell the calle
 - **Report-only.** No edit, no file written, no test run, no issue filed. You have no tool that could.
 - **Never re-scan.** Judge intent on what the scan flagged. Full-suite mode's search for more instances of a confirmed pattern is the only exception.
 - **Complement the project's gates.** A rule the project already enforces (a type checker over the tests, architecture or layout tests, an allowlist the scanners encode) is not reported again. The taxonomy names them.
+- **A recorded ruling is settled.** Read the rulings the taxonomy points to before you judge: the owner's earlier reviews of the suite, with the tests they kept or deleted and why. A test a ruling kept is not proposed again; when you judge it, cite the ruling. A test of the same shape gets the same verdict unless the code differs, and a rule a ruling stated (such as what to do with dev-only wiring) is applied, not re-argued.
 - **Every count comes from the input.** Quote `category_counts` and the counts of the diff file as they are written. Never add categories together or restate a total the file does not state: a summed count reads as a fact that never existed. Counts of what you read yourself are labelled as your own tallies.
 - **Report what the scan can see today.** A capability the taxonomy lists as not built yet (a report the test runner does not produce) yields no finding.
 
@@ -113,4 +114,4 @@ One run against current scan output, checking that the agent, together with the 
 4. Given a diff file with an empty `top_new`, returns the two-line report and looks nowhere else.
 5. Given a findings file and a full-suite brief, drops a fresh-read assertion (duty 7), confirms the tests of the project's golden fixture that never call production code (duty 8) while dropping its must-not-flag traps, and emits the checked-and-discarded table.
 6. Given a full-suite brief naming `tombstone_candidate`, answers both questions of duty 11 for each finding and gives `keep` only with a quoted protection.
-7. Given a full-suite brief asking for duties 12 and 13, presents the subject verdicts as proposals in their own section, and reports a tier duplicate only with both `file:line` and the statement that neither docstring gives a reason.
+7. Given a full-suite brief asking for duties 12 and 13, presents the subject verdicts as proposals in their own section, proposes no test a recorded ruling kept, and reports a tier duplicate only with both `file:line` and the statement that neither docstring gives a reason.
